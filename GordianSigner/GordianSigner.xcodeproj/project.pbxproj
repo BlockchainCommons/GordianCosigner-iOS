@@ -3,7 +3,7 @@
 	archiveVersion = 1;
 	classes = {
 	};
-	objectVersion = 50;
+	objectVersion = 52;
 	objects = {
 
 /* Begin PBXBuildFile section */
@@ -16,6 +16,9 @@
 		D0CF1E432522E2140059C541 /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = D0CF1E412522E2140059C541 /* LaunchScreen.storyboard */; };
 		D0CF1E4E2522E2140059C541 /* GordianSignerTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = D0CF1E4D2522E2140059C541 /* GordianSignerTests.swift */; };
 		D0CF1E592522E2140059C541 /* GordianSignerUITests.swift in Sources */ = {isa = PBXBuildFile; fileRef = D0CF1E582522E2140059C541 /* GordianSignerUITests.swift */; };
+		D0CF1E6A2522E5DB0059C541 /* CLibWally.xcframework in Frameworks */ = {isa = PBXBuildFile; fileRef = D0CF1E682522E5DB0059C541 /* CLibWally.xcframework */; };
+		D0CF1E6C2522E5DB0059C541 /* LibWally.xcframework in Frameworks */ = {isa = PBXBuildFile; fileRef = D0CF1E692522E5DB0059C541 /* LibWally.xcframework */; };
+		D0CF1E6D2522E5DB0059C541 /* LibWally.xcframework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = D0CF1E692522E5DB0059C541 /* LibWally.xcframework */; settings = {ATTRIBUTES = (CodeSignOnCopy, ); }; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -35,6 +38,20 @@
 		};
 /* End PBXContainerItemProxy section */
 
+/* Begin PBXCopyFilesBuildPhase section */
+		D0CF1E6E2522E5DB0059C541 /* Embed Frameworks */ = {
+			isa = PBXCopyFilesBuildPhase;
+			buildActionMask = 2147483647;
+			dstPath = "";
+			dstSubfolderSpec = 10;
+			files = (
+				D0CF1E6D2522E5DB0059C541 /* LibWally.xcframework in Embed Frameworks */,
+			);
+			name = "Embed Frameworks";
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXCopyFilesBuildPhase section */
+
 /* Begin PBXFileReference section */
 		D0CF1E302522E20C0059C541 /* GordianSigner.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = GordianSigner.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		D0CF1E332522E20C0059C541 /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
@@ -52,6 +69,8 @@
 		D0CF1E582522E2140059C541 /* GordianSignerUITests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GordianSignerUITests.swift; sourceTree = "<group>"; };
 		D0CF1E5A2522E2140059C541 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		D0CF1E662522E22A0059C541 /* GordianSigner.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = GordianSigner.entitlements; sourceTree = "<group>"; };
+		D0CF1E682522E5DB0059C541 /* CLibWally.xcframework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcframework; name = CLibWally.xcframework; path = ../../BCLibWallySwift/build/CLibWally.xcframework; sourceTree = "<group>"; };
+		D0CF1E692522E5DB0059C541 /* LibWally.xcframework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcframework; name = LibWally.xcframework; path = ../../BCLibWallySwift/build/LibWally.xcframework; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -59,6 +78,8 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				D0CF1E6A2522E5DB0059C541 /* CLibWally.xcframework in Frameworks */,
+				D0CF1E6C2522E5DB0059C541 /* LibWally.xcframework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -86,6 +107,7 @@
 				D0CF1E4C2522E2140059C541 /* GordianSignerTests */,
 				D0CF1E572522E2140059C541 /* GordianSignerUITests */,
 				D0CF1E312522E20C0059C541 /* Products */,
+				D0CF1E672522E5DB0059C541 /* Frameworks */,
 			);
 			sourceTree = "<group>";
 		};
@@ -133,6 +155,15 @@
 			path = GordianSignerUITests;
 			sourceTree = "<group>";
 		};
+		D0CF1E672522E5DB0059C541 /* Frameworks */ = {
+			isa = PBXGroup;
+			children = (
+				D0CF1E682522E5DB0059C541 /* CLibWally.xcframework */,
+				D0CF1E692522E5DB0059C541 /* LibWally.xcframework */,
+			);
+			name = Frameworks;
+			sourceTree = "<group>";
+		};
 /* End PBXGroup section */
 
 /* Begin PBXNativeTarget section */
@@ -143,6 +174,7 @@
 				D0CF1E2C2522E20C0059C541 /* Sources */,
 				D0CF1E2D2522E20C0059C541 /* Frameworks */,
 				D0CF1E2E2522E20C0059C541 /* Resources */,
+				D0CF1E6E2522E5DB0059C541 /* Embed Frameworks */,
 			);
 			buildRules = (
 			);
