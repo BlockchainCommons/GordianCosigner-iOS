@@ -29,13 +29,13 @@ To build GordianSigner-Catalyst you'll need to use the following tools:
 
 This GordianSigner-Catalyst project is either derived from or was inspired by:
 
-- [BlockchainCommons/GordianWallet-iOS](https://github.com/BlockchainCommons/GordianWallet-iOS) — Bitcoin wallet powered by your own node over Tor, by [@Fonta1n3](https://github.com/Fonta1n3) and [BlockchainCommons](https://github.com/BlockchainCommons).
+- [BlockchainCommons/GordianWallet-iOS](https://github.com/BlockchainCommons/GordianWallet-iOS) — Bitcoin wallet powered by your own node over Tor, from [BlockchainCommons](https://github.com/BlockchainCommons).
 
 ### Used with…
 
 These are other projects that work with or leverage GordianSigner-Catalyst:
 
-- [BlockchainCommons/bc-libwally-core](https://github.com/BlockchainCommons/bc-libwally-core) — Used for signing PSBT's offline, by [ElementsProject](https://github.com/ElementsProject).
+- [BlockchainCommons/bc-libwally-core](https://github.com/BlockchainCommons/bc-libwally-core) — Used for signing PSBT's offline, from [ElementsProject](https://github.com/ElementsProject).
 
 - [BlockchainCommons/bc-libwally-swift](https://github.com/BlockchainCommons/bc-libwally-swift) — A swift wrapper built around Libwally-core, from [blockchain](https://github.com/blockchain).
 
