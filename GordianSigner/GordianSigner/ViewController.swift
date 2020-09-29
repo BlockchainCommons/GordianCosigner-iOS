@@ -13,7 +13,14 @@ class ViewController: UIViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
         // Do any additional setup after loading the view.
+        if FirstTime.firstTimeHere() {
+            guard let randomData = "eeyguyegu".data(using: .utf8),
+                let encryptedData = Encryption.encryptData(dataToEncrypt: randomData) else { return }
+            
+            print("encryptedData: \(encryptedData)")
+        }
     }
+
 
 
 }
