@@ -1,0 +1,622 @@
+// !$*UTF8*$!
+{
+	archiveVersion = 1;
+	classes = {
+	};
+	objectVersion = 50;
+	objects = {
+
+/* Begin PBXBuildFile section */
+		D0CF1E342522E20C0059C541 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = D0CF1E332522E20C0059C541 /* AppDelegate.swift */; };
+		D0CF1E362522E20C0059C541 /* SceneDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = D0CF1E352522E20C0059C541 /* SceneDelegate.swift */; };
+		D0CF1E382522E20C0059C541 /* ViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = D0CF1E372522E20C0059C541 /* ViewController.swift */; };
+		D0CF1E3B2522E20C0059C541 /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = D0CF1E392522E20C0059C541 /* Main.storyboard */; };
+		D0CF1E3E2522E20C0059C541 /* GordianSigner.xcdatamodeld in Sources */ = {isa = PBXBuildFile; fileRef = D0CF1E3C2522E20C0059C541 /* GordianSigner.xcdatamodeld */; };
+		D0CF1E402522E2140059C541 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = D0CF1E3F2522E2140059C541 /* Assets.xcassets */; };
+		D0CF1E432522E2140059C541 /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = D0CF1E412522E2140059C541 /* LaunchScreen.storyboard */; };
+		D0CF1E4E2522E2140059C541 /* GordianSignerTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = D0CF1E4D2522E2140059C541 /* GordianSignerTests.swift */; };
+		D0CF1E592522E2140059C541 /* GordianSignerUITests.swift in Sources */ = {isa = PBXBuildFile; fileRef = D0CF1E582522E2140059C541 /* GordianSignerUITests.swift */; };
+/* End PBXBuildFile section */
+
+/* Begin PBXContainerItemProxy section */
+		D0CF1E4A2522E2140059C541 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = D0CF1E282522E20C0059C541 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = D0CF1E2F2522E20C0059C541;
+			remoteInfo = GordianSigner;
+		};
+		D0CF1E552522E2140059C541 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = D0CF1E282522E20C0059C541 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = D0CF1E2F2522E20C0059C541;
+			remoteInfo = GordianSigner;
+		};
+/* End PBXContainerItemProxy section */
+
+/* Begin PBXFileReference section */
+		D0CF1E302522E20C0059C541 /* GordianSigner.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = GordianSigner.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		D0CF1E332522E20C0059C541 /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
+		D0CF1E352522E20C0059C541 /* SceneDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SceneDelegate.swift; sourceTree = "<group>"; };
+		D0CF1E372522E20C0059C541 /* ViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ViewController.swift; sourceTree = "<group>"; };
+		D0CF1E3A2522E20C0059C541 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/Main.storyboard; sourceTree = "<group>"; };
+		D0CF1E3D2522E20C0059C541 /* GordianSigner.xcdatamodel */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcdatamodel; path = GordianSigner.xcdatamodel; sourceTree = "<group>"; };
+		D0CF1E3F2522E2140059C541 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
+		D0CF1E422522E2140059C541 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/LaunchScreen.storyboard; sourceTree = "<group>"; };
+		D0CF1E442522E2140059C541 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		D0CF1E492522E2140059C541 /* GordianSignerTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = GordianSignerTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
+		D0CF1E4D2522E2140059C541 /* GordianSignerTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GordianSignerTests.swift; sourceTree = "<group>"; };
+		D0CF1E4F2522E2140059C541 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		D0CF1E542522E2140059C541 /* GordianSignerUITests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = GordianSignerUITests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
+		D0CF1E582522E2140059C541 /* GordianSignerUITests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GordianSignerUITests.swift; sourceTree = "<group>"; };
+		D0CF1E5A2522E2140059C541 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		D0CF1E662522E22A0059C541 /* GordianSigner.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = GordianSigner.entitlements; sourceTree = "<group>"; };
+/* End PBXFileReference section */
+
+/* Begin PBXFrameworksBuildPhase section */
+		D0CF1E2D2522E20C0059C541 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		D0CF1E462522E2140059C541 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		D0CF1E512522E2140059C541 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXFrameworksBuildPhase section */
+
+/* Begin PBXGroup section */
+		D0CF1E272522E20C0059C541 = {
+			isa = PBXGroup;
+			children = (
+				D0CF1E322522E20C0059C541 /* GordianSigner */,
+				D0CF1E4C2522E2140059C541 /* GordianSignerTests */,
+				D0CF1E572522E2140059C541 /* GordianSignerUITests */,
+				D0CF1E312522E20C0059C541 /* Products */,
+			);
+			sourceTree = "<group>";
+		};
+		D0CF1E312522E20C0059C541 /* Products */ = {
+			isa = PBXGroup;
+			children = (
+				D0CF1E302522E20C0059C541 /* GordianSigner.app */,
+				D0CF1E492522E2140059C541 /* GordianSignerTests.xctest */,
+				D0CF1E542522E2140059C541 /* GordianSignerUITests.xctest */,
+			);
+			name = Products;
+			sourceTree = "<group>";
+		};
+		D0CF1E322522E20C0059C541 /* GordianSigner */ = {
+			isa = PBXGroup;
+			children = (
+				D0CF1E662522E22A0059C541 /* GordianSigner.entitlements */,
+				D0CF1E332522E20C0059C541 /* AppDelegate.swift */,
+				D0CF1E352522E20C0059C541 /* SceneDelegate.swift */,
+				D0CF1E372522E20C0059C541 /* ViewController.swift */,
+				D0CF1E392522E20C0059C541 /* Main.storyboard */,
+				D0CF1E3F2522E2140059C541 /* Assets.xcassets */,
+				D0CF1E412522E2140059C541 /* LaunchScreen.storyboard */,
+				D0CF1E442522E2140059C541 /* Info.plist */,
+				D0CF1E3C2522E20C0059C541 /* GordianSigner.xcdatamodeld */,
+			);
+			path = GordianSigner;
+			sourceTree = "<group>";
+		};
+		D0CF1E4C2522E2140059C541 /* GordianSignerTests */ = {
+			isa = PBXGroup;
+			children = (
+				D0CF1E4D2522E2140059C541 /* GordianSignerTests.swift */,
+				D0CF1E4F2522E2140059C541 /* Info.plist */,
+			);
+			path = GordianSignerTests;
+			sourceTree = "<group>";
+		};
+		D0CF1E572522E2140059C541 /* GordianSignerUITests */ = {
+			isa = PBXGroup;
+			children = (
+				D0CF1E582522E2140059C541 /* GordianSignerUITests.swift */,
+				D0CF1E5A2522E2140059C541 /* Info.plist */,
+			);
+			path = GordianSignerUITests;
+			sourceTree = "<group>";
+		};
+/* End PBXGroup section */
+
+/* Begin PBXNativeTarget section */
+		D0CF1E2F2522E20C0059C541 /* GordianSigner */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = D0CF1E5D2522E2140059C541 /* Build configuration list for PBXNativeTarget "GordianSigner" */;
+			buildPhases = (
+				D0CF1E2C2522E20C0059C541 /* Sources */,
+				D0CF1E2D2522E20C0059C541 /* Frameworks */,
+				D0CF1E2E2522E20C0059C541 /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = GordianSigner;
+			productName = GordianSigner;
+			productReference = D0CF1E302522E20C0059C541 /* GordianSigner.app */;
+			productType = "com.apple.product-type.application";
+		};
+		D0CF1E482522E2140059C541 /* GordianSignerTests */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = D0CF1E602522E2140059C541 /* Build configuration list for PBXNativeTarget "GordianSignerTests" */;
+			buildPhases = (
+				D0CF1E452522E2140059C541 /* Sources */,
+				D0CF1E462522E2140059C541 /* Frameworks */,
+				D0CF1E472522E2140059C541 /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+				D0CF1E4B2522E2140059C541 /* PBXTargetDependency */,
+			);
+			name = GordianSignerTests;
+			productName = GordianSignerTests;
+			productReference = D0CF1E492522E2140059C541 /* GordianSignerTests.xctest */;
+			productType = "com.apple.product-type.bundle.unit-test";
+		};
+		D0CF1E532522E2140059C541 /* GordianSignerUITests */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = D0CF1E632522E2140059C541 /* Build configuration list for PBXNativeTarget "GordianSignerUITests" */;
+			buildPhases = (
+				D0CF1E502522E2140059C541 /* Sources */,
+				D0CF1E512522E2140059C541 /* Frameworks */,
+				D0CF1E522522E2140059C541 /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+				D0CF1E562522E2140059C541 /* PBXTargetDependency */,
+			);
+			name = GordianSignerUITests;
+			productName = GordianSignerUITests;
+			productReference = D0CF1E542522E2140059C541 /* GordianSignerUITests.xctest */;
+			productType = "com.apple.product-type.bundle.ui-testing";
+		};
+/* End PBXNativeTarget section */
+
+/* Begin PBXProject section */
+		D0CF1E282522E20C0059C541 /* Project object */ = {
+			isa = PBXProject;
+			attributes = {
+				LastSwiftUpdateCheck = 1140;
+				LastUpgradeCheck = 1140;
+				ORGANIZATIONNAME = "Blockchain Commons";
+				TargetAttributes = {
+					D0CF1E2F2522E20C0059C541 = {
+						CreatedOnToolsVersion = 11.4.1;
+					};
+					D0CF1E482522E2140059C541 = {
+						CreatedOnToolsVersion = 11.4.1;
+						TestTargetID = D0CF1E2F2522E20C0059C541;
+					};
+					D0CF1E532522E2140059C541 = {
+						CreatedOnToolsVersion = 11.4.1;
+						TestTargetID = D0CF1E2F2522E20C0059C541;
+					};
+				};
+			};
+			buildConfigurationList = D0CF1E2B2522E20C0059C541 /* Build configuration list for PBXProject "GordianSigner" */;
+			compatibilityVersion = "Xcode 9.3";
+			developmentRegion = en;
+			hasScannedForEncodings = 0;
+			knownRegions = (
+				en,
+				Base,
+			);
+			mainGroup = D0CF1E272522E20C0059C541;
+			productRefGroup = D0CF1E312522E20C0059C541 /* Products */;
+			projectDirPath = "";
+			projectRoot = "";
+			targets = (
+				D0CF1E2F2522E20C0059C541 /* GordianSigner */,
+				D0CF1E482522E2140059C541 /* GordianSignerTests */,
+				D0CF1E532522E2140059C541 /* GordianSignerUITests */,
+			);
+		};
+/* End PBXProject section */
+
+/* Begin PBXResourcesBuildPhase section */
+		D0CF1E2E2522E20C0059C541 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				D0CF1E432522E2140059C541 /* LaunchScreen.storyboard in Resources */,
+				D0CF1E402522E2140059C541 /* Assets.xcassets in Resources */,
+				D0CF1E3B2522E20C0059C541 /* Main.storyboard in Resources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		D0CF1E472522E2140059C541 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		D0CF1E522522E2140059C541 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXResourcesBuildPhase section */
+
+/* Begin PBXSourcesBuildPhase section */
+		D0CF1E2C2522E20C0059C541 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				D0CF1E382522E20C0059C541 /* ViewController.swift in Sources */,
+				D0CF1E342522E20C0059C541 /* AppDelegate.swift in Sources */,
+				D0CF1E3E2522E20C0059C541 /* GordianSigner.xcdatamodeld in Sources */,
+				D0CF1E362522E20C0059C541 /* SceneDelegate.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		D0CF1E452522E2140059C541 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				D0CF1E4E2522E2140059C541 /* GordianSignerTests.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		D0CF1E502522E2140059C541 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				D0CF1E592522E2140059C541 /* GordianSignerUITests.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXSourcesBuildPhase section */
+
+/* Begin PBXTargetDependency section */
+		D0CF1E4B2522E2140059C541 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = D0CF1E2F2522E20C0059C541 /* GordianSigner */;
+			targetProxy = D0CF1E4A2522E2140059C541 /* PBXContainerItemProxy */;
+		};
+		D0CF1E562522E2140059C541 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = D0CF1E2F2522E20C0059C541 /* GordianSigner */;
+			targetProxy = D0CF1E552522E2140059C541 /* PBXContainerItemProxy */;
+		};
+/* End PBXTargetDependency section */
+
+/* Begin PBXVariantGroup section */
+		D0CF1E392522E20C0059C541 /* Main.storyboard */ = {
+			isa = PBXVariantGroup;
+			children = (
+				D0CF1E3A2522E20C0059C541 /* Base */,
+			);
+			name = Main.storyboard;
+			sourceTree = "<group>";
+		};
+		D0CF1E412522E2140059C541 /* LaunchScreen.storyboard */ = {
+			isa = PBXVariantGroup;
+			children = (
+				D0CF1E422522E2140059C541 /* Base */,
+			);
+			name = LaunchScreen.storyboard;
+			sourceTree = "<group>";
+		};
+/* End PBXVariantGroup section */
+
+/* Begin XCBuildConfiguration section */
+		D0CF1E5B2522E2140059C541 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++14";
+				CLANG_CXX_LIBRARY = "libc++";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_ENABLE_OBJC_WEAK = YES;
+				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_COMMA = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INFINITE_RECURSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
+				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
+				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
+				CLANG_WARN_STRICT_PROTOTYPES = YES;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
+				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				COPY_PHASE_STRIP = NO;
+				DEBUG_INFORMATION_FORMAT = dwarf;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				ENABLE_TESTABILITY = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu11;
+				GCC_DYNAMIC_NO_PIC = NO;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_OPTIMIZATION_LEVEL = 0;
+				GCC_PREPROCESSOR_DEFINITIONS = (
+					"DEBUG=1",
+					"$(inherited)",
+				);
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 13.4;
+				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
+				MTL_FAST_MATH = YES;
+				ONLY_ACTIVE_ARCH = YES;
+				SDKROOT = iphoneos;
+				SWIFT_ACTIVE_COMPILATION_CONDITIONS = DEBUG;
+				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
+			};
+			name = Debug;
+		};
+		D0CF1E5C2522E2140059C541 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++14";
+				CLANG_CXX_LIBRARY = "libc++";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_ENABLE_OBJC_WEAK = YES;
+				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_COMMA = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INFINITE_RECURSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
+				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
+				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
+				CLANG_WARN_STRICT_PROTOTYPES = YES;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
+				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				COPY_PHASE_STRIP = NO;
+				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				ENABLE_NS_ASSERTIONS = NO;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu11;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 13.4;
+				MTL_ENABLE_DEBUG_INFO = NO;
+				MTL_FAST_MATH = YES;
+				SDKROOT = iphoneos;
+				SWIFT_COMPILATION_MODE = wholemodule;
+				SWIFT_OPTIMIZATION_LEVEL = "-O";
+				VALIDATE_PRODUCT = YES;
+			};
+			name = Release;
+		};
+		D0CF1E5E2522E2140059C541 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				CODE_SIGN_ENTITLEMENTS = GordianSigner/GordianSigner.entitlements;
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 0.0.1;
+				DEVELOPMENT_TEAM = YZHG975W3A;
+				INFOPLIST_FILE = GordianSigner/Info.plist;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+				);
+				MARKETING_VERSION = 0.0.1;
+				PRODUCT_BUNDLE_IDENTIFIER = com.blockchaincommons.GordianSigner;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SUPPORTS_MACCATALYST = YES;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Debug;
+		};
+		D0CF1E5F2522E2140059C541 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				CODE_SIGN_ENTITLEMENTS = GordianSigner/GordianSigner.entitlements;
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 0.0.1;
+				DEVELOPMENT_TEAM = YZHG975W3A;
+				INFOPLIST_FILE = GordianSigner/Info.plist;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+				);
+				MARKETING_VERSION = 0.0.1;
+				PRODUCT_BUNDLE_IDENTIFIER = com.blockchaincommons.GordianSigner;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SUPPORTS_MACCATALYST = YES;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Release;
+		};
+		D0CF1E612522E2140059C541 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = YES;
+				BUNDLE_LOADER = "$(TEST_HOST)";
+				CODE_SIGN_STYLE = Automatic;
+				DEVELOPMENT_TEAM = YZHG975W3A;
+				INFOPLIST_FILE = GordianSignerTests/Info.plist;
+				IPHONEOS_DEPLOYMENT_TARGET = 13.4;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+					"@loader_path/Frameworks",
+				);
+				PRODUCT_BUNDLE_IDENTIFIER = com.blockchaincommons.GordianSignerTests;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/GordianSigner.app/GordianSigner";
+			};
+			name = Debug;
+		};
+		D0CF1E622522E2140059C541 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = YES;
+				BUNDLE_LOADER = "$(TEST_HOST)";
+				CODE_SIGN_STYLE = Automatic;
+				DEVELOPMENT_TEAM = YZHG975W3A;
+				INFOPLIST_FILE = GordianSignerTests/Info.plist;
+				IPHONEOS_DEPLOYMENT_TARGET = 13.4;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+					"@loader_path/Frameworks",
+				);
+				PRODUCT_BUNDLE_IDENTIFIER = com.blockchaincommons.GordianSignerTests;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/GordianSigner.app/GordianSigner";
+			};
+			name = Release;
+		};
+		D0CF1E642522E2140059C541 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = YES;
+				CODE_SIGN_STYLE = Automatic;
+				DEVELOPMENT_TEAM = YZHG975W3A;
+				INFOPLIST_FILE = GordianSignerUITests/Info.plist;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+					"@loader_path/Frameworks",
+				);
+				PRODUCT_BUNDLE_IDENTIFIER = com.blockchaincommons.GordianSignerUITests;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+				TEST_TARGET_NAME = GordianSigner;
+			};
+			name = Debug;
+		};
+		D0CF1E652522E2140059C541 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = YES;
+				CODE_SIGN_STYLE = Automatic;
+				DEVELOPMENT_TEAM = YZHG975W3A;
+				INFOPLIST_FILE = GordianSignerUITests/Info.plist;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+					"@loader_path/Frameworks",
+				);
+				PRODUCT_BUNDLE_IDENTIFIER = com.blockchaincommons.GordianSignerUITests;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+				TEST_TARGET_NAME = GordianSigner;
+			};
+			name = Release;
+		};
+/* End XCBuildConfiguration section */
+
+/* Begin XCConfigurationList section */
+		D0CF1E2B2522E20C0059C541 /* Build configuration list for PBXProject "GordianSigner" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				D0CF1E5B2522E2140059C541 /* Debug */,
+				D0CF1E5C2522E2140059C541 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		D0CF1E5D2522E2140059C541 /* Build configuration list for PBXNativeTarget "GordianSigner" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				D0CF1E5E2522E2140059C541 /* Debug */,
+				D0CF1E5F2522E2140059C541 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		D0CF1E602522E2140059C541 /* Build configuration list for PBXNativeTarget "GordianSignerTests" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				D0CF1E612522E2140059C541 /* Debug */,
+				D0CF1E622522E2140059C541 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		D0CF1E632522E2140059C541 /* Build configuration list for PBXNativeTarget "GordianSignerUITests" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				D0CF1E642522E2140059C541 /* Debug */,
+				D0CF1E652522E2140059C541 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+/* End XCConfigurationList section */
+
+/* Begin XCVersionGroup section */
+		D0CF1E3C2522E20C0059C541 /* GordianSigner.xcdatamodeld */ = {
+			isa = XCVersionGroup;
+			children = (
+				D0CF1E3D2522E20C0059C541 /* GordianSigner.xcdatamodel */,
+			);
+			currentVersion = D0CF1E3D2522E20C0059C541 /* GordianSigner.xcdatamodel */;
+			path = GordianSigner.xcdatamodeld;
+			sourceTree = "<group>";
+			versionGroupType = wrapper.xcdatamodel;
+		};
+/* End XCVersionGroup section */
+	};
+	rootObject = D0CF1E282522E20C0059C541 /* Project object */;
+}
