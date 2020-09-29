@@ -2,12 +2,6 @@
 
 **GordianSigner-Catalyst** is an offline proof of concept PSBT signing tool for your iOS and OSX device.
 
-## Additional Information
-
-The following files contain…
-
-* `$ListOfEssentialDocs`
-
 ## Status - Active Development
 
 GordianSigner-Catalyst is currently under active development. It should not be used for production tasks until it has had further testing and auditing.
