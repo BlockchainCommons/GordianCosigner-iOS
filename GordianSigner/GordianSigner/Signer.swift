@@ -39,44 +39,43 @@ class Signer {
                 }
             }
             
-            
             guard xprvsToSignWith.count > 0  else { return }
-                var signableKeys = [String]()
+            var signableKeys = [String]()
             
-                for (i, key) in xprvsToSignWith.enumerated() {
-                    let inputs = psbtToSign.inputs
-                    
-                    for (x, input) in inputs.enumerated() {
-                        /// Create an array of child keys that we know can sign our inputs.
-                        if let origins: [PubKey : KeyOrigin] = input.canSign(key) {
-                            for origin in origins {
-                                if let childKey = try? key.derive(origin.value.path) {
-                                    if let privKey = childKey.privKey {
-                                        precondition(privKey.pubKey == origin.key)
-                                        signableKeys.append(privKey.wif)
-                                    }
-                                }
-                            }
-                        }
-                        
-                        /// Once the above loops complete we remove an duplicate signing keys from the array then sign the psbt with each unique key.
-                        if i + 1 == xprvsToSignWith.count && x + 1 == inputs.count {
-                            let uniqueSigners = Array(Set(signableKeys))
-                            
-                            guard uniqueSigners.count > 0 else { return }
-                            
-                            for (s, signer) in uniqueSigners.enumerated() {
-                                guard let signingKey = Key(signer, .testnet) else { return }
-                                
-                                psbtToSign.sign(signingKey)
-                                /// Once we completed the signing loop we finalize with our node.
-                                if s + 1 == uniqueSigners.count {
-                                    //finalizeWithBitcoind()
+            for (i, key) in xprvsToSignWith.enumerated() {
+                let inputs = psbtToSign.inputs
+                
+                for (x, input) in inputs.enumerated() {
+                    /// Create an array of child keys that we know can sign our inputs.
+                    if let origins: [PubKey : KeyOrigin] = input.canSign(key) {
+                        for origin in origins {
+                            if let childKey = try? key.derive(origin.value.path) {
+                                if let privKey = childKey.privKey {
+                                    precondition(privKey.pubKey == origin.key)
+                                    signableKeys.append(privKey.wif)
                                 }
                             }
                         }
                     }
+                    
+                    /// Once the above loops complete we remove an duplicate signing keys from the array then sign the psbt with each unique key.
+                    if i + 1 == xprvsToSignWith.count && x + 1 == inputs.count {
+                        let uniqueSigners = Array(Set(signableKeys))
+                        
+                        guard uniqueSigners.count > 0 else { return }
+                        
+                        for (s, signer) in uniqueSigners.enumerated() {
+                            guard let signingKey = Key(signer, .testnet) else { return }
+                            
+                            psbtToSign.sign(signingKey)
+                            /// Once we completed the signing loop we finalize with our node.
+                            if s + 1 == uniqueSigners.count {
+                                //finalizeWithBitcoind()
+                            }
+                        }
+                    }
                 }
+            }
         }
         
         /// Fetch keys to sign with

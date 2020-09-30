@@ -12,16 +12,14 @@ class ViewController: UIViewController {
 
     override func viewDidLoad() {
         super.viewDidLoad()
-        // Do any additional setup after loading the view.
         if FirstTime.firstTimeHere() {
-            guard let randomData = "eeyguyegu".data(using: .utf8),
-                let encryptedData = Encryption.encryptData(dataToEncrypt: randomData) else { return }
             
-            print("encryptedData: \(encryptedData)")
+        } else {
+            showAlert(self, "Error", "We could not set your master encryption key to the keychain. Please raise an issue on our Github repo.")
         }
     }
 
-
+    
 
 }
 
