@@ -17,7 +17,7 @@ enum Encryption {
         var decryptedSeeds:[String] = []
         
         for seed in encryptedSeeds {
-            guard let decryptedSeed = Encryption.decryptData(dataToDecrypt: seed),
+            guard let decryptedSeed = Encryption.decrypt(seed),
                 let words = String(data: decryptedSeed, encoding: .utf8) else { return nil }
             
             decryptedSeeds.append(words)
@@ -30,15 +30,15 @@ enum Encryption {
         return P256.Signing.PrivateKey().rawRepresentation
     }
     
-    static func encryptData(dataToEncrypt: Data) -> Data? {
+    static func encrypt(_ data: Data) -> Data? {
         guard let key = KeyChain.getData("privateKey") else { return nil }
                 
-        return try? ChaChaPoly.seal(dataToEncrypt, using: SymmetricKey(data: key)).combined
+        return try? ChaChaPoly.seal(data, using: SymmetricKey(data: key)).combined
     }
     
-    static func decryptData(dataToDecrypt: Data) -> Data? {
+    static func decrypt(_ data: Data) -> Data? {
         guard let key = KeyChain.getData("privateKey"),
-            let box = try? ChaChaPoly.SealedBox.init(combined: dataToDecrypt) else { return nil }
+            let box = try? ChaChaPoly.SealedBox.init(combined: data) else { return nil }
                 
         return try? ChaChaPoly.open(box, using: SymmetricKey(data: key))
     }

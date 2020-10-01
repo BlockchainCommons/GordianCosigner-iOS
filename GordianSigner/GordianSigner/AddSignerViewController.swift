@@ -35,6 +35,18 @@ class AddSignerViewController: UIViewController {
         bip39Words = Bip39Words.valid
     }
     
+    @IBAction func addSignerAction(_ sender: Any) {
+        guard let mnemonic = BIP39Mnemonic(justWords.joined(separator: " ")),
+            let data = (mnemonic.description).data(using: .utf8),
+            let encryptedData = Encryption.encrypt(data),
+            KeyChain.saveNewSeed(encryptedData) else {
+                showAlert(self, "Error ⚠️", "Something went wrong, your seed words were not saved!")
+                return
+        }
+        
+        showAlert(self, "Seed words encrypted and saved 🔐", "")
+    }
+    
     @IBAction func removeWordAction(_ sender: Any) {
         guard self.justWords.count > 0 else { return }
         
