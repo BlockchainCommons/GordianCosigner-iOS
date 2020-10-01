@@ -30,3 +30,10 @@ public func showAlert(_ vc: UIViewController?, _ title: String, _ message: Strin
         }
     }
 }
+
+public extension String {
+    func condenseWhitespace() -> String {
+        let components = self.components(separatedBy: .whitespacesAndNewlines)
+        return components.filter { !$0.isEmpty }.joined(separator: " ")
+    }
+}
