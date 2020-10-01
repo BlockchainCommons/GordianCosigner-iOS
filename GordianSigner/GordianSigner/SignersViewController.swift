@@ -82,19 +82,13 @@ extension SignersViewController: UITableViewDataSource {
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         let cell = tableView.dequeueReusableCell(withIdentifier: "signerCell", for: indexPath)
         let label = cell.viewWithTag(1) as! UILabel
-        //let chevron = cell.viewWithTag(2) as! UIButton
         let imageView = cell.viewWithTag(3) as! UIImageView
         let backgroundView = cell.viewWithTag(4)!
         
         cell.selectionStyle = .none
         
         label.text = fingeprints[indexPath.section]
-        
-        //            chevron.tag = indexPath.section
-        //            chevron.addTarget(self, action: #selector(seeSignerDetail(_:)), for: .touchUpInside)
-        //            chevron.alpha = 0
-        
-        //imageView.image = UIImage(systemName: "pencil.and.ellipsis.rectangle")
+    
         imageView.tintColor = .white
         
         backgroundView.clipsToBounds = true

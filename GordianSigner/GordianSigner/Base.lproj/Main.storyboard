@@ -121,6 +121,7 @@
                         <subviews>
                             <imageView clipsSubviews="YES" userInteractionEnabled="NO" contentMode="scaleAspectFit" horizontalHuggingPriority="251" verticalHuggingPriority="251" image="pencil.and.ellipsis.rectangle" catalog="system" translatesAutoresizingMaskIntoConstraints="NO" id="1HM-F4-pEG">
                                 <rect key="frame" x="16" y="104" width="40" height="38.5"/>
+                                <color key="tintColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                                 <constraints>
                                     <constraint firstAttribute="width" constant="40" id="Y1l-cd-L1T"/>
                                     <constraint firstAttribute="height" constant="40" id="aet-Jv-xa3"/>
@@ -139,20 +140,11 @@
                                             <autoresizingMask key="autoresizingMask"/>
                                             <subviews>
                                                 <label opaque="NO" userInteractionEnabled="NO" tag="1" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Label" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="1T8-s8-d0S">
-                                                    <rect key="frame" x="58" y="16.5" width="282" height="21"/>
+                                                    <rect key="frame" x="58" y="16.5" width="42" height="21"/>
                                                     <fontDescription key="fontDescription" type="system" pointSize="17"/>
                                                     <color key="textColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                                                     <nil key="highlightedColor"/>
                                                 </label>
-                                                <button opaque="NO" tag="2" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="vmV-Go-R0O">
-                                                    <rect key="frame" x="341" y="17" width="20" height="20"/>
-                                                    <constraints>
-                                                        <constraint firstAttribute="height" constant="20" id="Dq5-KI-Scq"/>
-                                                        <constraint firstAttribute="width" constant="20" id="a8K-oV-RHz"/>
-                                                    </constraints>
-                                                    <color key="tintColor" white="0.33333333329999998" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
-                                                    <state key="normal" image="chevron.right" catalog="system"/>
-                                                </button>
                                                 <view tag="4" contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="C7k-Ui-wk9">
                                                     <rect key="frame" x="15" y="9.5" width="35" height="35"/>
                                                     <subviews>
@@ -175,12 +167,9 @@
                                                 </view>
                                             </subviews>
                                             <constraints>
-                                                <constraint firstItem="vmV-Go-R0O" firstAttribute="centerY" secondItem="gEg-ib-tlG" secondAttribute="centerY" id="4OL-8z-9bk"/>
                                                 <constraint firstItem="C7k-Ui-wk9" firstAttribute="leading" secondItem="gEg-ib-tlG" secondAttribute="leading" constant="15" id="KS1-MM-NPA"/>
                                                 <constraint firstItem="C7k-Ui-wk9" firstAttribute="centerY" secondItem="gEg-ib-tlG" secondAttribute="centerY" id="Yo7-8L-qWe"/>
-                                                <constraint firstAttribute="trailing" secondItem="vmV-Go-R0O" secondAttribute="trailing" constant="13" id="ZPF-Dn-a1c"/>
                                                 <constraint firstItem="1T8-s8-d0S" firstAttribute="leading" secondItem="C7k-Ui-wk9" secondAttribute="trailing" constant="8" id="qtD-cy-k9G"/>
-                                                <constraint firstItem="vmV-Go-R0O" firstAttribute="leading" secondItem="1T8-s8-d0S" secondAttribute="trailing" constant="1" id="rdn-Em-YyS"/>
                                                 <constraint firstItem="1T8-s8-d0S" firstAttribute="centerY" secondItem="gEg-ib-tlG" secondAttribute="centerY" id="vag-3E-A7l"/>
                                             </constraints>
                                         </tableViewCellContentView>
@@ -337,8 +326,7 @@
         </scene>
     </scenes>
     <resources>
-        <image name="Fingerprint" width="256" height="256"/>
-        <image name="chevron.right" catalog="system" width="96" height="128"/>
+        <image name="Fingerprint" width="128" height="128"/>
         <image name="doc.on.clipboard" catalog="system" width="117" height="128"/>
         <image name="minus.rectangle" catalog="system" width="128" height="93"/>
         <image name="pencil.and.ellipsis.rectangle" catalog="system" width="128" height="81"/>

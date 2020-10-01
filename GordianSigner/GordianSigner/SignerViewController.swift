@@ -7,6 +7,7 @@
 //
 
 import UIKit
+import LibWally
 
 class SignerViewController: UIViewController {
 
@@ -31,11 +32,35 @@ class SignerViewController: UIViewController {
     }
     
     @IBAction func pasteAction(_ sender: Any) {
+        guard let text = UIPasteboard.general.string else { return }
+        psbtValid(text)
     }
     
     @IBAction func seeSignerAction(_ sender: Any) {
         DispatchQueue.main.async { [weak self] in
             self?.performSegue(withIdentifier: "segueToSigners", sender: self)
+        }
+    }
+    
+    private func psbtValid(_ string: String) {
+        do {
+            let psbt = try PSBT(string, .testnet)
+            
+            setTextView(psbt.description)
+            
+            showAlert(self, "Valid psbt ✅", "You can tap the \"sign now\" button to sign this psbt")
+        } catch {
+            setTextView("")
+            
+            showAlert(self, "⚠️ Error!", "Invalid psbt")
+        }
+    }
+    
+    private func setTextView(_ text: String) {
+        DispatchQueue.main.async { [weak self] in
+            guard let self = self else { return }
+            
+            self.textView.text = text
         }
     }
     
