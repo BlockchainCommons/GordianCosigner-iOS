@@ -12,10 +12,17 @@ class SignersViewController: UIViewController {
 
     @IBOutlet weak private var tableView: UITableView!
     
+    var fingeprints = [String]()
+    
     override func viewDidLoad() {
         super.viewDidLoad()
 
         // Do any additional setup after loading the view.
+        
+    }
+    
+    override func viewDidAppear(_ animated: Bool) {
+        loadData()
     }
     
     @IBAction func addSigner(_ sender: Any) {
@@ -26,6 +33,19 @@ class SignersViewController: UIViewController {
     
     @objc func seeSignerDetail(_ sender: UIButton) {
         
+    }
+    
+    private func loadData() {
+        fingeprints.removeAll()
+        guard let signers = Encryption.decryptedSeeds(), signers.count > 0 else { return }
+        for signer in signers {
+            guard let masterKey = Keys.masterKey(signer, ""),
+                let fingerprint = Keys.fingerprint(masterKey) else {
+                    return
+            }
+            fingeprints.append(fingerprint)
+        }
+        tableView.reloadData()
     }
     
 
@@ -51,6 +71,10 @@ extension SignersViewController: UITableViewDelegate {
 
 extension SignersViewController: UITableViewDataSource {
     
+    func numberOfSections(in tableView: UITableView) -> Int {
+        return fingeprints.count
+    }
+    
     func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
         return 1
     }
@@ -58,22 +82,24 @@ extension SignersViewController: UITableViewDataSource {
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         let cell = tableView.dequeueReusableCell(withIdentifier: "signerCell", for: indexPath)
         let label = cell.viewWithTag(1) as! UILabel
-        let chevron = cell.viewWithTag(2) as! UIButton
+        //let chevron = cell.viewWithTag(2) as! UIButton
         let imageView = cell.viewWithTag(3) as! UIImageView
         let backgroundView = cell.viewWithTag(4)!
         
-        label.text = "some label"
+        cell.selectionStyle = .none
         
-        chevron.tag = indexPath.section
-        chevron.addTarget(self, action: #selector(seeSignerDetail(_:)), for: .touchUpInside)
+        label.text = fingeprints[indexPath.section]
         
-        imageView.image = UIImage(systemName: "pencil.and.ellipsis.rectangle")
+        //            chevron.tag = indexPath.section
+        //            chevron.addTarget(self, action: #selector(seeSignerDetail(_:)), for: .touchUpInside)
+        //            chevron.alpha = 0
+        
+        //imageView.image = UIImage(systemName: "pencil.and.ellipsis.rectangle")
         imageView.tintColor = .white
         
         backgroundView.clipsToBounds = true
         backgroundView.layer.cornerRadius = 5
         backgroundView.backgroundColor = .systemBlue
-        
         return cell
     }
     

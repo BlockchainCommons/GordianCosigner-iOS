@@ -11,6 +11,7 @@
 		D04B029A2524A18100C249B8 /* SignersViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = D04B02992524A18100C249B8 /* SignersViewController.swift */; };
 		D04B029C2524A9F800C249B8 /* AddSignerViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = D04B029B2524A9F800C249B8 /* AddSignerViewController.swift */; };
 		D0B4DDD725258B25009C8624 /* Bip39Words.swift in Sources */ = {isa = PBXBuildFile; fileRef = D0B4DDD625258B25009C8624 /* Bip39Words.swift */; };
+		D0B4DDD92525AC18009C8624 /* whiteFingerPrint.png in Resources */ = {isa = PBXBuildFile; fileRef = D0B4DDD82525AC18009C8624 /* whiteFingerPrint.png */; };
 		D0CF1E342522E20C0059C541 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = D0CF1E332522E20C0059C541 /* AppDelegate.swift */; };
 		D0CF1E362522E20C0059C541 /* SceneDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = D0CF1E352522E20C0059C541 /* SceneDelegate.swift */; };
 		D0CF1E382522E20C0059C541 /* ViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = D0CF1E372522E20C0059C541 /* ViewController.swift */; };
@@ -67,6 +68,7 @@
 		D04B02992524A18100C249B8 /* SignersViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SignersViewController.swift; sourceTree = "<group>"; };
 		D04B029B2524A9F800C249B8 /* AddSignerViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AddSignerViewController.swift; sourceTree = "<group>"; };
 		D0B4DDD625258B25009C8624 /* Bip39Words.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Bip39Words.swift; sourceTree = "<group>"; };
+		D0B4DDD82525AC18009C8624 /* whiteFingerPrint.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = whiteFingerPrint.png; sourceTree = "<group>"; };
 		D0CF1E302522E20C0059C541 /* GordianSigner.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = GordianSigner.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		D0CF1E332522E20C0059C541 /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
 		D0CF1E352522E20C0059C541 /* SceneDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SceneDelegate.swift; sourceTree = "<group>"; };
@@ -144,6 +146,7 @@
 		D0CF1E322522E20C0059C541 /* GordianSigner */ = {
 			isa = PBXGroup;
 			children = (
+				D0B4DDD82525AC18009C8624 /* whiteFingerPrint.png */,
 				D0CF1E662522E22A0059C541 /* GordianSigner.entitlements */,
 				D0CF1E332522E20C0059C541 /* AppDelegate.swift */,
 				D0CF1E352522E20C0059C541 /* SceneDelegate.swift */,
@@ -307,6 +310,7 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				D0B4DDD92525AC18009C8624 /* whiteFingerPrint.png in Resources */,
 				D0CF1E432522E2140059C541 /* LaunchScreen.storyboard in Resources */,
 				D0CF1E402522E2140059C541 /* Assets.xcassets in Resources */,
 				D0CF1E3B2522E20C0059C541 /* Main.storyboard in Resources */,

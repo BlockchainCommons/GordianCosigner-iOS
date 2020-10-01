@@ -83,7 +83,7 @@ class Signer {
             xprvsToSignWith.removeAll()
             
             for (i, words) in seedsToSignWith.enumerated() {
-                guard let masterKey = Keys.masterKey(words: words, passphrase: ""),
+                guard let masterKey = Keys.masterKey(words, ""),
                     let hdkey = HDKey(masterKey) else { return }
                 
                 xprvsToSignWith.append(hdkey)

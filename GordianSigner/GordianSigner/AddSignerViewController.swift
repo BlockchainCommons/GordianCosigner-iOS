@@ -45,6 +45,12 @@ class AddSignerViewController: UIViewController {
         }
         
         showAlert(self, "Seed words encrypted and saved 🔐", "")
+        textField.text = ""
+        addedWords.removeAll()
+        justWords.removeAll()
+        bip39Words.removeAll()
+        label.text = ""
+        navigationController?.popViewController(animated: true)
     }
     
     @IBAction func removeWordAction(_ sender: Any) {

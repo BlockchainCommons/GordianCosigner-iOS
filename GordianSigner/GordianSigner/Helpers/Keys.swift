@@ -11,7 +11,7 @@ import LibWally
 
 enum Keys {
     
-    static func masterKey(words: String, passphrase: String) -> String? {
+    static func masterKey(_ words: String, _ passphrase: String) -> String? {
         guard let mnemonic = BIP39Mnemonic(words) else { return nil }
         
         let seedHex = mnemonic.seedHex(passphrase)
@@ -19,6 +19,12 @@ enum Keys {
         guard let hdMasterKey = HDKey(seedHex, .testnet) else { return nil }
         
         return hdMasterKey.xpriv
+    }
+    
+    static func fingerprint(_ masterKey: String) -> String? {
+        guard let hdMasterKey = HDKey(masterKey) else { return nil }
+        
+        return hdMasterKey.fingerprint.hexString
     }
     
 }
