@@ -13,26 +13,27 @@ class SignersViewController: UIViewController {
     @IBOutlet weak private var tableView: UITableView!
     
     var fingeprints = [String]()
+    var addButton = UIBarButtonItem()
+    var editButton = UIBarButtonItem()
     
     override func viewDidLoad() {
         super.viewDidLoad()
-
-        // Do any additional setup after loading the view.
         
+        addButton.tintColor = .systemTeal
+        editButton.tintColor = .systemTeal
+        addButton = UIBarButtonItem.init(barButtonSystemItem: .add, target: self, action: #selector(add))
+        editButton = UIBarButtonItem.init(barButtonSystemItem: .edit, target: self, action: #selector(editSigners))
+        self.navigationItem.setRightBarButtonItems([addButton, editButton], animated: true)
     }
     
     override func viewDidAppear(_ animated: Bool) {
         loadData()
     }
     
-    @IBAction func addSigner(_ sender: Any) {
+    @objc func add() {
         DispatchQueue.main.async { [weak self] in
             self?.performSegue(withIdentifier: "segueToAddASigner", sender: self)
         }
-    }
-    
-    @objc func seeSignerDetail(_ sender: UIButton) {
-        
     }
     
     private func loadData() {
@@ -48,16 +49,77 @@ class SignersViewController: UIViewController {
         tableView.reloadData()
     }
     
-
-    /*
-    // MARK: - Navigation
-
-    // In a storyboard-based application, you will often want to do a little preparation before navigation
-    override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
-        // Get the new view controller using segue.destination.
-        // Pass the selected object to the new view controller.
+    @objc func editSigners() {
+        tableView.setEditing(!tableView.isEditing, animated: true)
+        
+        if tableView.isEditing {
+            editButton = UIBarButtonItem(title: "Done", style: .plain, target: self, action: #selector(editSigners))
+        } else {
+            editButton = UIBarButtonItem(title: "Edit", style: .plain, target: self, action: #selector(editSigners))
+        }
+        
+        self.navigationItem.setRightBarButtonItems([addButton, editButton], animated: true)
     }
-    */
+    
+    @objc func deleteSeed(_ xfp: String) {
+        DispatchQueue.main.async { [weak self] in
+            guard let self = self else { return }
+            
+            var alertStyle = UIAlertController.Style.actionSheet
+            if (UIDevice.current.userInterfaceIdiom == .pad) {
+              alertStyle = UIAlertController.Style.alert
+            }
+            
+            let alert = UIAlertController(title: "Delete signer?", message: "This action is undoable! The signer will be gone forever.", preferredStyle: alertStyle)
+            
+            alert.addAction(UIAlertAction(title: "Delete", style: .destructive, handler: { action in
+                self.deleteSeedNow(xfp)
+            }))
+            
+            alert.addAction(UIAlertAction(title: "Cancel", style: .cancel, handler: { action in }))
+            alert.popoverPresentationController?.sourceView = self.view
+            self.present(alert, animated: true, completion: nil)
+        }
+    }
+    
+    private func deleteSeedNow(_ xfp: String) {
+        let spinner = Spinner()
+        spinner.add(vc: self, description: "deleting signer...")
+        
+        guard var signers = Encryption.decryptedSeeds(), signers.count > 0 else { return }
+        
+        for (i, signer) in signers.enumerated() {
+            guard let masterKey = Keys.masterKey(signer, ""),
+                let fingerprint = Keys.fingerprint(masterKey) else {
+                    return
+            }
+            if fingerprint == xfp {
+                signers.remove(at: i)
+            }
+        }
+        
+        if signers.count > 0 {
+            KeyChain.overWriteExistingSeeds(signers) { success in
+                if success {
+                    self.loadData()
+                    spinner.remove()
+                    showAlert(self, "Success ✓", "Signer has been removed")
+                } else {
+                    spinner.remove()
+                    showAlert(self, "Error", "There was an error removing your signer")
+                }
+            }
+        } else {
+            if KeyChain.remove(key: "seeds") {
+                self.loadData()
+                spinner.remove()
+                showAlert(self, "Success ✓", "Signer has been removed")
+            } else {
+                spinner.remove()
+                showAlert(self, "Error", "There was an error removing your signer")
+            }
+        }
+    }
 
 }
 
@@ -65,6 +127,17 @@ extension SignersViewController: UITableViewDelegate {
     
     func tableView(_ tableView: UITableView, heightForRowAt indexPath: IndexPath) -> CGFloat {
         return 50
+    }
+    
+    func tableView(_ tableView: UITableView, canEditRowAt indexPath: IndexPath) -> Bool {
+        return true
+    }
+    
+    func tableView(_ tableView: UITableView, commit editingStyle: UITableViewCell.EditingStyle, forRowAt indexPath: IndexPath) {
+        if editingStyle == .delete {
+            let fingerprint = fingeprints[indexPath.section]
+            deleteSeed(fingerprint)
+        }
     }
     
 }

@@ -7,7 +7,6 @@
 //
 
 import UIKit
-import LibWally
 
 class AddSignerViewController: UIViewController {
     
@@ -36,8 +35,8 @@ class AddSignerViewController: UIViewController {
     }
     
     @IBAction func addSignerAction(_ sender: Any) {
-        guard let mnemonic = BIP39Mnemonic(justWords.joined(separator: " ")),
-            let data = (mnemonic.description).data(using: .utf8),
+        guard Keys.validMnemonicArray(justWords),
+            let data = (justWords.joined(separator: " ")).data(using: .utf8),
             let encryptedData = Encryption.encrypt(data),
             KeyChain.saveNewSeed(encryptedData) else {
                 showAlert(self, "Error ⚠️", "Something went wrong, your seed words were not saved!")
@@ -80,7 +79,7 @@ class AddSignerViewController: UIViewController {
             self.label.sizeToFit()
             self.textView.addSubview(self.label)
             
-            if let _ = BIP39Mnemonic(self.justWords.joined(separator: " ")) {
+            if Keys.validMnemonicArray(self.justWords) {
                 self.validWordsAdded()
             }
         }
@@ -120,7 +119,9 @@ class AddSignerViewController: UIViewController {
     
     private func configureTextField() {
         updatePlaceHolder(wordNumber: 1)
-        textField.becomeFirstResponder()
+        #if targetEnvironment(macCatalyst)
+            textField.becomeFirstResponder()
+        #endif
     }
     
     private func addTapGesture() {
@@ -133,6 +134,7 @@ class AddSignerViewController: UIViewController {
         DispatchQueue.main.async { [weak self] in
             guard let self = self else { return }
             
+            self.textField.resignFirstResponder()
             self.textView.resignFirstResponder()
             self.passphraseField.resignFirstResponder()
         }
@@ -238,7 +240,7 @@ class AddSignerViewController: UIViewController {
             self.label.sizeToFit()
             self.textView.addSubview(self.label)
             
-            guard let _ = BIP39Mnemonic(self.justWords.joined(separator: " ")) else {
+            guard Keys.validMnemonicArray(self.justWords) else {
                 showAlert(self, "Invalid", "Just so you know that is not a valid recovery phrase, if you are inputting a 24 word phrase ignore this message and keep adding your words.")
                 
                 return
@@ -272,7 +274,7 @@ class AddSignerViewController: UIViewController {
             self.label.sizeToFit()
             self.textView.addSubview(self.label)
             
-            if let _ = BIP39Mnemonic(self.justWords.joined(separator: " ")) {
+            if Keys.validMnemonicArray(self.justWords) {
                 self.validWordsAdded()
             }
             
@@ -284,6 +286,7 @@ class AddSignerViewController: UIViewController {
         DispatchQueue.main.async { [weak self] in
             guard let self = self else { return }
             
+            self.textField.resignFirstResponder()
             self.textView.resignFirstResponder()
             self.addSignerOutlet.isEnabled = true
         }
@@ -363,7 +366,7 @@ class AddSignerViewController: UIViewController {
                 
                 let processedInput = self.processedCharacters(textInput)
                 
-                if let _ = BIP39Mnemonic(processedInput) {
+                if Keys.validMnemonicString(processedInput) {
                     self.processTextfieldInput()
                     self.textField.textColor = .systemGreen
                     self.validWordsAdded()

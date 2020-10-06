@@ -27,4 +27,22 @@ enum Keys {
         return hdMasterKey.fingerprint.hexString
     }
     
+    static func psbtValid(_ string: String) -> Bool {
+        guard let _ = try? PSBT(string, .testnet) else { return false }
+        
+        return true
+    }
+    
+    static func validMnemonicArray(_ words: [String]) -> Bool {
+        guard let _ = BIP39Mnemonic(words) else { return false }
+        
+        return true
+    }
+    
+    static func validMnemonicString(_ words: String) -> Bool {
+        guard let _ = BIP39Mnemonic(words) else { return false }
+        
+        return true
+    }
+    
 }

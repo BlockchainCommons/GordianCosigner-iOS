@@ -21,7 +21,10 @@ enum KeyChain {
         
         for (i, unencryptedSeed) in unencryptedSeeds.enumerated() {
             guard let unencryptedData = unencryptedSeed.data(using: .utf8),
-                let encryptedData = Encryption.encrypt(unencryptedData) else { completion((false)); return }
+                let encryptedData = Encryption.encrypt(unencryptedData) else {
+                    completion((false))
+                    return
+            }
             
             encrpytedSeeds.append(encryptedData)
             

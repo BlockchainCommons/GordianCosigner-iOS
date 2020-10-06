@@ -9,9 +9,7 @@
 import Foundation
 
 enum FirstTime {
-    
-    static let ud = UserDefaults.standard
-    
+        
     static func firstTimeHere() -> Bool {
         if KeyChain.getData("privateKey") == nil {
             let privateKey = Encryption.privateKey()

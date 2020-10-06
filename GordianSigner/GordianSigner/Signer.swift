@@ -11,7 +11,7 @@ import LibWally
 
 class Signer {
     
-    class func sign(psbt: String, completion: @escaping ((psbt: String?, rawTx: String?, errorMessage: String?)) -> Void) {
+    class func sign(_ psbt: String, completion: @escaping ((psbt: String?, errorMessage: String?)) -> Void) {
         var seedsToSignWith = [String]()
         var xprvsToSignWith = [HDKey]()
         var psbtToSign:PSBT!
@@ -51,7 +51,6 @@ class Signer {
                         for origin in origins {
                             if let childKey = try? key.derive(origin.value.path) {
                                 if let privKey = childKey.privKey {
-                                    precondition(privKey.pubKey == origin.key)
                                     signableKeys.append(privKey.wif)
                                 }
                             }
@@ -62,7 +61,10 @@ class Signer {
                     if i + 1 == xprvsToSignWith.count && x + 1 == inputs.count {
                         let uniqueSigners = Array(Set(signableKeys))
                         
-                        guard uniqueSigners.count > 0 else { return }
+                        guard uniqueSigners.count > 0 else {
+                            completion((nil, "Looks like none of your signers can sign this psbt, ensure you added the signer and its optional passphrase correctly."))
+                            return
+                        }
                         
                         for (s, signer) in uniqueSigners.enumerated() {
                             guard let signingKey = Key(signer, .testnet) else { return }
@@ -70,7 +72,7 @@ class Signer {
                             psbtToSign.sign(signingKey)
                             /// Once we completed the signing loop we finalize with our node.
                             if s + 1 == uniqueSigners.count {
-                                //finalizeWithBitcoind()
+                                completion((psbtToSign.description, nil))
                             }
                         }
                     }
@@ -98,7 +100,10 @@ class Signer {
         func getSeeds() {
             seedsToSignWith.removeAll()
             
-            guard let seeds = Encryption.decryptedSeeds(), seeds.count > 0 else { return }
+            guard let seeds = Encryption.decryptedSeeds(), seeds.count > 0 else {
+                completion((nil, "Looks like you do not have any signers added yet. Tap the signer button then + to add signers."))
+                return
+            }
             
             for (i, seed) in seeds.enumerated() {
                 seedsToSignWith.append(seed)
@@ -113,14 +118,14 @@ class Signer {
             psbtToSign = try PSBT(psbt, .testnet)
             
             if psbtToSign.complete {
-                //finalizeWithBitcoind()
+                completion((psbt, nil))
             } else {
                 getSeeds()
             }
             
         } catch {
             
-            completion((nil, nil, "Error converting that psbt"))
+            completion((nil, "Error converting that psbt"))
         }
     }
 }
