@@ -7,18 +7,75 @@
 //
 
 import UIKit
+import URKit
 
 class QRDisplayerViewController: UIViewController {
     
     @IBOutlet weak private var imageView: UIImageView!
+    @IBOutlet weak var animateOutlet: UIButton!
     
+    private let spinner = Spinner()
     private let qrGenerator = QRGenerator()
     var text = ""
+    var encoder:UREncoder!
+    var timer: Timer?
+    var parts = [String]()
+    var ur:UR!
+    var partIndex = 0
     
     override func viewDidLoad() {
         super.viewDidLoad()
+        spinner.add(vc: self, description: "")
+        convertToUr()
+    }
+    
+    @IBAction func animateAction(_ sender: Any) {
+        animateNow()
+    }
+    
+    private func animateNow() {
+        animateOutlet.alpha = 0
+        encoder = UREncoder(ur, maxFragmentLen: 250)
+        setTimer()
+    }
+    
+    private func setTimer() {
+        timer?.invalidate()
+        timer = Timer.scheduledTimer(timeInterval: 0.2, target: self, selector: #selector(automaticRefresh), userInfo: nil, repeats: true)
+    }
 
-        showQR()
+    @objc func automaticRefresh() {
+        nextPart()
+    }
+    
+    private func convertToUr() {
+        let b64 = text.utf8.base64EncodedData()
+        ur = URHelper.makeBytesUR(b64)
+        let urString = UREncoder.encode(ur)
+        showQR(urString)
+    }
+    
+    private func nextPart() {
+        let part = encoder.nextPart()
+        let index = encoder.seqNum
+        
+        if index <= encoder.seqLen {
+            parts.append(part.uppercased())
+        } else {
+            timer?.invalidate()
+            timer = nil
+            timer = Timer.scheduledTimer(timeInterval: 1.0, target: self, selector: #selector(animate), userInfo: nil, repeats: true)
+        }
+    }
+    
+    @objc func animate() {
+        showQR(parts[partIndex])
+        
+        if partIndex < parts.count - 1 {
+            partIndex += 1
+        } else {
+            partIndex = 0
+        }
     }
     
     @IBAction func closeAction(_ sender: Any) {
@@ -29,9 +86,9 @@ class QRDisplayerViewController: UIViewController {
         }
     }
     
-    private func showQR() {
-        guard let qr = qrGenerator.getQRCode(text) else {
-            showAlert(self, "QR Error", "There is too much data to squeeze into that small of an image")
+    private func showQR(_ urString: String) {
+        guard let qr = qrGenerator.getQRCode(urString) else {
+            animateNow()
             return
         }
         
@@ -39,6 +96,7 @@ class QRDisplayerViewController: UIViewController {
             guard let self = self else { return }
             
             self.imageView.image = qr
+            self.spinner.remove()
         }
     }
     

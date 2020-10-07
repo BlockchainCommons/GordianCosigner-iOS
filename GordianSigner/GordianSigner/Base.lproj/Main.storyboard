@@ -59,7 +59,7 @@
             <objects>
                 <viewController id="9Vu-3O-YNg" customClass="QRDisplayerViewController" customModule="GordianSigner" customModuleProvider="target" sceneMemberID="viewController">
                     <view key="view" contentMode="scaleToFill" id="i3r-81-WoL">
-                        <rect key="frame" x="0.0" y="0.0" width="414" height="842"/>
+                        <rect key="frame" x="0.0" y="0.0" width="414" height="808"/>
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                         <subviews>
                             <imageView clipsSubviews="YES" userInteractionEnabled="NO" contentMode="scaleAspectFit" horizontalHuggingPriority="251" verticalHuggingPriority="251" translatesAutoresizingMaskIntoConstraints="NO" id="lJf-Uh-ILV">
@@ -69,29 +69,26 @@
                                     <constraint firstAttribute="width" constant="374" id="b5U-DN-2N7"/>
                                 </constraints>
                             </imageView>
-                            <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="qER-fL-Ri9">
-                                <rect key="frame" x="348" y="20" width="46" height="30"/>
-                                <constraints>
-                                    <constraint firstAttribute="width" constant="46" id="3bh-wC-G5O"/>
-                                    <constraint firstAttribute="height" constant="30" id="TCr-LD-RgG"/>
-                                </constraints>
-                                <color key="tintColor" systemColor="systemTealColor" red="0.35294117650000001" green="0.7843137255" blue="0.98039215690000003" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
-                                <state key="normal" image="xmark.circle" catalog="system"/>
+                            <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="QDZ-sc-dJG">
+                                <rect key="frame" x="179.5" y="486" width="55" height="30"/>
+                                <state key="normal" title="animate"/>
                                 <connections>
-                                    <action selector="closeAction:" destination="9Vu-3O-YNg" eventType="touchUpInside" id="CNZ-yt-NhD"/>
+                                    <action selector="animateAction:" destination="9Vu-3O-YNg" eventType="touchUpInside" id="Dbo-ER-vHy"/>
                                 </connections>
                             </button>
                         </subviews>
                         <color key="backgroundColor" white="0.0" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                         <constraints>
-                            <constraint firstItem="GK0-od-YHe" firstAttribute="trailing" secondItem="qER-fL-Ri9" secondAttribute="trailing" constant="20" id="4PQ-Em-KjI"/>
                             <constraint firstItem="lJf-Uh-ILV" firstAttribute="centerX" secondItem="i3r-81-WoL" secondAttribute="centerX" id="FY6-aA-ZeU"/>
+                            <constraint firstItem="QDZ-sc-dJG" firstAttribute="centerX" secondItem="i3r-81-WoL" secondAttribute="centerX" id="JlE-Ke-gjy"/>
                             <constraint firstItem="lJf-Uh-ILV" firstAttribute="top" secondItem="GK0-od-YHe" secondAttribute="top" constant="104" id="Nm8-ka-Xwb"/>
-                            <constraint firstItem="qER-fL-Ri9" firstAttribute="top" secondItem="GK0-od-YHe" secondAttribute="top" constant="20" id="Vb1-IQ-KJZ"/>
+                            <constraint firstItem="QDZ-sc-dJG" firstAttribute="top" secondItem="lJf-Uh-ILV" secondAttribute="bottom" constant="8" id="smS-UW-eh1"/>
                         </constraints>
                         <viewLayoutGuide key="safeArea" id="GK0-od-YHe"/>
                     </view>
+                    <navigationItem key="navigationItem" id="Moc-PD-hEV"/>
                     <connections>
+                        <outlet property="animateOutlet" destination="QDZ-sc-dJG" id="bkv-LB-9st"/>
                         <outlet property="imageView" destination="lJf-Uh-ILV" id="Rev-R0-d3L"/>
                     </connections>
                 </viewController>
@@ -189,7 +186,7 @@
                         <outlet property="textView" destination="bQU-lf-HJ1" id="Ojb-5g-Yj9"/>
                         <segue destination="A5d-PE-VBa" kind="show" identifier="segueToSigners" id="TeW-gj-xMB"/>
                         <segue destination="4dz-cW-ULS" kind="presentation" identifier="segueToScanQr" id="hWh-uj-ExK"/>
-                        <segue destination="9Vu-3O-YNg" kind="presentation" identifier="segueToQRDisplayer" id="Iyb-fk-8X5"/>
+                        <segue destination="9Vu-3O-YNg" kind="show" identifier="segueToQRDisplayer" id="Iyb-fk-8X5"/>
                     </connections>
                 </viewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="mUb-Mt-mRz" userLabel="First Responder" customClass="UIResponder" sceneMemberID="firstResponder"/>
@@ -411,6 +408,5 @@
         <image name="plus.rectangle" catalog="system" width="128" height="93"/>
         <image name="qrcode.viewfinder" catalog="system" width="128" height="114"/>
         <image name="square.and.arrow.down" catalog="system" width="121" height="128"/>
-        <image name="xmark.circle" catalog="system" width="128" height="121"/>
     </resources>
 </document>
