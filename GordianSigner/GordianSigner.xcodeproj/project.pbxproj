@@ -21,7 +21,6 @@
 		D0B4DDD92525AC18009C8624 /* whiteFingerPrint.png in Resources */ = {isa = PBXBuildFile; fileRef = D0B4DDD82525AC18009C8624 /* whiteFingerPrint.png */; };
 		D0CF1E342522E20C0059C541 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = D0CF1E332522E20C0059C541 /* AppDelegate.swift */; };
 		D0CF1E362522E20C0059C541 /* SceneDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = D0CF1E352522E20C0059C541 /* SceneDelegate.swift */; };
-		D0CF1E382522E20C0059C541 /* ViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = D0CF1E372522E20C0059C541 /* ViewController.swift */; };
 		D0CF1E3B2522E20C0059C541 /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = D0CF1E392522E20C0059C541 /* Main.storyboard */; };
 		D0CF1E3E2522E20C0059C541 /* GordianSigner.xcdatamodeld in Sources */ = {isa = PBXBuildFile; fileRef = D0CF1E3C2522E20C0059C541 /* GordianSigner.xcdatamodeld */; };
 		D0CF1E402522E2140059C541 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = D0CF1E3F2522E2140059C541 /* Assets.xcassets */; };
@@ -85,7 +84,6 @@
 		D0CF1E302522E20C0059C541 /* GordianSigner.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = GordianSigner.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		D0CF1E332522E20C0059C541 /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
 		D0CF1E352522E20C0059C541 /* SceneDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SceneDelegate.swift; sourceTree = "<group>"; };
-		D0CF1E372522E20C0059C541 /* ViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ViewController.swift; sourceTree = "<group>"; };
 		D0CF1E3A2522E20C0059C541 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/Main.storyboard; sourceTree = "<group>"; };
 		D0CF1E3D2522E20C0059C541 /* GordianSigner.xcdatamodel */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcdatamodel; path = GordianSigner.xcdatamodel; sourceTree = "<group>"; };
 		D0CF1E3F2522E2140059C541 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
@@ -164,7 +162,6 @@
 				D0CF1E662522E22A0059C541 /* GordianSigner.entitlements */,
 				D0CF1E332522E20C0059C541 /* AppDelegate.swift */,
 				D0CF1E352522E20C0059C541 /* SceneDelegate.swift */,
-				D0CF1E372522E20C0059C541 /* ViewController.swift */,
 				D0CF1E392522E20C0059C541 /* Main.storyboard */,
 				D0CF1E3F2522E2140059C541 /* Assets.xcassets */,
 				D0CF1E412522E2140059C541 /* LaunchScreen.storyboard */,
@@ -365,7 +362,6 @@
 			buildActionMask = 2147483647;
 			files = (
 				D064BCC8252D62FD00D42D66 /* URHelper.swift in Sources */,
-				D0CF1E382522E20C0059C541 /* ViewController.swift in Sources */,
 				D0CF1E732523012A0059C541 /* FirstTime.swift in Sources */,
 				D0CF1E342522E20C0059C541 /* AppDelegate.swift in Sources */,
 				D0CF1E3E2522E20C0059C541 /* GordianSigner.xcdatamodeld in Sources */,
