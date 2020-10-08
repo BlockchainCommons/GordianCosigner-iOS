@@ -139,7 +139,6 @@ class QRScannerViewController: UIViewController {
         decoder.receivePart(text.lowercased())
         
         let expectedParts = decoder.expectedPartCount ?? 0
-        print("expectedParts: \(expectedParts)")
         
         guard expectedParts != 0 else {
             guard let result = try? decoder.result?.get(), let psbt = URHelper.psbtUrToBase64Text(result) else { return }
@@ -147,11 +146,7 @@ class QRScannerViewController: UIViewController {
             return
         }
         
-        
         let percentageCompletion = "\(Int(decoder.estimatedPercentComplete * 100))% complete"
-        
-        print("self.decoder.estimatedPercentComplete: \(self.decoder.estimatedPercentComplete)")
-        
         
         DispatchQueue.main.async { [weak self] in
             guard let self = self else { return }
