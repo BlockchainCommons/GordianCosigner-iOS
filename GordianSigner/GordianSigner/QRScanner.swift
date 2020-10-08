@@ -214,31 +214,27 @@ class QRScanner: UIView, AVCaptureMetadataOutputObjectsDelegate, UIImagePickerCo
     func metadataOutput(_ output: AVCaptureMetadataOutput, didOutput metadataObjects: [AVMetadataObject], from connection: AVCaptureConnection) {
         
         if metadataObjects.count > 0 {
-            
             let machineReadableCode = metadataObjects[0] as! AVMetadataMachineReadableCodeObject
-            
             if machineReadableCode.type == AVMetadataObject.ObjectType.qr {
-                
                 let stringURL = machineReadableCode.stringValue!
                 self.stringToReturn = stringURL
                 self.avCaptureSession.stopRunning()
-                AudioServicesPlaySystemSound(SystemSoundID(kSystemSoundID_Vibrate))
+                
+                DispatchQueue.main.async {
+                    let impact = UIImpactFeedbackGenerator()
+                    impact.impactOccurred()
+                    AudioServicesPlaySystemSound(1103)
+                }
+                
                 completion()
                 
                 if keepRunning {
-                    
-                    DispatchQueue.main.asyncAfter(deadline: .now() + 2.0) {
-                        
+                    DispatchQueue.main.asyncAfter(deadline: .now() + 0.3) {
                         self.avCaptureSession.startRunning()
-                        
                     }
-                    
                 }
-                
             }
-            
         }
-        
     }
     
     func imagePickerControllerDidCancel(_ picker: UIImagePickerController) {
@@ -250,9 +246,7 @@ class QRScanner: UIView, AVCaptureMetadataOutputObjectsDelegate, UIImagePickerCo
     }
     
     func chooseQRCodeFromLibrary() {
-        
         vc.present(imagePicker, animated: true, completion: nil)
-        
     }
     
     func imagePickerController(_ picker: UIImagePickerController, didFinishPickingMediaWithInfo info: [UIImagePickerController.InfoKey : Any]) {
@@ -270,17 +264,16 @@ class QRScanner: UIView, AVCaptureMetadataOutputObjectsDelegate, UIImagePickerCo
                 qrCodeLink += feature.messageString!
             }
             
-            AudioServicesPlaySystemSound(SystemSoundID(kSystemSoundID_Vibrate))
+            DispatchQueue.main.async {
+                let impact = UIImpactFeedbackGenerator()
+                impact.impactOccurred()
+            }
             
             picker.dismiss(animated: true, completion: {
-                
                 self.qrString = qrCodeLink
                 self.didChooseImage()
-                
             })
-            
         }
-        
     }
     
     func removeScanner() {

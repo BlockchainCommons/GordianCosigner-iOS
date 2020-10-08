@@ -36,17 +36,52 @@
                             <imageView clipsSubviews="YES" userInteractionEnabled="NO" contentMode="scaleAspectFit" horizontalHuggingPriority="251" verticalHuggingPriority="251" translatesAutoresizingMaskIntoConstraints="NO" id="11N-cd-oai">
                                 <rect key="frame" x="0.0" y="0.0" width="414" height="842"/>
                             </imageView>
+                            <visualEffectView opaque="NO" contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="3vK-q4-XRq">
+                                <rect key="frame" x="20" y="666" width="374" height="93"/>
+                                <view key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" insetsLayoutMarginsFromSafeArea="NO" id="7h6-HL-YA9">
+                                    <rect key="frame" x="0.0" y="0.0" width="374" height="93"/>
+                                    <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
+                                    <subviews>
+                                        <progressView opaque="NO" contentMode="scaleToFill" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="Rtx-HY-9mw">
+                                            <rect key="frame" x="8" y="64" width="358" height="2"/>
+                                        </progressView>
+                                        <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Label" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="98x-sO-hO8">
+                                            <rect key="frame" x="166" y="20" width="42" height="21"/>
+                                            <fontDescription key="fontDescription" type="system" pointSize="17"/>
+                                            <color key="textColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+                                            <nil key="highlightedColor"/>
+                                        </label>
+                                    </subviews>
+                                    <constraints>
+                                        <constraint firstItem="Rtx-HY-9mw" firstAttribute="leading" secondItem="7h6-HL-YA9" secondAttribute="leading" constant="8" id="59C-11-oa9"/>
+                                        <constraint firstItem="98x-sO-hO8" firstAttribute="centerX" secondItem="7h6-HL-YA9" secondAttribute="centerX" id="Kwy-mh-8gs"/>
+                                        <constraint firstAttribute="bottom" secondItem="Rtx-HY-9mw" secondAttribute="bottom" constant="27" id="Xdw-2V-cQP"/>
+                                        <constraint firstItem="98x-sO-hO8" firstAttribute="top" secondItem="7h6-HL-YA9" secondAttribute="top" constant="20" id="bNu-PO-dGw"/>
+                                        <constraint firstAttribute="trailing" secondItem="Rtx-HY-9mw" secondAttribute="trailing" constant="8" id="sTA-m3-1Vq"/>
+                                    </constraints>
+                                </view>
+                                <constraints>
+                                    <constraint firstAttribute="height" constant="93" id="sD0-WT-jFq"/>
+                                </constraints>
+                                <blurEffect style="regular"/>
+                            </visualEffectView>
                         </subviews>
                         <color key="backgroundColor" systemColor="systemBackgroundColor" cocoaTouchSystemColor="whiteColor"/>
                         <constraints>
                             <constraint firstItem="11N-cd-oai" firstAttribute="trailing" secondItem="in4-ZL-XAA" secondAttribute="trailing" id="5pU-pY-v5t"/>
                             <constraint firstItem="11N-cd-oai" firstAttribute="top" secondItem="in4-ZL-XAA" secondAttribute="top" id="94M-7z-8kk"/>
+                            <constraint firstItem="in4-ZL-XAA" firstAttribute="trailing" secondItem="3vK-q4-XRq" secondAttribute="trailing" constant="20" id="CR7-oK-zc8"/>
+                            <constraint firstItem="in4-ZL-XAA" firstAttribute="bottom" secondItem="3vK-q4-XRq" secondAttribute="bottom" constant="49" id="QW4-bZ-YAK"/>
+                            <constraint firstItem="3vK-q4-XRq" firstAttribute="leading" secondItem="in4-ZL-XAA" secondAttribute="leading" constant="20" id="RQr-ex-pBh"/>
                             <constraint firstItem="11N-cd-oai" firstAttribute="leading" secondItem="in4-ZL-XAA" secondAttribute="leading" id="dA7-Rr-xJS"/>
                             <constraint firstAttribute="bottom" secondItem="11N-cd-oai" secondAttribute="bottom" id="zHV-aJ-rbg"/>
                         </constraints>
                         <viewLayoutGuide key="safeArea" id="in4-ZL-XAA"/>
                     </view>
                     <connections>
+                        <outlet property="backgroundView" destination="3vK-q4-XRq" id="0dy-OO-PJa"/>
+                        <outlet property="progressDescriptionLabel" destination="98x-sO-hO8" id="i1D-yT-gFc"/>
+                        <outlet property="progressView" destination="Rtx-HY-9mw" id="mkq-SC-2CR"/>
                         <outlet property="scannerView" destination="11N-cd-oai" id="Gjw-NT-50x"/>
                     </connections>
                 </viewController>

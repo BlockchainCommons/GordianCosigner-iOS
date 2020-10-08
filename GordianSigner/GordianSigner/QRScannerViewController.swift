@@ -7,9 +7,11 @@
 //
 
 import UIKit
+import URKit
 
 class QRScannerViewController: UIViewController {
     
+    var decoder:URDecoder!
     var doneBlock : ((String?) -> Void)?
     let spinner = Spinner()
     let blurView = UIVisualEffectView(effect: UIBlurEffect(style: UIBlurEffect.Style.dark))
@@ -20,12 +22,16 @@ class QRScannerViewController: UIViewController {
     var isTorchOn = Bool()
 
     @IBOutlet weak var scannerView: UIImageView!
+    @IBOutlet weak var backgroundView: UIVisualEffectView!
+    @IBOutlet weak var progressView: UIProgressView!
+    @IBOutlet weak var progressDescriptionLabel: UILabel!
+    
     
     override func viewDidLoad() {
         super.viewDidLoad()
-
         configureScanner()
         spinner.add(vc: self, description: "")
+        decoder = URDecoder()
     }
     
     override func viewDidAppear(_ animated: Bool) {
@@ -42,9 +48,17 @@ class QRScannerViewController: UIViewController {
     }
     
     private func configureScanner() {
+        
+        backgroundView.alpha = 0
+        progressView.alpha = 0
+        progressDescriptionLabel.alpha = 0
+        
+        backgroundView.clipsToBounds = true
+        backgroundView.layer.cornerRadius = 8
+        
         scannerView.isUserInteractionEnabled = true
         qrScanner.uploadButton.addTarget(self, action: #selector(chooseQRCodeFromLibrary), for: .touchUpInside)
-        qrScanner.keepRunning = false
+        qrScanner.keepRunning = true
         qrScanner.vc = self
         qrScanner.imageView = scannerView
         qrScanner.completion = { self.getQRCode() }
@@ -91,6 +105,7 @@ class QRScannerViewController: UIViewController {
         blur.clipsToBounds = true
         blur.layer.cornerRadius = frame.width / 2
         blur.contentView.addSubview(button)
+        blurArray.append(blur)
         scannerView.addSubview(blur)
     }
     
@@ -101,17 +116,58 @@ class QRScannerViewController: UIViewController {
         }
     }
     
-    private func process(text: String) {
-        spinner.add(vc: self, description: "processing...")
-        
+    private func stopScanning(_ result: String) {
         DispatchQueue.main.async { [weak self] in
             guard let self = self else { return }
             
             self.dismiss(animated: true) {
                 self.qrScanner.stopScanner()
                 self.qrScanner.avCaptureSession.stopRunning()
-                self.doneBlock!(text)
+                self.doneBlock!(result)
             }
+        }
+    }
+    
+    private func process(text: String) {
+        // Stop if we're already done with the decode.
+        guard decoder.result == nil else {
+            guard let result = try? decoder.result?.get(), let psbt = URHelper.psbtUrToBase64Text(result) else { return }
+            stopScanning(psbt)
+            return
+        }
+
+        decoder.receivePart(text.lowercased())
+        
+        let expectedParts = decoder.expectedPartCount ?? 0
+        print("expectedParts: \(expectedParts)")
+        
+        guard expectedParts != 0 else {
+            guard let result = try? decoder.result?.get(), let psbt = URHelper.psbtUrToBase64Text(result) else { return }
+            stopScanning(psbt)
+            return
+        }
+        
+        
+        let percentageCompletion = "\(Int(decoder.estimatedPercentComplete * 100))% complete"
+        
+        print("self.decoder.estimatedPercentComplete: \(self.decoder.estimatedPercentComplete)")
+        
+        
+        DispatchQueue.main.async { [weak self] in
+            guard let self = self else { return }
+            
+            if self.blurArray.count > 0 {
+                for i in self.blurArray {
+                    i.removeFromSuperview()
+                }
+                self.blurArray.removeAll()
+            }
+            
+            self.progressView.setProgress(Float(self.decoder.estimatedPercentComplete), animated: true)
+            self.progressDescriptionLabel.text = percentageCompletion
+            self.backgroundView.alpha = 1
+            self.progressView.alpha = 1
+            self.progressDescriptionLabel.alpha = 1
         }
     }
     

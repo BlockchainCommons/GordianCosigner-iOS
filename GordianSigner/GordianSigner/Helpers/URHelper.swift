@@ -11,9 +11,19 @@ import URKit
 
 enum URHelper {
 
-    static func makeBytesUR(_ data: Data) -> UR {
+    static func psbtUr(_ data: Data) -> UR? {
         let cbor = CBOR.byteString(data.bytes).encode().data
-        return try! UR(type: "psbt", cbor: cbor)
+        
+        return try? UR(type: "crypto-psbt", cbor: cbor)
+    }
+    
+    static func psbtUrToBase64Text(_ ur: UR) -> String? {
+        guard let decodedCbor = try? CBOR.decode(ur.cbor.bytes),
+            case let CBOR.byteString(bytes) = decodedCbor else {
+                return nil
+        }
+        
+        return Data(bytes).base64EncodedString()
     }
     
 }

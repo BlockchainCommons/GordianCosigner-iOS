@@ -17,11 +17,11 @@ class QRDisplayerViewController: UIViewController {
     private let spinner = Spinner()
     private let qrGenerator = QRGenerator()
     var text = ""
-    var encoder:UREncoder!
-    var timer: Timer?
-    var parts = [String]()
-    var ur:UR!
-    var partIndex = 0
+    private var encoder:UREncoder!
+    private var timer: Timer?
+    private var parts = [String]()
+    private var ur: UR!
+    private var partIndex = 0
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -49,8 +49,8 @@ class QRDisplayerViewController: UIViewController {
     }
     
     private func convertToUr() {
-        let b64 = text.utf8.base64EncodedData()
-        ur = URHelper.makeBytesUR(b64)
+        guard let b64 = Data(base64Encoded: text), let ur = URHelper.psbtUr(b64) else { return }
+        self.ur = ur
         let urString = UREncoder.encode(ur)
         showQR(urString)
     }
