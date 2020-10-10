@@ -133,7 +133,6 @@ class QRScannerViewController: UIViewController {
     }
     
     private func stopScanning(_ result: String) {
-        print("stopScanning")
         DispatchQueue.main.async { [weak self] in
             guard let self = self else { return }
             
@@ -146,11 +145,9 @@ class QRScannerViewController: UIViewController {
     }
     
     private func process(text: String) {
-        print("text: \(text)")
         // Stop if we're already done with the decode.
         guard decoder.result == nil else {
             guard let result = try? decoder.result?.get(), let psbt = URHelper.psbtUrToBase64Text(result) else { return }
-            print("psbt: \(psbt)")
             stopScanning(psbt)
             return
         }
