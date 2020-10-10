@@ -10,7 +10,6 @@
 		D04B029825249EEB00C249B8 /* SignerViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = D04B029725249EEB00C249B8 /* SignerViewController.swift */; };
 		D04B029A2524A18100C249B8 /* SignersViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = D04B02992524A18100C249B8 /* SignersViewController.swift */; };
 		D04B029C2524A9F800C249B8 /* AddSignerViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = D04B029B2524A9F800C249B8 /* AddSignerViewController.swift */; };
-		D04D497E252C197900D7383E /* QRScanner.swift in Sources */ = {isa = PBXBuildFile; fileRef = D04D497D252C197900D7383E /* QRScanner.swift */; };
 		D04D4980252C19E000D7383E /* QRScannerViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = D04D497F252C19E000D7383E /* QRScannerViewController.swift */; };
 		D04D4982252C1A9300D7383E /* Spinner.swift in Sources */ = {isa = PBXBuildFile; fileRef = D04D4981252C1A9300D7383E /* Spinner.swift */; };
 		D04D4984252C4FEF00D7383E /* QRDisplayerViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = D04D4983252C4FEF00D7383E /* QRDisplayerViewController.swift */; };
@@ -73,7 +72,6 @@
 		D04B029725249EEB00C249B8 /* SignerViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SignerViewController.swift; sourceTree = "<group>"; };
 		D04B02992524A18100C249B8 /* SignersViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SignersViewController.swift; sourceTree = "<group>"; };
 		D04B029B2524A9F800C249B8 /* AddSignerViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AddSignerViewController.swift; sourceTree = "<group>"; };
-		D04D497D252C197900D7383E /* QRScanner.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = QRScanner.swift; sourceTree = "<group>"; };
 		D04D497F252C19E000D7383E /* QRScannerViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = QRScannerViewController.swift; sourceTree = "<group>"; };
 		D04D4981252C1A9300D7383E /* Spinner.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Spinner.swift; sourceTree = "<group>"; };
 		D04D4983252C4FEF00D7383E /* QRDisplayerViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = QRDisplayerViewController.swift; sourceTree = "<group>"; };
@@ -173,7 +171,6 @@
 				D04B029725249EEB00C249B8 /* SignerViewController.swift */,
 				D04B02992524A18100C249B8 /* SignersViewController.swift */,
 				D04B029B2524A9F800C249B8 /* AddSignerViewController.swift */,
-				D04D497D252C197900D7383E /* QRScanner.swift */,
 				D04D497F252C19E000D7383E /* QRScannerViewController.swift */,
 				D04D4981252C1A9300D7383E /* Spinner.swift */,
 				D04D4983252C4FEF00D7383E /* QRDisplayerViewController.swift */,
@@ -372,7 +369,6 @@
 				D04B029C2524A9F800C249B8 /* AddSignerViewController.swift in Sources */,
 				D0B4DDD725258B25009C8624 /* Bip39Words.swift in Sources */,
 				D0CF1E79252360EC0059C541 /* Signer.swift in Sources */,
-				D04D497E252C197900D7383E /* QRScanner.swift in Sources */,
 				D0CF1E70252300B80059C541 /* Keychain.swift in Sources */,
 				D04B029A2524A18100C249B8 /* SignersViewController.swift in Sources */,
 				D0CF1E75252302A00059C541 /* Encryption.swift in Sources */,
