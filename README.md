@@ -1,10 +1,23 @@
 # Blockchain Commons GordianSigner-Catalyst
 
-**GordianSigner-Catalyst** is an offline proof of concept PSBT signing tool for your iOS and OSX device.
+**Gordian Signer** allows users to participate in a multisig by adding a signature to an otherwise unsigned or partially signed PSBT, where they did not initiate the transaction. It can also be used for signing a single-signature PSBT. It's largely intended as an offline signing tool, which allows signing without the usage of a full node: a real wallet is need to both initiate an account map and to initiate a transaction.
+
+## Additional Information
+
+This is a companion app for the Gordian system:
+
+* [Gordian system](https://github.com/BlockchainCommons/Gordian) — A self-sovereign Bitcoin wallet and node
+
+Gordian Signer is a multiplatform utility that's also available as:
+
+* [GordianSigner for Android](https://github.com/BlockchainCommons/GordianSigner-Android)
+* [GordianSigner for MacOS](https://github.com/BlockchainCommons/GordianSigner-macOS)
 
 ## Status - Active Development
 
 GordianSigner-Catalyst is currently under active development. It should not be used for production tasks until it has had further testing and auditing.
+
+At current, this Catalyst repo is only used for our iOS release, but we hope to eventually use it for the MacOS release as well. (A security lock on the MacOS camera currently prevents us from doing so.)
 
 ## Origin, Authors, Copyright & Licenses
 
