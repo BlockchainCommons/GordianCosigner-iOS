@@ -1,5 +1,7 @@
 # Blockchain Commons GordianSigner-Catalyst
 
+![](images/logos/gordian-signer-screen.jpg)
+
 **Gordian Signer** allows users to participate in a multisig by adding a signature to an otherwise unsigned or partially signed PSBT, where they did not initiate the transaction. It can also be used for signing a single-signature PSBT. It's largely intended as an offline signing tool, which allows signing without the usage of a full node: a real wallet is need to both initiate an account map and to initiate a transaction.
 
 ## Additional Information
