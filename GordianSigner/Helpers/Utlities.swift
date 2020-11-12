@@ -77,4 +77,13 @@ extension Date {
     }
 }
 
+public extension Double {
+    var avoidNotation: String {
+        let numberFormatter = NumberFormatter()
+        numberFormatter.maximumFractionDigits = 8
+        numberFormatter.numberStyle = .decimal
+        return numberFormatter.string(for: self) ?? ""
+    }
+}
+
 

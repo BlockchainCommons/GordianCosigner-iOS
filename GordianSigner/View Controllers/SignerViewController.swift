@@ -7,6 +7,7 @@
 //
 
 import UIKit
+import LibWally
 
 class SignerViewController: UIViewController {
 
@@ -17,6 +18,7 @@ class SignerViewController: UIViewController {
     private var psbt = ""
     private var export = false
     private var alertStyle = UIAlertController.Style.actionSheet
+    private var psbtToParse:PSBT!
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -178,15 +180,21 @@ class SignerViewController: UIViewController {
     }
     
     private func psbtValid(_ string: String) {
-        if Keys.psbtValid(string) {
-            psbt = string
-            setTextView(string)
-            
-            showAlert(self, "Valid psbt ✅", "You can tap the \"sign now\" button to sign this psbt")
-        } else {
+        guard let validPsbt = Keys.psbt(string) else {
             setTextView("")
             
             showAlert(self, "⚠️ Error!", "Invalid psbt")
+            return
+        }
+        
+        psbtToParse = validPsbt
+        psbt = string
+        setTextView(string)
+        
+        DispatchQueue.main.async { [weak self] in
+            guard let self = self else { return }
+            
+            self.performSegue(withIdentifier: "segueToPsbtDetail", sender: self)
         }
         
         export = false
@@ -259,6 +267,12 @@ class SignerViewController: UIViewController {
         if segue.identifier == "segueToQRDisplayer" {
             if let vc = segue.destination as? QRDisplayerViewController {
                 vc.text = psbt
+            }
+        }
+        
+        if segue.identifier == "segueToPsbtDetail" {
+            if let vc = segue.destination as? PsbtTableViewController {
+                vc.psbt = psbtToParse
             }
         }
     }

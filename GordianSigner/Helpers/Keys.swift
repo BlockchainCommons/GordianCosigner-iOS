@@ -48,7 +48,14 @@ enum Keys {
     }
     
     static func psbtValid(_ string: String) -> Bool {
-        guard let _ = try? PSBT(string, .testnet) else { return false }
+        guard let _ = try? PSBT(string, .testnet) else {
+            
+            guard let _ = try? PSBT(string, .mainnet) else {
+                return false
+            }
+            
+            return true
+        }
         
         return true
     }
@@ -92,5 +99,16 @@ enum Keys {
         let bip39entropy = BIP39Entropy(entropy)
         
         return BIP39Mnemonic(bip39entropy)?.description        
+    }
+    
+    static func psbt(_ psbt: String) -> PSBT? {
+        guard let testnetPsbt = try? PSBT(psbt, .testnet) else {
+            
+            guard let mainnetPsbt = try? PSBT(psbt, .mainnet) else { return nil }
+            
+            return mainnetPsbt
+        }
+        
+        return testnetPsbt
     }
 }

@@ -7,9 +7,11 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
-		D00C4C772534296E00B8A61F /* CLibWally.xcframework in Frameworks */ = {isa = PBXBuildFile; fileRef = D00C4C752534296E00B8A61F /* CLibWally.xcframework */; };
-		D00C4C792534297400B8A61F /* LibWally.xcframework in Frameworks */ = {isa = PBXBuildFile; fileRef = D00C4C762534296E00B8A61F /* LibWally.xcframework */; };
-		D00C4C7A2534297400B8A61F /* LibWally.xcframework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = D00C4C762534296E00B8A61F /* LibWally.xcframework */; settings = {ATTRIBUTES = (CodeSignOnCopy, ); }; };
+		D01C2953255CD66F00C5ED55 /* PSBTParser.swift in Sources */ = {isa = PBXBuildFile; fileRef = D01C2952255CD66F00C5ED55 /* PSBTParser.swift */; };
+		D01C2955255CE33F00C5ED55 /* PsbtTableViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = D01C2954255CE33F00C5ED55 /* PsbtTableViewController.swift */; };
+		D01C2958255D315F00C5ED55 /* CLibWally.xcframework in Frameworks */ = {isa = PBXBuildFile; fileRef = D01C2956255D315F00C5ED55 /* CLibWally.xcframework */; };
+		D01C295A255D316400C5ED55 /* LibWally.xcframework in Frameworks */ = {isa = PBXBuildFile; fileRef = D01C2957255D315F00C5ED55 /* LibWally.xcframework */; };
+		D01C295B255D316400C5ED55 /* LibWally.xcframework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = D01C2957255D315F00C5ED55 /* LibWally.xcframework */; settings = {ATTRIBUTES = (CodeSignOnCopy, ); }; };
 		D04B029825249EEB00C249B8 /* SignerViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = D04B029725249EEB00C249B8 /* SignerViewController.swift */; };
 		D04B029A2524A18100C249B8 /* SignersViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = D04B02992524A18100C249B8 /* SignersViewController.swift */; };
 		D04B029C2524A9F800C249B8 /* AddSignerViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = D04B029B2524A9F800C249B8 /* AddSignerViewController.swift */; };
@@ -62,13 +64,13 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXCopyFilesBuildPhase section */
-		D00C4C7B2534297400B8A61F /* Embed Frameworks */ = {
+		D01C295C255D316400C5ED55 /* Embed Frameworks */ = {
 			isa = PBXCopyFilesBuildPhase;
 			buildActionMask = 2147483647;
 			dstPath = "";
 			dstSubfolderSpec = 10;
 			files = (
-				D00C4C7A2534297400B8A61F /* LibWally.xcframework in Embed Frameworks */,
+				D01C295B255D316400C5ED55 /* LibWally.xcframework in Embed Frameworks */,
 			);
 			name = "Embed Frameworks";
 			runOnlyForDeploymentPostprocessing = 0;
@@ -76,8 +78,10 @@
 /* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
-		D00C4C752534296E00B8A61F /* CLibWally.xcframework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcframework; path = CLibWally.xcframework; sourceTree = "<group>"; };
-		D00C4C762534296E00B8A61F /* LibWally.xcframework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcframework; path = LibWally.xcframework; sourceTree = "<group>"; };
+		D01C2952255CD66F00C5ED55 /* PSBTParser.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PSBTParser.swift; sourceTree = "<group>"; };
+		D01C2954255CE33F00C5ED55 /* PsbtTableViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PsbtTableViewController.swift; sourceTree = "<group>"; };
+		D01C2956255D315F00C5ED55 /* CLibWally.xcframework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcframework; name = CLibWally.xcframework; path = ../BCLibwallySwift/build/CLibWally.xcframework; sourceTree = "<group>"; };
+		D01C2957255D315F00C5ED55 /* LibWally.xcframework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcframework; name = LibWally.xcframework; path = ../BCLibwallySwift/build/LibWally.xcframework; sourceTree = "<group>"; };
 		D04B029725249EEB00C249B8 /* SignerViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SignerViewController.swift; sourceTree = "<group>"; };
 		D04B02992524A18100C249B8 /* SignersViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SignersViewController.swift; sourceTree = "<group>"; };
 		D04B029B2524A9F800C249B8 /* AddSignerViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AddSignerViewController.swift; sourceTree = "<group>"; };
@@ -122,10 +126,10 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				D01C2958255D315F00C5ED55 /* CLibWally.xcframework in Frameworks */,
 				D0974A56255B8E300013DC60 /* LifeHash in Frameworks */,
 				D064BCC6252D5BD700D42D66 /* URKit in Frameworks */,
-				D00C4C772534296E00B8A61F /* CLibWally.xcframework in Frameworks */,
-				D00C4C792534297400B8A61F /* LibWally.xcframework in Frameworks */,
+				D01C295A255D316400C5ED55 /* LibWally.xcframework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -163,6 +167,7 @@
 				D04B029B2524A9F800C249B8 /* AddSignerViewController.swift */,
 				D04D497F252C19E000D7383E /* QRScannerViewController.swift */,
 				D04D4983252C4FEF00D7383E /* QRDisplayerViewController.swift */,
+				D01C2954255CE33F00C5ED55 /* PsbtTableViewController.swift */,
 			);
 			path = "View Controllers";
 			sourceTree = "<group>";
@@ -237,8 +242,8 @@
 		D0CF1E672522E5DB0059C541 /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
-				D00C4C752534296E00B8A61F /* CLibWally.xcframework */,
-				D00C4C762534296E00B8A61F /* LibWally.xcframework */,
+				D01C2956255D315F00C5ED55 /* CLibWally.xcframework */,
+				D01C2957255D315F00C5ED55 /* LibWally.xcframework */,
 			);
 			name = Frameworks;
 			sourceTree = "<group>";
@@ -259,6 +264,7 @@
 				D0B4DDD625258B25009C8624 /* Bip39Words.swift */,
 				D064BCC7252D62FD00D42D66 /* URHelper.swift */,
 				D0974A61255BA1B90013DC60 /* LifeHash.swift */,
+				D01C2952255CD66F00C5ED55 /* PSBTParser.swift */,
 			);
 			path = Helpers;
 			sourceTree = "<group>";
@@ -273,7 +279,7 @@
 				D0CF1E2C2522E20C0059C541 /* Sources */,
 				D0CF1E2D2522E20C0059C541 /* Frameworks */,
 				D0CF1E2E2522E20C0059C541 /* Resources */,
-				D00C4C7B2534297400B8A61F /* Embed Frameworks */,
+				D01C295C255D316400C5ED55 /* Embed Frameworks */,
 			);
 			buildRules = (
 			);
@@ -422,6 +428,8 @@
 				D0CF1E70252300B80059C541 /* Keychain.swift in Sources */,
 				D04B029A2524A18100C249B8 /* SignersViewController.swift in Sources */,
 				D0CF1E75252302A00059C541 /* Encryption.swift in Sources */,
+				D01C2953255CD66F00C5ED55 /* PSBTParser.swift in Sources */,
+				D01C2955255CE33F00C5ED55 /* PsbtTableViewController.swift in Sources */,
 				D04D4986252C509400D7383E /* QRGenerator.swift in Sources */,
 				D0974A62255BA1B90013DC60 /* LifeHash.swift in Sources */,
 				D0CF1E7B252368DC0059C541 /* Keys.swift in Sources */,
