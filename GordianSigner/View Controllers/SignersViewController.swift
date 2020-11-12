@@ -12,9 +12,9 @@ class SignersViewController: UIViewController {
 
     @IBOutlet weak private var tableView: UITableView!
     
-    var fingeprints = [String]()
     var addButton = UIBarButtonItem()
     var editButton = UIBarButtonItem()
+    var signerStructs = [SignerStruct]()
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -37,16 +37,24 @@ class SignersViewController: UIViewController {
     }
     
     private func loadData() {
-        fingeprints.removeAll()
-        guard let signers = Encryption.decryptedSeeds(), signers.count > 0 else { return }
-        for signer in signers {
-            guard let masterKey = Keys.masterKey(signer, ""),
-                let fingerprint = Keys.fingerprint(masterKey) else {
-                    return
+        signerStructs.removeAll()
+        
+        CoreDataService.retrieveEntity(entityName: .signer) { [weak self] (signers, errorDescription) in
+            guard let self = self, let signers = signers, signers.count > 0 else { return }
+            
+            for (i, signer) in signers.enumerated() {
+                let signerStruct = SignerStruct(dictionary: signer)
+                self.signerStructs.append(signerStruct)
+                
+                if i + 1 == signers.count {
+                    DispatchQueue.main.async { [weak self] in
+                        guard let self = self else { return }
+                        
+                        self.tableView.reloadData()
+                    }
+                }
             }
-            fingeprints.append(fingerprint)
         }
-        tableView.reloadData()
     }
     
     @objc func editSigners() {
@@ -61,7 +69,7 @@ class SignersViewController: UIViewController {
         self.navigationItem.setRightBarButtonItems([addButton, editButton], animated: true)
     }
     
-    @objc func deleteSeed(_ xfp: String) {
+    @objc func deleteSeed(_ id: UUID, _ section: Int) {
         DispatchQueue.main.async { [weak self] in
             guard let self = self else { return }
             
@@ -73,7 +81,7 @@ class SignersViewController: UIViewController {
             let alert = UIAlertController(title: "Delete signer?", message: "This action is undoable! The signer will be gone forever.", preferredStyle: alertStyle)
             
             alert.addAction(UIAlertAction(title: "Delete", style: .destructive, handler: { action in
-                self.deleteSeedNow(xfp)
+                self.deleteSeedNow(id, section)
             }))
             
             alert.addAction(UIAlertAction(title: "Cancel", style: .cancel, handler: { action in }))
@@ -82,42 +90,19 @@ class SignersViewController: UIViewController {
         }
     }
     
-    private func deleteSeedNow(_ xfp: String) {
-        let spinner = Spinner()
-        spinner.add(vc: self, description: "deleting signer...")
-        
-        guard var signers = Encryption.decryptedSeeds(), signers.count > 0 else { return }
-        
-        for (i, signer) in signers.enumerated() {
-            guard let masterKey = Keys.masterKey(signer, ""),
-                let fingerprint = Keys.fingerprint(masterKey) else {
-                    return
+    private func deleteSeedNow(_ id: UUID, _ section: Int) {
+        CoreDataService.deleteEntity(id: id, entityName: .signer) { (success, errorDescription) in
+            guard success else {
+                showAlert(self, "Error deleting signer", "We were unable to delete that signer!")
+                return
             }
-            if fingerprint == xfp {
-                signers.remove(at: i)
+            
+            DispatchQueue.main.async { [weak self] in
+                self?.signerStructs.remove(at: section)
+                self?.tableView.deleteSections(IndexSet.init(arrayLiteral: section), with: .fade)
             }
-        }
-        
-        if signers.count > 0 {
-            KeyChain.overWriteExistingSeeds(signers) { success in
-                if success {
-                    self.loadData()
-                    spinner.remove()
-                    showAlert(self, "Success ✓", "Signer has been removed")
-                } else {
-                    spinner.remove()
-                    showAlert(self, "Error", "There was an error removing your signer")
-                }
-            }
-        } else {
-            if KeyChain.remove(key: "seeds") {
-                self.loadData()
-                spinner.remove()
-                showAlert(self, "Success ✓", "Signer has been removed")
-            } else {
-                spinner.remove()
-                showAlert(self, "Error", "There was an error removing your signer")
-            }
+            
+            showAlert(self, "Signer deleted ✅", "")
         }
     }
 
@@ -126,7 +111,7 @@ class SignersViewController: UIViewController {
 extension SignersViewController: UITableViewDelegate {
     
     func tableView(_ tableView: UITableView, heightForRowAt indexPath: IndexPath) -> CGFloat {
-        return 50
+        return 80
     }
     
     func tableView(_ tableView: UITableView, canEditRowAt indexPath: IndexPath) -> Bool {
@@ -135,8 +120,8 @@ extension SignersViewController: UITableViewDelegate {
     
     func tableView(_ tableView: UITableView, commit editingStyle: UITableViewCell.EditingStyle, forRowAt indexPath: IndexPath) {
         if editingStyle == .delete {
-            let fingerprint = fingeprints[indexPath.section]
-            deleteSeed(fingerprint)
+            let signer = signerStructs[indexPath.section]
+            deleteSeed(signer.id, indexPath.section)
         }
     }
     
@@ -145,7 +130,7 @@ extension SignersViewController: UITableViewDelegate {
 extension SignersViewController: UITableViewDataSource {
     
     func numberOfSections(in tableView: UITableView) -> Int {
-        return fingeprints.count
+        return signerStructs.count
     }
     
     func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
@@ -155,18 +140,29 @@ extension SignersViewController: UITableViewDataSource {
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         let cell = tableView.dequeueReusableCell(withIdentifier: "signerCell", for: indexPath)
         let label = cell.viewWithTag(1) as! UILabel
+        let dateAdded = cell.viewWithTag(2) as! UILabel
         let imageView = cell.viewWithTag(3) as! UIImageView
-        let backgroundView = cell.viewWithTag(4)!
+        let fingerprintLabel = cell.viewWithTag(4) as! UILabel
+        let isHot = cell.viewWithTag(5) as! UIImageView
         
         cell.selectionStyle = .none
         
-        label.text = fingeprints[indexPath.section]
-    
-        imageView.tintColor = .white
+        let signer = signerStructs[indexPath.section]
         
-        backgroundView.clipsToBounds = true
-        backgroundView.layer.cornerRadius = 5
-        backgroundView.backgroundColor = .systemBlue
+        if signer.entropy != nil {
+            isHot.alpha = 1
+        } else {
+            isHot.alpha = 0
+        }
+        
+        label.text = signer.label
+        imageView.image = UIImage(data: signer.lifeHash)
+        dateAdded.text = signer.dateAdded.formatted()
+        fingerprintLabel.text = signer.fingerprint
+            
+        imageView.clipsToBounds = true
+        imageView.layer.cornerRadius = 8
+        
         return cell
     }
     

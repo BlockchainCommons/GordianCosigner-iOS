@@ -66,3 +66,15 @@ extension Array where Element == UInt8 {
         Data(self)
     }
 }
+
+extension Date {
+    func formatted() -> String {
+        let dateFormatter = DateFormatter()
+        dateFormatter.timeZone = .current
+        dateFormatter.dateFormat = "yyyy-MMM-dd hh:mm"
+        let strDate = dateFormatter.string(from: self)
+        return strDate
+    }
+}
+
+

@@ -1,4 +1,26 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
-<model type="com.apple.IDECoreDataModeler.DataModel" documentVersion="1.0" lastSavedToolsVersion="1" systemVersion="11A491" minimumToolsVersion="Automatic" sourceLanguage="Swift" usedWithCloudKit="false" userDefinedModelVersionIdentifier="">
-    <elements/>
+<model type="com.apple.IDECoreDataModeler.DataModel" documentVersion="1.0" lastSavedToolsVersion="16119" systemVersion="19E242d" minimumToolsVersion="Automatic" sourceLanguage="Swift" userDefinedModelVersionIdentifier="">
+    <entity name="AccountMap" representedClassName="AccountMap" syncable="YES" codeGenerationType="class">
+        <attribute name="accountMap" optional="YES" attributeType="String"/>
+        <attribute name="birthblock" optional="YES" attributeType="Integer 64" defaultValueString="0" usesScalarValueType="YES"/>
+        <attribute name="dateAdded" optional="YES" attributeType="Date" usesScalarValueType="NO"/>
+        <attribute name="descriptor" optional="YES" attributeType="String"/>
+        <attribute name="id" optional="YES" attributeType="UUID" usesScalarValueType="NO"/>
+        <attribute name="label" optional="YES" attributeType="String"/>
+        <attribute name="lifeHash" optional="YES" attributeType="Binary"/>
+    </entity>
+    <entity name="Signer" representedClassName="Signer" syncable="YES" codeGenerationType="class">
+        <attribute name="dateAdded" optional="YES" attributeType="Date" usesScalarValueType="NO"/>
+        <attribute name="entropy" optional="YES" attributeType="Binary"/>
+        <attribute name="fingerprint" optional="YES" attributeType="String"/>
+        <attribute name="id" optional="YES" attributeType="UUID" usesScalarValueType="NO"/>
+        <attribute name="label" optional="YES" attributeType="String"/>
+        <attribute name="lifeHash" optional="YES" attributeType="Binary"/>
+        <attribute name="passphrase" optional="YES" attributeType="Binary"/>
+        <attribute name="rootXpub" optional="YES" attributeType="String"/>
+    </entity>
+    <elements>
+        <element name="Signer" positionX="-63" positionY="-18" width="128" height="163"/>
+        <element name="AccountMap" positionX="-54" positionY="18" width="128" height="148"/>
+    </elements>
 </model>

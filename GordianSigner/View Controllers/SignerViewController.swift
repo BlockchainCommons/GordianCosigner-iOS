@@ -152,7 +152,7 @@ class SignerViewController: UIViewController {
         if psbt != "" {
             spinner.add(vc: self, description: "signing")
             
-            Signer.sign(psbt) { [weak self] (psbt, errorMessage) in
+            PSBTSigner.sign(psbt) { [weak self] (psbt, errorMessage) in
                 guard let self = self else { return }
                 
                 guard let signedPsbt = psbt else {

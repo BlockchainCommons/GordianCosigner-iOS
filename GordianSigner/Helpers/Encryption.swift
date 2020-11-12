@@ -11,21 +11,6 @@ import CryptoKit
 
 enum Encryption {
     
-    static func decryptedSeeds() -> [String]? {
-        guard let encryptedSeeds = KeyChain.seeds(), encryptedSeeds.count > 0 else { return nil }
-        
-        var decryptedSeeds:[String] = []
-        
-        for seed in encryptedSeeds {
-            guard let decryptedSeed = Encryption.decrypt(seed),
-                let words = String(data: decryptedSeed, encoding: .utf8) else { return nil }
-            
-            decryptedSeeds.append(words)
-        }
-        
-        return decryptedSeeds
-    }
-    
     static func privateKey() -> Data {
         return P256.Signing.PrivateKey().rawRepresentation
     }

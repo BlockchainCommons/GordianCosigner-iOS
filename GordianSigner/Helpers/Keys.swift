@@ -11,7 +11,7 @@ import LibWally
 
 enum Keys {
     
-    static func masterKey(_ words: String, _ passphrase: String) -> String? {
+    static func masterKey(_ words: [String], _ passphrase: String) -> String? {
         guard let mnemonic = BIP39Mnemonic(words) else { return nil }
         
         let seedHex = mnemonic.seedHex(passphrase)
@@ -19,6 +19,26 @@ enum Keys {
         guard let hdMasterKey = HDKey(seedHex, .testnet) else { return nil }
         
         return hdMasterKey.xpriv
+    }
+    
+    static func masterXprv(_ words: String, _ passphrase: String) -> String? {
+        guard let mnemonic = BIP39Mnemonic(words) else { return nil }
+        
+        let seedHex = mnemonic.seedHex(passphrase)
+        
+        guard let hdMasterKey = HDKey(seedHex, .testnet) else { return nil }
+        
+        return hdMasterKey.xpriv
+    }
+    
+    static func masterXpub(_ words: [String], _ passphrase: String) -> String? {
+        guard let mnemonic = BIP39Mnemonic(words) else { return nil }
+        
+        let seedHex = mnemonic.seedHex(passphrase)
+        
+        guard let hdMasterKey = HDKey(seedHex, .testnet) else { return nil }
+        
+        return hdMasterKey.xpub
     }
     
     static func fingerprint(_ masterKey: String) -> String? {
@@ -45,4 +65,32 @@ enum Keys {
         return true
     }
     
+    static func entropy(_ words: [String]) -> Data? {
+        guard let mnemonic = BIP39Mnemonic(words) else { return nil }
+        
+        return mnemonic.entropy.data
+    }
+    
+    static func seed() -> String? {
+        var words: String?
+        let bytesCount = 16
+        var randomBytes = [UInt8](repeating: 0, count: bytesCount)
+        let status = SecRandomCopyBytes(kSecRandomDefault, bytesCount, &randomBytes)
+        
+        if status == errSecSuccess {
+            let data = Data(randomBytes)
+            let hex = data.hexString
+            if let entropy = BIP39Entropy(hex), let mnemonic = BIP39Mnemonic(entropy) {
+                words = mnemonic.description
+            }
+        }
+        
+        return words
+    }
+    
+    static func mnemonic(_ entropy: Data) -> String? {
+        let bip39entropy = BIP39Entropy(entropy)
+        
+        return BIP39Mnemonic(bip39entropy)?.description        
+    }
 }

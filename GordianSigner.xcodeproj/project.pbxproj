@@ -19,6 +19,13 @@
 		D04D4986252C509400D7383E /* QRGenerator.swift in Sources */ = {isa = PBXBuildFile; fileRef = D04D4985252C509400D7383E /* QRGenerator.swift */; };
 		D064BCC6252D5BD700D42D66 /* URKit in Frameworks */ = {isa = PBXBuildFile; productRef = D064BCC5252D5BD700D42D66 /* URKit */; };
 		D064BCC8252D62FD00D42D66 /* URHelper.swift in Sources */ = {isa = PBXBuildFile; fileRef = D064BCC7252D62FD00D42D66 /* URHelper.swift */; };
+		D0974A56255B8E300013DC60 /* LifeHash in Frameworks */ = {isa = PBXBuildFile; productRef = D0974A55255B8E300013DC60 /* LifeHash */; };
+		D0974A58255B8E8D0013DC60 /* SignerStruct.swift in Sources */ = {isa = PBXBuildFile; fileRef = D0974A57255B8E8D0013DC60 /* SignerStruct.swift */; };
+		D0974A5A255B90A10013DC60 /* AccountMapStruct.swift in Sources */ = {isa = PBXBuildFile; fileRef = D0974A59255B90A10013DC60 /* AccountMapStruct.swift */; };
+		D0974A5C255B93130013DC60 /* CoreDataService.swift in Sources */ = {isa = PBXBuildFile; fileRef = D0974A5B255B93130013DC60 /* CoreDataService.swift */; };
+		D0974A5E255B93500013DC60 /* Entities.swift in Sources */ = {isa = PBXBuildFile; fileRef = D0974A5D255B93500013DC60 /* Entities.swift */; };
+		D0974A62255BA1B90013DC60 /* LifeHash.swift in Sources */ = {isa = PBXBuildFile; fileRef = D0974A61255BA1B90013DC60 /* LifeHash.swift */; };
+		D0974A64255BB3C00013DC60 /* icons8-key-24.png in Resources */ = {isa = PBXBuildFile; fileRef = D0974A63255BB3C00013DC60 /* icons8-key-24.png */; };
 		D0B4DDD725258B25009C8624 /* Bip39Words.swift in Sources */ = {isa = PBXBuildFile; fileRef = D0B4DDD625258B25009C8624 /* Bip39Words.swift */; };
 		D0B4DDD92525AC18009C8624 /* whiteFingerPrint.png in Resources */ = {isa = PBXBuildFile; fileRef = D0B4DDD82525AC18009C8624 /* whiteFingerPrint.png */; };
 		D0CF1E342522E20C0059C541 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = D0CF1E332522E20C0059C541 /* AppDelegate.swift */; };
@@ -79,6 +86,12 @@
 		D04D4983252C4FEF00D7383E /* QRDisplayerViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = QRDisplayerViewController.swift; sourceTree = "<group>"; };
 		D04D4985252C509400D7383E /* QRGenerator.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = QRGenerator.swift; sourceTree = "<group>"; };
 		D064BCC7252D62FD00D42D66 /* URHelper.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = URHelper.swift; sourceTree = "<group>"; };
+		D0974A57255B8E8D0013DC60 /* SignerStruct.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SignerStruct.swift; sourceTree = "<group>"; };
+		D0974A59255B90A10013DC60 /* AccountMapStruct.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AccountMapStruct.swift; sourceTree = "<group>"; };
+		D0974A5B255B93130013DC60 /* CoreDataService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CoreDataService.swift; sourceTree = "<group>"; };
+		D0974A5D255B93500013DC60 /* Entities.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Entities.swift; sourceTree = "<group>"; };
+		D0974A61255BA1B90013DC60 /* LifeHash.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LifeHash.swift; sourceTree = "<group>"; };
+		D0974A63255BB3C00013DC60 /* icons8-key-24.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "icons8-key-24.png"; sourceTree = "<group>"; };
 		D0B4DDD625258B25009C8624 /* Bip39Words.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Bip39Words.swift; sourceTree = "<group>"; };
 		D0B4DDD82525AC18009C8624 /* whiteFingerPrint.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = whiteFingerPrint.png; sourceTree = "<group>"; };
 		D0CF1E302522E20C0059C541 /* GordianSigner.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = GordianSigner.app; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -109,6 +122,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				D0974A56255B8E300013DC60 /* LifeHash in Frameworks */,
 				D064BCC6252D5BD700D42D66 /* URKit in Frameworks */,
 				D00C4C772534296E00B8A61F /* CLibWally.xcframework in Frameworks */,
 				D00C4C792534297400B8A61F /* LibWally.xcframework in Frameworks */,
@@ -132,6 +146,36 @@
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
+		D0974A5F255B99CF0013DC60 /* Structs */ = {
+			isa = PBXGroup;
+			children = (
+				D0974A57255B8E8D0013DC60 /* SignerStruct.swift */,
+				D0974A59255B90A10013DC60 /* AccountMapStruct.swift */,
+			);
+			path = Structs;
+			sourceTree = "<group>";
+		};
+		D0974A60255B9C870013DC60 /* View Controllers */ = {
+			isa = PBXGroup;
+			children = (
+				D04B029725249EEB00C249B8 /* SignerViewController.swift */,
+				D04B02992524A18100C249B8 /* SignersViewController.swift */,
+				D04B029B2524A9F800C249B8 /* AddSignerViewController.swift */,
+				D04D497F252C19E000D7383E /* QRScannerViewController.swift */,
+				D04D4983252C4FEF00D7383E /* QRDisplayerViewController.swift */,
+			);
+			path = "View Controllers";
+			sourceTree = "<group>";
+		};
+		D0974A65255BD2500013DC60 /* Images */ = {
+			isa = PBXGroup;
+			children = (
+				D0974A63255BB3C00013DC60 /* icons8-key-24.png */,
+				D0B4DDD82525AC18009C8624 /* whiteFingerPrint.png */,
+			);
+			path = Images;
+			sourceTree = "<group>";
+		};
 		D0CF1E272522E20C0059C541 = {
 			isa = PBXGroup;
 			children = (
@@ -156,7 +200,7 @@
 		D0CF1E322522E20C0059C541 /* GordianSigner */ = {
 			isa = PBXGroup;
 			children = (
-				D0B4DDD82525AC18009C8624 /* whiteFingerPrint.png */,
+				D0974A65255BD2500013DC60 /* Images */,
 				D0CF1E662522E22A0059C541 /* GordianSigner.entitlements */,
 				D0CF1E332522E20C0059C541 /* AppDelegate.swift */,
 				D0CF1E352522E20C0059C541 /* SceneDelegate.swift */,
@@ -166,15 +210,8 @@
 				D0CF1E442522E2140059C541 /* Info.plist */,
 				D0CF1E3C2522E20C0059C541 /* GordianSigner.xcdatamodeld */,
 				D0CF1E71252301030059C541 /* Helpers */,
-				D0CF1E76252303370059C541 /* Utlities.swift */,
-				D0CF1E78252360EC0059C541 /* Signer.swift */,
-				D04B029725249EEB00C249B8 /* SignerViewController.swift */,
-				D04B02992524A18100C249B8 /* SignersViewController.swift */,
-				D04B029B2524A9F800C249B8 /* AddSignerViewController.swift */,
-				D04D497F252C19E000D7383E /* QRScannerViewController.swift */,
-				D04D4981252C1A9300D7383E /* Spinner.swift */,
-				D04D4983252C4FEF00D7383E /* QRDisplayerViewController.swift */,
-				D04D4985252C509400D7383E /* QRGenerator.swift */,
+				D0974A60255B9C870013DC60 /* View Controllers */,
+				D0974A5F255B99CF0013DC60 /* Structs */,
 			);
 			path = GordianSigner;
 			sourceTree = "<group>";
@@ -209,12 +246,19 @@
 		D0CF1E71252301030059C541 /* Helpers */ = {
 			isa = PBXGroup;
 			children = (
+				D0974A5D255B93500013DC60 /* Entities.swift */,
+				D0CF1E78252360EC0059C541 /* Signer.swift */,
+				D0CF1E76252303370059C541 /* Utlities.swift */,
+				D04D4981252C1A9300D7383E /* Spinner.swift */,
+				D04D4985252C509400D7383E /* QRGenerator.swift */,
+				D0974A5B255B93130013DC60 /* CoreDataService.swift */,
 				D0CF1E6F252300B80059C541 /* Keychain.swift */,
 				D0CF1E722523012A0059C541 /* FirstTime.swift */,
 				D0CF1E74252302A00059C541 /* Encryption.swift */,
 				D0CF1E7A252368DC0059C541 /* Keys.swift */,
 				D0B4DDD625258B25009C8624 /* Bip39Words.swift */,
 				D064BCC7252D62FD00D42D66 /* URHelper.swift */,
+				D0974A61255BA1B90013DC60 /* LifeHash.swift */,
 			);
 			path = Helpers;
 			sourceTree = "<group>";
@@ -238,6 +282,7 @@
 			name = GordianSigner;
 			packageProductDependencies = (
 				D064BCC5252D5BD700D42D66 /* URKit */,
+				D0974A55255B8E300013DC60 /* LifeHash */,
 			);
 			productName = GordianSigner;
 			productReference = D0CF1E302522E20C0059C541 /* GordianSigner.app */;
@@ -313,6 +358,7 @@
 			mainGroup = D0CF1E272522E20C0059C541;
 			packageReferences = (
 				D064BCC4252D5BD700D42D66 /* XCRemoteSwiftPackageReference "URKit" */,
+				D0974A54255B8E300013DC60 /* XCRemoteSwiftPackageReference "LifeHash" */,
 			);
 			productRefGroup = D0CF1E312522E20C0059C541 /* Products */;
 			projectDirPath = "";
@@ -330,6 +376,7 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				D0974A64255BB3C00013DC60 /* icons8-key-24.png in Resources */,
 				D0B4DDD92525AC18009C8624 /* whiteFingerPrint.png in Resources */,
 				D0CF1E432522E2140059C541 /* LaunchScreen.storyboard in Resources */,
 				D0CF1E402522E2140059C541 /* Assets.xcassets in Resources */,
@@ -360,12 +407,15 @@
 			files = (
 				D064BCC8252D62FD00D42D66 /* URHelper.swift in Sources */,
 				D0CF1E732523012A0059C541 /* FirstTime.swift in Sources */,
+				D0974A58255B8E8D0013DC60 /* SignerStruct.swift in Sources */,
 				D0CF1E342522E20C0059C541 /* AppDelegate.swift in Sources */,
 				D0CF1E3E2522E20C0059C541 /* GordianSigner.xcdatamodeld in Sources */,
 				D04D4980252C19E000D7383E /* QRScannerViewController.swift in Sources */,
 				D0CF1E77252303370059C541 /* Utlities.swift in Sources */,
+				D0974A5C255B93130013DC60 /* CoreDataService.swift in Sources */,
 				D0CF1E362522E20C0059C541 /* SceneDelegate.swift in Sources */,
 				D04D4984252C4FEF00D7383E /* QRDisplayerViewController.swift in Sources */,
+				D0974A5E255B93500013DC60 /* Entities.swift in Sources */,
 				D04B029C2524A9F800C249B8 /* AddSignerViewController.swift in Sources */,
 				D0B4DDD725258B25009C8624 /* Bip39Words.swift in Sources */,
 				D0CF1E79252360EC0059C541 /* Signer.swift in Sources */,
@@ -373,7 +423,9 @@
 				D04B029A2524A18100C249B8 /* SignersViewController.swift in Sources */,
 				D0CF1E75252302A00059C541 /* Encryption.swift in Sources */,
 				D04D4986252C509400D7383E /* QRGenerator.swift in Sources */,
+				D0974A62255BA1B90013DC60 /* LifeHash.swift in Sources */,
 				D0CF1E7B252368DC0059C541 /* Keys.swift in Sources */,
+				D0974A5A255B90A10013DC60 /* AccountMapStruct.swift in Sources */,
 				D04B029825249EEB00C249B8 /* SignerViewController.swift in Sources */,
 				D04D4982252C1A9300D7383E /* Spinner.swift in Sources */,
 			);
@@ -724,6 +776,14 @@
 				minimumVersion = 2.0.0;
 			};
 		};
+		D0974A54255B8E300013DC60 /* XCRemoteSwiftPackageReference "LifeHash" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/BlockchainCommons/LifeHash";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 4.2.0;
+			};
+		};
 /* End XCRemoteSwiftPackageReference section */
 
 /* Begin XCSwiftPackageProductDependency section */
@@ -731,6 +791,11 @@
 			isa = XCSwiftPackageProductDependency;
 			package = D064BCC4252D5BD700D42D66 /* XCRemoteSwiftPackageReference "URKit" */;
 			productName = URKit;
+		};
+		D0974A55255B8E300013DC60 /* LifeHash */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = D0974A54255B8E300013DC60 /* XCRemoteSwiftPackageReference "LifeHash" */;
+			productName = LifeHash;
 		};
 /* End XCSwiftPackageProductDependency section */
 

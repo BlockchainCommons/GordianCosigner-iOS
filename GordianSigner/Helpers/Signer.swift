@@ -9,12 +9,13 @@
 import Foundation
 import LibWally
 
-class Signer {
+class PSBTSigner {
     
     class func sign(_ psbt: String, completion: @escaping ((psbt: String?, errorMessage: String?)) -> Void) {
         var seedsToSignWith = [String]()
         var xprvsToSignWith = [HDKey]()
         var psbtToSign:PSBT!
+        var network:Network!
         
         func reset() {
             seedsToSignWith.removeAll()
@@ -67,7 +68,7 @@ class Signer {
                         }
                         
                         for (s, signer) in uniqueSigners.enumerated() {
-                            guard let signingKey = Key(signer, .testnet) else { return }
+                            guard let signingKey = Key(signer, network) else { return }
                             
                             psbtToSign.sign(signingKey)
                             /// Once we completed the signing loop we finalize with our node.
@@ -85,7 +86,7 @@ class Signer {
             xprvsToSignWith.removeAll()
             
             for (i, words) in seedsToSignWith.enumerated() {
-                guard let masterKey = Keys.masterKey(words, ""),
+                guard let masterKey = Keys.masterXprv(words, ""),
                     let hdkey = HDKey(masterKey) else { return }
                 
                 xprvsToSignWith.append(hdkey)
@@ -100,22 +101,39 @@ class Signer {
         func getSeeds() {
             seedsToSignWith.removeAll()
             
-            guard let seeds = Encryption.decryptedSeeds(), seeds.count > 0 else {
-                completion((nil, "Looks like you do not have any signers added yet. Tap the signer button then + to add signers."))
-                return
-            }
-            
-            for (i, seed) in seeds.enumerated() {
-                seedsToSignWith.append(seed)
+            CoreDataService.retrieveEntity(entityName: .signer) { (signers, errorDescription) in
+                guard let signers = signers, signers.count > 0 else {
+                    completion((nil, "Looks like you do not have any signers added yet. Tap the signer button then + to add signers."))
+                    return
+                }
                 
-                if i + 1 == seeds.count {
-                    getKeysToSignWith()
+                for (i, signer) in signers.enumerated() {
+                    let signerStruct = SignerStruct(dictionary: signer)
+                    
+                    if let encryptedEntropy = signerStruct.entropy {
+                        guard let decryptedEntropy = Encryption.decrypt(encryptedEntropy) else {
+                            completion((nil, "There was an error decrypting your signer"))
+                            return
+                        }
+                        
+                        guard let words = Keys.mnemonic(decryptedEntropy) else {
+                            completion((nil, "There was an error converting your signer to a mnemonic"))
+                            return
+                        }
+                        
+                        seedsToSignWith.append(words)
+                    }
+                    
+                    if i + 1 == signers.count {
+                        getKeysToSignWith()
+                    }
                 }
             }
         }
         
         do {
             psbtToSign = try PSBT(psbt, .testnet)
+            network = .testnet
             
             if psbtToSign.complete {
                 completion((psbt, nil))
@@ -125,7 +143,19 @@ class Signer {
             
         } catch {
             
-            completion((nil, "Error converting that psbt"))
+            do {
+                psbtToSign = try PSBT(psbt, .mainnet)
+                network = .mainnet
+                
+                if psbtToSign.complete {
+                    completion((psbt, nil))
+                } else {
+                    getSeeds()
+                }
+                
+            } catch {
+                completion((nil, "Error converting that psbt"))
+            }
         }
     }
 }

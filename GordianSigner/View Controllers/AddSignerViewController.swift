@@ -14,6 +14,8 @@ class AddSignerViewController: UIViewController {
     @IBOutlet weak private var textView: UIView!
     @IBOutlet weak private var passphraseField: UITextField!
     @IBOutlet weak private var addSignerOutlet: UIButton!
+    @IBOutlet weak private var privateKeySwitch: UISwitch!
+    @IBOutlet weak private var aliasField: UITextField!
     
     private var addedWords = [String]()
     private var justWords = [String]()
@@ -34,16 +36,53 @@ class AddSignerViewController: UIViewController {
         bip39Words = Bip39Words.valid
     }
     
+    @IBAction func generateAction(_ sender: Any) {
+        guard let words = Keys.seed() else { return }
+        
+        DispatchQueue.main.async { [weak self] in
+            guard let self = self else { return }
+            
+            self.textField.text = words
+            self.processTextfieldInput()
+            self.validWordsAdded()
+        }
+    }
+    
     @IBAction func addSignerAction(_ sender: Any) {
-        guard Keys.validMnemonicArray(justWords),
-            let data = (justWords.joined(separator: " ")).data(using: .utf8),
-            let encryptedData = Encryption.encrypt(data),
-            KeyChain.saveNewSeed(encryptedData) else {
-                showAlert(self, "Error ⚠️", "Something went wrong, your seed words were not saved!")
-                return
+        let passphrase = passphraseField.text ?? ""
+        let alias = aliasField.text ?? "Signer"
+        
+        guard let entropy = Keys.entropy(justWords), let rootXpub = Keys.masterXpub(justWords, passphrase), let encryptedData = Encryption.encrypt(entropy), let masterKey = Keys.masterKey(justWords, passphrase), let fingerprint = Keys.fingerprint(masterKey), let lifeHash = LifeHash.hash(entropy) else {
+            showAlert(self, "Error ⚠️", "Something went wrong, your signer was not saved!")
+            return
         }
         
-        showAlert(self, "Seed words encrypted and saved 🔐", "")
+        var dict = [String:Any]()
+        dict["id"] = UUID()
+        dict["label"] = alias
+        dict["dateAdded"] = Date()
+        dict["lifeHash"] = lifeHash
+        dict["rootXpub"] = rootXpub
+        dict["fingerprint"] = fingerprint
+        
+        if privateKeySwitch.isOn {
+            dict["entropy"] = encryptedData
+            
+            if passphrase != "" {
+                guard let encryptedPassphrase = Encryption.encrypt(passphrase.utf8) else { return }
+                
+                dict["passphrase"] = encryptedPassphrase
+            }
+        }
+        
+        CoreDataService.saveEntity(dict: dict, entityName: .signer) { (success, errorDescription) in
+            guard success else {
+                showAlert(self, "Error ⚠️", "Failed saving that signer to Core Data!")
+                return
+            }
+        }
+        
+        showAlert(self, "Signer encrypted and saved 🔐", "")
         textField.text = ""
         addedWords.removeAll()
         justWords.removeAll()
@@ -95,6 +134,7 @@ class AddSignerViewController: UIViewController {
     
     private func setDelegates() {
         navigationController?.delegate = self
+        aliasField.delegate = self
         passphraseField.delegate = self
         textField.delegate = self
     }
@@ -137,6 +177,7 @@ class AddSignerViewController: UIViewController {
             self.textField.resignFirstResponder()
             self.textView.resignFirstResponder()
             self.passphraseField.resignFirstResponder()
+            self.aliasField.resignFirstResponder()
         }
     }
     
@@ -398,14 +439,14 @@ extension AddSignerViewController: UINavigationControllerDelegate {
 extension AddSignerViewController: UITextFieldDelegate {
     
     func textFieldShouldReturn(_ textField: UITextField) -> Bool {
-        if textField != passphraseField {
+        if textField == self.textField {
             processTextfieldInput()
         }
         return true
     }
     
     func textField(_ textField: UITextField, shouldChangeCharactersIn range: NSRange, replacementString string: String) -> Bool {
-        if textField != passphraseField {
+        if textField == self.textField {
             var subString = (textField.text!.capitalized as NSString).replacingCharacters(in: range, with: string)
             subString = formatSubstring(subString: subString)
             if subString.count == 0 {
