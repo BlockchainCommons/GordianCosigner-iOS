@@ -11,12 +11,17 @@ import URKit
 
 class QRDisplayerViewController: UIViewController {
     
+    @IBOutlet weak var textView: UITextView!
+    @IBOutlet weak var headerLabel: UILabel!
     @IBOutlet weak private var imageView: UIImageView!
     @IBOutlet weak var animateOutlet: UIButton!
     
+    var descriptionText = ""
+    var header = ""
     private let spinner = Spinner()
     private let qrGenerator = QRGenerator()
     var text = ""
+    var isPsbt = false
     private var encoder:UREncoder!
     private var timer: Timer?
     private var parts = [String]()
@@ -25,8 +30,18 @@ class QRDisplayerViewController: UIViewController {
     
     override func viewDidLoad() {
         super.viewDidLoad()
+        
         spinner.add(vc: self, description: "")
-        convertToUr()
+        headerLabel.text = header
+        textView.text = descriptionText
+        
+        if isPsbt {
+            animateOutlet.alpha = 1
+           convertToUr()
+        } else {
+            animateOutlet.alpha = 0
+            showQR(text)
+        }
     }
     
     @IBAction func animateAction(_ sender: Any) {

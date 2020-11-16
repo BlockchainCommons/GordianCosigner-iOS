@@ -16,7 +16,6 @@ class SignerViewController: UIViewController {
     
     private var spinner = Spinner()
     private var psbt = ""
-    private var export = false
     private var alertStyle = UIAlertController.Style.actionSheet
     private var psbtToParse:PSBT!
     
@@ -44,11 +43,9 @@ class SignerViewController: UIViewController {
     }
     
     @IBAction func signAction(_ sender: Any) {
-        if !export {
-            sign()
-        } else {
-            exportAction()
-        }
+        psbt = ""
+        psbtToParse = nil
+        textView.text = ""
     }
     
     @IBAction func scanQrAction(_ sender: Any) {
@@ -106,84 +103,40 @@ class SignerViewController: UIViewController {
         }
     }
     
-    private func exportAction() {
-        DispatchQueue.main.async { [weak self] in
-            guard let self = self else { return }
-            
-            let alert = UIAlertController(title: "Export as a file, text or QR?", message: "", preferredStyle: self.alertStyle)
-            
-            alert.addAction(UIAlertAction(title: "File", style: .default, handler: { action in
-                self.convertPSBTtoData(string: self.psbt)
-            }))
-            
-            alert.addAction(UIAlertAction(title: "Text", style: .default, handler: { action in
-                self.exportText()
-            }))
-            
-            alert.addAction(UIAlertAction(title: "QR", style: .default, handler: { action in
-                self.exportAsQR()
-            }))
-            
-            alert.addAction(UIAlertAction(title: "Cancel", style: .cancel, handler: { action in }))
-            alert.popoverPresentationController?.sourceView = self.view
-            self.present(alert, animated: true) {}
-        }
-    }
-    
-    private func exportAsQR() {
-        DispatchQueue.main.async {
-            self.performSegue(withIdentifier: "segueToQRDisplayer", sender: self)
-        }
-    }
-    
-    private func exportText() {
-        DispatchQueue.main.async {
-            let textToShare = [self.psbt]
-            let activityViewController = UIActivityViewController(activityItems: textToShare, applicationActivities: nil)
-            
-            if UIDevice.current.userInterfaceIdiom == .pad {
-                activityViewController.popoverPresentationController?.sourceView = self.view
-                activityViewController.popoverPresentationController?.sourceRect = CGRect(x: 0, y: 0, width: 100, height: 100)
-            }
-            
-            self.present(activityViewController, animated: true) {}
-        }
-    }
-    
     private func sign() {
-        if psbt != "" {
-            spinner.add(vc: self, description: "signing")
-            
-            PSBTSigner.sign(psbt) { [weak self] (psbt, errorMessage) in
-                guard let self = self else { return }
-                
-                guard let signedPsbt = psbt else {
-                    self.spinner.remove()
-                    showAlert(self, "Something is not right...", errorMessage ?? "unable to sign that psbt: unknown error")
-                    return
-                }
-                
-                DispatchQueue.main.async {
-                    self.textView.text = signedPsbt
-                    self.psbt = signedPsbt
-                    self.export = true
-                    self.signOutlet.setTitle("export", for: .normal)
-                }
-                
-                self.spinner.remove()
-                
-                showAlert(self, "PSBT signed ✅", "You may now export it by tapping the \"export\" button")
-            }
-        } else {
-            showAlert(self, "Add a psbt first", "You may either tap the paste button, scan a QR or upload a .psbt file.")
-        }
+//        if psbt != "" {
+//            spinner.add(vc: self, description: "signing")
+//            
+//            PSBTSigner.sign(psbt) { [weak self] (psbt, errorMessage) in
+//                guard let self = self else { return }
+//                
+//                guard let signedPsbt = psbt else {
+//                    self.spinner.remove()
+//                    showAlert(self, "Something is not right...", errorMessage ?? "unable to sign that psbt: unknown error")
+//                    return
+//                }
+//                
+//                DispatchQueue.main.async {
+//                    self.textView.text = signedPsbt
+//                    self.psbt = signedPsbt
+//                    self.export = true
+//                    self.signOutlet.setTitle("export", for: .normal)
+//                }
+//                
+//                self.spinner.remove()
+//                
+//                showAlert(self, "PSBT signed ✅", "You may now export it by tapping the \"export\" button")
+//            }
+//        } else {
+//            showAlert(self, "Add a psbt first", "You may either tap the paste button, scan a QR or upload a .psbt file.")
+//        }
     }
     
     private func psbtValid(_ string: String) {
-        guard let validPsbt = Keys.psbt(string) else {
+        guard let validPsbt = Keys.psbt(string, .testnet) else {
             setTextView("")
             
-            showAlert(self, "⚠️ Error!", "Invalid psbt")
+            showAlert(self, "⚠️ Invalid psbt", "")
             return
         }
         
@@ -196,8 +149,6 @@ class SignerViewController: UIViewController {
             
             self.performSegue(withIdentifier: "segueToPsbtDetail", sender: self)
         }
-        
-        export = false
     }
     
     private func setTextView(_ text: String) {
@@ -208,40 +159,7 @@ class SignerViewController: UIViewController {
         }
     }
     
-    private func convertPSBTtoData(string: String) {
-        guard let data = Data(base64Encoded: string), let url = exportPsbtToURL(data: data) else {
-            showAlert(self, "Ooops", "We had an issue converting that psbt to raw data.")
-            return
-        }
-        
-        DispatchQueue.main.async { [weak self] in
-            guard let self = self else { return }
-            
-            let activityViewController = UIActivityViewController(activityItems: [url], applicationActivities: nil)
-            
-            if UIDevice.current.userInterfaceIdiom == .pad {
-                activityViewController.popoverPresentationController?.sourceView = self.view
-                activityViewController.popoverPresentationController?.sourceRect = CGRect(x: 0, y: 0, width: 100, height: 100)
-            }
-            
-            self.present(activityViewController, animated: true) {}
-        }
-    }
     
-    public func exportPsbtToURL(data: Data) -> URL? {
-        let documents = FileManager.default.urls(for: .documentDirectory, in: .userDomainMask).first
-        guard let path = documents?.appendingPathComponent("/GordianSigner.psbt") else {
-            return nil
-        }
-        
-        do {
-            try data.write(to: path, options: .atomicWrite)
-            return path
-        } catch {
-            print(error.localizedDescription)
-            return nil
-        }
-    }
     
     // MARK: - Navigation
 

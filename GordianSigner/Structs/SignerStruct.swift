@@ -16,7 +16,6 @@ public struct SignerStruct: CustomStringConvertible {
     let passphrase:Data?
     let dateAdded:Date
     let lifeHash:Data
-    let rootXpub:String
     let fingerprint:String
     
     init(dictionary: [String: Any]) {
@@ -26,7 +25,6 @@ public struct SignerStruct: CustomStringConvertible {
         passphrase = dictionary["passphrase"] as? Data
         dateAdded = dictionary["dateAdded"] as! Date
         lifeHash = dictionary["lifeHash"] as! Data
-        rootXpub = dictionary["rootXpub"] as! String
         fingerprint = dictionary["fingerprint"] as! String
     }
     

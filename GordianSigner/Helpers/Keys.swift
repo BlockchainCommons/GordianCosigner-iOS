@@ -101,14 +101,125 @@ enum Keys {
         return BIP39Mnemonic(bip39entropy)?.description        
     }
     
-    static func psbt(_ psbt: String) -> PSBT? {
-        guard let testnetPsbt = try? PSBT(psbt, .testnet) else {
-            
-            guard let mainnetPsbt = try? PSBT(psbt, .mainnet) else { return nil }
-            
-            return mainnetPsbt
-        }
+    static func psbt(_ psbt: String, _ network: Network) -> PSBT? {
         
-        return testnetPsbt
+        return try? PSBT(psbt, network)
+    }
+    
+    static func bip44Account(_ masterKey: String, _ network: String) -> String? {
+        var coinType = "1"
+        
+        switch network {
+        case "main":
+            coinType = "0"
+        default:
+            break
+        }
+                
+        guard let hdKey = HDKey(masterKey), let bip44deriv = BIP32Path("m/44'/\(coinType)'/0'"),
+            let account = try? hdKey.derive(bip44deriv) else {
+                return nil
+        }
+                
+        return "[\(hdKey.fingerprint.hexString)/44h/\(coinType)h/0h]\(account.xpub)"
+    }
+    
+    static func bip45Account(_ masterKey: String) -> String? {
+        guard let hdKey = HDKey(masterKey), let bip45deriv = BIP32Path("m/45'"),
+            let account = try? hdKey.derive(bip45deriv) else {
+                return nil
+        }
+                
+        return "[\(hdKey.fingerprint.hexString)/45h]\(account.xpub)"
+    }
+    
+    static func bip84Account(_ masterKey: String, _ network: String) -> String? {
+        var coinType = "1"
+        
+        switch network {
+        case "main":
+            coinType = "0"
+        default:
+            break
+        }
+                
+        guard let hdKey = HDKey(masterKey), let bip84deriv = BIP32Path("m/84'/\(coinType)'/0'"),
+            let account = try? hdKey.derive(bip84deriv) else {
+                return nil
+        }
+                
+        return "[\(hdKey.fingerprint.hexString)/84h/\(coinType)h/0h]\(account.xpub)"
+    }
+    
+    static func bip49Account(_ masterKey: String, _ network: String) -> String? {
+        var coinType = "1"
+        
+        switch network {
+        case "main":
+            coinType = "0"
+        default:
+            break
+        }
+                
+        guard let hdKey = HDKey(masterKey), let bip49deriv = BIP32Path("m/49'/\(coinType)'/0'"),
+            let account = try? hdKey.derive(bip49deriv) else {
+                return nil
+        }
+                
+        return "[\(hdKey.fingerprint.hexString)/49h/\(coinType)h/0h]\(account.xpub)"
+    }
+    
+    static func bip48LegacyAccount(_ masterKey: String, _ network: String) -> String? {
+        var coinType = "1"
+        
+        switch network {
+        case "main":
+            coinType = "0"
+        default:
+            break
+        }
+                
+        guard let hdKey = HDKey(masterKey), let bip48LegacyDeriv = BIP32Path("m/48'/\(coinType)'/0'/1'"),
+            let account = try? hdKey.derive(bip48LegacyDeriv) else {
+                return nil
+        }
+                
+        return "[\(hdKey.fingerprint.hexString)/48h/\(coinType)h/0h/1h]\(account.xpub)"
+    }
+    
+    static func bip48SegwitAccount(_ masterKey: String, _ network: String) -> String? {
+        var coinType = "1"
+        
+        switch network {
+        case "main":
+            coinType = "0"
+        default:
+            break
+        }
+                
+        guard let hdKey = HDKey(masterKey), let bip48SegwitDeriv = BIP32Path("m/48'/\(coinType)'/0'/2'"),
+            let account = try? hdKey.derive(bip48SegwitDeriv) else {
+                return nil
+        }
+                
+        return "[\(hdKey.fingerprint.hexString)/48h/\(coinType)h/0h/2h]\(account.xpub)"
+    }
+    
+    static func bip48NestedAccount(_ masterKey: String, _ network: String) -> String? {
+        var coinType = "1"
+        
+        switch network {
+        case "main":
+            coinType = "0"
+        default:
+            break
+        }
+                
+        guard let hdKey = HDKey(masterKey), let bip48NestedDeriv = BIP32Path("m/48'/\(coinType)'/0'/3'"),
+            let account = try? hdKey.derive(bip48NestedDeriv) else {
+                return nil
+        }
+                
+        return "[\(hdKey.fingerprint.hexString)/48h/\(coinType)h/0h/3h]\(account.xpub)"
     }
 }

@@ -11,7 +11,7 @@ import LibWally
 
 class PSBTSigner {
     
-    class func sign(_ psbt: String, completion: @escaping ((psbt: String?, errorMessage: String?)) -> Void) {
+    class func sign(_ psbt: String, completion: @escaping ((psbt: PSBT?, errorMessage: String?)) -> Void) {
         var seedsToSignWith = [String]()
         var xprvsToSignWith = [HDKey]()
         var psbtToSign:PSBT!
@@ -73,7 +73,7 @@ class PSBTSigner {
                             psbtToSign.sign(signingKey)
                             /// Once we completed the signing loop we finalize with our node.
                             if s + 1 == uniqueSigners.count {
-                                completion((psbtToSign.description, nil))
+                                completion((psbtToSign, nil))
                             }
                         }
                     }
@@ -136,7 +136,7 @@ class PSBTSigner {
             network = .testnet
             
             if psbtToSign.complete {
-                completion((psbt, nil))
+                completion((psbtToSign, nil))
             } else {
                 getSeeds()
             }
@@ -148,7 +148,7 @@ class PSBTSigner {
                 network = .mainnet
                 
                 if psbtToSign.complete {
-                    completion((psbt, nil))
+                    completion((psbtToSign, nil))
                 } else {
                     getSeeds()
                 }

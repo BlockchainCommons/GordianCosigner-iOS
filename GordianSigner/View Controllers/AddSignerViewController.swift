@@ -50,9 +50,13 @@ class AddSignerViewController: UIViewController {
     
     @IBAction func addSignerAction(_ sender: Any) {
         let passphrase = passphraseField.text ?? ""
-        let alias = aliasField.text ?? "Signer"
+        var alias = "Signer"
         
-        guard let entropy = Keys.entropy(justWords), let rootXpub = Keys.masterXpub(justWords, passphrase), let encryptedData = Encryption.encrypt(entropy), let masterKey = Keys.masterKey(justWords, passphrase), let fingerprint = Keys.fingerprint(masterKey), let lifeHash = LifeHash.hash(entropy) else {
+        if aliasField.text != "" {
+            alias = aliasField.text!
+        }
+        
+        guard let entropy = Keys.entropy(justWords), let encryptedData = Encryption.encrypt(entropy), let masterKey = Keys.masterKey(justWords, passphrase), let fingerprint = Keys.fingerprint(masterKey), let lifeHash = LifeHash.hash(entropy) else {
             showAlert(self, "Error ⚠️", "Something went wrong, your signer was not saved!")
             return
         }
@@ -62,7 +66,6 @@ class AddSignerViewController: UIViewController {
         dict["label"] = alias
         dict["dateAdded"] = Date()
         dict["lifeHash"] = lifeHash
-        dict["rootXpub"] = rootXpub
         dict["fingerprint"] = fingerprint
         
         if privateKeySwitch.isOn {
@@ -75,20 +78,63 @@ class AddSignerViewController: UIViewController {
             }
         }
         
-        CoreDataService.saveEntity(dict: dict, entityName: .signer) { (success, errorDescription) in
+        CoreDataService.saveEntity(dict: dict, entityName: .signer) { [weak self] (success, errorDescription) in
+            guard let self = self else { return }
+            
             guard success else {
                 showAlert(self, "Error ⚠️", "Failed saving that signer to Core Data!")
                 return
             }
+            
+            self.saveKeysets(masterKey, alias, fingerprint)
+        }
+    }
+    
+    private func saveKeysets(_ masterKey: String, _ label: String, _ xfp: String) {
+        var keyset = [String:Any]()
+        keyset["id"] = UUID()
+        keyset["label"] = label
+        
+        guard let bip44Account = Keys.bip44Account(masterKey, "test"),
+            let bip45Account = Keys.bip45Account(masterKey),
+            let bip48LegacyAccount = Keys.bip48LegacyAccount(masterKey, "test"),
+            let bip48SegwitAccount = Keys.bip48SegwitAccount(masterKey, "test"),
+            let bip48NestedAccount = Keys.bip48NestedAccount(masterKey, "test"),
+            let bip84Account = Keys.bip84Account(masterKey, "test"),
+            let bip49Account = Keys.bip49Account(masterKey, "test") else {
+                showAlert(self, "Key derivation failed", "")
+        
+                return
         }
         
-        showAlert(self, "Signer encrypted and saved 🔐", "")
-        textField.text = ""
-        addedWords.removeAll()
-        justWords.removeAll()
-        bip39Words.removeAll()
-        label.text = ""
-        navigationController?.popViewController(animated: true)
+        keyset["fingerprint"] = xfp
+        keyset["bip44Account"] = bip44Account
+        keyset["bip45Account"] = bip45Account
+        keyset["bip48LegacyAccount"] = bip48LegacyAccount
+        keyset["bip48NestedAccount"] = bip48NestedAccount
+        keyset["bip48SegwitAccount"] = bip48SegwitAccount
+        keyset["bip49Account"] = bip49Account
+        keyset["bip84Account"] = bip84Account
+        keyset["dateAdded"] = Date()
+        
+        CoreDataService.saveEntity(dict: keyset, entityName: .keyset) { [weak self] (success, errorDescription) in
+            guard let self = self else { return }
+
+            guard success else {
+                showAlert(self, "Failed to save keyset", errorDescription ?? "unknown error")
+                return
+            }
+
+            showAlert(self, "Signer encrypted and saved 🔐", "")
+
+            self.textField.text = ""
+            self.addedWords.removeAll()
+            self.justWords.removeAll()
+            self.bip39Words.removeAll()
+            self.label.text = ""
+
+            self.navigationController?.popViewController(animated: true)
+        }
     }
     
     @IBAction func removeWordAction(_ sender: Any) {

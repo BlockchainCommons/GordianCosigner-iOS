@@ -144,48 +144,66 @@ class QRScannerViewController: UIViewController {
         }
     }
     
+    private func isAccountMap(_ text: String) -> Bool {
+        guard let _ = try? JSONSerialization.jsonObject(with: text.utf8, options: []) as? [String:Any] else { return false }
+        
+        return true
+    }
+    
     private func process(text: String) {
-        // Stop if we're already done with the decode.
-        guard decoder.result == nil else {
-            guard let result = try? decoder.result?.get(), let psbt = URHelper.psbtUrToBase64Text(result) else { return }
-            stopScanning(psbt)
-            return
-        }
         
-        decoder.receivePart(text.lowercased())
-        
-        let expectedParts = decoder.expectedPartCount ?? 0
-        
-        DispatchQueue.main.async {
-            self.avCaptureSession.stopRunning()
-            let impact = UIImpactFeedbackGenerator()
-            impact.impactOccurred()
-            AudioServicesPlaySystemSound(1103)
-        }
-        
-        guard expectedParts != 0 else {
-            guard let result = try? decoder.result?.get(), let psbt = URHelper.psbtUrToBase64Text(result) else { return }
-            stopScanning(psbt)
-            return
-        }
-        
-        let percentageCompletion = "\(Int(decoder.estimatedPercentComplete * 100))% complete"
-        
-        DispatchQueue.main.async { [weak self] in
-            guard let self = self else { return }
-            
-            if self.blurArray.count > 0 {
-                for i in self.blurArray {
-                    i.removeFromSuperview()
-                }
-                self.blurArray.removeAll()
+        if !isAccountMap(text) {
+            // Stop if we're already done with the decode.
+            guard decoder.result == nil else {
+                guard let result = try? decoder.result?.get(), let psbt = URHelper.psbtUrToBase64Text(result) else { return }
+                stopScanning(psbt)
+                return
             }
             
-            self.progressView.setProgress(Float(self.decoder.estimatedPercentComplete), animated: true)
-            self.progressDescriptionLabel.text = percentageCompletion
-            self.backgroundView.alpha = 1
-            self.progressView.alpha = 1
-            self.progressDescriptionLabel.alpha = 1
+            decoder.receivePart(text.lowercased())
+            
+            let expectedParts = decoder.expectedPartCount ?? 0
+            
+            DispatchQueue.main.async {
+                self.avCaptureSession.stopRunning()
+                let impact = UIImpactFeedbackGenerator()
+                impact.impactOccurred()
+                AudioServicesPlaySystemSound(1103)
+            }
+            
+            guard expectedParts != 0 else {
+                guard let result = try? decoder.result?.get(), let psbt = URHelper.psbtUrToBase64Text(result) else { return }
+                stopScanning(psbt)
+                return
+            }
+            
+            let percentageCompletion = "\(Int(decoder.estimatedPercentComplete * 100))% complete"
+            
+            DispatchQueue.main.async { [weak self] in
+                guard let self = self else { return }
+                
+                if self.blurArray.count > 0 {
+                    for i in self.blurArray {
+                        i.removeFromSuperview()
+                    }
+                    self.blurArray.removeAll()
+                }
+                
+                self.progressView.setProgress(Float(self.decoder.estimatedPercentComplete), animated: true)
+                self.progressDescriptionLabel.text = percentageCompletion
+                self.backgroundView.alpha = 1
+                self.progressView.alpha = 1
+                self.progressDescriptionLabel.alpha = 1
+            }
+            
+        } else {
+            DispatchQueue.main.async {
+                self.avCaptureSession.stopRunning()
+                let impact = UIImpactFeedbackGenerator()
+                impact.impactOccurred()
+                AudioServicesPlaySystemSound(1103)
+                self.stopScanning(text)
+            }
         }
     }
     
