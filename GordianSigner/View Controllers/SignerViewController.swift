@@ -140,6 +140,7 @@ class SignerViewController: UIViewController {
             return
         }
         
+        save(validPsbt)
         psbtToParse = validPsbt
         psbt = string
         setTextView(string)
@@ -157,6 +158,22 @@ class SignerViewController: UIViewController {
             
             self.textView.text = text
         }
+    }
+    
+    private func save(_ psbt: PSBT) {
+        var dict = [String:Any]()
+        dict["dateAdded"] = Date()
+        dict["psbt"] = Encryption.encrypt(psbt.data)
+        dict["label"] = "PSBT"
+        dict["id"] = UUID()
+        
+        CoreDataService.saveEntity(dict: dict, entityName: .psbt, completion: { (success, errorDescription) in
+            guard success else {
+                showAlert(self, "Not saved!", "There was an issue encrypting and saving your psbt. Please reach out and let us know. Error: \(errorDescription ?? "unknown")")
+                
+                return
+            }
+        })
     }
     
     

@@ -15,12 +15,13 @@ class PsbtTableViewController: UIViewController, UITableViewDelegate, UITableVie
     @IBOutlet weak private var signButtonOutlet: UIButton!
     
     private var spinner = Spinner()
+    var psbtText = ""
     var rawTx = ""
     var psbt:PSBT!
-    var ourFingerprints = [[String:String]]()
     private var canSign = false
     private var export = false
     private var alertStyle = UIAlertController.Style.actionSheet
+    var inputsArray = [[String:Any]]()
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -36,7 +37,152 @@ class PsbtTableViewController: UIViewController, UITableViewDelegate, UITableVie
           alertStyle = UIAlertController.Style.alert
         }
         
-        getOurFingerprints()
+        if psbtText != "" {
+            psbt = try? PSBT(psbtText, .testnet)
+        }
+    }
+    
+    override func viewDidAppear(_ animated: Bool) {
+        load { success in
+            if success {
+                DispatchQueue.main.async { [weak self] in
+                    self?.tableView.reloadData()
+                }
+            }
+        }
+    }
+    
+    private func load(completion: @escaping ((Bool) -> Void)) {
+        inputsArray.removeAll()
+        
+        var pubkeysArray = [[String:Any]]()
+        
+        let inputs = self.psbt.inputs
+        
+        for (i, input) in inputs.enumerated() {
+            
+            self.inputsArray.append(["input": input])
+            
+            guard let origins = input.origins else { completion(false); return }
+            
+            for (o, origin) in origins.enumerated() {
+                let pubkey = origin.key.data.hexString
+                
+                guard let path = try? origin.value.path.chop(4) else { completion(false); return }
+                
+                let dict = ["pubkey":pubkey, "hasSigned": false, "keysetLabel": "unknown", "path": path, "fullPath": origin.value.path] as [String : Any]
+                pubkeysArray.append(dict)
+                
+                if o + 1 == origins.count {
+                    self.inputsArray[i]["pubKeyArray"] = pubkeysArray
+                }
+                
+                if i + 1 == inputs.count && o + 1 == origins.count {
+                    self.parsePubkeys(completion: completion)
+                }
+            }
+        }
+    }
+    
+    private func parsePubkeys(completion: @escaping ((Bool) -> Void)) {
+        CoreDataService.retrieveEntity(entityName: .keyset) { [weak self] (keysets, errorDescription) in
+            guard let self = self else { return }
+            
+            guard let keysets = keysets, keysets.count > 0 else { completion(false); return }
+            
+            for (i, inputDictArray) in self.inputsArray.enumerated() {
+                
+                let input = inputDictArray["input"] as! PSBTInput
+                
+                var pubkeyArray = inputDictArray["pubKeyArray"] as! [[String:Any]]
+                
+                for (p, pubkeyDict) in pubkeyArray.enumerated() {
+                    
+                    let originalPubkey = pubkeyDict["pubkey"] as! String
+                    let path = pubkeyDict["path"] as! BIP32Path
+                    let fullPath = pubkeyDict["fullPath"] as! BIP32Path
+                    
+                    CoreDataService.retrieveEntity(entityName: .signer) { (signers, errorDescription) in
+                        if let signers = signers, signers.count > 0 {
+                            
+                            for signer in signers {
+                                let signerStruct = SignerStruct(dictionary: signer)
+                                if let entropy = signerStruct.entropy {
+                                    if let decryptedEntropy = Encryption.decrypt(entropy) {
+                                        let e = BIP39Entropy(decryptedEntropy)
+                                        if let mnemonic = BIP39Mnemonic(e) {
+                                            var passphrase = ""
+                                            if let encryptedPassphrase = signerStruct.passphrase {
+                                                if let decryptedPassphrase = Encryption.decrypt(encryptedPassphrase) {
+                                                    passphrase = decryptedPassphrase.utf8
+                                                }
+                                            }
+                                            
+                                            let seedHex = mnemonic.seedHex(passphrase)
+                                            
+                                            if let hdMasterKey = HDKey(seedHex, .testnet) {
+                                                if let childKey = try? hdMasterKey.derive(fullPath) {
+                                                    if childKey.pubKey.data.hexString == originalPubkey {
+                                                        self.canSign = true
+                                                    }
+                                                }
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                    
+                    for (k, keyset) in keysets.enumerated() {
+                        let keysetStruct = KeysetStruct(dictionary: keyset)
+                        
+                        if let descriptor = keysetStruct.bip48SegwitAccount {
+                            let arr = descriptor.split(separator: "]")
+                            var xpub = ""
+                            
+                            if arr.count > 0 {
+                                xpub = "\(arr[1])"
+                            }
+                            
+                            if let hdkey = HDKey(xpub), let childKey = try? hdkey.derive(path) {
+                                var updatedDict = pubkeyDict
+                                
+                                if originalPubkey == childKey.pubKey.data.hexString {
+                                    updatedDict["keysetLabel"] = keysetStruct.label
+                                    pubkeyArray[p] = updatedDict
+                                    self.inputsArray[i]["pubKeyArray"] = pubkeyArray
+                                }
+                                
+                                if let sigs = input.signatures {
+                                    for (s, sig) in sigs.enumerated() {
+                                        let signedKey = sig.key.data.hexString
+                                        
+                                        if signedKey == originalPubkey {
+                                            updatedDict["hasSigned"] = true
+                                            pubkeyArray[p] = updatedDict
+                                            self.inputsArray[i]["pubKeyArray"] = pubkeyArray
+                                        }
+                                        
+                                        if k + 1 == keysets.count && p + 1 == pubkeyArray.count && i + 1 == self.inputsArray.count && s + 1 == sigs.count {
+                                            completion(true)
+                                        }
+                                    }
+                                } else {
+                                    if k + 1 == keysets.count && p + 1 == pubkeyArray.count && i + 1 == self.inputsArray.count {
+                                        completion(true)
+                                    }
+                                }
+                            }/* else {
+                                if k + 1 == keysets.count && p + 1 == pubkeyArray.count && i + 1 == self.inputsArray.count {
+                                    completion(true)
+                                }
+                            }*/
+                        }
+                    }
+                }
+            }
+        }
     }
     
     @IBAction func signAction(_ sender: Any) {
@@ -44,7 +190,11 @@ class PsbtTableViewController: UIViewController, UITableViewDelegate, UITableVie
             if canSign {
                 sign()
             } else {
-                showAlert(self, "Signer not known", "The signer for this transaction does not exist on Gordian Signer yet, please add it then try again.")
+                DispatchQueue.main.async { [weak self] in
+                    guard let self = self else { return }
+                    
+                    self.performSegue(withIdentifier: "segueToSign", sender: self)
+                }
             }
         } else {
             exportAction()
@@ -57,9 +207,9 @@ class PsbtTableViewController: UIViewController, UITableViewDelegate, UITableVie
     
     func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
         switch section {
-        case 0:
-            return psbt.inputs.count
         case 1:
+            return psbt.inputs.count
+        case 2:
             return psbt.outputs.count
         default:
             return 1
@@ -67,16 +217,22 @@ class PsbtTableViewController: UIViewController, UITableViewDelegate, UITableVie
     }
     
     func numberOfSections(in tableView: UITableView) -> Int {
-        return 3
+        return 4
     }
     
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         switch indexPath.section {
         case 0:
-            return inputCell(indexPath)
+            return completeCell(indexPath)
         case 1:
-            return outputCell(indexPath)
+            if inputsArray.count > 0 {
+                return inputCell(indexPath)
+            } else {
+                return UITableViewCell()
+            }
         case 2:
+            return outputCell(indexPath)
+        case 3:
             return feeCell(indexPath)
         default:
             return UITableViewCell()
@@ -94,6 +250,42 @@ class PsbtTableViewController: UIViewController, UITableViewDelegate, UITableVie
         view.layer.cornerRadius = 8
     }
     
+    private func completeCell(_ indexPath: IndexPath) -> UITableViewCell {
+        let cell = tableView.dequeueReusableCell(withIdentifier: "completeCell", for: indexPath)
+        configureCell(cell)
+        
+        let label = cell.viewWithTag(1) as! UILabel
+        let icon = cell.viewWithTag(2) as! UIImageView
+        
+        var psbtToFinalize = psbt!
+        
+        if psbtToFinalize.finalize() {
+            if psbtToFinalize.complete {
+                if let _ = psbtToFinalize.transactionFinal {
+                    label.text = "PSBT complete"
+                    icon.image = UIImage(systemName: "checkmark.square")
+                    icon.tintColor = .systemGreen
+                }
+            } else {
+                label.text = "PSBT incomplete"
+                icon.image = UIImage(systemName: "exclamationmark.square")
+                icon.tintColor = .systemPink
+            }
+        } else {
+            if psbtToFinalize.complete {
+                label.text = "PSBT complete"
+                icon.image = UIImage(systemName: "checkmark.square")
+                icon.tintColor = .systemGreen
+            } else {
+                label.text = "PSBT incomplete"
+                icon.image = UIImage(systemName: "exclamationmark.square")
+                icon.tintColor = .systemPink
+            }
+        }
+        
+        return cell
+    }
+    
     private func inputCell(_ indexPath: IndexPath) -> UITableViewCell {
         let cell = tableView.dequeueReusableCell(withIdentifier: "inputCell", for: indexPath)
         configureCell(cell)
@@ -101,7 +293,6 @@ class PsbtTableViewController: UIViewController, UITableViewDelegate, UITableVie
         let isMineImageView = cell.viewWithTag(1) as! UIImageView
         let amountLabel = cell.viewWithTag(2) as! UILabel
         let participantsTextView = cell.viewWithTag(3) as! UITextView
-        let validSignersTextView = cell.viewWithTag(5) as! UITextView
         let numberOfSigsLabel = cell.viewWithTag(6) as! UILabel
         let inputNumberLabel = cell.viewWithTag(7) as! UILabel
         
@@ -109,38 +300,53 @@ class PsbtTableViewController: UIViewController, UITableViewDelegate, UITableVie
         
         configureView(isMineImageView)
         configureView(participantsTextView)
-        configureView(validSignersTextView)
         
-        let input = psbt.inputs[indexPath.row]
+        let inputDict = inputsArray[indexPath.row]
+        let input = inputDict["input"] as! PSBTInput
         
+        let pubkeyArray = inputDict["pubKeyArray"] as! [[String:Any]]
         
-//        print("sigs: \(input.wally_psbt_input.signatures)")
-//        print("items: \(Data(value: input.wally_psbt_input.signatures.items).hexString)")
-//        print("scriptSig: \(input.wally_psbt_input.final_scriptsig)")
-//        print("witness: \(input.wally_psbt_input.final_witness)")
+        var isMine = false
         
-        
+        if pubkeyArray.count > 0 {
+            for pubkey in pubkeyArray {
+                let participant = pubkey["keysetLabel"] as! String
+                let hasSigned = pubkey["hasSigned"] as! Bool
                 
+                if hasSigned {
+                    participantsTextView.text += "Signed: " + participant + "\n"
+                } else {
+                    participantsTextView.text += "NOT signed: " + participant + "\n"
+                }
+                
+                if participant != "unknown" {
+                    isMine = true
+                }
+            }
+            
+            if isMine {
+                isMineImageView.image = UIImage(systemName: "person.crop.circle.fill.badge.checkmark")
+                isMineImageView.tintColor = .systemGreen
+            } else {
+                isMineImageView.image = UIImage(systemName: "questionmark.circle")
+                isMineImageView.tintColor = .systemGray
+            }
+            
+            print("input.signatures: \(input.signatures)")
+            
+            if let sigs = input.signatures {
+                numberOfSigsLabel.text = "\(sigs.count) out of ? signatures"
+            } else {
+                numberOfSigsLabel.text = "?"
+            }
+        } else {
+            isMineImageView.image = UIImage(systemName: "questionmark.circle")
+            isMineImageView.tintColor = .systemGray
+            numberOfSigsLabel.text = "?"
+        }
+        
         if let amount = input.amount {
             amountLabel.text = "\(Double(amount) / 100000000.0) btc"
-        }
-        
-        let (can, signers) = canSign(input)
-        
-        if can {
-            isMineImageView.image = UIImage(systemName: "person.crop.circle.fill.badge.checkmark")
-            isMineImageView.tintColor = .systemGreen
-        } else {
-            isMineImageView.image = UIImage(systemName: "person.crop.circle.fill.badge.xmark")
-            isMineImageView.tintColor = .systemPink
-        }
-        
-        validSignersTextView.text = ""
-        
-        if signers.count > 0 {
-            for signer in signers {
-                validSignersTextView.text += signer + "\n"
-            }
         }
         
         return cell
@@ -192,10 +398,12 @@ class PsbtTableViewController: UIViewController, UITableViewDelegate, UITableVie
     func tableView(_ tableView: UITableView, heightForRowAt indexPath: IndexPath) -> CGFloat {
         switch indexPath.section {
         case 0:
-            return 168
+            return 44
         case 1:
-            return 107
+            return 168
         case 2:
+            return 107
+        case 3:
             return 44
         default:
             return 80
@@ -219,10 +427,12 @@ class PsbtTableViewController: UIViewController, UITableViewDelegate, UITableVie
         
         switch section {
         case 0:
-            textLabel.text = "Inputs"
+            textLabel.text = "Status"
         case 1:
-            textLabel.text = "Outputs"
+            textLabel.text = "Inputs"
         case 2:
+            textLabel.text = "Outputs"
+        case 3:
             textLabel.text = "Mining Fee"
         default:
             break
@@ -275,43 +485,91 @@ class PsbtTableViewController: UIViewController, UITableViewDelegate, UITableVie
 //        }
 //    }
     
-    private func getOurFingerprints() {
-        CoreDataService.retrieveEntity(entityName: .signer) { (signers, errorDescription) in
-            guard let signers = signers, signers.count > 0 else { return }
-            
-            for signer in signers {
-                let signerStruct = SignerStruct(dictionary: signer)
-                let dict = ["xfp": signerStruct.fingerprint, "label": signerStruct.label]
-                self.ourFingerprints.append(dict)
-            }
-            
-            self.tableView.reloadData()
-        }
-    }
+//    private func getOurFingerprints() {
+//        CoreDataService.retrieveEntity(entityName: .signer) { (signers, errorDescription) in
+//            guard let signers = signers, signers.count > 0 else { return }
+//
+//            for signer in signers {
+//                let signerStruct = SignerStruct(dictionary: signer)
+//                let dict = ["xfp": signerStruct.fingerprint, "label": signerStruct.label]
+//                self.ourFingerprints.append(dict)
+//            }
+//
+//            self.tableView.reloadData()
+//        }
+//    }
     
-    private func canSign(_ input: PSBTInput) -> (canSign: Bool, signer: [String]) {
-        var canSign = false
-        var signers = [String]()
-        
-        if let origins = input.origins {
-            
-            for origin in origins {
-                let xfp = origin.value.fingerprint.hexString
-                
-                for dict in ourFingerprints {
-                    let ourXfp = dict["xfp"]!
-                    let label = dict["label"]!
-                    
-                    if xfp == ourXfp {
-                        self.canSign = true
-                        canSign = true
-                        signers.append(label)
-                    }
-                }
-            }
-        }
-        return (canSign, signers)
-    }
+//    private func canSign(_ input: PSBTInput) -> (canSign: Bool, validSigners: [String], keysetSignerLabel: [[String:String]]) {
+//        var canSign = false
+//        var validSigners = [String]()
+//        var keysetSignerLabels = [[String:String]]()
+//        //var knownSigners = [String]()
+//
+//        //let witnessScript = input.witnessScript?.hexString ?? ""
+//
+//        if let origins = input.origins {
+//
+//            for origin in origins {
+//                let value = origin.key.data.hexString
+//
+//                guard let path = try? origin.value.path.chop(4) else { return (canSign, validSigners, keysetSignerLabels) }
+//
+//                let dict = [value:mapPubkeyToKeyset(value, path: path.description) ?? ""]
+//
+//                keysetSignerLabels.append(dict)
+//
+//
+////                if witnessScript.contains(value) && !knownSigners.contains(value) {
+////                    knownSigners.append(value)
+////                }
+//
+//                let xfp = origin.value.fingerprint.hexString
+//
+//                for dict in ourFingerprints {
+//                    let ourXfp = dict["xfp"]!
+//                    let label = dict["label"]!
+//
+//                    if xfp == ourXfp {
+//                        self.canSign = true
+//                        canSign = true
+//                        validSigners.append(label)
+//                    }
+//                }
+//            }
+//        }
+//
+//        return (canSign, validSigners, keysetSignerLabels)
+//    }
+//
+//    private func mapPubkeyToKeyset(_ pubkey: String, path: String) -> String? {
+//        var label = ""
+//
+////        for keyset in keysets {
+////            if let descriptor = keyset.bip48SegwitAccount {
+////                let arr = descriptor.split(separator: "]")
+////                var xpub = ""
+////
+////                if arr.count > 0 {
+////                    xpub = "\(arr[1])"
+////                }
+////
+////                print("xpub: \(xpub)")
+////                print("path: \(path)")
+////
+////                if let hdkey = HDKey(xpub), let bip32path = BIP32Path(path), let childKey = try? hdkey.derive(bip32path) {
+////                    print("pubkey: \(pubkey)")
+////                    print("childkey: \(childKey.pubKey.data.hexString)")
+////
+////                    if pubkey == childKey.pubKey.data.hexString {
+////                        print("signer is known: \(keyset.label)")
+////                        label = keyset.label
+////                    }
+////                }
+////            }
+////        }
+//
+//        return label
+//    }
     
     private func sign() {
         if psbt != nil {
@@ -333,7 +591,6 @@ class PsbtTableViewController: UIViewController, UITableViewDelegate, UITableVie
                         if let final = psbtToFinalize.transactionFinal {
                             if let hex = final.description {
                                 self.rawTx = hex
-                                print("hex: \(hex)")
                             }
                         }
                     }
@@ -342,7 +599,11 @@ class PsbtTableViewController: UIViewController, UITableViewDelegate, UITableVie
                 DispatchQueue.main.async {
                     self.export = true
                     self.psbt = signedPsbt
-                    self.tableView.reloadData()
+                    self.load { success in
+                        DispatchQueue.main.async {
+                            self.tableView.reloadData()
+                        }
+                    }
                     self.signButtonOutlet.setTitle("export", for: .normal)
                 }
                 

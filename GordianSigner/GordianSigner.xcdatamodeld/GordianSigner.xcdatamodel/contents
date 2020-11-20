@@ -25,6 +25,13 @@
         <attribute name="label" optional="YES" attributeType="String"/>
         <attribute name="sharedWith" optional="YES" attributeType="UUID" usesScalarValueType="NO"/>
     </entity>
+    <entity name="Psbt" representedClassName="Psbt" syncable="YES" codeGenerationType="class">
+        <attribute name="dateAdded" optional="YES" attributeType="Date" usesScalarValueType="NO"/>
+        <attribute name="dateSigned" optional="YES" attributeType="Date" usesScalarValueType="NO"/>
+        <attribute name="id" optional="YES" attributeType="UUID" usesScalarValueType="NO"/>
+        <attribute name="label" optional="YES" attributeType="String"/>
+        <attribute name="psbt" optional="YES" attributeType="Binary"/>
+    </entity>
     <entity name="Signer" representedClassName="Signer" syncable="YES" codeGenerationType="class">
         <attribute name="dateAdded" optional="YES" attributeType="Date" usesScalarValueType="NO"/>
         <attribute name="entropy" optional="YES" attributeType="Binary"/>
@@ -36,7 +43,8 @@
     </entity>
     <elements>
         <element name="AccountMap" positionX="-54" positionY="18" width="128" height="163"/>
-        <element name="Signer" positionX="-63" positionY="-18" width="128" height="148"/>
         <element name="Keyset" positionX="-54" positionY="54" width="128" height="238"/>
+        <element name="Signer" positionX="-63" positionY="-18" width="128" height="148"/>
+        <element name="Psbt" positionX="-54" positionY="117" width="128" height="118"/>
     </elements>
 </model>

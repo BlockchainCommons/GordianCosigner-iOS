@@ -19,8 +19,8 @@ class SignersViewController: UIViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
         
-        addButton.tintColor = .systemTeal
-        editButton.tintColor = .systemTeal
+        //addButton.tintColor = .de
+        //editButton.tintColor = .systemTeal
         addButton = UIBarButtonItem.init(barButtonSystemItem: .add, target: self, action: #selector(add))
         editButton = UIBarButtonItem.init(barButtonSystemItem: .edit, target: self, action: #selector(editSigners))
         self.navigationItem.setRightBarButtonItems([addButton, editButton], animated: true)

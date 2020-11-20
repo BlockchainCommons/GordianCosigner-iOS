@@ -107,7 +107,6 @@ class AddSignerViewController: UIViewController {
                 return
         }
         
-        keyset["fingerprint"] = xfp
         keyset["bip44Account"] = bip44Account
         keyset["bip45Account"] = bip45Account
         keyset["bip48LegacyAccount"] = bip48LegacyAccount

@@ -12,7 +12,9 @@ class AccountMapsViewController: UIViewController, UITableViewDelegate, UITableV
     
     var addButton = UIBarButtonItem()
     var editButton = UIBarButtonItem()
-    var accountMaps = [AccountMapStruct]()
+    var accountMaps = [[String:Any]]()
+    let descriptorParser = DescriptorParser()
+    var mapToExport = [String:Any]()
     
     @IBOutlet weak var accountMapTable: UITableView!
     
@@ -27,6 +29,10 @@ class AccountMapsViewController: UIViewController, UITableViewDelegate, UITableV
         self.navigationItem.setRightBarButtonItems([addButton, editButton], animated: true)
     }
     
+    override func viewDidAppear(_ animated: Bool) {
+        load()
+    }
+    
     private func load() {
         accountMaps.removeAll()
         
@@ -38,11 +44,61 @@ class AccountMapsViewController: UIViewController, UITableViewDelegate, UITableV
             for accountMap in accountMaps {
                 let str = AccountMapStruct(dictionary: accountMap)
                 
-                self.accountMaps.append(str)
+                self.accountMaps.append(["accountMap": str])
             }
             
-            DispatchQueue.main.async {
-                self.accountMapTable.reloadData()
+            self.loadKeysets()
+        }
+    }
+    
+    private func loadKeysets() {
+        CoreDataService.retrieveEntity(entityName: .keyset) { [weak self] (keysets, errorDescription) in
+            guard let self = self else { return }
+            
+            guard let keysets = keysets, keysets.count > 0 else { return }
+            
+            for (i, accountMap) in self.accountMaps.enumerated() {
+                let amStruct = accountMap["accountMap"] as! AccountMapStruct
+                self.accountMaps[i]["canSign"] = false
+                
+                var participants = ""
+                for (k, keyset) in keysets.enumerated() {
+                    let keysetStruct = KeysetStruct(dictionary: keyset)
+                    
+                    if let desc = keysetStruct.bip48SegwitAccount {
+                        
+                        if amStruct.descriptor.contains(desc) {
+                            
+                            let participant = keysetStruct.label
+                            
+                            participants += participant + "\n"
+                            
+                            CoreDataService.retrieveEntity(entityName: .signer) { (signers, errorDescription) in
+                                if let signers = signers, signers.count > 0 {
+                                    for signer in signers {
+                                        let signerStruct = SignerStruct(dictionary: signer)
+                                        if signerStruct.entropy != nil {
+                                            if keysetStruct.fingerprint == signerStruct.fingerprint {
+                                                self.accountMaps[i]["canSign"] = true
+                                                self.accountMaps[i]["lifeHash"] = signerStruct.lifeHash
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                    
+                    if k + 1 == keysets.count {
+                        self.accountMaps[i]["participants"] = participants
+                    }
+                }
+                
+                if i + 1 == self.accountMaps.count {
+                    DispatchQueue.main.async {
+                        self.accountMapTable.reloadData()
+                    }
+                }
             }
         }
     }
@@ -55,14 +111,71 @@ class AccountMapsViewController: UIViewController, UITableViewDelegate, UITableV
         return accountMaps.count
     }
     
+    func tableView(_ tableView: UITableView, commit editingStyle: UITableViewCell.EditingStyle, forRowAt indexPath: IndexPath) {
+        if editingStyle == .delete {
+            let accountMap = accountMaps[indexPath.section]["accountMap"] as! AccountMapStruct
+            delete(accountMap.id, indexPath.section)
+        }
+    }
+    
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         let cell = tableView.dequeueReusableCell(withIdentifier: "accountMapCell", for: indexPath)
         cell.selectionStyle = .none
         
-        let accountMap = accountMaps[indexPath.section]
+        let accountMap = accountMaps[indexPath.section]["accountMap"] as! AccountMapStruct
+        let descriptor = accountMap.descriptor
+        let descriptorStruct = descriptorParser.descriptor(descriptor)
         
         let label = cell.viewWithTag(1) as! UILabel
         label.text = accountMap.label
+        
+        let policy = cell.viewWithTag(2) as! UILabel
+        policy.text = descriptorStruct.mOfNType
+        
+        let script = cell.viewWithTag(3) as! UILabel
+        script.text = descriptorStruct.format
+        
+        let participants = cell.viewWithTag(4) as! UITextView
+        participants.text = (accountMaps[indexPath.section]["participants"] as! String)
+        participants.clipsToBounds = true
+        participants.layer.cornerRadius = 8
+        
+        let isCompleteImage = cell.viewWithTag(5) as! UIImageView
+        if accountMap.descriptor.contains("keystore") {
+            isCompleteImage.image = UIImage(systemName: "circle.lefthalf.fill")
+            isCompleteImage.tintColor = .systemYellow
+        } else {
+            isCompleteImage.image = UIImage(systemName: "circle.fill")
+            isCompleteImage.tintColor = .systemGreen
+        }
+        
+        let signerLifeHash = cell.viewWithTag(6) as! UIImageView
+        signerLifeHash.clipsToBounds = true
+        signerLifeHash.layer.cornerRadius = 8
+        if let lifehash = accountMaps[indexPath.section]["lifeHash"] as? Data {
+            signerLifeHash.image = UIImage(data: lifehash)
+            signerLifeHash.alpha = 1
+        } else {
+            signerLifeHash.alpha = 0
+        }
+        
+        let keyIcon = cell.viewWithTag(8) as! UIImageView
+        let canSign = accountMaps[indexPath.section]["canSign"] as! Bool
+        if canSign {
+            keyIcon.alpha = 1
+        } else {
+            keyIcon.alpha = 0
+        }
+        
+        let exportButton = cell.viewWithTag(10) as! UIButton
+        exportButton.clipsToBounds = true
+        exportButton.layer.cornerRadius = 8
+        exportButton.restorationIdentifier = "\(indexPath.section)"
+        exportButton.addTarget(self, action: #selector(exportQr(_:)), for: .touchUpInside)
+        
+        let date = cell.viewWithTag(11) as! UILabel
+        date.text = accountMap.dateAdded.formatted()
+        
         return cell
     }
     
@@ -70,9 +183,48 @@ class AccountMapsViewController: UIViewController, UITableViewDelegate, UITableV
         return 267
     }
     
+    @objc func exportQr(_ sender: UIButton) {
+        guard let sectionString = sender.restorationIdentifier, let int = Int(sectionString) else { return }
+        
+        let accountMapData = (accountMaps[int]["accountMap"] as! AccountMapStruct).accountMap
+        
+        guard let dict = try? JSONSerialization.jsonObject(with: accountMapData, options: []) as? [String:Any] else { return }
+        
+        mapToExport = dict
+        
+        DispatchQueue.main.async { [weak self] in
+            guard let self = self else { return }
+            
+            self.performSegue(withIdentifier: "segueToExportAccountMap", sender: self)
+        }
+    }
+    
     @objc func add() {
         DispatchQueue.main.async { [weak self] in
-            self?.performSegue(withIdentifier: "segueToAddAccountMap", sender: self)
+            guard let self = self else { return }
+            
+            var alertStyle = UIAlertController.Style.actionSheet
+            if (UIDevice.current.userInterfaceIdiom == .pad) {
+              alertStyle = UIAlertController.Style.alert
+            }
+            
+            let alert = UIAlertController(title: "Add Account Map", message: "You may either create a new account map or import one.", preferredStyle: alertStyle)
+            
+            alert.addAction(UIAlertAction(title: "Import", style: .default, handler: { action in
+                DispatchQueue.main.async { [weak self] in
+                    self?.performSegue(withIdentifier: "segueToAddAccountMap", sender: self)
+                }
+            }))
+            
+            alert.addAction(UIAlertAction(title: "Create", style: .default, handler: { action in
+                DispatchQueue.main.async { [weak self] in
+                    self?.performSegue(withIdentifier: "createAccountMap", sender: self)
+                }
+            }))
+            
+            alert.addAction(UIAlertAction(title: "Cancel", style: .cancel, handler: { action in }))
+            alert.popoverPresentationController?.sourceView = self.view
+            self.present(alert, animated: true, completion: nil)
         }
     }
     
@@ -88,7 +240,7 @@ class AccountMapsViewController: UIViewController, UITableViewDelegate, UITableV
         self.navigationItem.setRightBarButtonItems([addButton, editButton], animated: true)
     }
     
-    @objc func deleteSeed(_ id: UUID, _ section: Int) {
+    @objc func delete(_ id: UUID, _ section: Int) {
         DispatchQueue.main.async { [weak self] in
             guard let self = self else { return }
             
@@ -100,7 +252,7 @@ class AccountMapsViewController: UIViewController, UITableViewDelegate, UITableV
             let alert = UIAlertController(title: "Delete Account Map?", message: "", preferredStyle: alertStyle)
             
             alert.addAction(UIAlertAction(title: "Delete", style: .destructive, handler: { action in
-                self.deleteSeedNow(id, section)
+                self.deleteAccountMapNow(id, section)
             }))
             
             alert.addAction(UIAlertAction(title: "Cancel", style: .cancel, handler: { action in }))
@@ -109,8 +261,8 @@ class AccountMapsViewController: UIViewController, UITableViewDelegate, UITableV
         }
     }
     
-    private func deleteSeedNow(_ id: UUID, _ section: Int) {
-        CoreDataService.deleteEntity(id: id, entityName: .signer) { (success, errorDescription) in
+    private func deleteAccountMapNow(_ id: UUID, _ section: Int) {
+        CoreDataService.deleteEntity(id: id, entityName: .accountMap) { (success, errorDescription) in
             guard success else {
                 showAlert(self, "Error deleting Account Map", "We were unable to delete that signer!")
                 return
@@ -167,6 +319,20 @@ class AccountMapsViewController: UIViewController, UITableViewDelegate, UITableV
                 let path = sortedItem["path"]!
                 let key = sortedItem["key"]!
                 let fullKey = path + key
+                
+                let hack = "wsh(\(fullKey)/0/*)"
+                let dp = DescriptorParser()
+                let ds = dp.descriptor(hack)
+                
+                var keyset = [String:Any]()
+                keyset["id"] = UUID()
+                keyset["label"] = "account map keyset"
+                keyset["bip48SegwitAccount"] = fullKey.replacingOccurrences(of: "/0/*", with: "")
+                keyset["dateAdded"] = Date()
+                keyset["fingerprint"] = ds.fingerprint
+                
+                CoreDataService.saveEntity(dict: keyset, entityName: .keyset) { (_, _) in }
+                
                 sortedKeys += fullKey
                 
                 if i + 1 < dictArray.count {
@@ -208,6 +374,15 @@ class AccountMapsViewController: UIViewController, UITableViewDelegate, UITableV
                                         
                     self.parseAccountMap(accountMap)
                 }
+            }
+        }
+        
+        if segue.identifier == "segueToExportAccountMap" {
+            if let vc = segue.destination as? QRDisplayerViewController {
+                vc.header = "Account Map"
+                vc.descriptionText = "Share this to import your account to other wallets, if it is incomplete invite others to join."
+                vc.isPsbt = false
+                vc.text = mapToExport.json() ?? ""
             }
         }
     }

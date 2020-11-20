@@ -142,20 +142,7 @@ class PSBTSigner {
             }
             
         } catch {
-            
-            do {
-                psbtToSign = try PSBT(psbt, .mainnet)
-                network = .mainnet
-                
-                if psbtToSign.complete {
-                    completion((psbtToSign, nil))
-                } else {
-                    getSeeds()
-                }
-                
-            } catch {
-                completion((nil, "Error converting that psbt"))
-            }
+             completion((nil, "Error converting that psbt"))
         }
     }
 }

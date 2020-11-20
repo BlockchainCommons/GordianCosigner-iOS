@@ -7,6 +7,8 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		D01ACBA42563EA8100B5B4E5 /* PsbtViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = D01ACBA32563EA8100B5B4E5 /* PsbtViewController.swift */; };
+		D01ACBA62563ED3200B5B4E5 /* Psbt.swift in Sources */ = {isa = PBXBuildFile; fileRef = D01ACBA52563ED3200B5B4E5 /* Psbt.swift */; };
 		D01C2953255CD66F00C5ED55 /* PSBTParser.swift in Sources */ = {isa = PBXBuildFile; fileRef = D01C2952255CD66F00C5ED55 /* PSBTParser.swift */; };
 		D01C2955255CE33F00C5ED55 /* PsbtTableViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = D01C2954255CE33F00C5ED55 /* PsbtTableViewController.swift */; };
 		D04B029825249EEB00C249B8 /* SignerViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = D04B029725249EEB00C249B8 /* SignerViewController.swift */; };
@@ -46,9 +48,10 @@
 		D0CF1E77252303370059C541 /* Utlities.swift in Sources */ = {isa = PBXBuildFile; fileRef = D0CF1E76252303370059C541 /* Utlities.swift */; };
 		D0CF1E79252360EC0059C541 /* Signer.swift in Sources */ = {isa = PBXBuildFile; fileRef = D0CF1E78252360EC0059C541 /* Signer.swift */; };
 		D0CF1E7B252368DC0059C541 /* Keys.swift in Sources */ = {isa = PBXBuildFile; fileRef = D0CF1E7A252368DC0059C541 /* Keys.swift */; };
-		D0E4A193255E620600D34343 /* CLibWally.xcframework in Frameworks */ = {isa = PBXBuildFile; fileRef = D0E4A191255E620600D34343 /* CLibWally.xcframework */; };
-		D0E4A195255E620D00D34343 /* LibWally.xcframework in Frameworks */ = {isa = PBXBuildFile; fileRef = D0E4A192255E620600D34343 /* LibWally.xcframework */; };
-		D0E4A196255E620D00D34343 /* LibWally.xcframework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = D0E4A192255E620600D34343 /* LibWally.xcframework */; settings = {ATTRIBUTES = (CodeSignOnCopy, ); }; };
+		D0E0E9FC25674AED00F2403C /* CLibWally.xcframework in Frameworks */ = {isa = PBXBuildFile; fileRef = D0E0E9FA25674AED00F2403C /* CLibWally.xcframework */; };
+		D0E0E9FE25674AF000F2403C /* LibWally.xcframework in Frameworks */ = {isa = PBXBuildFile; fileRef = D0E0E9FB25674AED00F2403C /* LibWally.xcframework */; };
+		D0E0E9FF25674AF000F2403C /* LibWally.xcframework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = D0E0E9FB25674AED00F2403C /* LibWally.xcframework */; settings = {ATTRIBUTES = (CodeSignOnCopy, ); }; };
+		D0E0EA022567A10900F2403C /* CreateAccountMapViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = D0E0EA012567A10900F2403C /* CreateAccountMapViewController.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -69,13 +72,13 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXCopyFilesBuildPhase section */
-		D0E4A197255E620D00D34343 /* Embed Frameworks */ = {
+		D0E0EA0025674AF100F2403C /* Embed Frameworks */ = {
 			isa = PBXCopyFilesBuildPhase;
 			buildActionMask = 2147483647;
 			dstPath = "";
 			dstSubfolderSpec = 10;
 			files = (
-				D0E4A196255E620D00D34343 /* LibWally.xcframework in Embed Frameworks */,
+				D0E0E9FF25674AF000F2403C /* LibWally.xcframework in Embed Frameworks */,
 			);
 			name = "Embed Frameworks";
 			runOnlyForDeploymentPostprocessing = 0;
@@ -83,6 +86,8 @@
 /* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
+		D01ACBA32563EA8100B5B4E5 /* PsbtViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PsbtViewController.swift; sourceTree = "<group>"; };
+		D01ACBA52563ED3200B5B4E5 /* Psbt.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Psbt.swift; sourceTree = "<group>"; };
 		D01C2952255CD66F00C5ED55 /* PSBTParser.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PSBTParser.swift; sourceTree = "<group>"; };
 		D01C2954255CE33F00C5ED55 /* PsbtTableViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PsbtTableViewController.swift; sourceTree = "<group>"; };
 		D04B029725249EEB00C249B8 /* SignerViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SignerViewController.swift; sourceTree = "<group>"; };
@@ -127,8 +132,9 @@
 		D0CF1E76252303370059C541 /* Utlities.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Utlities.swift; sourceTree = "<group>"; };
 		D0CF1E78252360EC0059C541 /* Signer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Signer.swift; sourceTree = "<group>"; };
 		D0CF1E7A252368DC0059C541 /* Keys.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Keys.swift; sourceTree = "<group>"; };
-		D0E4A191255E620600D34343 /* CLibWally.xcframework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcframework; name = CLibWally.xcframework; path = ../BCLibwallySwift_2/BCLibwallySwift/build/CLibWally.xcframework; sourceTree = "<group>"; };
-		D0E4A192255E620600D34343 /* LibWally.xcframework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcframework; name = LibWally.xcframework; path = ../BCLibwallySwift_2/BCLibwallySwift/build/LibWally.xcframework; sourceTree = "<group>"; };
+		D0E0E9FA25674AED00F2403C /* CLibWally.xcframework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcframework; name = CLibWally.xcframework; path = ../BCLibWallySwift/build/CLibWally.xcframework; sourceTree = "<group>"; };
+		D0E0E9FB25674AED00F2403C /* LibWally.xcframework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcframework; name = LibWally.xcframework; path = ../BCLibWallySwift/build/LibWally.xcframework; sourceTree = "<group>"; };
+		D0E0EA012567A10900F2403C /* CreateAccountMapViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CreateAccountMapViewController.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -136,10 +142,10 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				D0E4A193255E620600D34343 /* CLibWally.xcframework in Frameworks */,
+				D0E0E9FC25674AED00F2403C /* CLibWally.xcframework in Frameworks */,
 				D0974A56255B8E300013DC60 /* LifeHash in Frameworks */,
 				D064BCC6252D5BD700D42D66 /* URKit in Frameworks */,
-				D0E4A195255E620D00D34343 /* LibWally.xcframework in Frameworks */,
+				D0E0E9FE25674AF000F2403C /* LibWally.xcframework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -167,6 +173,7 @@
 				D0974A59255B90A10013DC60 /* AccountMapStruct.swift */,
 				D090963A2560FE540098013A /* KeysetStruct.swift */,
 				D090964225625CED0098013A /* Descriptor.swift */,
+				D01ACBA52563ED3200B5B4E5 /* Psbt.swift */,
 			);
 			path = Structs;
 			sourceTree = "<group>";
@@ -182,6 +189,8 @@
 				D01C2954255CE33F00C5ED55 /* PsbtTableViewController.swift */,
 				D090963C25610D440098013A /* KeysetsViewController.swift */,
 				D090963E2562564F0098013A /* AccountMapsViewController.swift */,
+				D01ACBA32563EA8100B5B4E5 /* PsbtViewController.swift */,
+				D0E0EA012567A10900F2403C /* CreateAccountMapViewController.swift */,
 			);
 			path = "View Controllers";
 			sourceTree = "<group>";
@@ -256,8 +265,8 @@
 		D0CF1E672522E5DB0059C541 /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
-				D0E4A191255E620600D34343 /* CLibWally.xcframework */,
-				D0E4A192255E620600D34343 /* LibWally.xcframework */,
+				D0E0E9FA25674AED00F2403C /* CLibWally.xcframework */,
+				D0E0E9FB25674AED00F2403C /* LibWally.xcframework */,
 			);
 			name = Frameworks;
 			sourceTree = "<group>";
@@ -294,7 +303,7 @@
 				D0CF1E2C2522E20C0059C541 /* Sources */,
 				D0CF1E2D2522E20C0059C541 /* Frameworks */,
 				D0CF1E2E2522E20C0059C541 /* Resources */,
-				D0E4A197255E620D00D34343 /* Embed Frameworks */,
+				D0E0EA0025674AF100F2403C /* Embed Frameworks */,
 			);
 			buildRules = (
 			);
@@ -436,10 +445,12 @@
 				D04D4980252C19E000D7383E /* QRScannerViewController.swift in Sources */,
 				D0CF1E77252303370059C541 /* Utlities.swift in Sources */,
 				D090964125625CC30098013A /* DescriptorParser.swift in Sources */,
+				D0E0EA022567A10900F2403C /* CreateAccountMapViewController.swift in Sources */,
 				D0974A5C255B93130013DC60 /* CoreDataService.swift in Sources */,
 				D0CF1E362522E20C0059C541 /* SceneDelegate.swift in Sources */,
 				D090963B2560FE540098013A /* KeysetStruct.swift in Sources */,
 				D090963F256256500098013A /* AccountMapsViewController.swift in Sources */,
+				D01ACBA42563EA8100B5B4E5 /* PsbtViewController.swift in Sources */,
 				D04D4984252C4FEF00D7383E /* QRDisplayerViewController.swift in Sources */,
 				D0974A5E255B93500013DC60 /* Entities.swift in Sources */,
 				D04B029C2524A9F800C249B8 /* AddSignerViewController.swift in Sources */,
@@ -455,6 +466,7 @@
 				D0CF1E7B252368DC0059C541 /* Keys.swift in Sources */,
 				D0974A5A255B90A10013DC60 /* AccountMapStruct.swift in Sources */,
 				D04B029825249EEB00C249B8 /* SignerViewController.swift in Sources */,
+				D01ACBA62563ED3200B5B4E5 /* Psbt.swift in Sources */,
 				D04D4982252C1A9300D7383E /* Spinner.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;

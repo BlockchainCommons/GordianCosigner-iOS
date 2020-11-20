@@ -106,11 +106,7 @@ class KeysetsViewController: UIViewController, UITableViewDelegate, UITableViewD
         
         let dateAddedLabel = cell.viewWithTag(7) as! UILabel
         dateAddedLabel.text = keyset.dateAdded.formatted()
-        
-//        let singleSigKeysetButton = cell.viewWithTag(8) as! UIButton
-//        singleSigKeysetButton.restorationIdentifier = "\(indexPath.section)"
-//        configureView(singleSigKeysetButton)
-//        singleSigKeysetButton.addTarget(self, action: #selector(exportSingleSigKeyset), for: .touchUpInside)
+
         let addToMapButton = cell.viewWithTag(11) as! UIButton
         addToMapButton.restorationIdentifier = "\(indexPath.section)"
         configureView(addToMapButton)
@@ -130,11 +126,18 @@ class KeysetsViewController: UIViewController, UITableViewDelegate, UITableViewD
             isSharedImage.tintColor = .systemBlue
         }
         
+        let editButton = cell.viewWithTag(12) as! UIButton
+        editButton.addTarget(self, action: #selector(editLabel(_:)), for: .touchUpInside)
+        editButton.restorationIdentifier = "\(indexPath.section)"
+        
+        let textView = cell.viewWithTag(13) as! UITextView
+        textView.text = keyset.bip48SegwitAccount ?? ""
+        
         return cell
     }
     
     func tableView(_ tableView: UITableView, heightForRowAt indexPath: IndexPath) -> CGFloat {
-        return 207
+        return 319
     }
     
     func tableView(_ tableView: UITableView, commit editingStyle: UITableViewCell.EditingStyle, forRowAt indexPath: IndexPath) {
@@ -184,16 +187,133 @@ class KeysetsViewController: UIViewController, UITableViewDelegate, UITableViewD
         return (isHot, isMine, lifeHash)
     }
     
+    @objc func editLabel(_ sender: UIButton) {
+        guard let sectionString = sender.restorationIdentifier, let int = Int(sectionString) else { return }
+        
+        let keyset = keysets[int]
+        
+        DispatchQueue.main.async { [weak self] in
+            guard let self = self else { return }
+            
+            let title = "Edit keyset label"
+            let message = ""
+            let style = UIAlertController.Style.alert
+            let alert = UIAlertController(title: title, message: message, preferredStyle: style)
+            
+            let save = UIAlertAction(title: "Save", style: .default) { [weak self] (alertAction) in
+                guard let self = self else { return }
+                
+                let textField1 = (alert.textFields![0] as UITextField).text
+                
+                guard let updatedLabel = textField1, updatedLabel != "" else { return }
+                
+                self.updateLabel(keyset.id, updatedLabel)
+            }
+            
+            alert.addTextField { (textField) in
+                textField.placeholder = "new label"
+                textField.isSecureTextEntry = false
+                textField.keyboardAppearance = .dark
+            }
+            
+            alert.addAction(save)
+            
+            let cancel = UIAlertAction(title: "Cancel", style: .default) { (alertAction) in }
+            alert.addAction(cancel)
+            
+            self.present(alert, animated:true, completion: nil)
+        }
+    }
+    
+    private func updateLabel(_ id: UUID, _ label: String) {
+        CoreDataService.updateEntity(id: id, keyToUpdate: "label", newValue: label, entityName: .keyset) { (success, errorDescription) in
+            guard success else { showAlert(self, "Label not saved!", "There was an error updating your label, please let us know about it: \(errorDescription ?? "unknown")"); return }
+            
+            self.load()
+        }
+    }
+    
     @objc func addToMap(_ sender: UIButton) {
         guard let sectionString = sender.restorationIdentifier, let int = Int(sectionString) else { return }
         
         let keyset = keysets[int]
         guard let account = keyset.bip48SegwitAccount else { return }
         
-        keysetToExport = account
-//        headerText = "Single-sig keyset"
-//        subheaderText = account
-//        export()
+        promptToSelectMap(account)
+    }
+    
+    private func promptToSelectMap(_ keyset: String) {
+        CoreDataService.retrieveEntity(entityName: .accountMap) { [weak self] (accountMaps, errorDescription) in
+            guard let self = self else { return }
+            
+            guard let accountMaps = accountMaps, accountMaps.count > 0 else {
+                showAlert(self, "No Account Maps exist yet", "Create one first.")
+                return
+            }
+            
+            DispatchQueue.main.async { [weak self] in
+                guard let self = self else { return }
+                
+                var alertStyle = UIAlertController.Style.actionSheet
+                if (UIDevice.current.userInterfaceIdiom == .pad) {
+                  alertStyle = UIAlertController.Style.alert
+                }
+                
+                let alert = UIAlertController(title: "Which Account Map?", message: "Select the Account Map you want this keyset to join.", preferredStyle: alertStyle)
+                
+                for accountMap in accountMaps {
+                    let mapStruct = AccountMapStruct(dictionary: accountMap)
+                    
+                    if mapStruct.descriptor.contains("keystore") {
+                        alert.addAction(UIAlertAction(title: mapStruct.label, style: .default, handler: { action in
+                            self.updateAccountMap(mapStruct, keyset: keyset)
+                        }))
+                    }
+                }
+                                
+                alert.addAction(UIAlertAction(title: "Cancel", style: .cancel, handler: { action in }))
+                alert.popoverPresentationController?.sourceView = self.view
+                self.present(alert, animated: true, completion: nil)
+            }
+        }
+    }
+    
+    private func updateAccountMap(_ accountMap: AccountMapStruct, keyset: String) {
+        var desc = accountMap.descriptor
+        let descriptorParser = DescriptorParser()
+        let descStruct = descriptorParser.descriptor(desc)
+        var mofn = descStruct.mOfNType
+        mofn = mofn.replacingOccurrences(of: " of ", with: "*")
+        let arr = mofn.split(separator: "*")
+        guard let n = Int(arr[1]) else { return }
+        
+        for i in 0...n - 1 {
+            if desc.contains("<keystore #\(i + 1)>") {
+                desc = desc.replacingOccurrences(of: "<keystore #\(i + 1)>", with: keyset)
+                break
+            }
+        }
+        
+        guard var dict = try? JSONSerialization.jsonObject(with: accountMap.accountMap, options: []) as? [String:Any] else { return }
+        dict["descriptor"] = desc
+        
+        let updatedMap = (dict.json() ?? "").utf8
+        
+        CoreDataService.updateEntity(id: accountMap.id, keyToUpdate: "descriptor", newValue: desc, entityName: .accountMap) { (success, errorDesc) in
+            guard success else {
+                showAlert(self, "Account Map updating failed...", "Please let us know about this bug.")
+                return
+            }
+            
+            CoreDataService.updateEntity(id: accountMap.id, keyToUpdate: "accountMap", newValue: updatedMap, entityName: .accountMap) { (success, errorDesc) in
+                guard success else {
+                    showAlert(self, "Account Map updating failed...", "Please let us know about this bug.")
+                    return
+                }
+                
+                showAlert(self, "Account Map updated ✓", "")
+            }
+        }
     }
     
     @objc func exportMultisigKeyset(_ sender: UIButton) {
@@ -238,7 +358,7 @@ class KeysetsViewController: UIViewController, UITableViewDelegate, UITableViewD
     }
     
     private func deleteKeysetNow(_ id: UUID, _ section: Int) {
-        CoreDataService.deleteEntity(id: id, entityName: .signer) { (success, errorDescription) in
+        CoreDataService.deleteEntity(id: id, entityName: .keyset) { (success, errorDescription) in
             guard success else {
                 showAlert(self, "Error deleting signer", "We were unable to delete that signer!")
                 return

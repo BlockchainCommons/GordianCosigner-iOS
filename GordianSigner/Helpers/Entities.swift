@@ -12,4 +12,5 @@ public enum ENTITY: String {
     case accountMap = "AccountMap"
     case signer = "Signer"
     case keyset = "Keyset"
+    case psbt = "Psbt"
 }
