@@ -60,6 +60,29 @@ class KeysetsViewController: UIViewController, UITableViewDelegate, UITableViewD
         }
     }
     
+    private func refresh(_ section: Int) {
+        keysets.removeAll()
+        
+        CoreDataService.retrieveEntity(entityName: .keyset) { [weak self] (keysets, errorDescription) in
+            guard let self = self else { return }
+            
+            guard let keysets = keysets, keysets.count > 0 else { return }
+            
+            for (i, keyset) in keysets.enumerated() {
+                let keysetStruct = KeysetStruct(dictionary: keyset)
+                self.keysets.append(keysetStruct)
+                
+                if i + 1 == keysets.count {
+                    DispatchQueue.main.async { [weak self] in
+                        guard let self = self else { return }
+                        
+                        self.keysetsTable.reloadSections(IndexSet(arrayLiteral: section), with: .none)
+                    }
+                }
+            }
+        }
+    }
+    
     func numberOfSections(in tableView: UITableView) -> Int {
         return keysets.count
     }
@@ -102,6 +125,9 @@ class KeysetsViewController: UIViewController, UITableViewDelegate, UITableViewD
         configureView(lifeHashImage)
         if lifeHash != nil {
             lifeHashImage.image = lifeHash
+            lifeHashImage.alpha = 1
+        } else {
+            lifeHashImage.alpha = 0
         }
         
         let dateAddedLabel = cell.viewWithTag(7) as! UILabel
@@ -237,12 +263,32 @@ class KeysetsViewController: UIViewController, UITableViewDelegate, UITableViewD
         guard let sectionString = sender.restorationIdentifier, let int = Int(sectionString) else { return }
         
         let keyset = keysets[int]
-        guard let account = keyset.bip48SegwitAccount else { return }
         
-        promptToSelectMap(account)
+        if keyset.sharedWith != nil {
+            DispatchQueue.main.async { [weak self] in
+                guard let self = self else { return }
+                
+                var alertStyle = UIAlertController.Style.actionSheet
+                if (UIDevice.current.userInterfaceIdiom == .pad) {
+                  alertStyle = UIAlertController.Style.alert
+                }
+                
+                let alert = UIAlertController(title: "Keyset already shared!", message: "This keyset was previously added to an Account Map, reusing keys is never a good idea. Are you sure you want to share this keyset again?", preferredStyle: alertStyle)
+                
+                alert.addAction(UIAlertAction(title: "Yes", style: .default, handler: { action in
+                    self.promptToSelectMap(keyset, int)
+                }))
+                                
+                alert.addAction(UIAlertAction(title: "Cancel", style: .cancel, handler: { action in }))
+                alert.popoverPresentationController?.sourceView = self.view
+                self.present(alert, animated: true, completion: nil)
+            }
+        } else {
+            promptToSelectMap(keyset, int)
+        }
     }
     
-    private func promptToSelectMap(_ keyset: String) {
+    private func promptToSelectMap(_ keyset: KeysetStruct, _ section: Int) {
         CoreDataService.retrieveEntity(entityName: .accountMap) { [weak self] (accountMaps, errorDescription) in
             guard let self = self else { return }
             
@@ -264,9 +310,9 @@ class KeysetsViewController: UIViewController, UITableViewDelegate, UITableViewD
                 for accountMap in accountMaps {
                     let mapStruct = AccountMapStruct(dictionary: accountMap)
                     
-                    if mapStruct.descriptor.contains("keystore") {
+                    if mapStruct.descriptor.contains("keyset") {
                         alert.addAction(UIAlertAction(title: mapStruct.label, style: .default, handler: { action in
-                            self.updateAccountMap(mapStruct, keyset: keyset)
+                            self.updateAccountMap(mapStruct, keyset, section)
                         }))
                     }
                 }
@@ -278,7 +324,7 @@ class KeysetsViewController: UIViewController, UITableViewDelegate, UITableViewD
         }
     }
     
-    private func updateAccountMap(_ accountMap: AccountMapStruct, keyset: String) {
+    private func updateAccountMap(_ accountMap: AccountMapStruct, _ keyset: KeysetStruct, _ section: Int) {
         var desc = accountMap.descriptor
         let descriptorParser = DescriptorParser()
         let descStruct = descriptorParser.descriptor(desc)
@@ -288,8 +334,8 @@ class KeysetsViewController: UIViewController, UITableViewDelegate, UITableViewD
         guard let n = Int(arr[1]) else { return }
         
         for i in 0...n - 1 {
-            if desc.contains("<keystore #\(i + 1)>") {
-                desc = desc.replacingOccurrences(of: "<keystore #\(i + 1)>", with: keyset)
+            if desc.contains("<keyset #\(i + 1)>") {
+                desc = desc.replacingOccurrences(of: "<keyset #\(i + 1)>", with: keyset.bip48SegwitAccount!)
                 break
             }
         }
@@ -311,7 +357,23 @@ class KeysetsViewController: UIViewController, UITableViewDelegate, UITableViewD
                     return
                 }
                 
-                showAlert(self, "Account Map updated ✓", "")
+                CoreDataService.updateEntity(id: keyset.id, keyToUpdate: "sharedWith", newValue: accountMap.id, entityName: .keyset) { (success, errorDescription) in
+                    guard success else {
+                        showAlert(self, "Account Map updating failed...", "Please let us know about this bug.")
+                        return
+                    }
+                    
+                    CoreDataService.updateEntity(id: keyset.id, keyToUpdate: "dateShared", newValue: Date(), entityName: .keyset) { (success, errorDescription) in
+                        guard success else {
+                            showAlert(self, "Account Map updating failed...", "Please let us know about this bug.")
+                            return
+                        }
+                        
+                        showAlert(self, "Account Map updated ✓", "")
+                        
+                        self.refresh(section)
+                    }
+                }
             }
         }
     }

@@ -11,13 +11,7 @@
         <attribute name="lifehash" optional="YES" attributeType="Binary"/>
     </entity>
     <entity name="Keyset" representedClassName="Keyset" syncable="YES" codeGenerationType="class">
-        <attribute name="bip44Account" optional="YES" attributeType="String"/>
-        <attribute name="bip45Account" optional="YES" attributeType="String"/>
-        <attribute name="bip48LegacyAccount" optional="YES" attributeType="String"/>
-        <attribute name="bip48NestedAccount" optional="YES" attributeType="String"/>
         <attribute name="bip48SegwitAccount" optional="YES" attributeType="String"/>
-        <attribute name="bip49Account" optional="YES" attributeType="String"/>
-        <attribute name="bip84Account" optional="YES" attributeType="String"/>
         <attribute name="dateAdded" optional="YES" attributeType="Date" usesScalarValueType="NO"/>
         <attribute name="dateShared" optional="YES" attributeType="Date" usesScalarValueType="NO"/>
         <attribute name="fingerprint" optional="YES" attributeType="String"/>
@@ -43,8 +37,8 @@
     </entity>
     <elements>
         <element name="AccountMap" positionX="-54" positionY="18" width="128" height="163"/>
-        <element name="Keyset" positionX="-54" positionY="54" width="128" height="238"/>
-        <element name="Signer" positionX="-63" positionY="-18" width="128" height="148"/>
+        <element name="Keyset" positionX="-54" positionY="54" width="128" height="148"/>
         <element name="Psbt" positionX="-54" positionY="117" width="128" height="118"/>
+        <element name="Signer" positionX="-63" positionY="-18" width="128" height="148"/>
     </elements>
 </model>

@@ -23,6 +23,8 @@ class AddSignerViewController: UIViewController {
     private let label = UILabel()
     private var autoCompleteCharacterCount = 0
     private var timer = Timer()
+    var doneBlock: (((words: String, passphrase: String)) -> Void)?
+    var tempWords = false
 
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -94,26 +96,14 @@ class AddSignerViewController: UIViewController {
         var keyset = [String:Any]()
         keyset["id"] = UUID()
         keyset["label"] = label
+        keyset["fingerprint"] = xfp
         
-        guard let bip44Account = Keys.bip44Account(masterKey, "test"),
-            let bip45Account = Keys.bip45Account(masterKey),
-            let bip48LegacyAccount = Keys.bip48LegacyAccount(masterKey, "test"),
-            let bip48SegwitAccount = Keys.bip48SegwitAccount(masterKey, "test"),
-            let bip48NestedAccount = Keys.bip48NestedAccount(masterKey, "test"),
-            let bip84Account = Keys.bip84Account(masterKey, "test"),
-            let bip49Account = Keys.bip49Account(masterKey, "test") else {
+        guard let bip48SegwitAccount = Keys.bip48SegwitAccount(masterKey, "test") else {
                 showAlert(self, "Key derivation failed", "")
-        
                 return
         }
         
-        keyset["bip44Account"] = bip44Account
-        keyset["bip45Account"] = bip45Account
-        keyset["bip48LegacyAccount"] = bip48LegacyAccount
-        keyset["bip48NestedAccount"] = bip48NestedAccount
         keyset["bip48SegwitAccount"] = bip48SegwitAccount
-        keyset["bip49Account"] = bip49Account
-        keyset["bip84Account"] = bip84Account
         keyset["dateAdded"] = Date()
         
         CoreDataService.saveEntity(dict: keyset, entityName: .keyset) { [weak self] (success, errorDescription) in
@@ -123,16 +113,21 @@ class AddSignerViewController: UIViewController {
                 showAlert(self, "Failed to save keyset", errorDescription ?? "unknown error")
                 return
             }
+            
+            if self.tempWords {
+                self.doneBlock!((self.justWords.joined(separator: " "), self.passphraseField.text ?? ""))
+                self.navigationController?.popViewController(animated: true)
+            } else {
+                showAlert(self, "Signer encrypted and saved 🔐", "")
 
-            showAlert(self, "Signer encrypted and saved 🔐", "")
+                self.textField.text = ""
+                self.addedWords.removeAll()
+                self.justWords.removeAll()
+                self.bip39Words.removeAll()
+                self.label.text = ""
 
-            self.textField.text = ""
-            self.addedWords.removeAll()
-            self.justWords.removeAll()
-            self.bip39Words.removeAll()
-            self.label.text = ""
-
-            self.navigationController?.popViewController(animated: true)
+                self.navigationController?.popViewController(animated: true)
+            }
         }
     }
     

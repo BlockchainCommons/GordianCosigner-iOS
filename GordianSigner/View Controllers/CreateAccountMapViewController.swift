@@ -8,11 +8,12 @@
 
 import UIKit
 
-class CreateAccountMapViewController: UIViewController, UIPickerViewDelegate, UIPickerViewDataSource {
+class CreateAccountMapViewController: UIViewController, UIPickerViewDelegate, UIPickerViewDataSource, UITextFieldDelegate {
     
     var totalParticipants = 15
     var totalRequiredSigs = 15
     
+    @IBOutlet weak var textField: UITextField!
     @IBOutlet weak var nPickerView: UIPickerView!
     @IBOutlet weak var mPickerView: UIPickerView!
     @IBOutlet weak var createOutlet: UIButton!
@@ -27,6 +28,22 @@ class CreateAccountMapViewController: UIViewController, UIPickerViewDelegate, UI
         mPickerView.delegate = self
         nPickerView.isUserInteractionEnabled = true
         mPickerView.isUserInteractionEnabled = true
+        createOutlet.clipsToBounds = true
+        createOutlet.layer.cornerRadius = 8
+        textField.delegate = self
+        
+        let tapGesture = UITapGestureRecognizer(target: self, action: #selector(self.dismissKeyboard(_:)))
+        tapGesture.numberOfTapsRequired = 1
+        view.addGestureRecognizer(tapGesture)
+        textField.removeGestureRecognizer(tapGesture)
+    }
+    
+    func textFieldShouldReturn(_ textField: UITextField) -> Bool {
+        textField.resignFirstResponder()
+    }
+    
+    @objc func dismissKeyboard(_ sender: UITapGestureRecognizer) {
+        textField.resignFirstResponder()
     }
     
     @IBAction func createAction(_ sender: Any) {
@@ -41,9 +58,9 @@ class CreateAccountMapViewController: UIViewController, UIPickerViewDelegate, UI
         
         for i in 0...n - 1 {
             if i < n - 1 {
-                keystores += "<keystore #\(i + 1)>,"
+                keystores += "<keyset #\(i + 1)>,"
             } else {
-               keystores += "<keystore #\(i + 1)>"
+               keystores += "<keyset #\(i + 1)>"
             }
         }
         
@@ -52,10 +69,15 @@ class CreateAccountMapViewController: UIViewController, UIPickerViewDelegate, UI
         let accountMap = ["descriptor":desc, "birthblock":0, "label":"Policy Map"] as [String : Any]
         let json = accountMap.json() ?? ""
         
+        var label = textField.text ?? "Policy map"
+        if label == "" {
+            label = "Policy map"
+        }
+        
         var map = [String:Any]()
         map["birthblock"] = Int64(0)
         map["accountMap"] = json.utf8
-        map["label"] = "Policy Map"
+        map["label"] = label
         map["id"] = UUID()
         map["dateAdded"] = Date()
         map["complete"] = false

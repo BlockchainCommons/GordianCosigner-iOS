@@ -141,7 +141,7 @@ class AccountMapsViewController: UIViewController, UITableViewDelegate, UITableV
         participants.layer.cornerRadius = 8
         
         let isCompleteImage = cell.viewWithTag(5) as! UIImageView
-        if accountMap.descriptor.contains("keystore") {
+        if accountMap.descriptor.contains("keyset") {
             isCompleteImage.image = UIImage(systemName: "circle.lefthalf.fill")
             isCompleteImage.tintColor = .systemYellow
         } else {
@@ -167,6 +167,10 @@ class AccountMapsViewController: UIViewController, UITableViewDelegate, UITableV
             keyIcon.alpha = 0
         }
         
+        let editButton = cell.viewWithTag(9) as! UIButton
+        editButton.addTarget(self, action: #selector(editLabel(_:)), for: .touchUpInside)
+        editButton.restorationIdentifier = "\(indexPath.section)"
+        
         let exportButton = cell.viewWithTag(10) as! UIButton
         exportButton.clipsToBounds = true
         exportButton.layer.cornerRadius = 8
@@ -181,6 +185,52 @@ class AccountMapsViewController: UIViewController, UITableViewDelegate, UITableV
     
     func tableView(_ tableView: UITableView, heightForRowAt indexPath: IndexPath) -> CGFloat {
         return 267
+    }
+    
+    @objc func editLabel(_ sender: UIButton) {
+        guard let sectionString = sender.restorationIdentifier, let int = Int(sectionString) else { return }
+        
+        let am = accountMaps[int]["accountMap"] as! AccountMapStruct
+        
+        DispatchQueue.main.async { [weak self] in
+            guard let self = self else { return }
+            
+            let title = "Edit Account Map label"
+            let message = ""
+            let style = UIAlertController.Style.alert
+            let alert = UIAlertController(title: title, message: message, preferredStyle: style)
+            
+            let save = UIAlertAction(title: "Save", style: .default) { [weak self] (alertAction) in
+                guard let self = self else { return }
+                
+                let textField1 = (alert.textFields![0] as UITextField).text
+                
+                guard let updatedLabel = textField1, updatedLabel != "" else { return }
+                
+                self.updateLabel(am.id, updatedLabel)
+            }
+            
+            alert.addTextField { (textField) in
+                textField.placeholder = "new label"
+                textField.isSecureTextEntry = false
+                textField.keyboardAppearance = .dark
+            }
+            
+            alert.addAction(save)
+            
+            let cancel = UIAlertAction(title: "Cancel", style: .default) { (alertAction) in }
+            alert.addAction(cancel)
+            
+            self.present(alert, animated:true, completion: nil)
+        }
+    }
+    
+    private func updateLabel(_ id: UUID, _ label: String) {
+        CoreDataService.updateEntity(id: id, keyToUpdate: "label", newValue: label, entityName: .keyset) { (success, errorDescription) in
+            guard success else { showAlert(self, "Label not saved!", "There was an error updating your label, please let us know about it: \(errorDescription ?? "unknown")"); return }
+            
+            self.load()
+        }
     }
     
     @objc func exportQr(_ sender: UIButton) {
@@ -282,6 +332,13 @@ class AccountMapsViewController: UIViewController, UITableViewDelegate, UITableV
         
         guard var descriptor = dict["descriptor"] as? String else { return }
         
+        guard !descriptor.contains("keyset") else {
+            showAlert(self, "Policy maps not yet supported", "You can only create Policy Map's for now, importing is for Account Map's only.")
+            return
+        }
+        
+        let accountMapId = UUID()
+        
         let descriptorParser = DescriptorParser()
         var descStruct = descriptorParser.descriptor(descriptor)
     
@@ -307,8 +364,10 @@ class AccountMapsViewController: UIViewController, UITableViewDelegate, UITableV
             
             for keyWithPath in descStruct.keysWithPath {
                 let arr = keyWithPath.split(separator: "]")
-                let dict = ["path":"\(arr[0])]", "key": "\(arr[1].replacingOccurrences(of: "))", with: ""))"]
-                dictArray.append(dict)
+                if arr.count > 1 {
+                    let dict = ["path":"\(arr[0])]", "key": "\(arr[1].replacingOccurrences(of: "))", with: ""))"]
+                    dictArray.append(dict)
+                }
             }
             
             dictArray.sort(by: {($0["key"]!) < $1["key"]!})
@@ -330,6 +389,8 @@ class AccountMapsViewController: UIViewController, UITableViewDelegate, UITableV
                 keyset["bip48SegwitAccount"] = fullKey.replacingOccurrences(of: "/0/*", with: "")
                 keyset["dateAdded"] = Date()
                 keyset["fingerprint"] = ds.fingerprint
+                keyset["sharedWith"] = accountMapId
+                keyset["dateShared"] = Date()
                 
                 CoreDataService.saveEntity(dict: keyset, entityName: .keyset) { (_, _) in }
                 
@@ -348,7 +409,7 @@ class AccountMapsViewController: UIViewController, UITableViewDelegate, UITableV
         map["birthblock"] = Int64(dict["birthblock"] as? Int ?? 0)
         map["accountMap"] = accountMap.utf8
         map["label"] = dict["label"] as? String ?? "Account map"
-        map["id"] = UUID()
+        map["id"] = accountMapId
         map["dateAdded"] = Date()
         map["complete"] = descStruct.complete
         map["lifehash"] = LifeHash.hash(descriptor.utf8)

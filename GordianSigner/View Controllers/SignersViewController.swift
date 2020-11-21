@@ -19,8 +19,6 @@ class SignersViewController: UIViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
         
-        //addButton.tintColor = .de
-        //editButton.tintColor = .systemTeal
         addButton = UIBarButtonItem.init(barButtonSystemItem: .add, target: self, action: #selector(add))
         editButton = UIBarButtonItem.init(barButtonSystemItem: .edit, target: self, action: #selector(editSigners))
         self.navigationItem.setRightBarButtonItems([addButton, editButton], animated: true)
@@ -105,13 +103,59 @@ class SignersViewController: UIViewController {
             showAlert(self, "Signer deleted ✅", "")
         }
     }
+    
+    @objc func editLabel(_ sender: UIButton) {
+        guard let sectionString = sender.restorationIdentifier, let int = Int(sectionString) else { return }
+        
+        let signer = signerStructs[int]
+        
+        DispatchQueue.main.async { [weak self] in
+            guard let self = self else { return }
+            
+            let title = "Edit Signer label"
+            let message = ""
+            let style = UIAlertController.Style.alert
+            let alert = UIAlertController(title: title, message: message, preferredStyle: style)
+            
+            let save = UIAlertAction(title: "Save", style: .default) { [weak self] (alertAction) in
+                guard let self = self else { return }
+                
+                let textField1 = (alert.textFields![0] as UITextField).text
+                
+                guard let updatedLabel = textField1, updatedLabel != "" else { return }
+                
+                self.updateLabel(signer.id, updatedLabel)
+            }
+            
+            alert.addTextField { (textField) in
+                textField.placeholder = "new label"
+                textField.isSecureTextEntry = false
+                textField.keyboardAppearance = .dark
+            }
+            
+            alert.addAction(save)
+            
+            let cancel = UIAlertAction(title: "Cancel", style: .default) { (alertAction) in }
+            alert.addAction(cancel)
+            
+            self.present(alert, animated:true, completion: nil)
+        }
+    }
+    
+    private func updateLabel(_ id: UUID, _ label: String) {
+        CoreDataService.updateEntity(id: id, keyToUpdate: "label", newValue: label, entityName: .signer) { (success, errorDescription) in
+            guard success else { showAlert(self, "Label not saved!", "There was an error updating your label, please let us know about it: \(errorDescription ?? "unknown")"); return }
+            
+            self.loadData()
+        }
+    }
 
 }
 
 extension SignersViewController: UITableViewDelegate {
     
     func tableView(_ tableView: UITableView, heightForRowAt indexPath: IndexPath) -> CGFloat {
-        return 80
+        return 120
     }
     
     func tableView(_ tableView: UITableView, canEditRowAt indexPath: IndexPath) -> Bool {
@@ -139,11 +183,16 @@ extension SignersViewController: UITableViewDataSource {
     
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         let cell = tableView.dequeueReusableCell(withIdentifier: "signerCell", for: indexPath)
+        
         let label = cell.viewWithTag(1) as! UILabel
         let dateAdded = cell.viewWithTag(2) as! UILabel
         let imageView = cell.viewWithTag(3) as! UIImageView
         let fingerprintLabel = cell.viewWithTag(4) as! UILabel
         let isHot = cell.viewWithTag(5) as! UIImageView
+        
+        let editButton = cell.viewWithTag(6) as! UIButton
+        editButton.addTarget(self, action: #selector(editLabel(_:)), for: .touchUpInside)
+        editButton.restorationIdentifier = "\(indexPath.section)"
         
         cell.selectionStyle = .none
         

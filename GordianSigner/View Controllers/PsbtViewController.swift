@@ -16,6 +16,7 @@ class PsbtViewController: UIViewController, UITableViewDelegate, UITableViewData
     private var lifeHashes = [UIImage]()
     private var completes = [Bool]()
     private var decryptedPsbts = [String]()
+    private var psbtToExport = ""
     var addButton = UIBarButtonItem()
     var editButton = UIBarButtonItem()
     @IBOutlet weak private var psbtTable: UITableView!
@@ -107,6 +108,7 @@ class PsbtViewController: UIViewController, UITableViewDelegate, UITableViewData
         
         let exportQrButton = cell.viewWithTag(4) as! UIButton
         exportQrButton.restorationIdentifier = "\(indexPath.section)"
+        exportQrButton.addTarget(self, action: #selector(exportQr(_:)), for: .touchUpInside)
         
         let label = cell.viewWithTag(5) as! UILabel
         label.text = psbt.label
@@ -138,6 +140,19 @@ class PsbtViewController: UIViewController, UITableViewDelegate, UITableViewData
         textView.text = decryptedPsbts[indexPath.section]
         
         return cell
+    }
+    
+    @objc func exportQr(_ sender: UIButton) {
+        guard let sectionString = sender.restorationIdentifier, let int = Int(sectionString) else { return }
+        
+        psbtToExport = decryptedPsbts[int]
+        
+        DispatchQueue.main.async { [weak self] in
+            guard let self = self else { return }
+            
+            self.performSegue(withIdentifier: "segueToShowPsbtQR", sender: self)
+        }
+        
     }
     
     @objc func exportAsFile(_ sender: UIButton) {
@@ -323,6 +338,13 @@ class PsbtViewController: UIViewController, UITableViewDelegate, UITableViewData
         if segue.identifier == "segueToPsbtDetail" {
             if let vc = segue.destination as? PsbtTableViewController {
                 vc.psbtText = psbtText
+            }
+        }
+        
+        if segue.identifier == "segueToShowPsbtQR" {
+            if let vc = segue.destination as? QRDisplayerViewController {
+                vc.isPsbt = true
+                vc.text = psbtToExport
             }
         }
     }

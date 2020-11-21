@@ -11,11 +11,17 @@ import LibWally
 
 class PSBTSigner {
     
-    class func sign(_ psbt: String, completion: @escaping ((psbt: PSBT?, errorMessage: String?)) -> Void) {
+    class func sign(_ psbt: String, _ xprv: HDKey?, completion: @escaping ((psbt: PSBT?, signedFor: [String]?, errorMessage: String?)) -> Void) {
         var seedsToSignWith = [String]()
         var xprvsToSignWith = [HDKey]()
+        
+        if xprv != nil {
+            xprvsToSignWith.append(xprv!)
+        }
+        
         var psbtToSign:PSBT!
         var network:Network!
+        var signedFor = [String]()
         
         func reset() {
             seedsToSignWith.removeAll()
@@ -63,17 +69,17 @@ class PSBTSigner {
                         let uniqueSigners = Array(Set(signableKeys))
                         
                         guard uniqueSigners.count > 0 else {
-                            completion((nil, "Looks like none of your signers can sign this psbt, ensure you added the signer and its optional passphrase correctly."))
+                            completion((nil, nil, "Looks like none of your signers can sign this psbt, ensure you added the signer and its optional passphrase correctly."))
                             return
                         }
                         
                         for (s, signer) in uniqueSigners.enumerated() {
                             guard let signingKey = Key(signer, network) else { return }
-                            
+                            signedFor.append(signingKey.pubKey.data.hexString)
                             psbtToSign.sign(signingKey)
                             /// Once we completed the signing loop we finalize with our node.
                             if s + 1 == uniqueSigners.count {
-                                completion((psbtToSign, nil))
+                                completion((psbtToSign, signedFor, nil))
                             }
                         }
                     }
@@ -84,17 +90,24 @@ class PSBTSigner {
         /// Fetch keys to sign with
         func getKeysToSignWith() {
             xprvsToSignWith.removeAll()
-            
-            for (i, words) in seedsToSignWith.enumerated() {
-                guard let masterKey = Keys.masterXprv(words, ""),
-                    let hdkey = HDKey(masterKey) else { return }
-                
-                xprvsToSignWith.append(hdkey)
-                
-                if i + 1 == seedsToSignWith.count {
-                    attemptToSignLocally()
-                }
+            if xprv != nil {
+                xprvsToSignWith.append(xprv!)
             }
+            
+            if seedsToSignWith.count > 0 {
+                for (i, words) in seedsToSignWith.enumerated() {
+                    guard let masterKey = Keys.masterXprv(words, ""),
+                        let hdkey = HDKey(masterKey) else { return }
+                    
+                    xprvsToSignWith.append(hdkey)
+                    
+                    if i + 1 == seedsToSignWith.count {
+                        attemptToSignLocally()
+                    }
+                }
+            } else {
+                attemptToSignLocally()
+            }            
         }
         
         /// Fetch wallets on the same network
@@ -103,7 +116,7 @@ class PSBTSigner {
             
             CoreDataService.retrieveEntity(entityName: .signer) { (signers, errorDescription) in
                 guard let signers = signers, signers.count > 0 else {
-                    completion((nil, "Looks like you do not have any signers added yet. Tap the signer button then + to add signers."))
+                    completion((nil, nil, "Looks like you do not have any signers added yet. Tap the signer button then + to add signers."))
                     return
                 }
                 
@@ -112,12 +125,12 @@ class PSBTSigner {
                     
                     if let encryptedEntropy = signerStruct.entropy {
                         guard let decryptedEntropy = Encryption.decrypt(encryptedEntropy) else {
-                            completion((nil, "There was an error decrypting your signer"))
+                            completion((nil, nil, "There was an error decrypting your signer"))
                             return
                         }
                         
                         guard let words = Keys.mnemonic(decryptedEntropy) else {
-                            completion((nil, "There was an error converting your signer to a mnemonic"))
+                            completion((nil, nil, "There was an error converting your signer to a mnemonic"))
                             return
                         }
                         
@@ -136,13 +149,13 @@ class PSBTSigner {
             network = .testnet
             
             if psbtToSign.complete {
-                completion((psbtToSign, nil))
+                completion((psbtToSign, nil, nil))
             } else {
                 getSeeds()
             }
             
         } catch {
-             completion((nil, "Error converting that psbt"))
+             completion((nil, nil, "Error converting that psbt"))
         }
     }
 }
