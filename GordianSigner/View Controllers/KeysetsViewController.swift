@@ -10,6 +10,7 @@ import UIKit
 
 class KeysetsViewController: UIViewController, UITableViewDelegate, UITableViewDataSource {
     
+    var addButton = UIBarButtonItem()
     var editButton = UIBarButtonItem()
     private var keysets = [KeysetStruct]()
     private var signers = [SignerStruct]()
@@ -26,13 +27,44 @@ class KeysetsViewController: UIViewController, UITableViewDelegate, UITableViewD
         keysetsTable.delegate = self
         keysetsTable.dataSource = self
         
-        editButton.tintColor = .systemTeal
+        addButton = UIBarButtonItem.init(barButtonSystemItem: .add, target: self, action: #selector(add))
         editButton = UIBarButtonItem.init(barButtonSystemItem: .edit, target: self, action: #selector(editKeysets))
-        self.navigationItem.setRightBarButtonItems([editButton], animated: true)
+        self.navigationItem.setRightBarButtonItems([addButton, editButton], animated: true)
     }
     
     override func viewDidAppear(_ animated: Bool) {
         load()
+        
+        guard let pasteBoard = UIPasteboard.general.string, pasteBoard.lowercased().hasPrefix("ur:crypto-account") else { return }
+        
+        if let account = URHelper.accountUr(pasteBoard) {
+            DispatchQueue.main.async { [weak self] in
+                guard let self = self else { return }
+                
+                var alertStyle = UIAlertController.Style.actionSheet
+                if (UIDevice.current.userInterfaceIdiom == .pad) {
+                  alertStyle = UIAlertController.Style.alert
+                }
+                
+                let alert = UIAlertController(title: "Import keyset?", message: "You have a valid keyset on your clipboard, would you like to import it?", preferredStyle: alertStyle)
+                
+                alert.addAction(UIAlertAction(title: "Yes", style: .default, handler: { action in
+                    self.addKeyset(account)
+                }))
+                                
+                alert.addAction(UIAlertAction(title: "Cancel", style: .cancel, handler: { action in }))
+                alert.popoverPresentationController?.sourceView = self.view
+                self.present(alert, animated: true, completion: nil)
+            }
+        }
+    }
+    
+    @objc func add() {
+        DispatchQueue.main.async { [weak self] in
+            guard let self = self else { return }
+            
+            self.performSegue(withIdentifier: "segueToScanKeyset", sender: self)
+        }
     }
     
     private func load() {
@@ -218,6 +250,10 @@ class KeysetsViewController: UIViewController, UITableViewDelegate, UITableViewD
         
         let keyset = keysets[int]
         
+        promptToEditLabel(keyset)
+    }
+    
+    private func promptToEditLabel(_ keyset: KeysetStruct) {
         DispatchQueue.main.async { [weak self] in
             guard let self = self else { return }
             
@@ -250,6 +286,7 @@ class KeysetsViewController: UIViewController, UITableViewDelegate, UITableViewD
             self.present(alert, animated:true, completion: nil)
         }
     }
+    
     
     private func updateLabel(_ id: UUID, _ label: String) {
         CoreDataService.updateEntity(id: id, keyToUpdate: "label", newValue: label, entityName: .keyset) { (success, errorDescription) in
@@ -444,7 +481,48 @@ class KeysetsViewController: UIViewController, UITableViewDelegate, UITableViewD
             editButton = UIBarButtonItem(title: "Edit", style: .plain, target: self, action: #selector(editKeysets))
         }
         
-        self.navigationItem.setRightBarButtonItems([editButton], animated: true)
+        self.navigationItem.setRightBarButtonItems([addButton, editButton], animated: true)
+    }
+    
+    private func addKeyset(_ account: String) {
+        let hack = "wsh(\(account)/0/*)"
+        let dp = DescriptorParser()
+        let ds = dp.descriptor(hack)
+        
+        var keyset = [String:Any]()
+        keyset["id"] = UUID()
+        keyset["label"] = "keyset"
+        keyset["bip48SegwitAccount"] = account
+        keyset["dateAdded"] = Date()
+        keyset["fingerprint"] = ds.fingerprint
+        
+        CoreDataService.saveEntity(dict: keyset, entityName: .keyset) { [weak self] (success, errorDesc) in
+            guard let self = self else { return }
+            
+            guard success else {
+                showAlert(self, "Keyset not saved!", "Please let us know about this bug.")
+                return
+            }
+            
+            DispatchQueue.main.async {
+                self.keysetsTable.reloadData()
+                
+                var alertStyle = UIAlertController.Style.actionSheet
+                if (UIDevice.current.userInterfaceIdiom == .pad) {
+                  alertStyle = UIAlertController.Style.alert
+                }
+                
+                let alert = UIAlertController(title: "Keyset imported ✓", message: "Would you like to give it a label now? You can edit the label at any time.", preferredStyle: alertStyle)
+                
+                alert.addAction(UIAlertAction(title: "Add label", style: .default, handler: { action in
+                    self.promptToEditLabel(KeysetStruct(dictionary: keyset))
+                }))
+                                
+                alert.addAction(UIAlertAction(title: "Cancel", style: .cancel, handler: { action in }))
+                alert.popoverPresentationController?.sourceView = self.view
+                self.present(alert, animated: true, completion: nil)
+            }
+        }
     }
     
     // MARK: - Navigation
@@ -459,6 +537,21 @@ class KeysetsViewController: UIViewController, UITableViewDelegate, UITableViewD
                 vc.isPsbt = false
                 vc.descriptionText = subheaderText
                 vc.header = headerText
+            }
+        }
+        
+        if segue.identifier == "segueToScanKeyset" {
+            if let vc = segue.destination as? QRScannerViewController {
+                vc.doneBlock = { [weak self] result in
+                    guard let self = self else { return }
+                    
+                    guard let accountUr = result, let account = URHelper.accountUr(accountUr) else {
+                        showAlert(self, "Keyset not recognized!", "Currently Gordian Signer only supports native segwit multisig derivations.")
+                        return
+                    }
+                    
+                    self.addKeyset(account)
+                }
             }
         }
     }

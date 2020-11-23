@@ -11,6 +11,12 @@ import CryptoKit
 
 enum Encryption {
     
+    static func checksum(_ data: Data) -> String {
+        let hash = SHA256.hash(data: Data(SHA256.hash(data: data)))
+        let checksum = Data(hash).subdata(in: Range(0...3))
+        return checksum.hexString
+    }
+    
     static func privateKey() -> Data {
         return P256.Signing.PrivateKey().rawRepresentation
     }

@@ -8,6 +8,7 @@
 
 import UIKit
 import LibWally
+import URKit
 
 class PsbtViewController: UIViewController, UITableViewDelegate, UITableViewDataSource {
     
@@ -28,8 +29,6 @@ class PsbtViewController: UIViewController, UITableViewDelegate, UITableViewData
         psbtTable.delegate = self
         psbtTable.dataSource = self
         
-        //addButton.tintColor = .systemTeal
-        //editButton.tintColor = .systemTeal
         addButton = UIBarButtonItem.init(barButtonSystemItem: .add, target: self, action: #selector(add))
         editButton = UIBarButtonItem.init(barButtonSystemItem: .edit, target: self, action: #selector(editPsbts))
         self.navigationItem.setRightBarButtonItems([addButton, editButton], animated: true)

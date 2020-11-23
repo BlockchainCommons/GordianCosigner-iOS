@@ -1054,6 +1054,7 @@
                     <connections>
                         <outlet property="keysetsTable" destination="MwK-VP-A9M" id="3JO-uw-bHb"/>
                         <segue destination="9Vu-3O-YNg" kind="show" identifier="exportKeyset" id="2q9-qh-fxy"/>
+                        <segue destination="4dz-cW-ULS" kind="presentation" identifier="segueToScanKeyset" id="hha-MU-QkB"/>
                     </connections>
                 </viewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="gRC-G0-bbK" userLabel="First Responder" customClass="UIResponder" sceneMemberID="firstResponder"/>
@@ -1463,8 +1464,8 @@
     <inferredMetricsTieBreakers>
         <segue reference="c3G-hh-8KG"/>
         <segue reference="KzM-QC-ivF"/>
-        <segue reference="no9-tq-P7U"/>
-        <segue reference="hPq-I8-kVg"/>
+        <segue reference="2q9-qh-fxy"/>
+        <segue reference="hha-MU-QkB"/>
     </inferredMetricsTieBreakers>
     <resources>
         <image name="Fingerprint" width="128" height="128"/>

@@ -11,6 +11,8 @@
 		D01ACBA62563ED3200B5B4E5 /* Psbt.swift in Sources */ = {isa = PBXBuildFile; fileRef = D01ACBA52563ED3200B5B4E5 /* Psbt.swift */; };
 		D01C2953255CD66F00C5ED55 /* PSBTParser.swift in Sources */ = {isa = PBXBuildFile; fileRef = D01C2952255CD66F00C5ED55 /* PSBTParser.swift */; };
 		D01C2955255CE33F00C5ED55 /* PsbtTableViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = D01C2954255CE33F00C5ED55 /* PsbtTableViewController.swift */; };
+		D0246DD7256B660100F812A5 /* Base58.swift in Sources */ = {isa = PBXBuildFile; fileRef = D0246DD6256B660100F812A5 /* Base58.swift */; };
+		D0246DDB256B667800F812A5 /* base58.c in Sources */ = {isa = PBXBuildFile; fileRef = D0246DDA256B667800F812A5 /* base58.c */; };
 		D04B029825249EEB00C249B8 /* SignerViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = D04B029725249EEB00C249B8 /* SignerViewController.swift */; };
 		D04B029A2524A18100C249B8 /* SignersViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = D04B02992524A18100C249B8 /* SignersViewController.swift */; };
 		D04B029C2524A9F800C249B8 /* AddSignerViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = D04B029B2524A9F800C249B8 /* AddSignerViewController.swift */; };
@@ -90,6 +92,10 @@
 		D01ACBA52563ED3200B5B4E5 /* Psbt.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Psbt.swift; sourceTree = "<group>"; };
 		D01C2952255CD66F00C5ED55 /* PSBTParser.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PSBTParser.swift; sourceTree = "<group>"; };
 		D01C2954255CE33F00C5ED55 /* PsbtTableViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PsbtTableViewController.swift; sourceTree = "<group>"; };
+		D0246DD6256B660100F812A5 /* Base58.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Base58.swift; sourceTree = "<group>"; };
+		D0246DD8256B663800F812A5 /* base58.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = base58.h; sourceTree = "<group>"; };
+		D0246DD9256B667700F812A5 /* GordianSigner-Bridging-Header.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "GordianSigner-Bridging-Header.h"; sourceTree = "<group>"; };
+		D0246DDA256B667800F812A5 /* base58.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; path = base58.c; sourceTree = "<group>"; };
 		D04B029725249EEB00C249B8 /* SignerViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SignerViewController.swift; sourceTree = "<group>"; };
 		D04B02992524A18100C249B8 /* SignersViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SignersViewController.swift; sourceTree = "<group>"; };
 		D04B029B2524A9F800C249B8 /* AddSignerViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AddSignerViewController.swift; sourceTree = "<group>"; };
@@ -289,6 +295,10 @@
 				D0974A61255BA1B90013DC60 /* LifeHash.swift */,
 				D01C2952255CD66F00C5ED55 /* PSBTParser.swift */,
 				D090964025625CC30098013A /* DescriptorParser.swift */,
+				D0246DD9256B667700F812A5 /* GordianSigner-Bridging-Header.h */,
+				D0246DD6256B660100F812A5 /* Base58.swift */,
+				D0246DD8256B663800F812A5 /* base58.h */,
+				D0246DDA256B667800F812A5 /* base58.c */,
 			);
 			path = Helpers;
 			sourceTree = "<group>";
@@ -366,6 +376,7 @@
 				TargetAttributes = {
 					D0CF1E2F2522E20C0059C541 = {
 						CreatedOnToolsVersion = 11.4.1;
+						LastSwiftMigration = 1140;
 					};
 					D0CF1E482522E2140059C541 = {
 						CreatedOnToolsVersion = 11.4.1;
@@ -462,9 +473,11 @@
 				D01C2953255CD66F00C5ED55 /* PSBTParser.swift in Sources */,
 				D01C2955255CE33F00C5ED55 /* PsbtTableViewController.swift in Sources */,
 				D04D4986252C509400D7383E /* QRGenerator.swift in Sources */,
+				D0246DD7256B660100F812A5 /* Base58.swift in Sources */,
 				D0974A62255BA1B90013DC60 /* LifeHash.swift in Sources */,
 				D0CF1E7B252368DC0059C541 /* Keys.swift in Sources */,
 				D0974A5A255B90A10013DC60 /* AccountMapStruct.swift in Sources */,
+				D0246DDB256B667800F812A5 /* base58.c in Sources */,
 				D04B029825249EEB00C249B8 /* SignerViewController.swift in Sources */,
 				D01ACBA62563ED3200B5B4E5 /* Psbt.swift in Sources */,
 				D04D4982252C1A9300D7383E /* Spinner.swift in Sources */,
@@ -640,20 +653,24 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				CLANG_ENABLE_MODULES = YES;
 				CODE_SIGN_ENTITLEMENTS = GordianSigner/GordianSigner.entitlements;
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 0.0.2;
+				CURRENT_PROJECT_VERSION = 0.0.3;
 				DEVELOPMENT_TEAM = YZHG975W3A;
+				ENABLE_BITCODE = NO;
 				INFOPLIST_FILE = GordianSigner/Info.plist;
 				IPHONEOS_DEPLOYMENT_TARGET = 13.0;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				MARKETING_VERSION = 0.0.2;
+				MARKETING_VERSION = 0.0.3;
 				PRODUCT_BUNDLE_IDENTIFIER = com.blockchaincommons.GordianSigner;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SUPPORTS_MACCATALYST = YES;
+				SWIFT_OBJC_BRIDGING_HEADER = "GordianSigner/Helpers/GordianSigner-Bridging-Header.h";
+				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
 				SWIFT_VERSION = 5.0;
 				TARGETED_DEVICE_FAMILY = "1,2";
 			};
@@ -663,20 +680,23 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				CLANG_ENABLE_MODULES = YES;
 				CODE_SIGN_ENTITLEMENTS = GordianSigner/GordianSigner.entitlements;
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 0.0.2;
+				CURRENT_PROJECT_VERSION = 0.0.3;
 				DEVELOPMENT_TEAM = YZHG975W3A;
+				ENABLE_BITCODE = NO;
 				INFOPLIST_FILE = GordianSigner/Info.plist;
 				IPHONEOS_DEPLOYMENT_TARGET = 13.0;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				MARKETING_VERSION = 0.0.2;
+				MARKETING_VERSION = 0.0.3;
 				PRODUCT_BUNDLE_IDENTIFIER = com.blockchaincommons.GordianSigner;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SUPPORTS_MACCATALYST = YES;
+				SWIFT_OBJC_BRIDGING_HEADER = "GordianSigner/Helpers/GordianSigner-Bridging-Header.h";
 				SWIFT_VERSION = 5.0;
 				TARGETED_DEVICE_FAMILY = "1,2";
 			};

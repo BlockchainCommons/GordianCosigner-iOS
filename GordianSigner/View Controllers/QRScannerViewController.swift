@@ -12,6 +12,7 @@ import AVFoundation
 
 class QRScannerViewController: UIViewController {
     
+    var isRunning = false
     var qrString = ""
     let downSwipe = UISwipeGestureRecognizer()
     let uploadButton = UIButton()
@@ -32,7 +33,6 @@ class QRScannerViewController: UIViewController {
     @IBOutlet weak var backgroundView: UIVisualEffectView!
     @IBOutlet weak var progressView: UIProgressView!
     @IBOutlet weak var progressDescriptionLabel: UILabel!
-    
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -150,9 +150,15 @@ class QRScannerViewController: UIViewController {
         return true
     }
     
+    private func isCryptoAccount(_ text: String) -> Bool {
+        return text.lowercased().hasPrefix("ur:crypto-account")
+    }
+    
     private func process(text: String) {
+        isRunning = false
         
-        if !isAccountMap(text) {
+        if !isAccountMap(text) && !isCryptoAccount(text) {
+            keepRunning = true
             // Stop if we're already done with the decode.
             guard decoder.result == nil else {
                 guard let result = try? decoder.result?.get(), let psbt = URHelper.psbtUrToBase64Text(result) else { return }
@@ -195,7 +201,6 @@ class QRScannerViewController: UIViewController {
                 self.progressView.alpha = 1
                 self.progressDescriptionLabel.alpha = 1
             }
-            
         } else {
             DispatchQueue.main.async {
                 self.avCaptureSession.stopRunning()
@@ -338,13 +343,17 @@ class QRScannerViewController: UIViewController {
 extension QRScannerViewController: AVCaptureMetadataOutputObjectsDelegate {
     
     func metadataOutput(_ output: AVCaptureMetadataOutput, didOutput metadataObjects: [AVMetadataObject], from connection: AVCaptureConnection) {
+        if !isRunning {
+            
         guard metadataObjects.count > 0,
             let machineReadableCode = metadataObjects[0] as? AVMetadataMachineReadableCodeObject,
             machineReadableCode.type == AVMetadataObject.ObjectType.qr,
             let string = machineReadableCode.stringValue else {
-                
+                isRunning = false
                 return
         }
+            
+            isRunning = true
         
         DispatchQueue.main.async { [weak self] in
             guard let self = self else { return }
@@ -353,12 +362,16 @@ extension QRScannerViewController: AVCaptureMetadataOutputObjectsDelegate {
         }
         
         process(text: string)
-        
-        DispatchQueue.main.asyncAfter(deadline: .now() + 0.3) { [weak self] in
-            guard let self = self else { return }
             
-            self.avCaptureSession.startRunning()
-        }
+            if keepRunning {
+                isRunning = false
+                DispatchQueue.main.asyncAfter(deadline: .now() + 0.3) { [weak self] in
+                    guard let self = self else { return }
+                    
+                    self.avCaptureSession.startRunning()
+                }
+            }
+    }
     }
     
 }
