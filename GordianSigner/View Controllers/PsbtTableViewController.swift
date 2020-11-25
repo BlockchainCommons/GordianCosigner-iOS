@@ -163,16 +163,12 @@ class PsbtTableViewController: UIViewController, UITableViewDelegate, UITableVie
                                     pubkeyArray[p] = updatedDict
                                     
                                     if let sigs = input.signatures {
-                                        print("sigs: \(sigs)")
                                         
                                         for (s, sig) in sigs.enumerated() {
                                             let signedKey = sig.key.data.hexString
-                                            print("signedKey: \(signedKey)")
-                                            print("originalPubkey: \(originalPubkey)")
                                             
                                             if signedKey == originalPubkey {
                                                 updatedDict["hasSigned"] = true
-                                                print("hasSigned")
                                                 pubkeyArray[p] = updatedDict
                                                 self.inputsArray[i]["pubKeyArray"] = pubkeyArray
                                             }
@@ -210,6 +206,7 @@ class PsbtTableViewController: UIViewController, UITableViewDelegate, UITableVie
                                     }
                                     
                                 } else {
+                                    // It is an unknown keyset
                                     if let sigs = input.signatures {
                                         for sig in sigs {
                                             let signedKey = sig.key.data.hexString
