@@ -49,9 +49,9 @@
 		D0CF1E77252303370059C541 /* Utlities.swift in Sources */ = {isa = PBXBuildFile; fileRef = D0CF1E76252303370059C541 /* Utlities.swift */; };
 		D0CF1E79252360EC0059C541 /* Signer.swift in Sources */ = {isa = PBXBuildFile; fileRef = D0CF1E78252360EC0059C541 /* Signer.swift */; };
 		D0CF1E7B252368DC0059C541 /* Keys.swift in Sources */ = {isa = PBXBuildFile; fileRef = D0CF1E7A252368DC0059C541 /* Keys.swift */; };
-		D0DC3758256DE6E40045D967 /* CLibWally.xcframework in Frameworks */ = {isa = PBXBuildFile; fileRef = D0DC3756256DE6E40045D967 /* CLibWally.xcframework */; };
-		D0DC375A256DE6E80045D967 /* LibWally.xcframework in Frameworks */ = {isa = PBXBuildFile; fileRef = D0DC3757256DE6E40045D967 /* LibWally.xcframework */; };
-		D0DC375B256DE6E80045D967 /* LibWally.xcframework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = D0DC3757256DE6E40045D967 /* LibWally.xcframework */; settings = {ATTRIBUTES = (CodeSignOnCopy, ); }; };
+		D0DC3762256E00E80045D967 /* CLibWally.xcframework in Frameworks */ = {isa = PBXBuildFile; fileRef = D0DC3761256E00E80045D967 /* CLibWally.xcframework */; };
+		D0DC3765256E00FE0045D967 /* LibWally.xcframework in Frameworks */ = {isa = PBXBuildFile; fileRef = D0DC3763256E00FA0045D967 /* LibWally.xcframework */; };
+		D0DC3766256E00FE0045D967 /* LibWally.xcframework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = D0DC3763256E00FA0045D967 /* LibWally.xcframework */; settings = {ATTRIBUTES = (CodeSignOnCopy, ); }; };
 		D0E0EA022567A10900F2403C /* CreateAccountMapViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = D0E0EA012567A10900F2403C /* CreateAccountMapViewController.swift */; };
 /* End PBXBuildFile section */
 
@@ -73,13 +73,13 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXCopyFilesBuildPhase section */
-		D0DC375C256DE6E80045D967 /* Embed Frameworks */ = {
+		D0DC3760256E00CC0045D967 /* Embed Frameworks */ = {
 			isa = PBXCopyFilesBuildPhase;
 			buildActionMask = 2147483647;
 			dstPath = "";
 			dstSubfolderSpec = 10;
 			files = (
-				D0DC375B256DE6E80045D967 /* LibWally.xcframework in Embed Frameworks */,
+				D0DC3766256E00FE0045D967 /* LibWally.xcframework in Embed Frameworks */,
 			);
 			name = "Embed Frameworks";
 			runOnlyForDeploymentPostprocessing = 0;
@@ -136,8 +136,8 @@
 		D0CF1E76252303370059C541 /* Utlities.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Utlities.swift; sourceTree = "<group>"; };
 		D0CF1E78252360EC0059C541 /* Signer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Signer.swift; sourceTree = "<group>"; };
 		D0CF1E7A252368DC0059C541 /* Keys.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Keys.swift; sourceTree = "<group>"; };
-		D0DC3756256DE6E40045D967 /* CLibWally.xcframework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcframework; name = CLibWally.xcframework; path = ../BCLibWallySwift/build/CLibWally.xcframework; sourceTree = "<group>"; };
-		D0DC3757256DE6E40045D967 /* LibWally.xcframework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcframework; name = LibWally.xcframework; path = ../BCLibWallySwift/build/LibWally.xcframework; sourceTree = "<group>"; };
+		D0DC3761256E00E80045D967 /* CLibWally.xcframework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcframework; name = CLibWally.xcframework; path = "/Users/peter/Desktop/Projects/GordianSigner-Catalyst/../../CLibWally.xcframework"; sourceTree = "<absolute>"; };
+		D0DC3763256E00FA0045D967 /* LibWally.xcframework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcframework; name = LibWally.xcframework; path = "/Users/peter/Desktop/Projects/GordianSigner-Catalyst/../../LibWally.xcframework"; sourceTree = "<absolute>"; };
 		D0E0EA012567A10900F2403C /* CreateAccountMapViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CreateAccountMapViewController.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
@@ -146,10 +146,10 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				D0DC3758256DE6E40045D967 /* CLibWally.xcframework in Frameworks */,
+				D0DC3762256E00E80045D967 /* CLibWally.xcframework in Frameworks */,
 				D0974A56255B8E300013DC60 /* LifeHash in Frameworks */,
 				D064BCC6252D5BD700D42D66 /* URKit in Frameworks */,
-				D0DC375A256DE6E80045D967 /* LibWally.xcframework in Frameworks */,
+				D0DC3765256E00FE0045D967 /* LibWally.xcframework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -269,8 +269,8 @@
 		D0CF1E672522E5DB0059C541 /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
-				D0DC3756256DE6E40045D967 /* CLibWally.xcframework */,
-				D0DC3757256DE6E40045D967 /* LibWally.xcframework */,
+				D0DC3763256E00FA0045D967 /* LibWally.xcframework */,
+				D0DC3761256E00E80045D967 /* CLibWally.xcframework */,
 			);
 			name = Frameworks;
 			sourceTree = "<group>";
@@ -310,7 +310,7 @@
 				D0CF1E2C2522E20C0059C541 /* Sources */,
 				D0CF1E2D2522E20C0059C541 /* Frameworks */,
 				D0CF1E2E2522E20C0059C541 /* Resources */,
-				D0DC375C256DE6E80045D967 /* Embed Frameworks */,
+				D0DC3760256E00CC0045D967 /* Embed Frameworks */,
 			);
 			buildRules = (
 			);
