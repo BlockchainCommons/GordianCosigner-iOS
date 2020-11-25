@@ -39,7 +39,7 @@ enum URHelper {
             switch key {
             case 1:
                 guard case let CBOR.unsignedInt(fingerprint) = value else { fallthrough }
-                let hex = String(Int(fingerprint), radix: 16)//String(format:"%02X", fingerprint)
+                let hex = String(Int(fingerprint), radix: 16)
                 xfp = "[\(hex)/"
             case 2:
                 guard case let CBOR.array(accounts) = value else { fallthrough }
@@ -54,10 +54,10 @@ enum URHelper {
                                 let prefix = "043587cf"//testnet
                                 var base58String = "\(prefix)000000000000000000\(chainCode)\(keyData)"
                                 
-                                if let data = Data(base58String) {
+                                if let data = Data(base64Encoded: base58String) {
                                     let checksum = Encryption.checksum(Data(data))
                                     base58String += checksum
-                                    if let rawData = Data(base58String) {
+                                    if let rawData = Data(base64Encoded: base58String) {
                                         xpub = Base58.encode([UInt8](rawData))
                                     }
                                 }

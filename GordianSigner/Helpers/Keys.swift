@@ -12,45 +12,45 @@ import LibWally
 enum Keys {
     
     static func masterKey(_ words: [String], _ passphrase: String) -> String? {
-        guard let mnemonic = BIP39Mnemonic(words) else { return nil }
+        guard let mnemonic = try? BIP39Mnemonic(words: words) else { return nil }
         
-        let seedHex = mnemonic.seedHex(passphrase)
+        let seedHex = mnemonic.seedHex(passphrase: passphrase)
         
-        guard let hdMasterKey = HDKey(seedHex, .testnet) else { return nil }
+        guard let hdMasterKey = try? HDKey(seed: seedHex, network: .testnet) else { return nil }
         
         return hdMasterKey.xpriv
     }
     
     static func masterXprv(_ words: String, _ passphrase: String) -> String? {
-        guard let mnemonic = BIP39Mnemonic(words) else { return nil }
+        guard let mnemonic = try? BIP39Mnemonic(words: words) else { return nil }
         
-        let seedHex = mnemonic.seedHex(passphrase)
+        let seedHex = mnemonic.seedHex(passphrase: passphrase)
         
-        guard let hdMasterKey = HDKey(seedHex, .testnet) else { return nil }
+        guard let hdMasterKey = try? HDKey(seed: seedHex, network: .testnet) else { return nil }
         
         return hdMasterKey.xpriv
     }
     
     static func masterXpub(_ words: [String], _ passphrase: String) -> String? {
-        guard let mnemonic = BIP39Mnemonic(words) else { return nil }
+        guard let mnemonic = try? BIP39Mnemonic(words: words) else { return nil }
         
-        let seedHex = mnemonic.seedHex(passphrase)
+        let seedHex = mnemonic.seedHex(passphrase: passphrase)
         
-        guard let hdMasterKey = HDKey(seedHex, .testnet) else { return nil }
+        guard let hdMasterKey = try? HDKey(seed: seedHex, network: .testnet) else { return nil }
         
         return hdMasterKey.xpub
     }
     
     static func fingerprint(_ masterKey: String) -> String? {
-        guard let hdMasterKey = HDKey(masterKey) else { return nil }
+        guard let hdMasterKey = try? HDKey(base58: masterKey) else { return nil }
         
         return hdMasterKey.fingerprint.hexString
     }
     
     static func psbtValid(_ string: String) -> Bool {
-        guard let _ = try? PSBT(string, .testnet) else {
+        guard let _ = try? PSBT(psbt: string, network: .testnet) else {
             
-            guard let _ = try? PSBT(string, .mainnet) else {
+            guard let _ = try? PSBT(psbt: string, network: .mainnet) else {
                 return false
             }
             
@@ -61,19 +61,19 @@ enum Keys {
     }
     
     static func validMnemonicArray(_ words: [String]) -> Bool {
-        guard let _ = BIP39Mnemonic(words) else { return false }
+        guard let _ = try? BIP39Mnemonic(words: words) else { return false }
         
         return true
     }
     
     static func validMnemonicString(_ words: String) -> Bool {
-        guard let _ = BIP39Mnemonic(words) else { return false }
+        guard let _ = try? BIP39Mnemonic(words: words) else { return false }
         
         return true
     }
     
     static func entropy(_ words: [String]) -> Data? {
-        guard let mnemonic = BIP39Mnemonic(words) else { return nil }
+        guard let mnemonic = try? BIP39Mnemonic(words: words) else { return nil }
         
         return mnemonic.entropy.data
     }
@@ -86,8 +86,8 @@ enum Keys {
         
         if status == errSecSuccess {
             let data = Data(randomBytes)
-            let hex = data.hexString
-            if let entropy = BIP39Entropy(hex), let mnemonic = BIP39Mnemonic(entropy) {
+            let entropy = BIP39Mnemonic.Entropy(data)
+            if let mnemonic = try? BIP39Mnemonic(entropy: entropy) {
                 words = mnemonic.description
             }
         }
@@ -96,14 +96,14 @@ enum Keys {
     }
     
     static func mnemonic(_ entropy: Data) -> String? {
-        let bip39entropy = BIP39Entropy(entropy)
-        
-        return BIP39Mnemonic(bip39entropy)?.description        
+        let bip39entropy = BIP39Mnemonic.Entropy(entropy)
+
+        return try? BIP39Mnemonic(entropy: bip39entropy).description
     }
     
     static func psbt(_ psbt: String, _ network: Network) -> PSBT? {
         
-        return try? PSBT(psbt, network)
+        return try? PSBT(psbt: psbt, network: network)
     }
     
     static func bip44Account(_ masterKey: String, _ network: String) -> String? {
@@ -116,17 +116,17 @@ enum Keys {
             break
         }
                 
-        guard let hdKey = HDKey(masterKey), let bip44deriv = BIP32Path("m/44'/\(coinType)'/0'"),
-            let account = try? hdKey.derive(bip44deriv) else {
+        guard let hdKey = try? HDKey(base58: masterKey), let bip44deriv = try? BIP32Path(string: "m/44'/\(coinType)'/0'"),
+            let account = try? hdKey.derive(using: bip44deriv) else {
                 return nil
         }
-                
+                        
         return "[\(hdKey.fingerprint.hexString)/44h/\(coinType)h/0h]\(account.xpub)"
     }
     
     static func bip45Account(_ masterKey: String) -> String? {
-        guard let hdKey = HDKey(masterKey), let bip45deriv = BIP32Path("m/45'"),
-            let account = try? hdKey.derive(bip45deriv) else {
+        guard let hdKey = try? HDKey(base58: masterKey), let bip45deriv = try? BIP32Path(string: "m/45'"),
+            let account = try? hdKey.derive(using: bip45deriv) else {
                 return nil
         }
                 
@@ -143,8 +143,8 @@ enum Keys {
             break
         }
                 
-        guard let hdKey = HDKey(masterKey), let bip84deriv = BIP32Path("m/84'/\(coinType)'/0'"),
-            let account = try? hdKey.derive(bip84deriv) else {
+        guard let hdKey = try? HDKey(base58: masterKey), let bip84deriv = try? BIP32Path(string: "m/84'/\(coinType)'/0'"),
+            let account = try? hdKey.derive(using: bip84deriv) else {
                 return nil
         }
                 
@@ -161,8 +161,8 @@ enum Keys {
             break
         }
                 
-        guard let hdKey = HDKey(masterKey), let bip49deriv = BIP32Path("m/49'/\(coinType)'/0'"),
-            let account = try? hdKey.derive(bip49deriv) else {
+        guard let hdKey = try? HDKey(base58: masterKey), let bip49deriv = try? BIP32Path(string: "m/49'/\(coinType)'/0'"),
+            let account = try? hdKey.derive(using: bip49deriv) else {
                 return nil
         }
                 
@@ -179,8 +179,8 @@ enum Keys {
             break
         }
                 
-        guard let hdKey = HDKey(masterKey), let bip48LegacyDeriv = BIP32Path("m/48'/\(coinType)'/0'/1'"),
-            let account = try? hdKey.derive(bip48LegacyDeriv) else {
+        guard let hdKey = try? HDKey(base58: masterKey), let bip48LegacyDeriv = try? BIP32Path(string: "m/48'/\(coinType)'/0'/1'"),
+            let account = try? hdKey.derive(using: bip48LegacyDeriv) else {
                 return nil
         }
                 
@@ -197,8 +197,8 @@ enum Keys {
             break
         }
                 
-        guard let hdKey = HDKey(masterKey), let bip48SegwitDeriv = BIP32Path("m/48'/\(coinType)'/0'/2'"),
-            let account = try? hdKey.derive(bip48SegwitDeriv) else {
+        guard let hdKey = try? HDKey(base58: masterKey), let bip48SegwitDeriv = try? BIP32Path(string: "m/48'/\(coinType)'/0'/2'"),
+            let account = try? hdKey.derive(using: bip48SegwitDeriv) else {
                 return nil
         }
                 
@@ -215,8 +215,8 @@ enum Keys {
             break
         }
                 
-        guard let hdKey = HDKey(masterKey), let bip48NestedDeriv = BIP32Path("m/48'/\(coinType)'/0'/3'"),
-            let account = try? hdKey.derive(bip48NestedDeriv) else {
+        guard let hdKey = try? HDKey(base58: masterKey), let bip48NestedDeriv = try? BIP32Path(string: "m/48'/\(coinType)'/0'/3'"),
+            let account = try? hdKey.derive(using: bip48NestedDeriv) else {
                 return nil
         }
                 

@@ -41,7 +41,7 @@ class PSBTSigner {
             let uniqueXprvs = Array(Set(xprvStrings))
             
             for uniqueXprv in uniqueXprvs {
-                if let xprv = HDKey(uniqueXprv) {
+                if let xprv = try? HDKey(base58: uniqueXprv) {
                     xprvsToSignWith.append(xprv)
                 }
             }
@@ -53,10 +53,10 @@ class PSBTSigner {
                 let inputs = psbtToSign.inputs
                 
                 for (x, input) in inputs.enumerated() {
-                    /// Create an array of child keys that we know can sign our inputs.
-                    if let origins: [PubKey : KeyOrigin] = input.canSign(key) {
+                    /// Create an array of child keys that we know can sign our inputs.                    
+                    if let origins: [PubKey : KeyOrigin] = input.canSignOrigins(with: key) {
                         for origin in origins {
-                            if let childKey = try? key.derive(origin.value.path) {
+                            if let childKey = try? key.derive(using: origin.value.path) {
                                 if let privKey = childKey.privKey {
                                     signableKeys.append(privKey.wif)
                                 }
@@ -74,9 +74,10 @@ class PSBTSigner {
                         }
                         
                         for (s, signer) in uniqueSigners.enumerated() {
-                            guard let signingKey = Key(signer, network) else { return }
+                            guard let signingKey = try? Key(wif: signer, network: network) else { return }
                             signedFor.append(signingKey.pubKey.data.hexString)
-                            psbtToSign.sign(signingKey)
+                            psbtToSign = try? psbtToSign.signed(with: signingKey)
+                            //psbtToSign.sign(signingKey)
                             /// Once we completed the signing loop we finalize with our node.
                             if s + 1 == uniqueSigners.count {
                                 completion((psbtToSign, signedFor, nil))
@@ -97,7 +98,7 @@ class PSBTSigner {
             if seedsToSignWith.count > 0 {
                 for (i, words) in seedsToSignWith.enumerated() {
                     guard let masterKey = Keys.masterXprv(words, ""),
-                        let hdkey = HDKey(masterKey) else { return }
+                        let hdkey = try? HDKey(base58: masterKey) else { return }
                     
                     xprvsToSignWith.append(hdkey)
                     
@@ -145,10 +146,10 @@ class PSBTSigner {
         }
         
         do {
-            psbtToSign = try PSBT(psbt, .testnet)
+            psbtToSign = try PSBT(psbt: psbt, network: .testnet)
             network = .testnet
             
-            if psbtToSign.complete {
+            if psbtToSign.isComplete {
                 completion((psbtToSign, nil, nil))
             } else {
                 getSeeds()

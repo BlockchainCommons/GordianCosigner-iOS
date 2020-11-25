@@ -54,7 +54,6 @@ class PsbtViewController: UIViewController, UITableViewDelegate, UITableViewData
             guard let psbts = psbts, psbts.count > 0 else { return }
             
             for (i, psbt) in psbts.enumerated() {
-                print("psbt: \(psbt)")
                 let psbtStruct = PsbtStruct(dictionary: psbt)
                 self.psbts.append(psbtStruct)
                 
@@ -62,12 +61,12 @@ class PsbtViewController: UIViewController, UITableViewDelegate, UITableViewData
                 
                 self.decryptedPsbts.append(data.base64EncodedString())
                 
-                guard var psbtWally = Keys.psbt(data.base64EncodedString(), .testnet) else { return }
+                guard let psbtWally = Keys.psbt(data.base64EncodedString(), .testnet) else { return }
                 
-                if psbtWally.finalize() {
-                    self.completes.append(psbtWally.complete)
+                if let finalized = try? psbtWally.finalized() {
+                    self.completes.append(finalized.isComplete)
                 } else {
-                    self.completes.append(psbtWally.complete)
+                    self.completes.append(psbtWally.isComplete)
                 }
                 
                 self.lifeHashes.append(image)

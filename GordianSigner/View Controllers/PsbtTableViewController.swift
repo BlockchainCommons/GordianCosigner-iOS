@@ -39,7 +39,19 @@ class PsbtTableViewController: UIViewController, UITableViewDelegate, UITableVie
         }
         
         if psbtText != "" {
-            psbt = try? PSBT(psbtText, .testnet)
+            psbt = try? PSBT(psbt: psbtText, network: .testnet)
+            
+            if let psbtToFinalize = try? psbt.finalized() {
+                if psbtToFinalize.isComplete {
+                    self.export = true
+                    self.signButtonOutlet.setTitle("export", for: .normal)
+                    if let final = psbtToFinalize.transactionFinal {
+                        if let hex = final.description {
+                            self.rawTx = hex
+                        }
+                    }
+                }
+            }
         }
     }
     
@@ -48,6 +60,7 @@ class PsbtTableViewController: UIViewController, UITableViewDelegate, UITableVie
             if success {
                 DispatchQueue.main.async { [weak self] in
                     self?.tableView.reloadData()
+                    
                 }
             }
         }
@@ -67,7 +80,7 @@ class PsbtTableViewController: UIViewController, UITableViewDelegate, UITableVie
             for (o, origin) in origins.enumerated() {
                 let pubkey = origin.key.data.hexString
                 
-                guard let path = try? origin.value.path.chop(4) else { completion(false); return }
+                guard let path = try? origin.value.path.chop(depth: 4) else { completion(false); return }
                 
                 let dict = ["pubkey":pubkey, "hasSigned": false, "keysetLabel": "unknown", "path": path, "fullPath": origin.value.path] as [String : Any]
                 pubkeysArray.append(dict)
@@ -107,8 +120,8 @@ class PsbtTableViewController: UIViewController, UITableViewDelegate, UITableVie
                                 let signerStruct = SignerStruct(dictionary: signer)
                                 if let entropy = signerStruct.entropy {
                                     if let decryptedEntropy = Encryption.decrypt(entropy) {
-                                        let e = BIP39Entropy(decryptedEntropy)
-                                        if let mnemonic = BIP39Mnemonic(e) {
+                                        let e = BIP39Mnemonic.Entropy(decryptedEntropy)
+                                        if let mnemonic = try? BIP39Mnemonic(entropy: e) {
                                             var passphrase = ""
                                             if let encryptedPassphrase = signerStruct.passphrase {
                                                 if let decryptedPassphrase = Encryption.decrypt(encryptedPassphrase) {
@@ -116,10 +129,10 @@ class PsbtTableViewController: UIViewController, UITableViewDelegate, UITableVie
                                                 }
                                             }
                                             
-                                            let seedHex = mnemonic.seedHex(passphrase)
+                                            let seedHex = mnemonic.seedHex(passphrase: passphrase)
                                             
-                                            if let hdMasterKey = HDKey(seedHex, .testnet) {
-                                                if let childKey = try? hdMasterKey.derive(fullPath) {
+                                            if let hdMasterKey = try? HDKey(seed: seedHex, network: .testnet) {
+                                                if let childKey = try? hdMasterKey.derive(using: fullPath) {
                                                     if childKey.pubKey.data.hexString == originalPubkey {
                                                         self.canSign = true
                                                     }
@@ -143,19 +156,23 @@ class PsbtTableViewController: UIViewController, UITableViewDelegate, UITableVie
                                 xpub = "\(arr[1])"
                             }
                             
-                            if let hdkey = HDKey(xpub), let childKey = try? hdkey.derive(path) {
+                            if let hdkey = try? HDKey(base58: xpub), let childKey = try? hdkey.derive(using: path) {
                                 
                                 if originalPubkey == childKey.pubKey.data.hexString {
                                     updatedDict["keysetLabel"] = keysetStruct.label
                                     pubkeyArray[p] = updatedDict
                                     
                                     if let sigs = input.signatures {
+                                        print("sigs: \(sigs)")
                                         
                                         for (s, sig) in sigs.enumerated() {
                                             let signedKey = sig.key.data.hexString
+                                            print("signedKey: \(signedKey)")
+                                            print("originalPubkey: \(originalPubkey)")
                                             
                                             if signedKey == originalPubkey {
                                                 updatedDict["hasSigned"] = true
+                                                print("hasSigned")
                                                 pubkeyArray[p] = updatedDict
                                                 self.inputsArray[i]["pubKeyArray"] = pubkeyArray
                                             }
@@ -176,6 +193,7 @@ class PsbtTableViewController: UIViewController, UITableViewDelegate, UITableVie
                                                 }
                                                 
                                             } else {
+                                                self.inputsArray[i]["pubKeyArray"] = pubkeyArray
                                                 
                                                 if k + 1 == keysets.count && p + 1 == pubkeyArray.count && i + 1 == self.inputsArray.count && s + 1 == sigs.count {
                                                     completion(true)
@@ -192,14 +210,26 @@ class PsbtTableViewController: UIViewController, UITableViewDelegate, UITableVie
                                     }
                                     
                                 } else {
+                                    if let sigs = input.signatures {
+                                        for sig in sigs {
+                                            let signedKey = sig.key.data.hexString
+                                            if signedKey == originalPubkey {
+                                                updatedDict["hasSigned"] = true
+                                                pubkeyArray[p] = updatedDict
+                                                self.inputsArray[i]["pubKeyArray"] = pubkeyArray
+                                            }
+                                        }
+                                    } else {
+                                        self.inputsArray[i]["pubKeyArray"] = pubkeyArray
+                                    }
                                     
                                     if k + 1 == keysets.count && p + 1 == pubkeyArray.count && i + 1 == self.inputsArray.count {
-                                        print("finishing here")
                                         completion(true)
                                     }
                                 }
                                 
                             } else {
+                                self.inputsArray[i]["pubKeyArray"] = pubkeyArray
                                 
                                 if k + 1 == keysets.count && p + 1 == pubkeyArray.count && i + 1 == self.inputsArray.count {
                                     completion(true)
@@ -297,31 +327,31 @@ class PsbtTableViewController: UIViewController, UITableViewDelegate, UITableVie
         let label = cell.viewWithTag(1) as! UILabel
         let icon = cell.viewWithTag(2) as! UIImageView
         
-        var psbtToFinalize = psbt!
-        
-        if psbtToFinalize.finalize() {
-            if psbtToFinalize.complete {
-                if let _ = psbtToFinalize.transactionFinal {
-                    label.text = "PSBT complete"
-                    icon.image = UIImage(systemName: "checkmark.square")
-                    icon.tintColor = .systemGreen
-                }
-            } else {
-                label.text = "PSBT incomplete"
-                icon.image = UIImage(systemName: "exclamationmark.square")
-                icon.tintColor = .systemPink
-            }
-        } else {
-            if psbtToFinalize.complete {
+        if let psbtToFinalize = try? psbt.finalized() {
+            if psbtToFinalize.isComplete {
                 label.text = "PSBT complete"
                 icon.image = UIImage(systemName: "checkmark.square")
                 icon.tintColor = .systemGreen
+                export = true
             } else {
                 label.text = "PSBT incomplete"
                 icon.image = UIImage(systemName: "exclamationmark.square")
                 icon.tintColor = .systemPink
+                export = false
             }
-        }
+        } else {
+            if psbt.isComplete {
+                label.text = "PSBT complete"
+                icon.image = UIImage(systemName: "checkmark.square")
+                icon.tintColor = .systemGreen
+                export = true
+            } else {
+                label.text = "PSBT incomplete"
+                icon.image = UIImage(systemName: "exclamationmark.square")
+                icon.tintColor = .systemPink
+                export = false
+            }
+        }        
         
         return cell
     }
@@ -498,13 +528,12 @@ class PsbtTableViewController: UIViewController, UITableViewDelegate, UITableVie
                 
                 self.signedFor = signedFor
                 
-                var psbtToFinalize = signedPsbt
-                
-                if psbtToFinalize.finalize() {
-                    if psbtToFinalize.complete {
+                if let psbtToFinalize = try? signedPsbt.finalized() {
+                    if psbtToFinalize.isComplete {
                         if let final = psbtToFinalize.transactionFinal {
                             if let hex = final.description {
                                 self.rawTx = hex
+                                self.save(signedPsbt)
                             }
                         }
                     }
@@ -528,6 +557,22 @@ class PsbtTableViewController: UIViewController, UITableViewDelegate, UITableVie
         } else {
             showAlert(self, "Add a psbt first", "You may either tap the paste button, scan a QR or upload a .psbt file.")
         }
+    }
+    
+    private func save(_ psbt: PSBT) {
+        var dict = [String:Any]()
+        dict["dateAdded"] = Date()
+        dict["psbt"] = Encryption.encrypt(psbt.data)
+        dict["label"] = "Signed PSBT"
+        dict["id"] = UUID()
+        
+        CoreDataService.saveEntity(dict: dict, entityName: .psbt, completion: { (success, errorDescription) in
+            guard success else {
+                showAlert(self, "Not saved!", "There was an issue encrypting and saving your psbt. Please reach out and let us know. Error: \(errorDescription ?? "unknown")")
+                
+                return
+            }
+        })
     }
     
     private func exportAsFile(_ psbt: Data) {
@@ -637,11 +682,11 @@ class PsbtTableViewController: UIViewController, UITableViewDelegate, UITableVie
                     let (words, passphrase) = arg0
                     guard let self = self else { return }
 
-                    guard let mnemonic = BIP39Mnemonic(words) else { return }
+                    guard let mnemonic = try? BIP39Mnemonic(words: words) else { return }
 
-                    let seedHex = mnemonic.seedHex(passphrase)
+                    let seedHex = mnemonic.seedHex(passphrase: passphrase)
 
-                    guard let mk = HDKey(seedHex, .testnet) else { return }
+                    guard let mk = try? HDKey(seed: seedHex, network: .testnet) else { return }
 
                     self.sign(mk)
                 }
