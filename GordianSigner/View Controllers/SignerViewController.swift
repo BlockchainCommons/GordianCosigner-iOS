@@ -133,7 +133,7 @@ class SignerViewController: UIViewController {
     }
     
     private func psbtValid(_ string: String) {
-        guard let validPsbt = Keys.psbt(string, .testnet) else {
+        guard let validPsbt = Keys.psbt(string, .mainnet) else {
             setTextView("")
             
             showAlert(self, "⚠️ Invalid psbt", "")

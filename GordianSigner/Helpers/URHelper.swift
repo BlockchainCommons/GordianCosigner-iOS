@@ -51,7 +51,7 @@ enum URHelper {
                                 let (keydata, chaincode, origins) = urToHdkey(cbor: hdkeyCbor)
                                 guard let keyData = keydata, let chainCode = chaincode, let origin = origins else { return nil }
                                 path = origin
-                                let prefix = "043587cf"//testnet
+                                let prefix = "0488b21e"//mainnet "043587cf"//testnet
                                 var base58String = "\(prefix)000000000000000000\(chainCode)\(keyData)"
                                 
                                 if let data = Data(base64Encoded: base58String) {

@@ -16,7 +16,7 @@ enum Keys {
         
         let seedHex = mnemonic.seedHex(passphrase: passphrase)
         
-        guard let hdMasterKey = try? HDKey(seed: seedHex, network: .testnet) else { return nil }
+        guard let hdMasterKey = try? HDKey(seed: seedHex, network: .mainnet) else { return nil }
         
         return hdMasterKey.xpriv
     }
@@ -26,7 +26,7 @@ enum Keys {
         
         let seedHex = mnemonic.seedHex(passphrase: passphrase)
         
-        guard let hdMasterKey = try? HDKey(seed: seedHex, network: .testnet) else { return nil }
+        guard let hdMasterKey = try? HDKey(seed: seedHex, network: .mainnet) else { return nil }
         
         return hdMasterKey.xpriv
     }
@@ -36,7 +36,7 @@ enum Keys {
         
         let seedHex = mnemonic.seedHex(passphrase: passphrase)
         
-        guard let hdMasterKey = try? HDKey(seed: seedHex, network: .testnet) else { return nil }
+        guard let hdMasterKey = try? HDKey(seed: seedHex, network: .mainnet) else { return nil }
         
         return hdMasterKey.xpub
     }
@@ -48,7 +48,7 @@ enum Keys {
     }
     
     static func psbtValid(_ string: String) -> Bool {
-        guard let _ = try? PSBT(psbt: string, network: .testnet) else {
+        guard let _ = try? PSBT(psbt: string, network: .mainnet) else {
             
             guard let _ = try? PSBT(psbt: string, network: .mainnet) else {
                 return false

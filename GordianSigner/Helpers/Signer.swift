@@ -146,8 +146,8 @@ class PSBTSigner {
         }
         
         do {
-            psbtToSign = try PSBT(psbt: psbt, network: .testnet)
-            network = .testnet
+            psbtToSign = try PSBT(psbt: psbt, network: .mainnet)
+            network = .mainnet
             
             if psbtToSign.isComplete {
                 completion((psbtToSign, nil, nil))

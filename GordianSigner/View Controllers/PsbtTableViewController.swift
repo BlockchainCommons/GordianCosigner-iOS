@@ -39,7 +39,7 @@ class PsbtTableViewController: UIViewController, UITableViewDelegate, UITableVie
         }
         
         if psbtText != "" {
-            psbt = try? PSBT(psbt: psbtText, network: .testnet)
+            psbt = try? PSBT(psbt: psbtText, network: .mainnet)
             
             if let psbtToFinalize = try? psbt.finalized() {
                 if psbtToFinalize.isComplete {
@@ -131,7 +131,7 @@ class PsbtTableViewController: UIViewController, UITableViewDelegate, UITableVie
                                             
                                             let seedHex = mnemonic.seedHex(passphrase: passphrase)
                                             
-                                            if let hdMasterKey = try? HDKey(seed: seedHex, network: .testnet) {
+                                            if let hdMasterKey = try? HDKey(seed: seedHex, network: .mainnet) {
                                                 if let childKey = try? hdMasterKey.derive(using: fullPath) {
                                                     if childKey.pubKey.data.hexString == originalPubkey {
                                                         self.canSign = true
@@ -683,7 +683,7 @@ class PsbtTableViewController: UIViewController, UITableViewDelegate, UITableVie
 
                     let seedHex = mnemonic.seedHex(passphrase: passphrase)
 
-                    guard let mk = try? HDKey(seed: seedHex, network: .testnet) else { return }
+                    guard let mk = try? HDKey(seed: seedHex, network: .mainnet) else { return }
 
                     self.sign(mk)
                 }

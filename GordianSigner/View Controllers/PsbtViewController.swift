@@ -61,7 +61,7 @@ class PsbtViewController: UIViewController, UITableViewDelegate, UITableViewData
                 
                 self.decryptedPsbts.append(data.base64EncodedString())
                 
-                guard let psbtWally = Keys.psbt(data.base64EncodedString(), .testnet) else { return }
+                guard let psbtWally = Keys.psbt(data.base64EncodedString(), .mainnet) else { return }
                 
                 if let finalized = try? psbtWally.finalized() {
                     self.completes.append(finalized.isComplete)

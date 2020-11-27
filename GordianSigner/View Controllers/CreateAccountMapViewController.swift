@@ -50,8 +50,6 @@ class CreateAccountMapViewController: UIViewController, UIPickerViewDelegate, UI
         let m = totalParticipants
         let n = totalRequiredSigs
         
-        print("\(m) of \(n)")
-        
         var desc = "wsh(sortedmulti(\(m),"
         
         var keystores = ""

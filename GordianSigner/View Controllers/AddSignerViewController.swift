@@ -98,7 +98,7 @@ class AddSignerViewController: UIViewController {
         keyset["label"] = label
         keyset["fingerprint"] = xfp
         
-        guard let bip48SegwitAccount = Keys.bip48SegwitAccount(masterKey, "test") else {
+        guard let bip48SegwitAccount = Keys.bip48SegwitAccount(masterKey, "main") else {
                 showAlert(self, "Key derivation failed", "")
                 return
         }
