@@ -22,7 +22,9 @@ class PsbtTableViewController: UIViewController, UITableViewDelegate, UITableVie
     private var export = false
     private var alertStyle = UIAlertController.Style.actionSheet
     var inputsArray = [[String:Any]]()
+    var outputsArray = [[String:Any]]()
     var signedFor = [String]()
+    var accountMaps = [AccountMapStruct]()
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -68,6 +70,18 @@ class PsbtTableViewController: UIViewController, UITableViewDelegate, UITableVie
     
     private func load(completion: @escaping ((Bool) -> Void)) {
         inputsArray.removeAll()
+        outputsArray.removeAll()
+        accountMaps.removeAll()
+        
+        CoreDataService.retrieveEntity(entityName: .accountMap) { (accountMaps, errorDescription) in
+            if accountMaps != nil {
+                if accountMaps!.count > 0 {
+                    for accountMap in accountMaps! {
+                        self.accountMaps.append(AccountMapStruct(dictionary: accountMap))
+                    }
+                }
+            }
+        }
         
         let inputs = self.psbt.inputs
         
@@ -184,7 +198,7 @@ class PsbtTableViewController: UIViewController, UITableViewDelegate, UITableVie
                                                     }
                                                     
                                                     if k + 1 == keysets.count && p + 1 == pubkeyArray.count && i + 1 == self.inputsArray.count && s + 1 == sigs.count && x + 1 == self.signedFor.count {
-                                                        completion(true)
+                                                        self.parseOutputs(completion: completion)
                                                     }
                                                 }
                                                 
@@ -192,7 +206,7 @@ class PsbtTableViewController: UIViewController, UITableViewDelegate, UITableVie
                                                 self.inputsArray[i]["pubKeyArray"] = pubkeyArray
                                                 
                                                 if k + 1 == keysets.count && p + 1 == pubkeyArray.count && i + 1 == self.inputsArray.count && s + 1 == sigs.count {
-                                                    completion(true)
+                                                    self.parseOutputs(completion: completion)
                                                 }
                                             }
                                         }
@@ -201,7 +215,7 @@ class PsbtTableViewController: UIViewController, UITableViewDelegate, UITableVie
                                         self.inputsArray[i]["pubKeyArray"] = pubkeyArray
                                         
                                         if k + 1 == keysets.count && p + 1 == pubkeyArray.count && i + 1 == self.inputsArray.count {
-                                            completion(true)
+                                            self.parseOutputs(completion: completion)
                                         }
                                     }
                                     
@@ -221,7 +235,7 @@ class PsbtTableViewController: UIViewController, UITableViewDelegate, UITableVie
                                     }
                                     
                                     if k + 1 == keysets.count && p + 1 == pubkeyArray.count && i + 1 == self.inputsArray.count {
-                                        completion(true)
+                                        self.parseOutputs(completion: completion)
                                     }
                                 }
                                 
@@ -229,10 +243,68 @@ class PsbtTableViewController: UIViewController, UITableViewDelegate, UITableVie
                                 self.inputsArray[i]["pubKeyArray"] = pubkeyArray
                                 
                                 if k + 1 == keysets.count && p + 1 == pubkeyArray.count && i + 1 == self.inputsArray.count {
-                                    completion(true)
+                                    self.parseOutputs(completion: completion)
                                 }
                             }
                         }
+                    }
+                }
+            }
+        }
+    }
+    
+    private func parseOutputs(completion: @escaping ((Bool) -> Void)) {
+        let outputs = psbt.outputs
+        
+        for (o, output) in outputs.enumerated() {
+            self.outputsArray.append(["output": output])
+            
+            guard let address = output.txOutput.address else { return }
+            
+            self.outputsArray[o]["address"] = address
+            self.outputsArray[o]["isMine"] = false
+            self.outputsArray[o]["accountMap"] = "unknown"
+            self.outputsArray[o]["path"] = "path unknown"
+            
+            if accountMaps.count == 0 && o + 1 == outputs.count {
+                completion(true)
+            }
+            
+            for (a, accountMap) in accountMaps.enumerated() {
+                let descriptor = accountMap.descriptor
+                let descriptorParser = DescriptorParser()
+                let descriptorStruct = descriptorParser.descriptor(descriptor)
+                let keys = descriptorStruct.multiSigKeys
+                let sigsRequired = descriptorStruct.sigsRequired
+                
+                if let origins = output.origins {
+                    
+                    for origin in origins {
+                        let path = origin.value.path
+                        self.outputsArray[o]["path"] = path.description
+                        var pubkeys = [PubKey]()
+                        
+                        for (k, key) in keys.enumerated() {
+                            guard let hdkey = try? HDKey(base58: key) else { return }
+                            
+                            guard let pubkey = try? hdkey.derive(using: path.chop(depth: 4)) else { return }
+                            
+                            pubkeys.append(pubkey.pubKey)
+                            
+                            if k + 1 == keys.count {
+                                let scriptPubKey = ScriptPubKey(multisig: pubkeys, threshold: sigsRequired, isBIP67: true)
+                                guard let multiSigAddress = try? Address(scriptPubKey: scriptPubKey, network: .mainnet) else { return }
+                                                                
+                                if multiSigAddress.description == address {
+                                    self.outputsArray[o]["isMine"] = true
+                                    self.outputsArray[o]["accountMap"] = accountMap.label
+                                }
+                            }
+                        }
+                    }
+                    
+                    if a + 1 == accountMaps.count {
+                        completion(true)
                     }
                 }
             }
@@ -298,7 +370,11 @@ class PsbtTableViewController: UIViewController, UITableViewDelegate, UITableVie
                 return UITableViewCell()
             }
         case 2:
-            return outputCell(indexPath)
+            if outputsArray.count > 0 {
+                return outputCell(indexPath)
+            } else {
+                return UITableViewCell()
+            }
         case 3:
             return feeCell(indexPath)
         default:
@@ -384,12 +460,13 @@ class PsbtTableViewController: UIViewController, UITableViewDelegate, UITableVie
             for pubkey in pubkeyArray {
                 let participant = pubkey["keysetLabel"] as! String
                 let hasSigned = pubkey["hasSigned"] as! Bool
+                let fullPath = pubkey["fullPath"] as! BIP32Path
                 
                 if hasSigned {
-                    participantsTextView.text += "Signed: " + participant + "\n"
+                    participantsTextView.text += "Signed: " + participant + " - \(fullPath.description)\n"
                     numberOfSigs += 1
                 } else {
-                    participantsTextView.text += "NOT signed: " + participant + "\n"
+                    participantsTextView.text += "NOT signed: " + participant + " - \(fullPath.description)\n"
                 }
                 
                 if participant != "unknown" {
@@ -428,13 +505,22 @@ class PsbtTableViewController: UIViewController, UITableViewDelegate, UITableVie
         let isMineImageView = cell.viewWithTag(2) as! UIImageView
         let amountLabel = cell.viewWithTag(3) as! UILabel
         let addressLabel = cell.viewWithTag(4) as! UILabel
+        let accountMapLabel = cell.viewWithTag(5) as! UILabel
+        let pathLabel = cell.viewWithTag(6) as! UILabel
         
-        let output = psbt.outputs[indexPath.row]
+        let outputDict = outputsArray[indexPath.row]
+        let output = outputDict["output"] as! PSBTOutput
         
         outputLabel.text = "Output #\(indexPath.row + 1)"
         
-        isMineImageView.image = UIImage(systemName: "person.crop.circle.fill.badge.checkmark")
-        isMineImageView.tintColor = .systemGreen
+        let isMine = outputDict["isMine"] as! Bool
+        if isMine {
+            isMineImageView.image = UIImage(systemName: "person.crop.circle.fill.badge.checkmark")
+            isMineImageView.tintColor = .systemGreen
+        } else {
+            isMineImageView.image = UIImage(systemName: "questionmark.circle")
+            isMineImageView.tintColor = .systemGray
+        }
         
         amountLabel.text = (Double(output.txOutput.amount) / 100000000.0).avoidNotation + " btc"
         
@@ -443,8 +529,13 @@ class PsbtTableViewController: UIViewController, UITableViewDelegate, UITableVie
         } else {
             addressLabel.text = "no address..."
         }
-        
         addressLabel.adjustsFontSizeToFitWidth = true
+        
+        let accountMap = outputDict["accountMap"] as! String
+        accountMapLabel.text = accountMap
+        
+        let path = outputDict["path"] as! String
+        pathLabel.text = path
         
         return cell
     }
@@ -470,7 +561,7 @@ class PsbtTableViewController: UIViewController, UITableViewDelegate, UITableVie
         case 1:
             return 168
         case 2:
-            return 107
+            return 156
         case 3:
             return 44
         default:
@@ -674,10 +765,10 @@ class PsbtTableViewController: UIViewController, UITableViewDelegate, UITableVie
             if let vc = segue.destination as? AddSignerViewController {
                 vc.tempWords = true
                 
-                vc.doneBlock = { [weak self] (arg0) in
+                vc.doneBlock = { [weak self] arg0 in
+                    guard let self = self else { return }
                     
                     let (words, passphrase) = arg0
-                    guard let self = self else { return }
 
                     guard let mnemonic = try? BIP39Mnemonic(words: words) else { return }
 
