@@ -12,11 +12,13 @@ import URKit
 
 class PsbtViewController: UIViewController, UITableViewDelegate, UITableViewDataSource {
     
+    private let spinner = Spinner()
     private var psbts = [PsbtStruct]()
     private var psbtText = ""
     private var lifeHashes = [UIImage]()
     private var completes = [Bool]()
     private var decryptedPsbts = [String]()
+    private var amounts = [Double]()
     private var psbtToExport = ""
     var addButton = UIBarButtonItem()
     var editButton = UIBarButtonItem()
@@ -32,9 +34,23 @@ class PsbtViewController: UIViewController, UITableViewDelegate, UITableViewData
         addButton = UIBarButtonItem.init(barButtonSystemItem: .add, target: self, action: #selector(add))
         editButton = UIBarButtonItem.init(barButtonSystemItem: .edit, target: self, action: #selector(editPsbts))
         self.navigationItem.setRightBarButtonItems([addButton, editButton], animated: true)
+        
+        NotificationCenter.default.addObserver(self, selector: #selector(reload), name: .psbtSaved, object: nil)
+        spinner.add(vc: self, description: "loading...")
+        load()
     }
     
-    override func viewDidAppear(_ animated: Bool) {
+    @objc func reload() {
+        refresh()
+    }
+    
+    private func refresh() {
+        spinner.add(vc: self, description: "refreshing...")
+        psbts.removeAll()
+        completes.removeAll()
+        lifeHashes.removeAll()
+        decryptedPsbts.removeAll()
+        amounts.removeAll()
         load()
     }
     
@@ -43,42 +59,47 @@ class PsbtViewController: UIViewController, UITableViewDelegate, UITableViewData
     }
     
     private func load() {
-        psbts.removeAll()
-        completes.removeAll()
-        lifeHashes.removeAll()
-        decryptedPsbts.removeAll()
-        
         CoreDataService.retrieveEntity(entityName: .psbt) { [weak self] (psbts, errorDescription) in
             guard let self = self else { return }
             
-            guard let psbts = psbts, psbts.count > 0 else { return }
+            guard let psbts = psbts, psbts.count > 0 else { self.spinner.remove(); return }
             
-            for (i, psbt) in psbts.enumerated() {
-                let psbtStruct = PsbtStruct(dictionary: psbt)
-                self.psbts.append(psbtStruct)
+            DispatchQueue.background(background: {
                 
-                guard let data = Encryption.decrypt(psbtStruct.psbt), let image = LifeHash.image(data) else { return }
-                
-                self.decryptedPsbts.append(data.base64EncodedString())
-                
-                guard let psbtWally = Keys.psbt(data.base64EncodedString(), .mainnet) else { return }
-                
-                if let finalized = try? psbtWally.finalized() {
-                    self.completes.append(finalized.isComplete)
-                } else {
-                    self.completes.append(psbtWally.isComplete)
-                }
-                
-                self.lifeHashes.append(image)
-                
-                if i + 1 == psbts.count {
-                    DispatchQueue.main.async { [weak self] in
-                        guard let self = self else { return }
-                        
-                        self.psbtTable.reloadData()
+                for psbt in psbts {
+                    let psbtStruct = PsbtStruct(dictionary: psbt)
+                    self.psbts.append(psbtStruct)
+                    
+                    guard let data = Encryption.decrypt(psbtStruct.psbt), let image = LifeHash.image(data) else { self.spinner.remove(); return }
+                    
+                    self.decryptedPsbts.append(data.base64EncodedString())
+                    
+                    guard let psbtWally = Keys.psbt(data.base64EncodedString(), .mainnet) else { self.spinner.remove(); return }
+                    
+                    var amount = 0.0
+                    for input in psbtWally.inputs {
+                        if let inputAmount = input.amount {
+                            amount += Double(inputAmount) / 100000000.0
+                        }
                     }
+                    
+                    self.amounts.append(amount)
+                    
+                    if let finalized = try? psbtWally.finalized() {
+                        self.completes.append(finalized.isComplete)
+                    } else {
+                        self.completes.append(psbtWally.isComplete)
+                    }
+                    
+                    self.lifeHashes.append(image)
                 }
-            }
+                
+            }, completion: { [weak self] in
+                guard let self = self else { return }
+                
+                self.psbtTable.reloadData()
+                self.spinner.remove()
+            })
         }
     }
     
@@ -94,51 +115,63 @@ class PsbtViewController: UIViewController, UITableViewDelegate, UITableViewData
         let cell = tableView.dequeueReusableCell(withIdentifier: "psbtCell", for: indexPath)
         configureCell(cell)
         
-        let psbt = psbts[indexPath.section]
-        
-        let exportFileButton = cell.viewWithTag(2) as! UIButton
-        exportFileButton.restorationIdentifier = "\(indexPath.section)"
-        exportFileButton.addTarget(self, action: #selector(exportAsFile(_:)), for: .touchUpInside)
-        
-        let copyTextButton = cell.viewWithTag(10) as! UIButton
-        copyTextButton.restorationIdentifier = "\(indexPath.section)"
-        copyTextButton.addTarget(self, action: #selector(copyText(_:)), for: .touchUpInside)
-        
-        let exportQrButton = cell.viewWithTag(4) as! UIButton
-        exportQrButton.restorationIdentifier = "\(indexPath.section)"
-        exportQrButton.addTarget(self, action: #selector(exportQr(_:)), for: .touchUpInside)
-        
-        let label = cell.viewWithTag(5) as! UILabel
-        label.text = psbt.label
-        
-        let complete = cell.viewWithTag(9) as! UILabel
-        if completes[indexPath.section] {
-            complete.text = "complete"
+        if lifeHashes.count > 0 {
+            let psbt = psbts[indexPath.section]
+            
+            let copyTextButton = cell.viewWithTag(1) as! UIButton
+            copyTextButton.restorationIdentifier = "\(indexPath.section)"
+            copyTextButton.addTarget(self, action: #selector(copyText(_:)), for: .touchUpInside)
+            
+            let exportFileButton = cell.viewWithTag(2) as! UIButton
+            exportFileButton.restorationIdentifier = "\(indexPath.section)"
+            exportFileButton.addTarget(self, action: #selector(exportAsFile(_:)), for: .touchUpInside)
+            
+            let detailButton = cell.viewWithTag(3) as! UIButton
+            detailButton.addTarget(self, action: #selector(seeDetail(_:)), for: .touchUpInside)
+            detailButton.restorationIdentifier = "\(indexPath.section)"
+            
+            let exportQrButton = cell.viewWithTag(4) as! UIButton
+            exportQrButton.restorationIdentifier = "\(indexPath.section)"
+            exportQrButton.addTarget(self, action: #selector(exportQr(_:)), for: .touchUpInside)
+            
+            let label = cell.viewWithTag(5) as! UILabel
+            label.text = psbt.label
+            
+            let dateAdded = cell.viewWithTag(6) as! UILabel
+            dateAdded.text = psbt.dateAdded.formatted()
+            
+            let lifehash = cell.viewWithTag(7) as! UIImageView
+            configureView(lifehash)
+            lifehash.contentMode = .scaleAspectFit
+            lifehash.image = lifeHashes[indexPath.section]
+            
+            let editButton = cell.viewWithTag(8) as! UIButton
+            editButton.addTarget(self, action: #selector(editLabel(_:)), for: .touchUpInside)
+            editButton.restorationIdentifier = "\(indexPath.section)"
+            
+            let complete = cell.viewWithTag(9) as! UILabel
+            let completeIcon = cell.viewWithTag(10) as! UIImageView
+            if completes[indexPath.section] {
+                complete.text = "fully signed"
+                completeIcon.image = UIImage(systemName: "checkmark.circle")
+                complete.textColor = .systemGreen
+                completeIcon.tintColor = .systemGreen
+            } else {
+                complete.text = "requires signature"
+                completeIcon.image = UIImage(systemName: "exclamationmark.triangle")
+                complete.textColor = .systemOrange
+                completeIcon.tintColor = .systemOrange
+            }
+            
+            let amountLabel = cell.viewWithTag(11) as! UILabel
+            amountLabel.text = amounts[indexPath.section].avoidNotation
+            
+            return cell
         } else {
-            complete.text = "incomplete"
+            
+            return UITableViewCell()
         }
-        complete.textColor = .white
-        
-        let dateAdded = cell.viewWithTag(6) as! UILabel
-        dateAdded.text = psbt.dateAdded.formatted()
-        
-        let lifehash = cell.viewWithTag(7) as! UIImageView
-        configureView(lifehash)
-        lifehash.image = lifeHashes[indexPath.section]
-        
-        let editButton = cell.viewWithTag(8) as! UIButton
-        editButton.addTarget(self, action: #selector(editLabel(_:)), for: .touchUpInside)
-        editButton.restorationIdentifier = "\(indexPath.section)"
-        
-        let detailButton = cell.viewWithTag(3) as! UIButton
-        detailButton.addTarget(self, action: #selector(seeDetail(_:)), for: .touchUpInside)
-        detailButton.restorationIdentifier = "\(indexPath.section)"
-        
-        let textView = cell.viewWithTag(1) as! UITextView
-        textView.text = decryptedPsbts[indexPath.section]
-        
-        return cell
-    }
+     }
     
     @objc func exportQr(_ sender: UIButton) {
         guard let sectionString = sender.restorationIdentifier, let int = Int(sectionString) else { return }
@@ -181,7 +214,7 @@ class PsbtViewController: UIViewController, UITableViewDelegate, UITableViewData
     }
     
     func tableView(_ tableView: UITableView, heightForRowAt indexPath: IndexPath) -> CGFloat {
-        return 262
+        return 228
     }
     
     func tableView(_ tableView: UITableView, canEditRowAt indexPath: IndexPath) -> Bool {
@@ -249,7 +282,7 @@ class PsbtViewController: UIViewController, UITableViewDelegate, UITableViewData
                 return
             }
             
-            self.load()
+            self.refresh()
         }
     }
     

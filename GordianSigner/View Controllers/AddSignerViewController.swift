@@ -117,7 +117,7 @@ class AddSignerViewController: UIViewController {
             if self.tempWords {
                 self.doneBlock!((self.justWords.joined(separator: " "), self.passphraseField.text ?? ""))
                 self.navigationController?.popViewController(animated: true)
-            } else {
+            } else {                
                 showAlert(self, "Signer encrypted and saved 🔐", "")
 
                 self.textField.text = ""

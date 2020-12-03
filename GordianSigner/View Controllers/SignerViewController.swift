@@ -10,9 +10,6 @@ import UIKit
 import LibWally
 
 class SignerViewController: UIViewController {
-
-    @IBOutlet weak private var textView: UITextView!
-    @IBOutlet weak private var signOutlet: UIButton!
     
     private var spinner = Spinner()
     private var psbt = ""
@@ -23,14 +20,6 @@ class SignerViewController: UIViewController {
         super.viewDidLoad()
 
         // Do any additional setup after loading the view.
-        signOutlet.clipsToBounds = true
-        signOutlet.layer.cornerRadius = 5
-        
-        textView.clipsToBounds = true
-        textView.layer.cornerRadius = 8
-        textView.layer.borderColor = UIColor.lightGray.cgColor
-        textView.layer.borderWidth = 0.5
-        
         if (UIDevice.current.userInterfaceIdiom == .pad) {
           alertStyle = UIAlertController.Style.alert
         }
@@ -42,21 +31,7 @@ class SignerViewController: UIViewController {
         }
     }
     
-    @IBAction func signAction(_ sender: Any) {
-        psbt = ""
-        psbtToParse = nil
-        textView.text = ""
-    }
-    
-    @IBAction func scanQrAction(_ sender: Any) {
-        DispatchQueue.main.async { [weak self] in
-            guard let self = self else { return }
-            
-            self.performSegue(withIdentifier: "segueToScanQr", sender: self)
-        }
-    }    
-    
-    @IBAction func uploadFileAction(_ sender: Any) {
+    @IBAction func importViaFilesAction(_ sender: Any) {
         DispatchQueue.main.async { [weak self] in
             guard let self = self else { return }
             
@@ -82,7 +57,15 @@ class SignerViewController: UIViewController {
            psbtValid(string)
         } else {
             
-            showAlert(self, "Ooops", "Whatever you have pasted does not seem to be valid text.")
+            showAlert(self, "", "Whatever you have pasted does not seem to be valid text.")
+        }
+    }
+    
+    @IBAction func qrAction(_ sender: Any) {
+        DispatchQueue.main.async { [weak self] in
+            guard let self = self else { return }
+            
+            self.performSegue(withIdentifier: "segueToScanQr", sender: self)
         }
     }
     
@@ -103,39 +86,8 @@ class SignerViewController: UIViewController {
         }
     }
     
-    private func sign() {
-//        if psbt != "" {
-//            spinner.add(vc: self, description: "signing")
-//            
-//            PSBTSigner.sign(psbt) { [weak self] (psbt, errorMessage) in
-//                guard let self = self else { return }
-//                
-//                guard let signedPsbt = psbt else {
-//                    self.spinner.remove()
-//                    showAlert(self, "Something is not right...", errorMessage ?? "unable to sign that psbt: unknown error")
-//                    return
-//                }
-//                
-//                DispatchQueue.main.async {
-//                    self.textView.text = signedPsbt
-//                    self.psbt = signedPsbt
-//                    self.export = true
-//                    self.signOutlet.setTitle("export", for: .normal)
-//                }
-//                
-//                self.spinner.remove()
-//                
-//                showAlert(self, "PSBT signed ✅", "You may now export it by tapping the \"export\" button")
-//            }
-//        } else {
-//            showAlert(self, "Add a psbt first", "You may either tap the paste button, scan a QR or upload a .psbt file.")
-//        }
-    }
-    
     private func psbtValid(_ string: String) {
         guard let validPsbt = Keys.psbt(string, .mainnet) else {
-            setTextView("")
-            
             showAlert(self, "⚠️ Invalid psbt", "")
             return
         }
@@ -143,20 +95,11 @@ class SignerViewController: UIViewController {
         save(validPsbt)
         psbtToParse = validPsbt
         psbt = string
-        setTextView(string)
         
         DispatchQueue.main.async { [weak self] in
             guard let self = self else { return }
             
             self.performSegue(withIdentifier: "segueToPsbtDetail", sender: self)
-        }
-    }
-    
-    private func setTextView(_ text: String) {
-        DispatchQueue.main.async { [weak self] in
-            guard let self = self else { return }
-            
-            self.textView.text = text
         }
     }
     
@@ -172,6 +115,10 @@ class SignerViewController: UIViewController {
                 showAlert(self, "Not saved!", "There was an issue encrypting and saving your psbt. Please reach out and let us know. Error: \(errorDescription ?? "unknown")")
                 
                 return
+            }
+            
+            DispatchQueue.main.async {
+                NotificationCenter.default.post(name: .psbtSaved, object: nil, userInfo: nil)
             }
         })
     }
