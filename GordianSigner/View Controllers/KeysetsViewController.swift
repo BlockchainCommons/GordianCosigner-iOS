@@ -135,31 +135,31 @@ class KeysetsViewController: UIViewController, UITableViewDelegate, UITableViewD
         let fingerprintLabel = cell.viewWithTag(2) as! UILabel
         fingerprintLabel.text = keyset.fingerprint
         
-        let (isHot, isMine, lifeHash) = canSign(keyset)
+        let (_, _, lifeHash) = canSign(keyset)
         
-        let isHotImage = cell.viewWithTag(3) as! UIImageView
-        if isHot {
-            isHotImage.alpha = 1
-        } else {
-            isHotImage.alpha = 0
-        }
+//        let isHotImage = cell.viewWithTag(3) as! UIImageView
+//        if isHot {
+//            isHotImage.alpha = 1
+//        } else {
+//            isHotImage.alpha = 0
+//        }
         
-        let isMineImage = cell.viewWithTag(4) as! UIImageView
-        if isMine {
-            isMineImage.image = UIImage(systemName: "person.crop.circle.fill.badge.checkmark")
-            isMineImage.tintColor = .systemGreen
-        } else {
-            isMineImage.image = UIImage(systemName: "person.crop.circle.fill.badge.xmark")
-            isMineImage.tintColor = .systemOrange
-        }
+//        let isMineImage = cell.viewWithTag(4) as! UIImageView
+//        if isMine {
+//            isMineImage.image = UIImage(systemName: "person.crop.circle.fill.badge.checkmark")
+//            isMineImage.tintColor = .systemGreen
+//        } else {
+//            isMineImage.image = UIImage(systemName: "person.crop.circle.fill.badge.xmark")
+//            isMineImage.tintColor = .systemOrange
+//        }
         
         let lifeHashImage = cell.viewWithTag(6) as! UIImageView
         configureView(lifeHashImage)
         if lifeHash != nil {
             lifeHashImage.image = lifeHash
-            lifeHashImage.alpha = 1
         } else {
-            lifeHashImage.alpha = 0
+            lifeHashImage.image = UIImage(systemName: "person.crop.circle.fill.badge.xmark")
+            lifeHashImage.tintColor = .lightGray
         }
         
         let dateAddedLabel = cell.viewWithTag(7) as! UILabel
@@ -176,26 +176,32 @@ class KeysetsViewController: UIViewController, UITableViewDelegate, UITableViewD
         exportKeysetButton.addTarget(self, action: #selector(exportMultisigKeyset(_:)), for: .touchUpInside)
         
         let isSharedImage = cell.viewWithTag(5) as! UIImageView
+        let sharedText = cell.viewWithTag(14) as! UILabel
         if keyset.sharedWith != nil {
-            isSharedImage.image = UIImage(systemName: "person.2")
+            isSharedImage.image = UIImage(systemName: "person.2.square.stack")
             isSharedImage.tintColor = .systemPink
+            sharedText.text = "used"
+            sharedText.textColor = .systemPink
         } else {
             isSharedImage.image = UIImage(systemName: "person")
             isSharedImage.tintColor = .systemBlue
+            sharedText.text = "unused"
+            sharedText.textColor = .systemBlue
         }
         
         let editButton = cell.viewWithTag(12) as! UIButton
         editButton.addTarget(self, action: #selector(editLabel(_:)), for: .touchUpInside)
         editButton.restorationIdentifier = "\(indexPath.section)"
         
-        let textView = cell.viewWithTag(13) as! UITextView
-        textView.text = keyset.bip48SegwitAccount ?? ""
+        let copyTextButton = cell.viewWithTag(15) as! UIButton
+        copyTextButton.addTarget(self, action: #selector(copyText(_:)), for: .touchUpInside)
+        copyTextButton.restorationIdentifier = "\(indexPath.section)"
         
         return cell
     }
     
     func tableView(_ tableView: UITableView, heightForRowAt indexPath: IndexPath) -> CGFloat {
-        return 319
+        return 170
     }
     
     func tableView(_ tableView: UITableView, commit editingStyle: UITableViewCell.EditingStyle, forRowAt indexPath: IndexPath) {
@@ -207,6 +213,10 @@ class KeysetsViewController: UIViewController, UITableViewDelegate, UITableViewD
     
     private func configureCell(_ cell: UITableViewCell) {
         cell.selectionStyle = .none
+        cell.clipsToBounds = true
+        cell.layer.cornerRadius = 8
+        cell.layer.borderColor = UIColor.darkGray.cgColor
+        cell.layer.borderWidth = 0.5
     }
     
     private func configureView(_ view: UIView) {
@@ -243,6 +253,15 @@ class KeysetsViewController: UIViewController, UITableViewDelegate, UITableViewD
         }
         
         return (isHot, isMine, lifeHash)
+    }
+    
+    @objc func copyText(_ sender: UIButton) {
+        guard let sectionString = sender.restorationIdentifier, let int = Int(sectionString) else { return }
+        
+        let keyset = keysets[int]
+        
+        UIPasteboard.general.string = keyset.bip48SegwitAccount
+        showAlert(self, "", "Cosigner text copied ✓")
     }
     
     @objc func editLabel(_ sender: UIButton) {
@@ -468,7 +487,7 @@ class KeysetsViewController: UIViewController, UITableViewDelegate, UITableViewD
                 self?.keysetsTable.deleteSections(IndexSet.init(arrayLiteral: section), with: .fade)
             }
             
-            showAlert(self, "Keyset deleted ✅", "")
+            showAlert(self, "", "Keyset deleted ✓")
         }
     }
     

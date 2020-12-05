@@ -106,7 +106,7 @@ class SignerViewController: UIViewController {
     private func save(_ psbt: PSBT) {
         var dict = [String:Any]()
         dict["dateAdded"] = Date()
-        dict["psbt"] = Encryption.encrypt(psbt.data)
+        dict["psbt"] = psbt.data
         dict["label"] = "PSBT"
         dict["id"] = UUID()
         

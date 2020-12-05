@@ -189,7 +189,7 @@ class PsbtTableViewController: UIViewController, UITableViewDelegate, UITableVie
                                                     pubkeyArray[p] = updatedDict
                                                     self.inputsArray[i]["pubKeyArray"] = pubkeyArray
                                                 }
-                                                                                                                                        
+                                                
                                                 if self.signedFor.count > 0 {
                                                     
                                                     for (x, signed) in self.signedFor.enumerated() {
@@ -254,9 +254,7 @@ class PsbtTableViewController: UIViewController, UITableViewDelegate, UITableVie
                     }
                 }
                 
-                }, completion: {
-                    
-            })
+            }, completion: {})
         }
     }
     
@@ -324,15 +322,15 @@ class PsbtTableViewController: UIViewController, UITableViewDelegate, UITableVie
     @IBAction func signAction(_ sender: Any) {
         if !export {
             if canSign {
-                sign(nil)
+                sign()
             } else {
                 
                 DispatchQueue.main.async { [weak self] in
                     guard let self = self else { return }
                     
-                    let alert = UIAlertController(title: "No private keys to sign with", message: "You can add a signer now to sign this psbt. You can opt of storing the private keys and we will only temporarily use the signer to sign this psbt.", preferredStyle: self.alertStyle)
+                    let alert = UIAlertController(title: "No private keys to sign with", message: "", preferredStyle: self.alertStyle)
                     
-                    alert.addAction(UIAlertAction(title: "add signer", style: .default, handler: { action in
+                    alert.addAction(UIAlertAction(title: "add private keys", style: .default, handler: { action in
                         DispatchQueue.main.async { [weak self] in
                             guard let self = self else { return }
                             
@@ -412,24 +410,24 @@ class PsbtTableViewController: UIViewController, UITableViewDelegate, UITableVie
         
         if let psbtToFinalize = try? psbt.finalized() {
             if psbtToFinalize.isComplete {
-                label.text = "PSBT complete"
+                label.text = "Signatures complete"
                 icon.image = UIImage(systemName: "checkmark.square")
                 icon.tintColor = .systemGreen
                 export = true
             } else {
-                label.text = "PSBT incomplete"
+                label.text = "Signatures required"
                 icon.image = UIImage(systemName: "exclamationmark.square")
                 icon.tintColor = .systemPink
                 export = false
             }
         } else {
             if psbt.isComplete {
-                label.text = "PSBT complete"
+                label.text = "Signatures complete"
                 icon.image = UIImage(systemName: "checkmark.square")
                 icon.tintColor = .systemGreen
                 export = true
             } else {
-                label.text = "PSBT incomplete"
+                label.text = "Signatures required"
                 icon.image = UIImage(systemName: "exclamationmark.square")
                 icon.tintColor = .systemPink
                 export = false
@@ -611,56 +609,52 @@ class PsbtTableViewController: UIViewController, UITableViewDelegate, UITableVie
         return header
     }
     
-    private func sign(_ mk: HDKey?) {
-        if psbt != nil {
-            spinner.add(vc: self, description: "signing")
+    private func sign() {
+        spinner.add(vc: self, description: "signing")
+        
+        PSBTSigner.sign(psbt.description) { [weak self] (signedPsbt, signedFor, errorMessage) in
+            guard let self = self else { return }
             
-            PSBTSigner.sign(psbt.description, mk) { [weak self] (signedPsbt, signedFor, errorMessage) in
-                guard let self = self else { return }
-                
-                guard let signedPsbt = signedPsbt, let signedFor = signedFor else {
-                    self.spinner.remove()
-                    showAlert(self, "Something is not right...", errorMessage ?? "unable to sign that psbt: unknown error")
-                    return
-                }
-                
-                self.signedFor = signedFor
-                
-                if let psbtToFinalize = try? signedPsbt.finalized() {
-                    if psbtToFinalize.isComplete {
-                        if let final = psbtToFinalize.transactionFinal {
-                            if let hex = final.description {
-                                self.rawTx = hex
-                                self.save(signedPsbt)
-                            }
-                        }
-                    }
-                }
-                
-                DispatchQueue.main.async {
-                    self.export = true
-                    self.psbt = signedPsbt
-                    self.load { success in
-                        DispatchQueue.main.async {
-                            self.tableView.reloadData()
-                        }
-                    }
-                    self.signButtonOutlet.setTitle("export", for: .normal)
-                }
-                
+            guard let signedPsbt = signedPsbt, let signedFor = signedFor else {
                 self.spinner.remove()
-                
-                showAlert(self, "PSBT signed ✅", "You may now export it by tapping the \"export\" button")
+                showAlert(self, "Something is not right...", errorMessage ?? "unable to sign that psbt: unknown error")
+                return
             }
-        } else {
-            showAlert(self, "Add a psbt first", "You may either tap the paste button, scan a QR or upload a .psbt file.")
+            
+            self.signedFor = signedFor
+            
+            if let psbtToFinalize = try? signedPsbt.finalized() {
+                if psbtToFinalize.isComplete {
+                    if let final = psbtToFinalize.transactionFinal {
+                        if let hex = final.description {
+                            self.rawTx = hex
+                            self.save(signedPsbt)
+                        }
+                    }
+                }
+            }
+            
+            DispatchQueue.main.async {
+                self.export = true
+                self.psbt = signedPsbt
+                self.load { success in
+                    DispatchQueue.main.async {
+                        self.tableView.reloadData()
+                    }
+                }
+                self.signButtonOutlet.setTitle("export", for: .normal)
+            }
+            
+            self.spinner.remove()
+            
+            showAlert(self, "Payment signed ✓", "The signed copy of the payment has been saved. You may export it at anytime by tapping the \"export\" button.")
         }
     }
     
     private func save(_ psbt: PSBT) {
         var dict = [String:Any]()
         dict["dateAdded"] = Date()
-        dict["psbt"] = Encryption.encrypt(psbt.data)
+        dict["psbt"] = psbt.data
         dict["label"] = "Signed PSBT"
         dict["id"] = UUID()
         
@@ -779,18 +773,10 @@ class PsbtTableViewController: UIViewController, UITableViewDelegate, UITableVie
             if let vc = segue.destination as? AddSignerViewController {
                 vc.tempWords = true
                 
-                vc.doneBlock = { [weak self] arg0 in
+                vc.doneBlock = { [weak self] in
                     guard let self = self else { return }
                     
-                    let (words, passphrase) = arg0
-
-                    guard let mnemonic = try? BIP39Mnemonic(words: words) else { return }
-
-                    let seedHex = mnemonic.seedHex(passphrase: passphrase)
-
-                    guard let mk = try? HDKey(seed: seedHex, network: .mainnet) else { return }
-
-                    self.sign(mk)
+                    self.sign()
                 }
             }
         }

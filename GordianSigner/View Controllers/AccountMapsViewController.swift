@@ -25,7 +25,7 @@ class AccountMapsViewController: UIViewController, UITableViewDelegate, UITableV
         addButton.tintColor = .systemTeal
         editButton.tintColor = .systemTeal
         addButton = UIBarButtonItem.init(barButtonSystemItem: .add, target: self, action: #selector(add))
-        editButton = UIBarButtonItem.init(barButtonSystemItem: .edit, target: self, action: #selector(editSigners))
+        editButton = UIBarButtonItem.init(barButtonSystemItem: .edit, target: self, action: #selector(editAccounts))
         self.navigationItem.setRightBarButtonItems([addButton, editButton], animated: true)
     }
     
@@ -39,7 +39,12 @@ class AccountMapsViewController: UIViewController, UITableViewDelegate, UITableV
         CoreDataService.retrieveEntity(entityName: .accountMap) { [weak self] (accountMaps, errorDescription) in
             guard let self = self else { return }
             
-            guard let accountMaps = accountMaps, accountMaps.count > 0 else { return }
+            guard let accountMaps = accountMaps, accountMaps.count > 0 else {
+                if UserDefaults.standard.object(forKey: "createDefaults") == nil {
+                    self.createSigner()
+                }
+                return
+            }
             
             for accountMap in accountMaps {
                 let str = AccountMapStruct(dictionary: accountMap)
@@ -121,6 +126,9 @@ class AccountMapsViewController: UIViewController, UITableViewDelegate, UITableV
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         let cell = tableView.dequeueReusableCell(withIdentifier: "accountMapCell", for: indexPath)
         cell.selectionStyle = .none
+        cell.layer.cornerRadius = 8
+        cell.layer.borderColor = UIColor.darkGray.cgColor
+        cell.layer.borderWidth = 0.5
         
         let accountMap = accountMaps[indexPath.section]["accountMap"] as! AccountMapStruct
         let descriptor = accountMap.descriptor
@@ -135,18 +143,19 @@ class AccountMapsViewController: UIViewController, UITableViewDelegate, UITableV
         let script = cell.viewWithTag(3) as! UILabel
         script.text = descriptorStruct.format
         
-        let participants = cell.viewWithTag(4) as! UITextView
+        let participants = cell.viewWithTag(4) as! UILabel
         participants.text = (accountMaps[indexPath.section]["participants"] as! String)
-        participants.clipsToBounds = true
-        participants.layer.cornerRadius = 8
         
         let isCompleteImage = cell.viewWithTag(5) as! UIImageView
+        let completeLabel = cell.viewWithTag(12) as! UILabel
         if accountMap.descriptor.contains("keyset") {
             isCompleteImage.image = UIImage(systemName: "circle.lefthalf.fill")
             isCompleteImage.tintColor = .systemYellow
+            completeLabel.text = "Account incomplete, needs more cosigners"
         } else {
             isCompleteImage.image = UIImage(systemName: "circle.fill")
             isCompleteImage.tintColor = .systemGreen
+            completeLabel.text = "Account complete"
         }
         
         let signerLifeHash = cell.viewWithTag(6) as! UIImageView
@@ -154,17 +163,9 @@ class AccountMapsViewController: UIViewController, UITableViewDelegate, UITableV
         signerLifeHash.layer.cornerRadius = 8
         if let lifehash = accountMaps[indexPath.section]["lifeHash"] as? Data {
             signerLifeHash.image = UIImage(data: lifehash)
-            signerLifeHash.alpha = 1
         } else {
-            signerLifeHash.alpha = 0
-        }
-        
-        let keyIcon = cell.viewWithTag(8) as! UIImageView
-        let canSign = accountMaps[indexPath.section]["canSign"] as! Bool
-        if canSign {
-            keyIcon.alpha = 1
-        } else {
-            keyIcon.alpha = 0
+            signerLifeHash.image = UIImage(systemName: "person.crop.circle.fill.badge.xmark")
+            signerLifeHash.tintColor = .darkGray
         }
         
         let editButton = cell.viewWithTag(9) as! UIButton
@@ -226,7 +227,7 @@ class AccountMapsViewController: UIViewController, UITableViewDelegate, UITableV
     }
     
     private func updateLabel(_ id: UUID, _ label: String) {
-        CoreDataService.updateEntity(id: id, keyToUpdate: "label", newValue: label, entityName: .keyset) { (success, errorDescription) in
+        CoreDataService.updateEntity(id: id, keyToUpdate: "label", newValue: label, entityName: .accountMap) { (success, errorDescription) in
             guard success else { showAlert(self, "Label not saved!", "There was an error updating your label, please let us know about it: \(errorDescription ?? "unknown")"); return }
             
             self.load()
@@ -278,13 +279,13 @@ class AccountMapsViewController: UIViewController, UITableViewDelegate, UITableV
         }
     }
     
-    @objc func editSigners() {
+    @objc func editAccounts() {
         accountMapTable.setEditing(!accountMapTable.isEditing, animated: true)
         
         if accountMapTable.isEditing {
-            editButton = UIBarButtonItem(title: "Done", style: .plain, target: self, action: #selector(editSigners))
+            editButton = UIBarButtonItem(title: "Done", style: .plain, target: self, action: #selector(editAccounts))
         } else {
-            editButton = UIBarButtonItem(title: "Edit", style: .plain, target: self, action: #selector(editSigners))
+            editButton = UIBarButtonItem(title: "Edit", style: .plain, target: self, action: #selector(editAccounts))
         }
         
         self.navigationItem.setRightBarButtonItems([addButton, editButton], animated: true)
@@ -323,7 +324,7 @@ class AccountMapsViewController: UIViewController, UITableViewDelegate, UITableV
                 self?.accountMapTable.deleteSections(IndexSet.init(arrayLiteral: section), with: .fade)
             }
             
-            showAlert(self, "Account Map deleted ✅", "")
+            showAlert(self, "", "Account Map deleted ✓")
         }
     }
     
@@ -445,6 +446,91 @@ class AccountMapsViewController: UIViewController, UITableViewDelegate, UITableV
                 vc.isPsbt = false
                 vc.text = mapToExport.json() ?? ""
             }
+        }
+    }
+    
+    // MARK: - Never used the app before
+    
+    private func createSigner() {
+        guard let words = Keys.seed(),
+            let entropy = Keys.entropy(words),
+            let encryptedData = Encryption.encrypt(entropy),
+            let masterKey = Keys.masterXprv(words, ""),
+            let fingerprint = Keys.fingerprint(masterKey),
+            let lifeHash = LifeHash.hash(entropy) else {
+                showAlert(self, "Error ⚠️", "Something went wrong, private keys not saved!")
+                return
+        }
+        
+        var dict = [String:Any]()
+        dict["id"] = UUID()
+        dict["label"] = UIDevice.current.name
+        dict["dateAdded"] = Date()
+        dict["lifeHash"] = lifeHash
+        dict["fingerprint"] = fingerprint
+        dict["entropy"] = encryptedData
+        
+        CoreDataService.saveEntity(dict: dict, entityName: .signer) { [weak self] (success, errorDescription) in
+            guard let self = self else { return }
+            
+            guard success else {
+                showAlert(self, "Error ⚠️", "Failed saving to Core Data!")
+                return
+            }
+            
+            self.saveKeysets(masterKey, UIDevice.current.name, fingerprint)
+        }
+    }
+    
+    private func saveKeysets(_ masterKey: String, _ label: String, _ xfp: String) {
+        let idToShare = UUID()
+        var keyset = [String:Any]()
+        keyset["id"] = UUID()
+        keyset["label"] = label
+        keyset["fingerprint"] = xfp
+        
+        guard let bip48SegwitAccount = Keys.bip48SegwitAccount(masterKey, "main") else {
+            showAlert(self, "Key derivation failed", "")
+            return
+        }
+        
+        keyset["bip48SegwitAccount"] = bip48SegwitAccount
+        keyset["dateAdded"] = Date()
+        keyset["dateShared"] = Date()
+        keyset["sharedWith"] = idToShare
+        
+        CoreDataService.saveEntity(dict: keyset, entityName: .keyset) { [weak self] (success, errorDescription) in
+            guard let self = self else { return }
+
+            guard success else {
+                showAlert(self, "Failed to save keyset", errorDescription ?? "unknown error")
+                return
+            }
+            
+            self.createPolicyMap(bip48SegwitAccount, idToShare)
+        }
+    }
+    
+    private func createPolicyMap(_ keyset: String, _ id: UUID) {
+        let desc = "wsh(sortedmulti(2,\(keyset),<keyset #2>,<keyset #3>))"
+        
+        let accountMap = ["descriptor":desc, "birthblock":0, "label":"Incomplete Account"] as [String : Any]
+        let json = accountMap.json() ?? ""
+        
+        var map = [String:Any]()
+        map["birthblock"] = Int64(0)
+        map["accountMap"] = json.utf8
+        map["label"] = "Incomplete Account"
+        map["id"] = id
+        map["dateAdded"] = Date()
+        map["complete"] = false
+        map["descriptor"] = desc
+        
+        CoreDataService.saveEntity(dict: map, entityName: .accountMap) { [weak self] (success, errorDescription) in
+            guard let self = self, success else { return }
+            
+            UserDefaults.standard.set(true, forKey: "createDefaults")
+            self.load()
         }
     }
 

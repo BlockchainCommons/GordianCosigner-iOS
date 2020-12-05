@@ -11,19 +11,17 @@ import UIKit
 class AddSignerViewController: UIViewController {
     
     @IBOutlet weak private var textField: UITextField!
-    @IBOutlet weak private var textView: UIView!
     @IBOutlet weak private var passphraseField: UITextField!
     @IBOutlet weak private var addSignerOutlet: UIButton!
-    @IBOutlet weak private var privateKeySwitch: UISwitch!
     @IBOutlet weak private var aliasField: UITextField!
+    @IBOutlet weak private var textView: UITextView!
     
     private var addedWords = [String]()
     private var justWords = [String]()
     private var bip39Words = [String]()
-    private let label = UILabel()
     private var autoCompleteCharacterCount = 0
     private var timer = Timer()
-    var doneBlock: (((words: String, passphrase: String)) -> Void)?
+    var doneBlock: (() -> Void)?
     var tempWords = false
 
     override func viewDidLoad() {
@@ -34,7 +32,6 @@ class AddSignerViewController: UIViewController {
         configureSignerOutlet()
         configureTextView()
         addTapGesture()
-        addKeyboardNotifications()
         bip39Words = Bip39Words.valid
     }
     
@@ -51,26 +48,25 @@ class AddSignerViewController: UIViewController {
     }
     
     @IBAction func addSignerAction(_ sender: Any) {
-        let passphrase = passphraseField.text ?? ""
-        var alias = "Signer"
-        
-        if aliasField.text != "" {
-            alias = aliasField.text!
-        }
-        
-        guard let entropy = Keys.entropy(justWords), let encryptedData = Encryption.encrypt(entropy), let masterKey = Keys.masterKey(justWords, passphrase), let fingerprint = Keys.fingerprint(masterKey), let lifeHash = LifeHash.hash(entropy) else {
-            showAlert(self, "Error ⚠️", "Something went wrong, your signer was not saved!")
-            return
-        }
-        
-        var dict = [String:Any]()
-        dict["id"] = UUID()
-        dict["label"] = alias
-        dict["dateAdded"] = Date()
-        dict["lifeHash"] = lifeHash
-        dict["fingerprint"] = fingerprint
-        
-        if privateKeySwitch.isOn {
+        if Keys.validMnemonicArray(self.justWords) {
+            let passphrase = passphraseField.text ?? ""
+            var alias = UIDevice.current.name
+            
+            if aliasField.text != "" {
+                alias = aliasField.text!
+            }
+            
+            guard let entropy = Keys.entropy(justWords), let encryptedData = Encryption.encrypt(entropy), let masterKey = Keys.masterKey(justWords, passphrase), let fingerprint = Keys.fingerprint(masterKey), let lifeHash = LifeHash.hash(entropy) else {
+                showAlert(self, "Error ⚠️", "Something went wrong, private keys not saved!")
+                return
+            }
+            
+            var dict = [String:Any]()
+            dict["id"] = UUID()
+            dict["label"] = alias
+            dict["dateAdded"] = Date()
+            dict["lifeHash"] = lifeHash
+            dict["fingerprint"] = fingerprint
             dict["entropy"] = encryptedData
             
             if passphrase != "" {
@@ -78,17 +74,19 @@ class AddSignerViewController: UIViewController {
                 
                 dict["passphrase"] = encryptedPassphrase
             }
-        }
-        
-        CoreDataService.saveEntity(dict: dict, entityName: .signer) { [weak self] (success, errorDescription) in
-            guard let self = self else { return }
             
-            guard success else {
-                showAlert(self, "Error ⚠️", "Failed saving that signer to Core Data!")
-                return
+            CoreDataService.saveEntity(dict: dict, entityName: .signer) { [weak self] (success, errorDescription) in
+                guard let self = self else { return }
+                
+                guard success else {
+                    showAlert(self, "Error ⚠️", "Failed saving to Core Data!")
+                    return
+                }
+                
+                self.saveKeysets(masterKey, alias, fingerprint)
             }
-            
-            self.saveKeysets(masterKey, alias, fingerprint)
+        } else {
+            showAlert(self, "Invalid bip39 mnemonic", "Take a deep breath and make sure you input your words and optional passphrase correctly. If you add the words one by one autocorrect will assist you to ensure no errors are made.")
         }
     }
     
@@ -106,27 +104,47 @@ class AddSignerViewController: UIViewController {
         keyset["bip48SegwitAccount"] = bip48SegwitAccount
         keyset["dateAdded"] = Date()
         
-        CoreDataService.saveEntity(dict: keyset, entityName: .keyset) { [weak self] (success, errorDescription) in
-            guard let self = self else { return }
+        func finish() {
+            CoreDataService.saveEntity(dict: keyset, entityName: .keyset) { [weak self] (success, errorDescription) in
+                guard let self = self else { return }
 
-            guard success else {
-                showAlert(self, "Failed to save keyset", errorDescription ?? "unknown error")
-                return
+                guard success else {
+                    showAlert(self, "Failed to save keyset", errorDescription ?? "unknown error")
+                    return
+                }
+                
+                if self.tempWords {
+                    self.doneBlock!()
+                    self.navigationController?.popViewController(animated: true)
+                } else {
+                    showAlert(self, "Private keys encrypted and saved 🔐", "")
+
+                    self.textField.text = ""
+                    self.addedWords.removeAll()
+                    self.justWords.removeAll()
+                    self.bip39Words.removeAll()
+                    self.textView.text = ""
+
+                    self.navigationController?.popViewController(animated: true)
+                }
             }
-            
-            if self.tempWords {
-                self.doneBlock!((self.justWords.joined(separator: " "), self.passphraseField.text ?? ""))
-                self.navigationController?.popViewController(animated: true)
-            } else {                
-                showAlert(self, "Signer encrypted and saved 🔐", "")
-
-                self.textField.text = ""
-                self.addedWords.removeAll()
-                self.justWords.removeAll()
-                self.bip39Words.removeAll()
-                self.label.text = ""
-
-                self.navigationController?.popViewController(animated: true)
+        }
+        
+        CoreDataService.retrieveEntity(entityName: .accountMap) { (accountMaps, errorDescription) in
+            if let accountMaps = accountMaps, accountMaps.count > 0 {
+                for (i, accountMap) in accountMaps.enumerated() {
+                    let accountMapStruct = AccountMapStruct(dictionary: accountMap)
+                    if accountMapStruct.descriptor.contains(bip48SegwitAccount) {
+                        keyset["dateShared"] = Date()
+                        keyset["sharedWith"] = accountMapStruct.id
+                    }
+                    
+                    if i + 1 == accountMaps.count {
+                        finish()
+                    }
+                }
+            } else {
+                finish()
             }
         }
     }
@@ -137,8 +155,7 @@ class AddSignerViewController: UIViewController {
         DispatchQueue.main.async { [weak self] in
             guard let self = self else { return }
             
-            self.label.removeFromSuperview()
-            self.label.text = ""
+            self.textView.text = ""
             self.addedWords.removeAll()
             self.justWords.remove(at: self.justWords.count - 1)
             
@@ -151,12 +168,8 @@ class AddSignerViewController: UIViewController {
                 }
             }
             
-            self.label.textColor = .systemGreen
-            self.label.text = self.addedWords.joined(separator: "")
-            self.label.frame = CGRect(x: 16, y: 0, width: self.textView.frame.width - 32, height: self.textView.frame.height - 10)
-            self.label.numberOfLines = 0
-            self.label.sizeToFit()
-            self.textView.addSubview(self.label)
+            self.textView.textColor = .systemGreen
+            self.textView.text = self.addedWords.joined(separator: "")
             
             if Keys.validMnemonicArray(self.justWords) {
                 self.validWordsAdded()
@@ -179,13 +192,8 @@ class AddSignerViewController: UIViewController {
         textField.delegate = self
     }
     
-    private func addKeyboardNotifications() {
-        NotificationCenter.default.addObserver(self, selector: #selector(keyboardWillShow), name: UIResponder.keyboardWillShowNotification, object: nil)
-        NotificationCenter.default.addObserver(self, selector: #selector(keyboardWillHide), name: UIResponder.keyboardWillHideNotification, object: nil)
-    }
-    
     private func configureSignerOutlet() {
-        addSignerOutlet.isEnabled = false
+        addSignerOutlet.showsTouchWhenHighlighted = true
         addSignerOutlet.clipsToBounds = true
         addSignerOutlet.layer.cornerRadius = 8
     }
@@ -193,11 +201,12 @@ class AddSignerViewController: UIViewController {
     private func configureTextView() {
         textView.clipsToBounds = true
         textView.layer.cornerRadius = 8
-        textView.layer.borderColor = UIColor.lightGray.cgColor
+        textView.layer.borderColor = UIColor.darkGray.cgColor
         textView.layer.borderWidth = 0.5
     }
     
     private func configureTextField() {
+        aliasField.text = UIDevice.current.name
         updatePlaceHolder(wordNumber: 1)
         #if targetEnvironment(macCatalyst)
             textField.becomeFirstResponder()
@@ -221,29 +230,11 @@ class AddSignerViewController: UIViewController {
         }
     }
     
-    @objc func keyboardWillShow(notification: NSNotification) {
-        guard passphraseField.isEditing,
-            let keyboardSize = (notification.userInfo?[UIResponder.keyboardFrameBeginUserInfoKey] as? NSValue)?.cgRectValue,
-            view.frame.origin.y == 0 else {
-                return
-        }
-        
-        view.frame.origin.y -= keyboardSize.height
-    }
-    
-    @objc func keyboardWillHide(notification: NSNotification) {
-        guard passphraseField.isEditing, view.frame.origin.y != 0 else {
-                return
-        }
-        
-        view.frame.origin.y = 0
-    }
-    
     private func updatePlaceHolder(wordNumber: Int) {
         DispatchQueue.main.async { [weak self] in
             guard let self = self else { return }
             
-            self.textField.attributedPlaceholder = NSAttributedString(string: "add word #\(wordNumber)", attributes: [NSAttributedString.Key.foregroundColor: UIColor.lightGray])
+            self.textField.attributedPlaceholder = NSAttributedString(string: "add word #\(wordNumber)", attributes: [NSAttributedString.Key.foregroundColor: UIColor.darkGray])
         }
     }
     
@@ -299,8 +290,7 @@ class AddSignerViewController: UIViewController {
         DispatchQueue.main.async { [weak self] in
             guard let self = self else { return }
             
-            self.label.removeFromSuperview()
-            self.label.text = ""
+            self.textView.text = ""
             self.addedWords.removeAll()
             self.justWords = words
             
@@ -309,21 +299,12 @@ class AddSignerViewController: UIViewController {
                 self.updatePlaceHolder(wordNumber: i + 2)
             }
             
-            self.label.textColor = .systemGreen
-            self.label.text = self.addedWords.joined(separator: "")
-            
-            self.label.frame = CGRect(x: 16,
-                                      y: 0,
-                                      width: self.textView.frame.width - 32,
-                                      height: self.textView.frame.height - 10)
-            
-            self.label.numberOfLines = 0
-            self.label.sizeToFit()
-            self.textView.addSubview(self.label)
+            self.textView.textColor = .systemGreen
+            self.textView.text = self.addedWords.joined(separator: "")
             
             guard Keys.validMnemonicArray(self.justWords) else {
-                showAlert(self, "Invalid", "Just so you know that is not a valid recovery phrase, if you are inputting a 24 word phrase ignore this message and keep adding your words.")
-                
+                showAlert(self, "Invalid", "Just so you know that is not a valid bip39 mnemonic, if you are inputting a 24 word phrase ignore this message and keep adding your words.")
+
                 return
             }
         }
@@ -333,8 +314,7 @@ class AddSignerViewController: UIViewController {
         DispatchQueue.main.async { [weak self] in
             guard let self = self else { return }
             
-            self.label.removeFromSuperview()
-            self.label.text = ""
+            self.textView.text = ""
             self.addedWords.removeAll()
             self.justWords.append(word)
             
@@ -343,17 +323,8 @@ class AddSignerViewController: UIViewController {
                 self.updatePlaceHolder(wordNumber: i + 2)
             }
             
-            self.label.textColor = .systemGreen
-            self.label.text = self.addedWords.joined(separator: "")
-            
-            self.label.frame = CGRect(x: 16,
-                                      y: 0,
-                                      width: self.textView.frame.width - 32,
-                                      height: self.textView.frame.height - 10)
-            
-            self.label.numberOfLines = 0
-            self.label.sizeToFit()
-            self.textView.addSubview(self.label)
+            self.textView.textColor = .systemGreen
+            self.textView.text = self.addedWords.joined(separator: "")
             
             if Keys.validMnemonicArray(self.justWords) {
                 self.validWordsAdded()
@@ -372,7 +343,7 @@ class AddSignerViewController: UIViewController {
             self.addSignerOutlet.isEnabled = true
         }
         
-        showAlert(self, "Valid Words ✓", "That is a valid recovery phrase, tap \"add signer\" to encrypt it and save it securely to the device so that it may sign your psbt's.")
+        showAlert(self, "Valid ✓", "Ensure you have this mnemonic saved securely offline so that you may recover it if you lose this device!\n\nTap \"encrypt & save\" to encrypt the private keys and save them securely to the device.")
     }
     
     private func processedCharacters(_ string: String) -> String {
@@ -472,9 +443,7 @@ class AddSignerViewController: UIViewController {
 
 }
 
-extension AddSignerViewController: UINavigationControllerDelegate {
-    
-}
+extension AddSignerViewController: UINavigationControllerDelegate {}
 
 extension AddSignerViewController: UITextFieldDelegate {
     

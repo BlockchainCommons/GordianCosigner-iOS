@@ -78,6 +78,12 @@ enum Keys {
         return mnemonic.entropy.data
     }
     
+    static func entropy(_ words: String) -> Data? {
+        guard let mnemonic = try? BIP39Mnemonic(words: words) else { return nil }
+        
+        return mnemonic.entropy.data
+    }
+    
     static func seed() -> String? {
         var words: String?
         let bytesCount = 16

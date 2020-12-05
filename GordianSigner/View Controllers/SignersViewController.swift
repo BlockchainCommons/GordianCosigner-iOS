@@ -100,7 +100,7 @@ class SignersViewController: UIViewController {
                 self?.tableView.deleteSections(IndexSet.init(arrayLiteral: section), with: .fade)
             }
             
-            showAlert(self, "Signer deleted ✅", "")
+            showAlert(self, "", "Signer deleted ✓")
         }
     }
     
@@ -155,7 +155,7 @@ class SignersViewController: UIViewController {
 extension SignersViewController: UITableViewDelegate {
     
     func tableView(_ tableView: UITableView, heightForRowAt indexPath: IndexPath) -> CGFloat {
-        return 120
+        return 105
     }
     
     func tableView(_ tableView: UITableView, canEditRowAt indexPath: IndexPath) -> Bool {
@@ -183,26 +183,22 @@ extension SignersViewController: UITableViewDataSource {
     
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         let cell = tableView.dequeueReusableCell(withIdentifier: "signerCell", for: indexPath)
+        cell.selectionStyle = .none
+        cell.layer.cornerRadius = 8
+        cell.layer.borderColor = UIColor.darkGray.cgColor
+        cell.layer.borderWidth = 0.5
         
         let label = cell.viewWithTag(1) as! UILabel
         let dateAdded = cell.viewWithTag(2) as! UILabel
         let imageView = cell.viewWithTag(3) as! UIImageView
         let fingerprintLabel = cell.viewWithTag(4) as! UILabel
-        let isHot = cell.viewWithTag(5) as! UIImageView
         
         let editButton = cell.viewWithTag(6) as! UIButton
         editButton.addTarget(self, action: #selector(editLabel(_:)), for: .touchUpInside)
         editButton.restorationIdentifier = "\(indexPath.section)"
-        
-        cell.selectionStyle = .none
+        editButton.showsTouchWhenHighlighted = true
         
         let signer = signerStructs[indexPath.section]
-        
-        if signer.entropy != nil {
-            isHot.alpha = 1
-        } else {
-            isHot.alpha = 0
-        }
         
         label.text = signer.label
         imageView.image = UIImage(data: signer.lifeHash)

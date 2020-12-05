@@ -11,14 +11,9 @@ import LibWally
 
 class PSBTSigner {
     
-    class func sign(_ psbt: String, _ xprv: HDKey?, completion: @escaping ((psbt: PSBT?, signedFor: [String]?, errorMessage: String?)) -> Void) {
+    class func sign(_ psbt: String, completion: @escaping ((psbt: PSBT?, signedFor: [String]?, errorMessage: String?)) -> Void) {
         var seedsToSignWith = [String]()
         var xprvsToSignWith = [HDKey]()
-        
-        if xprv != nil {
-            xprvsToSignWith.append(xprv!)
-        }
-        
         var psbtToSign:PSBT!
         var network:Network!
         var signedFor = [String]()
@@ -91,9 +86,6 @@ class PSBTSigner {
         /// Fetch keys to sign with
         func getKeysToSignWith() {
             xprvsToSignWith.removeAll()
-            if xprv != nil {
-                xprvsToSignWith.append(xprv!)
-            }
             
             if seedsToSignWith.count > 0 {
                 for (i, words) in seedsToSignWith.enumerated() {

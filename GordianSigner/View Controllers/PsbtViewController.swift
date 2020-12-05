@@ -17,7 +17,6 @@ class PsbtViewController: UIViewController, UITableViewDelegate, UITableViewData
     private var psbtText = ""
     private var lifeHashes = [UIImage]()
     private var completes = [Bool]()
-    private var decryptedPsbts = [String]()
     private var amounts = [Double]()
     private var psbtToExport = ""
     var addButton = UIBarButtonItem()
@@ -49,7 +48,6 @@ class PsbtViewController: UIViewController, UITableViewDelegate, UITableViewData
         psbts.removeAll()
         completes.removeAll()
         lifeHashes.removeAll()
-        decryptedPsbts.removeAll()
         amounts.removeAll()
         load()
     }
@@ -70,11 +68,9 @@ class PsbtViewController: UIViewController, UITableViewDelegate, UITableViewData
                     let psbtStruct = PsbtStruct(dictionary: psbt)
                     self.psbts.append(psbtStruct)
                     
-                    guard let data = Encryption.decrypt(psbtStruct.psbt), let image = LifeHash.image(data) else { self.spinner.remove(); return }
-                    
-                    self.decryptedPsbts.append(data.base64EncodedString())
-                    
-                    guard let psbtWally = Keys.psbt(data.base64EncodedString(), .mainnet) else { self.spinner.remove(); return }
+                    guard let image = LifeHash.image(psbtStruct.psbt) else { self.spinner.remove(); return }
+                                        
+                    guard let psbtWally = Keys.psbt(psbtStruct.psbt.base64EncodedString(), .mainnet) else { self.spinner.remove(); return }
                     
                     var amount = 0.0
                     for input in psbtWally.inputs {
@@ -104,7 +100,11 @@ class PsbtViewController: UIViewController, UITableViewDelegate, UITableViewData
     }
     
     func numberOfSections(in tableView: UITableView) -> Int {
-        return psbts.count
+        if psbts.count == 0 {
+            return 1
+        } else {
+            return psbts.count
+        }
     }
     
     func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
@@ -112,10 +112,9 @@ class PsbtViewController: UIViewController, UITableViewDelegate, UITableViewData
     }
     
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
-        let cell = tableView.dequeueReusableCell(withIdentifier: "psbtCell", for: indexPath)
-        configureCell(cell)
-        
         if lifeHashes.count > 0 {
+            let cell = tableView.dequeueReusableCell(withIdentifier: "psbtCell", for: indexPath)
+            configureCell(cell)
             let psbt = psbts[indexPath.section]
             
             let copyTextButton = cell.viewWithTag(1) as! UIButton
@@ -168,15 +167,19 @@ class PsbtViewController: UIViewController, UITableViewDelegate, UITableViewData
             
             return cell
         } else {
-            
-            return UITableViewCell()
+            let defaultCell = UITableViewCell()
+            defaultCell.textLabel?.text = "No payments added yet, use Gordian Wallet to create an unsigned payment and add it here."
+            defaultCell.textLabel?.textColor = .lightGray
+            defaultCell.textLabel?.numberOfLines = 0
+            defaultCell.sizeToFit()
+            return defaultCell
         }
      }
     
     @objc func exportQr(_ sender: UIButton) {
         guard let sectionString = sender.restorationIdentifier, let int = Int(sectionString) else { return }
         
-        psbtToExport = decryptedPsbts[int]
+        psbtToExport = psbts[int].psbt.base64EncodedString()
         
         DispatchQueue.main.async { [weak self] in
             guard let self = self else { return }
@@ -190,12 +193,12 @@ class PsbtViewController: UIViewController, UITableViewDelegate, UITableViewData
         guard let sectionString = sender.restorationIdentifier, let int = Int(sectionString) else { return }
                 
         DispatchQueue.main.async { [weak self] in
-            guard let self = self, let data = Data(base64Encoded: self.decryptedPsbts[int]) else { return }
+            guard let self = self else { return }
                         
             let fileManager = FileManager.default
             let fileURL = fileManager.temporaryDirectory.appendingPathComponent("Gordian.psbt")
             
-            try? data.write(to: fileURL)
+            try? self.psbts[int].psbt.write(to: fileURL)
             
             let controller = UIDocumentPickerViewController(url: fileURL, in: .exportToService)
             self.present(controller, animated: true)
@@ -208,13 +211,17 @@ class PsbtViewController: UIViewController, UITableViewDelegate, UITableViewData
         DispatchQueue.main.async { [weak self] in
             guard let self = self else { return }
             
-            UIPasteboard.general.string = self.decryptedPsbts[int]
+            UIPasteboard.general.string = self.psbts[int].psbt.base64EncodedString()
             showAlert(self, "Copied ✓", "")
         }
     }
     
     func tableView(_ tableView: UITableView, heightForRowAt indexPath: IndexPath) -> CGFloat {
-        return 228
+        if psbts.count > 0 {
+            return 228
+        } else {
+            return 100
+        }
     }
     
     func tableView(_ tableView: UITableView, canEditRowAt indexPath: IndexPath) -> Bool {
@@ -230,6 +237,9 @@ class PsbtViewController: UIViewController, UITableViewDelegate, UITableViewData
     
     private func configureCell(_ cell: UITableViewCell) {
         cell.selectionStyle = .none
+        cell.layer.cornerRadius = 8
+        cell.layer.borderColor = UIColor.darkGray.cgColor
+        cell.layer.borderWidth = 0.5
     }
     
     private func configureView(_ view: UIView) {
@@ -297,7 +307,7 @@ class PsbtViewController: UIViewController, UITableViewDelegate, UITableViewData
     @objc func seeDetail(_ sender: UIButton) {
         guard let sectionString = sender.restorationIdentifier, let int = Int(sectionString) else { return }
         
-        psbtText = decryptedPsbts[int]
+        psbtText = psbts[int].psbt.base64EncodedString()
         segueToDetail()
     }
     
@@ -351,7 +361,6 @@ class PsbtViewController: UIViewController, UITableViewDelegate, UITableViewData
             
             DispatchQueue.main.async { [weak self] in
                 self?.psbts.remove(at: section)
-                self?.decryptedPsbts.remove(at: section)
                 self?.lifeHashes.remove(at: section)
                 self?.completes.remove(at: section)
                 self?.psbtTable.deleteSections(IndexSet.init(arrayLiteral: section), with: .fade)
