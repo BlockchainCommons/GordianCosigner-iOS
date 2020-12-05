@@ -91,21 +91,30 @@ class PsbtTableViewController: UIViewController, UITableViewDelegate, UITableVie
             var pubkeysArray = [[String:Any]]()
             self.inputsArray.append(["input": input])
             
-            guard let origins = input.origins else { completion(false); return }
-            
-            for (o, origin) in origins.enumerated() {
-                let pubkey = origin.key.data.hexString
-                
-                guard let path = try? origin.value.path.chop(depth: 4) else { completion(false); return }
-                
-                let dict = ["pubkey":pubkey, "hasSigned": false, "keysetLabel": "unknown", "path": path, "fullPath": origin.value.path] as [String : Any]
-                pubkeysArray.append(dict)
-                
-                if o + 1 == origins.count {
-                    self.inputsArray[i]["pubKeyArray"] = pubkeysArray
+            if let origins = input.origins {
+                for (o, origin) in origins.enumerated() {
+                    let pubkey = origin.key.data.hexString
+                    
+                    var dict:[String:Any]!
+                    
+                    if let path = try? origin.value.path.chop(depth: 4) {
+                        dict = ["pubkey":pubkey, "hasSigned": false, "keysetLabel": "unknown", "path": path, "fullPath": origin.value.path] as [String : Any]
+                    } else {
+                        dict = ["pubkey":pubkey, "hasSigned": false, "keysetLabel": "unknown", "fullPath": origin.value.path] as [String : Any]
+                    }
+                    
+                    pubkeysArray.append(dict)
+                    
+                    if o + 1 == origins.count {
+                        self.inputsArray[i]["pubKeyArray"] = pubkeysArray
+                    }
+                    
+                    if i + 1 == inputs.count && o + 1 == origins.count {
+                        self.parsePubkeys(completion: completion)
+                    }
                 }
-                
-                if i + 1 == inputs.count && o + 1 == origins.count {
+            } else {
+                if i + 1 == inputs.count {
                     self.parsePubkeys(completion: completion)
                 }
             }
@@ -127,7 +136,6 @@ class PsbtTableViewController: UIViewController, UITableViewDelegate, UITableVie
                         var updatedDict = pubkeyDict
                         
                         let originalPubkey = pubkeyDict["pubkey"] as! String
-                        let path = pubkeyDict["path"] as! BIP32Path
                         let fullPath = pubkeyDict["fullPath"] as! BIP32Path
                         
                         CoreDataService.retrieveEntity(entityName: .signer) { (signers, errorDescription) in
@@ -173,7 +181,7 @@ class PsbtTableViewController: UIViewController, UITableViewDelegate, UITableVie
                                     xpub = "\(arr[1])"
                                 }
                                 
-                                if let hdkey = try? HDKey(base58: xpub), let childKey = try? hdkey.derive(using: path) {
+                                if let path = pubkeyDict["path"] as? BIP32Path, let hdkey = try? HDKey(base58: xpub), let childKey = try? hdkey.derive(using: path) {
                                     
                                     if originalPubkey == childKey.pubKey.data.hexString {
                                         updatedDict["keysetLabel"] = keysetStruct.label
@@ -264,56 +272,62 @@ class PsbtTableViewController: UIViewController, UITableViewDelegate, UITableVie
         for (o, output) in outputs.enumerated() {
             self.outputsArray.append(["output": output])
             
-            guard let address = output.txOutput.address else { return }
-            
-            self.outputsArray[o]["address"] = address
-            self.outputsArray[o]["isMine"] = false
-            self.outputsArray[o]["accountMap"] = "unknown"
-            self.outputsArray[o]["path"] = "path unknown"
-            
-            if accountMaps.count == 0 && o + 1 == outputs.count {
-                completion(true)
-            }
-            
-            for (a, accountMap) in accountMaps.enumerated() {
-                let descriptor = accountMap.descriptor
-                let descriptorParser = DescriptorParser()
-                let descriptorStruct = descriptorParser.descriptor(descriptor)
-                let keys = descriptorStruct.multiSigKeys
-                let sigsRequired = descriptorStruct.sigsRequired
+            if let address = output.txOutput.address {
+                self.outputsArray[o]["address"] = address
+                self.outputsArray[o]["isMine"] = false
+                self.outputsArray[o]["accountMap"] = "unknown"
+                self.outputsArray[o]["path"] = "path unknown"
                 
-                if let origins = output.origins {
-                    for (x, origin) in origins.enumerated() {
-                        let path = origin.value.path
-                        self.outputsArray[o]["path"] = path.description
-                        var pubkeys = [PubKey]()
-                        
-                        for (k, key) in keys.enumerated() {
-                            guard let hdkey = try? HDKey(base58: key) else { return }
+                if accountMaps.count == 0 && o + 1 == outputs.count {
+                    completion(true)
+                }
+                
+                for (a, accountMap) in accountMaps.enumerated() {
+                    let descriptor = accountMap.descriptor
+                    let descriptorParser = DescriptorParser()
+                    let descriptorStruct = descriptorParser.descriptor(descriptor)
+                    let keys = descriptorStruct.multiSigKeys
+                    let sigsRequired = descriptorStruct.sigsRequired
+                    
+                    if let origins = output.origins {
+                        for (x, origin) in origins.enumerated() {
+                            let path = origin.value.path
+                            self.outputsArray[o]["path"] = path.description
+                            var pubkeys = [PubKey]()
                             
-                            guard let pubkey = try? hdkey.derive(using: path.chop(depth: 4)) else { return }
-                            
-                            pubkeys.append(pubkey.pubKey)
-                            
-                            if k + 1 == keys.count {
-                                let scriptPubKey = ScriptPubKey(multisig: pubkeys, threshold: sigsRequired, isBIP67: true)
-                                guard let multiSigAddress = try? Address(scriptPubKey: scriptPubKey, network: .mainnet) else { return }
-                                                                
-                                if multiSigAddress.description == address {
-                                    self.outputsArray[o]["isMine"] = true
-                                    self.outputsArray[o]["accountMap"] = accountMap.label
-                                }
-                                
-                                if a + 1 == accountMaps.count && o + 1 == outputs.count && x + 1 == origins.count {
-                                    completion(true)
+                            for (k, key) in keys.enumerated() {
+                                if let hdkey = try? HDKey(base58: key), let pubkey = try? hdkey.derive(using: path.chop(depth: 4)) {
+                                    pubkeys.append(pubkey.pubKey)
+                                    
+                                    if k + 1 == keys.count {
+                                        let scriptPubKey = ScriptPubKey(multisig: pubkeys, threshold: sigsRequired, isBIP67: true)
+                                        guard let multiSigAddress = try? Address(scriptPubKey: scriptPubKey, network: .mainnet) else { return }
+                                                                        
+                                        if multiSigAddress.description == address {
+                                            self.outputsArray[o]["isMine"] = true
+                                            self.outputsArray[o]["accountMap"] = accountMap.label
+                                        }
+                                        
+                                        if a + 1 == accountMaps.count && o + 1 == outputs.count && x + 1 == origins.count {
+                                            completion(true)
+                                        }
+                                    }
+                                } else {
+                                    if k + 1 == keys.count && a + 1 == accountMaps.count && o + 1 == outputs.count && x + 1 == origins.count {
+                                        completion(true)
+                                    }
                                 }
                             }
                         }
+                    } else {
+                        if a + 1 == accountMaps.count && o + 1 == outputs.count {
+                            completion(true)
+                        }
                     }
-                } else {
-                    if a + 1 == accountMaps.count && o + 1 == outputs.count {
-                        completion(true)
-                    }
+                }
+            } else {
+                if o + 1 == outputs.count {
+                    completion(true)
                 }
             }
         }
@@ -455,47 +469,54 @@ class PsbtTableViewController: UIViewController, UITableViewDelegate, UITableVie
         let inputDict = inputsArray[indexPath.row]
         let input = inputDict["input"] as! PSBTInput
         
-        let pubkeyArray = inputDict["pubKeyArray"] as! [[String:Any]]
-                
-        var isMine = false
-        
-        participantsTextView.text = ""
-        numberOfSigsLabel.text = "?"
-        
-        if pubkeyArray.count > 0 {
-            var numberOfSigs = 0
+        if let pubkeyArray = inputDict["pubKeyArray"] as? [[String:Any]] {
+            var isMine = false
             
-            for pubkey in pubkeyArray {
-                let participant = pubkey["keysetLabel"] as! String
-                let hasSigned = pubkey["hasSigned"] as! Bool
-                let fullPath = pubkey["fullPath"] as! BIP32Path
+            participantsTextView.text = ""
+            numberOfSigsLabel.text = "?"
+            
+            if pubkeyArray.count > 0 {
+                var numberOfSigs = 0
                 
-                if hasSigned {
-                    participantsTextView.text += "Signed: " + participant + " - \(fullPath.description)\n"
-                    numberOfSigs += 1
+                for pubkey in pubkeyArray {
+                    let participant = pubkey["keysetLabel"] as! String
+                    let hasSigned = pubkey["hasSigned"] as! Bool
+                    let fullPath = pubkey["fullPath"] as! BIP32Path
+                    
+                    if hasSigned {
+                        participantsTextView.text += "Signed: " + participant + " - \(fullPath.description)\n"
+                        numberOfSigs += 1
+                    } else {
+                        participantsTextView.text += "NOT signed: " + participant + " - \(fullPath.description)\n"
+                    }
+                    
+                    if participant != "unknown" {
+                        isMine = true
+                    }
+                }
+                
+                if isMine {
+                    isMineImageView.image = UIImage(systemName: "person.crop.circle.fill.badge.checkmark")
+                    isMineImageView.tintColor = .systemGreen
                 } else {
-                    participantsTextView.text += "NOT signed: " + participant + " - \(fullPath.description)\n"
+                    isMineImageView.image = UIImage(systemName: "questionmark.circle")
+                    isMineImageView.tintColor = .systemGray
                 }
                 
-                if participant != "unknown" {
-                    isMine = true
-                }
-            }
-            
-            if isMine {
-                isMineImageView.image = UIImage(systemName: "person.crop.circle.fill.badge.checkmark")
-                isMineImageView.tintColor = .systemGreen
+                numberOfSigsLabel.text = "\(numberOfSigs) signatures"
+                
             } else {
                 isMineImageView.image = UIImage(systemName: "questionmark.circle")
                 isMineImageView.tintColor = .systemGray
+                numberOfSigsLabel.text = "?"
             }
             
-            numberOfSigsLabel.text = "\(numberOfSigs) signatures"
             
         } else {
             isMineImageView.image = UIImage(systemName: "questionmark.circle")
             isMineImageView.tintColor = .systemGray
             numberOfSigsLabel.text = "?"
+            participantsTextView.text = "unknown"
         }
         
         if let amount = input.amount {
@@ -515,7 +536,6 @@ class PsbtTableViewController: UIViewController, UITableViewDelegate, UITableVie
         let addressLabel = cell.viewWithTag(4) as! UILabel
         let accountMapLabel = cell.viewWithTag(5) as! UILabel
         let pathLabel = cell.viewWithTag(6) as! UILabel
-        
         let outputDict = outputsArray[indexPath.row]
         let output = outputDict["output"] as! PSBTOutput
         
