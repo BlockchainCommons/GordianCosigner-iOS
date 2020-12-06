@@ -154,10 +154,14 @@ class QRScannerViewController: UIViewController {
         return text.lowercased().hasPrefix("ur:crypto-account")
     }
     
+    private func isKeyset(_ text: String) -> Bool {
+        return text.contains("48h/0h/0h/2h")
+    }
+    
     private func process(text: String) {
         isRunning = false
         
-        if !isAccountMap(text) && !isCryptoAccount(text) {
+        if !isAccountMap(text) && !isCryptoAccount(text) && !isKeyset(text) {
             keepRunning = true
             // Stop if we're already done with the decode.
             guard decoder.result == nil else {

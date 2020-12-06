@@ -562,14 +562,15 @@ class KeysetsViewController: UIViewController, UITableViewDelegate, UITableViewD
         if segue.identifier == "segueToScanKeyset" {
             if let vc = segue.destination as? QRScannerViewController {
                 vc.doneBlock = { [weak self] result in
-                    guard let self = self else { return }
+                    guard let self = self, let result = result else { return }
                     
-                    guard let accountUr = result, let account = URHelper.accountUr(accountUr) else {
-                        showAlert(self, "Keyset not recognized!", "Currently Gordian Signer only supports native segwit multisig derivations.")
-                        return
+                    if let account = URHelper.accountUr(result) {
+                        self.addKeyset(account)
+                    } else if result.contains("48h/0h/0h/2h") {
+                        self.addKeyset(result)
+                    } else {
+                        showAlert(self, "Keyset not recognized!", "Currently Gordian Cosigner only supports native segwit multisig derivations.")
                     }
-                    
-                    self.addKeyset(account)
                 }
             }
         }

@@ -143,4 +143,39 @@ enum URHelper {
         return (keyData, chainCode, origins)
     }
     
+//    static func account(_ account: String) -> UR? {
+//        //[73756c7f/48h/0h/0h/2h]xpub6E3pgkahcxomzJRVmEQb9RjdB4Xx4tjRL6mmmfNzpgvFjL94jTQSHGqpfeWwE4wvhFbomye5mMQNrDiAdgEnfzcGWVgbsAiN4W86bKfpihD
+//    }
+//    
+//    static func keysetToUr(keyset: String) -> String? {
+//        let descriptorParser = DescriptorParser()
+//        let descriptor = "wsh(\(keyset))"
+//        let descriptorStruct = descriptorParser.descriptor(descriptor)
+//        let xfp = Data(value: descriptorStruct.fingerprint)
+//        let key = descriptorStruct.accountXpub
+//        
+//        let hdKeyWrapper:CBOR = .map([
+//            .unsignedInt(3) : .byteString(<#T##[UInt8]#>), //keyData bytestring
+//            .unsignedInt(4) : .byteString(<#T##[UInt8]#>) //chainCode bytestring
+//            .unsignedInt(6) : .byteString(<#T##[UInt8]#>) //chainCode bytestring
+//        ])
+//        
+//        let arrayWrapper:CBOR = .array([
+//            .tagged(.init(rawValue: 401), hdKeyWrapper)
+//        ])
+//        
+//        let wrapper:CBOR = .map([
+//            .unsignedInt(1) : .byteString(xfp.bytes),
+//            .unsignedInt(2) : .array([arrayWrapper])
+//        ])
+//        //let wrapper:CBOR = .tagged(.init(rawValue: 309), .byteString(data.bytes))
+//        let cbor = Data(wrapper.encode())
+//        do {
+//            let rawUr = try UR(type: "crypto-account", cbor: cbor)
+//            return UREncoder.encode(rawUr)
+//        } catch {
+//            return nil
+//        }
+//    }
+    
 }
