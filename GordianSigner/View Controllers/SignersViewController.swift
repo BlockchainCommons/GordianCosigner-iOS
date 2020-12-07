@@ -10,7 +10,7 @@ import UIKit
 
 class SignersViewController: UIViewController {
 
-    @IBOutlet weak private var tableView: UITableView!
+    @IBOutlet weak var signerTable: UITableView!
     
     var addButton = UIBarButtonItem()
     var editButton = UIBarButtonItem()
@@ -19,6 +19,7 @@ class SignersViewController: UIViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
         
+        signerTable.delegate = self
         addButton = UIBarButtonItem.init(barButtonSystemItem: .add, target: self, action: #selector(add))
         editButton = UIBarButtonItem.init(barButtonSystemItem: .edit, target: self, action: #selector(editSigners))
         self.navigationItem.setRightBarButtonItems([addButton, editButton], animated: true)
@@ -48,7 +49,7 @@ class SignersViewController: UIViewController {
                     DispatchQueue.main.async { [weak self] in
                         guard let self = self else { return }
                         
-                        self.tableView.reloadData()
+                        self.signerTable.reloadData()
                     }
                 }
             }
@@ -56,9 +57,9 @@ class SignersViewController: UIViewController {
     }
     
     @objc func editSigners() {
-        tableView.setEditing(!tableView.isEditing, animated: true)
+        signerTable.setEditing(!signerTable.isEditing, animated: true)
         
-        if tableView.isEditing {
+        if signerTable.isEditing {
             editButton = UIBarButtonItem(title: "Done", style: .plain, target: self, action: #selector(editSigners))
         } else {
             editButton = UIBarButtonItem(title: "Edit", style: .plain, target: self, action: #selector(editSigners))
@@ -97,7 +98,7 @@ class SignersViewController: UIViewController {
             
             DispatchQueue.main.async { [weak self] in
                 self?.signerStructs.remove(at: section)
-                self?.tableView.deleteSections(IndexSet.init(arrayLiteral: section), with: .fade)
+                self?.signerTable.deleteSections(IndexSet.init(arrayLiteral: section), with: .fade)
             }
             
             showAlert(self, "", "Signer deleted ✓")

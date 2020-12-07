@@ -83,7 +83,7 @@
         <!--Psbt View Controller-->
         <scene sceneID="gcV-bV-elg">
             <objects>
-                <viewController id="tIM-97-jRz" customClass="PsbtViewController" customModule="GordianSigner" customModuleProvider="target" sceneMemberID="viewController">
+                <viewController id="tIM-97-jRz" customClass="PsbtViewController" customModule="Gordian_Cosigner" customModuleProvider="target" sceneMemberID="viewController">
                     <view key="view" contentMode="scaleToFill" id="EP2-t0-s2N">
                         <rect key="frame" x="0.0" y="0.0" width="414" height="808"/>
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
@@ -319,7 +319,7 @@
         <!--Scanner View Controller-->
         <scene sceneID="xPI-7w-DVQ">
             <objects>
-                <viewController hidesBottomBarWhenPushed="YES" id="4dz-cW-ULS" customClass="QRScannerViewController" customModule="GordianSigner" customModuleProvider="target" sceneMemberID="viewController">
+                <viewController hidesBottomBarWhenPushed="YES" id="4dz-cW-ULS" customClass="QRScannerViewController" customModule="Gordian_Cosigner" customModuleProvider="target" sceneMemberID="viewController">
                     <view key="view" contentMode="scaleToFill" id="vUa-HR-41x">
                         <rect key="frame" x="0.0" y="0.0" width="414" height="842"/>
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
@@ -383,7 +383,7 @@
         <!--Displayer View Controller-->
         <scene sceneID="5aD-nS-0Jx">
             <objects>
-                <viewController hidesBottomBarWhenPushed="YES" id="9Vu-3O-YNg" customClass="QRDisplayerViewController" customModule="GordianSigner" customModuleProvider="target" sceneMemberID="viewController">
+                <viewController hidesBottomBarWhenPushed="YES" id="9Vu-3O-YNg" customClass="QRDisplayerViewController" customModule="Gordian_Cosigner" customModuleProvider="target" sceneMemberID="viewController">
                     <view key="view" contentMode="scaleToFill" id="i3r-81-WoL">
                         <rect key="frame" x="0.0" y="0.0" width="414" height="808"/>
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
@@ -528,7 +528,7 @@
         <!--Psbt Table View Controller-->
         <scene sceneID="UeW-BD-fWq">
             <objects>
-                <viewController hidesBottomBarWhenPushed="YES" id="zVW-ac-A1r" customClass="PsbtTableViewController" customModule="GordianSigner" customModuleProvider="target" sceneMemberID="viewController">
+                <viewController hidesBottomBarWhenPushed="YES" id="zVW-ac-A1r" customClass="PsbtTableViewController" customModule="Gordian_Cosigner" customModuleProvider="target" sceneMemberID="viewController">
                     <view key="view" contentMode="scaleToFill" id="NFA-8g-kkT">
                         <rect key="frame" x="0.0" y="0.0" width="414" height="808"/>
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
@@ -820,7 +820,7 @@
         <!--Signers View Controller-->
         <scene sceneID="Jdb-gV-f0W">
             <objects>
-                <viewController extendedLayoutIncludesOpaqueBars="YES" id="A5d-PE-VBa" customClass="SignersViewController" customModule="GordianSigner" sceneMemberID="viewController">
+                <viewController extendedLayoutIncludesOpaqueBars="YES" id="A5d-PE-VBa" customClass="SignersViewController" customModule="Gordian_Cosigner" customModuleProvider="target" sceneMemberID="viewController">
                     <view key="view" contentMode="scaleToFill" id="Oqn-0y-wiZ">
                         <rect key="frame" x="0.0" y="0.0" width="414" height="896"/>
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
@@ -938,7 +938,7 @@
                     </view>
                     <navigationItem key="navigationItem" id="OSG-Z9-yEP"/>
                     <connections>
-                        <outlet property="tableView" destination="SJ3-p2-cJf" id="5wu-K0-lt1"/>
+                        <outlet property="signerTable" destination="SJ3-p2-cJf" id="4Do-vL-2hL"/>
                         <segue destination="vZg-oW-Ek8" kind="show" identifier="segueToAddASigner" id="c3G-hh-8KG"/>
                     </connections>
                 </viewController>
@@ -949,7 +949,7 @@
         <!--Keysets View Controller-->
         <scene sceneID="ksN-Qj-G3P">
             <objects>
-                <viewController id="50H-8w-bzV" customClass="KeysetsViewController" customModule="GordianSigner" customModuleProvider="target" sceneMemberID="viewController">
+                <viewController id="50H-8w-bzV" customClass="KeysetsViewController" customModule="Gordian_Cosigner" customModuleProvider="target" sceneMemberID="viewController">
                     <view key="view" contentMode="scaleToFill" id="6iA-4d-gNe">
                         <rect key="frame" x="0.0" y="0.0" width="414" height="808"/>
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
@@ -1137,7 +1137,7 @@
         <!--Account Maps View Controller-->
         <scene sceneID="cCB-AA-CPG">
             <objects>
-                <viewController id="wCx-A7-8Dm" customClass="AccountMapsViewController" customModule="GordianSigner" customModuleProvider="target" sceneMemberID="viewController">
+                <viewController id="wCx-A7-8Dm" customClass="AccountMapsViewController" customModule="Gordian_Cosigner" customModuleProvider="target" sceneMemberID="viewController">
                     <view key="view" contentMode="scaleToFill" id="CUw-dd-MTq">
                         <rect key="frame" x="0.0" y="0.0" width="414" height="808"/>
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
@@ -1337,7 +1337,7 @@
         <!--Create Account Map View Controller-->
         <scene sceneID="w8w-0c-Mmg">
             <objects>
-                <viewController extendedLayoutIncludesOpaqueBars="YES" hidesBottomBarWhenPushed="YES" id="Iuy-9M-v3m" customClass="CreateAccountMapViewController" customModule="GordianSigner" customModuleProvider="target" sceneMemberID="viewController">
+                <viewController extendedLayoutIncludesOpaqueBars="YES" hidesBottomBarWhenPushed="YES" id="Iuy-9M-v3m" customClass="CreateAccountMapViewController" customModule="Gordian_Cosigner" customModuleProvider="target" sceneMemberID="viewController">
                     <view key="view" contentMode="scaleToFill" id="nvN-Sp-idZ">
                         <rect key="frame" x="0.0" y="0.0" width="414" height="896"/>
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
@@ -1422,7 +1422,7 @@
         <!--Add Signer View Controller-->
         <scene sceneID="qsT-Fj-gs1">
             <objects>
-                <viewController extendedLayoutIncludesOpaqueBars="YES" hidesBottomBarWhenPushed="YES" id="vZg-oW-Ek8" customClass="AddSignerViewController" customModule="GordianSigner" customModuleProvider="target" sceneMemberID="viewController">
+                <viewController extendedLayoutIncludesOpaqueBars="YES" hidesBottomBarWhenPushed="YES" id="vZg-oW-Ek8" customClass="AddSignerViewController" customModule="Gordian_Cosigner" customModuleProvider="target" sceneMemberID="viewController">
                     <view key="view" contentMode="scaleToFill" id="C11-ED-fBH">
                         <rect key="frame" x="0.0" y="0.0" width="414" height="896"/>
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
