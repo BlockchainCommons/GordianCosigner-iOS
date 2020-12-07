@@ -411,7 +411,7 @@ class AccountMapsViewController: UIViewController, UITableViewDelegate, UITableV
         }
         
         var map = [String:Any]()
-        map["birthblock"] = Int64(dict["birthblock"] as? Int ?? 0)
+        map["blockheight"] = Int64(dict["blockheight"] as? Int ?? 0)
         map["accountMap"] = accountMap.utf8
         map["label"] = dict["label"] as? String ?? "Account map"
         map["id"] = accountMapId
@@ -518,11 +518,11 @@ class AccountMapsViewController: UIViewController, UITableViewDelegate, UITableV
     private func createPolicyMap(_ keyset: String, _ id: UUID) {
         let desc = "wsh(sortedmulti(2,\(keyset),<keyset #2>,<keyset #3>))"
         
-        let accountMap = ["descriptor":desc, "birthblock":0, "label":"Incomplete Account"] as [String : Any]
+        let accountMap = ["descriptor":desc, "blockheight":0, "label":"Incomplete Account"] as [String : Any]
         let json = accountMap.json() ?? ""
         
         var map = [String:Any]()
-        map["birthblock"] = Int64(0)
+        map["blockheight"] = Int64(0)
         map["accountMap"] = json.utf8
         map["label"] = "Incomplete Account"
         map["id"] = id

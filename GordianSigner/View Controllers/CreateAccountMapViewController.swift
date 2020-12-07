@@ -64,7 +64,7 @@ class CreateAccountMapViewController: UIViewController, UIPickerViewDelegate, UI
         
         desc += keystores + "))"
         
-        let accountMap = ["descriptor":desc, "birthblock":0, "label":"Policy Map"] as [String : Any]
+        let accountMap = ["descriptor":desc, "blockheight":0, "label":"Policy Map"] as [String : Any]
         let json = accountMap.json() ?? ""
         
         var label = textField.text ?? "Policy map"
@@ -73,7 +73,7 @@ class CreateAccountMapViewController: UIViewController, UIPickerViewDelegate, UI
         }
         
         var map = [String:Any]()
-        map["birthblock"] = Int64(0)
+        map["blockheight"] = Int64(0)
         map["accountMap"] = json.utf8
         map["label"] = label
         map["id"] = UUID()
