@@ -27,6 +27,10 @@ class AccountMapsViewController: UIViewController, UITableViewDelegate, UITableV
         addButton = UIBarButtonItem.init(barButtonSystemItem: .add, target: self, action: #selector(add))
         editButton = UIBarButtonItem.init(barButtonSystemItem: .edit, target: self, action: #selector(editAccounts))
         self.navigationItem.setRightBarButtonItems([addButton, editButton], animated: true)
+        
+        if !FirstTime.firstTimeHere() {
+            showAlert(self, "Fatal error", "We were unable to set and save an encryption key to your secure enclave, the app will not function without this key.")
+        }
     }
     
     override func viewDidAppear(_ animated: Bool) {

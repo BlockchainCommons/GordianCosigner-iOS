@@ -26,9 +26,7 @@ class SignerViewController: UIViewController {
     }
     
     override func viewDidAppear(_ animated: Bool) {
-        if !FirstTime.firstTimeHere() {
-            showAlert(self, "Fatal error", "We were unable to set and save an encryption key to your secure enclave, the app will not function without this key.")
-        }
+        
     }
     
     @IBAction func importViaFilesAction(_ sender: Any) {
