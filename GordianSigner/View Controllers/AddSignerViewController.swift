@@ -116,6 +116,10 @@ class AddSignerViewController: UIViewController {
                     return
                 }
                 
+                DispatchQueue.main.async {
+                    NotificationCenter.default.post(name: .cosignerAdded, object: nil, userInfo: nil)
+                }
+                
                 if self.tempWords {
                     self.doneBlock!()
                     self.navigationController?.popViewController(animated: true)

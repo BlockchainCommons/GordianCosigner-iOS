@@ -423,6 +423,10 @@ class AccountMapsViewController: UIViewController, UITableViewDelegate, UITableV
         CoreDataService.saveEntity(dict: map, entityName: .accountMap) { [weak self] (success, errorDescription) in
             guard let self = self, success else { return }
             
+            DispatchQueue.main.async {
+                NotificationCenter.default.post(name: .cosignerAdded, object: nil, userInfo: nil)
+            }
+            
             self.load()
         }
     }
@@ -446,7 +450,7 @@ class AccountMapsViewController: UIViewController, UITableViewDelegate, UITableV
         if segue.identifier == "segueToExportAccountMap" {
             if let vc = segue.destination as? QRDisplayerViewController {
                 vc.header = "Account Map"
-                vc.descriptionText = "Share this to import your account to other wallets, if it is incomplete invite others to join."
+                vc.descriptionText = mapToExport.json() ?? ""
                 vc.isPsbt = false
                 vc.text = mapToExport.json() ?? ""
             }
@@ -509,6 +513,10 @@ class AccountMapsViewController: UIViewController, UITableViewDelegate, UITableV
             guard success else {
                 showAlert(self, "Failed to save keyset", errorDescription ?? "unknown error")
                 return
+            }
+            
+            DispatchQueue.main.async {
+                NotificationCenter.default.post(name: .cosignerAdded, object: nil, userInfo: nil)
             }
             
             self.createPolicyMap(bip48SegwitAccount, idToShare)

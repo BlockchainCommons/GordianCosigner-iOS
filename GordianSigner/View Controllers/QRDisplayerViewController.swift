@@ -16,6 +16,11 @@ class QRDisplayerViewController: UIViewController {
     @IBOutlet weak private var imageView: UIImageView!
     @IBOutlet weak var animateOutlet: UIButton!
     
+    @IBOutlet weak var shareQrOutlet: UIButton!
+    @IBOutlet weak var copyQrOutlet: UIButton!
+    @IBOutlet weak var shareTextOutlet: UIButton!
+    @IBOutlet weak var copyTextOutlet: UIButton!
+    
     var descriptionText = ""
     var header = ""
     private let spinner = Spinner()
@@ -37,15 +42,59 @@ class QRDisplayerViewController: UIViewController {
         
         if isPsbt {
             animateOutlet.alpha = 1
-           convertToUr()
+            shareQrOutlet.alpha = 0
+            shareTextOutlet.alpha = 0
+            copyQrOutlet.alpha = 0
+            copyTextOutlet.alpha = 0
+            convertToUr()
         } else {
             animateOutlet.alpha = 0
+            shareQrOutlet.alpha = 1
+            shareTextOutlet.alpha = 1
+            copyQrOutlet.alpha = 1
+            copyTextOutlet.alpha = 1
             showQR(text)
         }
     }
     
+    @IBAction func shareQrAction(_ sender: Any) {
+        guard let image = imageView.image else { return }
+        
+        share(image)
+    }
+    
+    @IBAction func copyQrAction(_ sender: Any) {
+        guard let image = imageView.image else { return }
+        
+        UIPasteboard.general.image = image
+        showAlert(self, "", "QR copied ✓")
+    }
+    
+    @IBAction func shareTextAction(_ sender: Any) {
+        share(descriptionText)
+    }
+    
+    @IBAction func copyTextAction(_ sender: Any) {
+        UIPasteboard.general.string = descriptionText
+        showAlert(self, "", "Text copied ✓")
+    }
+    
     @IBAction func animateAction(_ sender: Any) {
         animateNow()
+    }
+    
+    private func share(_ item: Any) {
+        DispatchQueue.main.async {
+            let itemToShare = [item]
+            let activityViewController = UIActivityViewController(activityItems: itemToShare, applicationActivities: nil)
+            
+            if UIDevice.current.userInterfaceIdiom == .pad {
+                activityViewController.popoverPresentationController?.sourceView = self.view
+                activityViewController.popoverPresentationController?.sourceRect = CGRect(x: 0, y: 0, width: 100, height: 100)
+            }
+            
+            self.present(activityViewController, animated: true) {}
+        }
     }
     
     private func animateNow() {

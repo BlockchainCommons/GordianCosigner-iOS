@@ -92,6 +92,7 @@ extension DispatchQueue {
 
 extension Notification.Name {
     public static let psbtSaved = Notification.Name(rawValue: "psbtSaved")
+    public static let cosignerAdded = Notification.Name(rawValue: "cosignerAdded")
 }
 
 extension Data {

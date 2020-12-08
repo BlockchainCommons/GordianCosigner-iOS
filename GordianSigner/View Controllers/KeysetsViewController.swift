@@ -32,12 +32,11 @@ class KeysetsViewController: UIViewController, UITableViewDelegate, UITableViewD
         addButton = UIBarButtonItem.init(barButtonSystemItem: .add, target: self, action: #selector(add))
         editButton = UIBarButtonItem.init(barButtonSystemItem: .edit, target: self, action: #selector(editKeysets))
         self.navigationItem.setRightBarButtonItems([addButton, editButton], animated: true)
-        spinner.add(vc: self, description: "loading...")
+        NotificationCenter.default.addObserver(self, selector: #selector(refreshTable), name: .cosignerAdded, object: nil)
+        load()
     }
     
     override func viewDidAppear(_ animated: Bool) {
-        load()
-        
         guard let pasteBoard = UIPasteboard.general.string, pasteBoard.lowercased().hasPrefix("ur:crypto-account") else { return }
         
         if let account = URHelper.accountUr(pasteBoard) {
@@ -70,33 +69,46 @@ class KeysetsViewController: UIViewController, UITableViewDelegate, UITableViewD
         }
     }
     
+    @objc func refreshTable() {
+        load()
+    }
+    
     private func load() {
-        getSigners()
+        spinner.add(vc: self, description: "loading...")
         keysets.removeAll()
         lifehashes.removeAll()
+        signers.removeAll()
         
-        CoreDataService.retrieveEntity(entityName: .keyset) { [weak self] (keysets, errorDescription) in
-            guard let self = self else { return }
+        CoreDataService.retrieveEntity(entityName: .signer) { (signers, errorDescription) in
+            guard let signers = signers else { return }
             
-            guard let keysets = keysets, keysets.count > 0 else { self.spinner.remove(); return }
+            for signer in signers {
+                self.signers.append(SignerStruct(dictionary: signer))
+            }
             
-            DispatchQueue.background(background: { [weak self] in
+            CoreDataService.retrieveEntity(entityName: .keyset) { [weak self] (keysets, errorDescription) in
                 guard let self = self else { return }
-                for (i, keyset) in keysets.enumerated() {
-                    let keysetStruct = KeysetStruct(dictionary: keyset)
-                    self.keysets.append(keysetStruct)
-                    self.lifehashes.append(LifeHash.image(keysetStruct.bip48SegwitAccount ?? ""))
-                    
-                    if i + 1 == keysets.count {
-                        DispatchQueue.main.async { [weak self] in
-                            guard let self = self else { return }
-                            
-                            self.keysetsTable.reloadData()
-                            self.spinner.remove()
+                
+                guard let keysets = keysets, keysets.count > 0 else { self.spinner.remove(); return }
+                
+                DispatchQueue.background(background: { [weak self] in
+                    guard let self = self else { return }
+                    for (i, keyset) in keysets.enumerated() {
+                        let keysetStruct = KeysetStruct(dictionary: keyset)
+                        self.keysets.append(keysetStruct)
+                        self.lifehashes.append(LifeHash.image(keysetStruct.bip48SegwitAccount ?? ""))
+                        
+                        if i + 1 == keysets.count {
+                            DispatchQueue.main.async { [weak self] in
+                                guard let self = self else { return }
+                                
+                                self.keysetsTable.reloadData()
+                                self.spinner.remove()
+                            }
                         }
                     }
-                }
-            }, completion: {})
+                }, completion: {})
+            }
         }
     }
     
@@ -230,18 +242,6 @@ class KeysetsViewController: UIViewController, UITableViewDelegate, UITableViewD
     private func configureView(_ view: UIView) {
         view.clipsToBounds = true
         view.layer.cornerRadius = 8
-    }
-    
-    private func getSigners() {
-        self.signers.removeAll()
-        
-        CoreDataService.retrieveEntity(entityName: .signer) { (signers, errorDescription) in
-            guard let signers = signers, signers.count > 0 else { return }
-            
-            for signer in signers {
-                self.signers.append(SignerStruct(dictionary: signer))
-            }
-        }
     }
     
     private func canSign(_ keyset: KeysetStruct) -> (isHot: Bool, isMine: Bool, lifeHash: UIImage?) {
@@ -599,5 +599,4 @@ class KeysetsViewController: UIViewController, UITableViewDelegate, UITableViewD
             }
         }
     }
-
 }

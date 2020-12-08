@@ -389,7 +389,7 @@
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                         <subviews>
                             <imageView clipsSubviews="YES" userInteractionEnabled="NO" contentMode="scaleAspectFit" horizontalHuggingPriority="251" verticalHuggingPriority="251" translatesAutoresizingMaskIntoConstraints="NO" id="lJf-Uh-ILV">
-                                <rect key="frame" x="20" y="104" width="374" height="374"/>
+                                <rect key="frame" x="20" y="95" width="374" height="374"/>
                                 <constraints>
                                     <constraint firstAttribute="height" constant="374" id="4ru-z0-5On"/>
                                     <constraint firstAttribute="width" constant="374" id="b5U-DN-2N7"/>
@@ -397,7 +397,9 @@
                             </imageView>
                             <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="QDZ-sc-dJG">
                                 <rect key="frame" x="179.5" y="486" width="55" height="30"/>
-                                <state key="normal" title="animate"/>
+                                <state key="normal" title="animate">
+                                    <color key="titleColor" red="0.25174289789999998" green="0.82675522769999998" blue="1" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+                                </state>
                                 <connections>
                                     <action selector="animateAction:" destination="9Vu-3O-YNg" eventType="touchUpInside" id="Dbo-ER-vHy"/>
                                 </connections>
@@ -408,34 +410,90 @@
                                 <color key="textColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                                 <nil key="highlightedColor"/>
                             </label>
+                            <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" showsTouchWhenHighlighted="YES" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="hpJ-y0-mBa">
+                                <rect key="frame" x="332.5" y="63" width="61.5" height="24"/>
+                                <fontDescription key="fontDescription" type="system" pointSize="10"/>
+                                <color key="tintColor" red="0.25174289789999998" green="0.82675522769999998" blue="1" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+                                <state key="normal" title=" copy qr" image="doc.on.doc" catalog="system">
+                                    <color key="titleColor" red="0.25174289789999998" green="0.82675522769999998" blue="1" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+                                </state>
+                                <connections>
+                                    <action selector="copyQrAction:" destination="9Vu-3O-YNg" eventType="touchUpInside" id="gAk-T6-1iV"/>
+                                </connections>
+                            </button>
+                            <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" showsTouchWhenHighlighted="YES" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="hEA-SP-XCB">
+                                <rect key="frame" x="252.5" y="64.5" width="62" height="21"/>
+                                <fontDescription key="fontDescription" type="system" pointSize="10"/>
+                                <color key="tintColor" red="0.25174289789999998" green="0.82675522769999998" blue="1" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+                                <state key="normal" title=" share qr" image="square.and.arrow.up" catalog="system">
+                                    <color key="titleColor" red="0.25174289789999998" green="0.82675522769999998" blue="1" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+                                </state>
+                                <connections>
+                                    <action selector="shareQrAction:" destination="9Vu-3O-YNg" eventType="touchUpInside" id="yXh-On-kga"/>
+                                </connections>
+                            </button>
                             <textView clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="scaleToFill" editable="NO" translatesAutoresizingMaskIntoConstraints="NO" id="0t4-W0-Izf">
-                                <rect key="frame" x="20" y="524" width="374" height="259"/>
+                                <rect key="frame" x="20" y="518" width="374" height="256"/>
                                 <color key="backgroundColor" white="0.0" alpha="0.0" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                                 <color key="textColor" white="0.66666666669999997" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                                 <fontDescription key="fontDescription" type="system" weight="semibold" pointSize="17"/>
                                 <textInputTraits key="textInputTraits" autocapitalizationType="sentences"/>
                             </textView>
+                            <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" showsTouchWhenHighlighted="YES" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="LAq-QM-9fZ">
+                                <rect key="frame" x="324" y="486" width="70" height="24"/>
+                                <fontDescription key="fontDescription" type="system" pointSize="10"/>
+                                <color key="tintColor" red="0.25174289789999998" green="0.82675522769999998" blue="1" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+                                <state key="normal" title=" copy text" image="doc.on.doc" catalog="system">
+                                    <color key="titleColor" red="0.25174289789999998" green="0.82675522769999998" blue="1" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+                                </state>
+                                <connections>
+                                    <action selector="copyTextAction:" destination="9Vu-3O-YNg" eventType="touchUpInside" id="Xas-Bo-mdt"/>
+                                </connections>
+                            </button>
+                            <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" showsTouchWhenHighlighted="YES" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="gnh-pp-jsJ">
+                                <rect key="frame" x="244" y="487.5" width="70" height="21"/>
+                                <fontDescription key="fontDescription" type="system" pointSize="10"/>
+                                <color key="tintColor" red="0.25174289789999998" green="0.82675522769999998" blue="1" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+                                <state key="normal" title=" share text" image="square.and.arrow.up" catalog="system">
+                                    <color key="titleColor" red="0.25174289789999998" green="0.82675522769999998" blue="1" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+                                </state>
+                                <connections>
+                                    <action selector="shareTextAction:" destination="9Vu-3O-YNg" eventType="touchUpInside" id="0Gt-aN-TCa"/>
+                                </connections>
+                            </button>
                         </subviews>
                         <color key="backgroundColor" white="0.0" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                         <constraints>
-                            <constraint firstAttribute="bottom" secondItem="0t4-W0-Izf" secondAttribute="bottom" constant="25" id="Dpo-5E-Yb4"/>
                             <constraint firstItem="lJf-Uh-ILV" firstAttribute="centerX" secondItem="i3r-81-WoL" secondAttribute="centerX" id="FY6-aA-ZeU"/>
                             <constraint firstItem="8Fb-WX-yzn" firstAttribute="top" secondItem="GK0-od-YHe" secondAttribute="top" constant="20" id="Gfw-rt-wiH"/>
+                            <constraint firstItem="GK0-od-YHe" firstAttribute="trailing" secondItem="hpJ-y0-mBa" secondAttribute="trailing" constant="20" id="IEd-L4-VF8"/>
                             <constraint firstItem="QDZ-sc-dJG" firstAttribute="centerX" secondItem="i3r-81-WoL" secondAttribute="centerX" id="JlE-Ke-gjy"/>
                             <constraint firstItem="0t4-W0-Izf" firstAttribute="leading" secondItem="GK0-od-YHe" secondAttribute="leading" constant="20" id="KiD-GM-eqQ"/>
-                            <constraint firstItem="lJf-Uh-ILV" firstAttribute="top" secondItem="GK0-od-YHe" secondAttribute="top" constant="104" id="Nm8-ka-Xwb"/>
+                            <constraint firstItem="lJf-Uh-ILV" firstAttribute="top" secondItem="GK0-od-YHe" secondAttribute="top" constant="95" id="Nm8-ka-Xwb"/>
                             <constraint firstItem="GK0-od-YHe" firstAttribute="trailing" secondItem="0t4-W0-Izf" secondAttribute="trailing" constant="20" id="UXa-KW-O5Y"/>
-                            <constraint firstItem="0t4-W0-Izf" firstAttribute="top" secondItem="QDZ-sc-dJG" secondAttribute="bottom" constant="8" id="Wkd-xe-uPQ"/>
+                            <constraint firstItem="LAq-QM-9fZ" firstAttribute="leading" secondItem="gnh-pp-jsJ" secondAttribute="trailing" constant="10" id="WCB-GI-YA7"/>
+                            <constraint firstItem="0t4-W0-Izf" firstAttribute="top" secondItem="LAq-QM-9fZ" secondAttribute="bottom" constant="8" id="b2Y-iM-eX2"/>
+                            <constraint firstItem="GK0-od-YHe" firstAttribute="trailing" secondItem="LAq-QM-9fZ" secondAttribute="trailing" constant="20" id="bJ0-Pf-gb9"/>
+                            <constraint firstItem="0t4-W0-Izf" firstAttribute="bottom" secondItem="GK0-od-YHe" secondAttribute="bottom" id="dve-if-voS"/>
+                            <constraint firstItem="hpJ-y0-mBa" firstAttribute="leading" secondItem="hEA-SP-XCB" secondAttribute="trailing" constant="18" id="jT1-Jp-gCz"/>
+                            <constraint firstItem="LAq-QM-9fZ" firstAttribute="centerY" secondItem="gnh-pp-jsJ" secondAttribute="centerY" id="qlf-59-evw"/>
+                            <constraint firstItem="lJf-Uh-ILV" firstAttribute="top" secondItem="hpJ-y0-mBa" secondAttribute="bottom" constant="8" id="rKO-yt-7Gi"/>
                             <constraint firstItem="8Fb-WX-yzn" firstAttribute="leading" secondItem="GK0-od-YHe" secondAttribute="leading" constant="20" id="sbl-9T-L1l"/>
-                            <constraint firstItem="QDZ-sc-dJG" firstAttribute="top" secondItem="lJf-Uh-ILV" secondAttribute="bottom" constant="8" id="smS-UW-eh1"/>
+                            <constraint firstItem="QDZ-sc-dJG" firstAttribute="top" secondItem="lJf-Uh-ILV" secondAttribute="bottom" constant="17" id="smS-UW-eh1"/>
+                            <constraint firstItem="hpJ-y0-mBa" firstAttribute="centerY" secondItem="hEA-SP-XCB" secondAttribute="centerY" id="w9x-fr-RZy"/>
+                            <constraint firstItem="LAq-QM-9fZ" firstAttribute="top" secondItem="lJf-Uh-ILV" secondAttribute="bottom" constant="17" id="zht-Q2-AjK"/>
                         </constraints>
                         <viewLayoutGuide key="safeArea" id="GK0-od-YHe"/>
                     </view>
                     <navigationItem key="navigationItem" id="Moc-PD-hEV"/>
                     <connections>
                         <outlet property="animateOutlet" destination="QDZ-sc-dJG" id="bkv-LB-9st"/>
+                        <outlet property="copyQrOutlet" destination="hpJ-y0-mBa" id="5nR-G6-qeG"/>
+                        <outlet property="copyTextOutlet" destination="LAq-QM-9fZ" id="jnG-42-ncQ"/>
                         <outlet property="headerLabel" destination="8Fb-WX-yzn" id="IAR-Dt-XTV"/>
                         <outlet property="imageView" destination="lJf-Uh-ILV" id="Rev-R0-d3L"/>
+                        <outlet property="shareQrOutlet" destination="hEA-SP-XCB" id="oU0-gR-RwN"/>
+                        <outlet property="shareTextOutlet" destination="gnh-pp-jsJ" id="o6M-7T-OtL"/>
                         <outlet property="textView" destination="0t4-W0-Izf" id="PNM-Pa-ebT"/>
                     </connections>
                 </viewController>
