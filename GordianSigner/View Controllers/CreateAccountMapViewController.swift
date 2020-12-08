@@ -47,6 +47,11 @@ class CreateAccountMapViewController: UIViewController, UIPickerViewDelegate, UI
     }
     
     @IBAction func createAction(_ sender: Any) {
+        guard let label = textField.text, label != "" else {
+            showAlert(self, "Add a label first", "Add a label to the Alias field above so you may easily identify this Account, then try again.")
+            return
+        }
+        
         let m = mPickerView.selectedRow(inComponent: 0) + 1
         let n = nPickerView.selectedRow(inComponent: 0) + 1
         
@@ -66,11 +71,6 @@ class CreateAccountMapViewController: UIViewController, UIPickerViewDelegate, UI
         
         let accountMap = ["descriptor":desc, "blockheight":0, "label":"Policy Map"] as [String : Any]
         let json = accountMap.json() ?? ""
-        
-        var label = textField.text ?? "Policy map"
-        if label == "" {
-            label = "Policy map"
-        }
         
         var map = [String:Any]()
         map["blockheight"] = Int64(0)
