@@ -56,7 +56,7 @@ class AddSignerViewController: UIViewController {
                 alias = aliasField.text!
             }
             
-            guard let entropy = Keys.entropy(justWords), let encryptedData = Encryption.encrypt(entropy), let masterKey = Keys.masterKey(justWords, passphrase), let fingerprint = Keys.fingerprint(masterKey), let lifeHash = LifeHash.hash(entropy) else {
+            guard let entropy = Keys.entropy(justWords), let encryptedData = Encryption.encrypt(entropy), let masterKey = Keys.masterKey(justWords, passphrase), let fingerprint = Keys.fingerprint(masterKey), let lifeHash = LifeHash.hash(entropy), let cosigner = Keys.bip48SegwitAccount(masterKey, "main") else {
                 showAlert(self, "Error ⚠️", "Something went wrong, private keys not saved!")
                 return
             }
@@ -68,12 +68,15 @@ class AddSignerViewController: UIViewController {
             dict["lifeHash"] = lifeHash
             dict["fingerprint"] = fingerprint
             dict["entropy"] = encryptedData
+            dict["cosigner"] = cosigner
             
             if passphrase != "" {
                 guard let encryptedPassphrase = Encryption.encrypt(passphrase.utf8) else { return }
                 
                 dict["passphrase"] = encryptedPassphrase
             }
+            
+            
             
             CoreDataService.saveEntity(dict: dict, entityName: .signer) { [weak self] (success, errorDescription) in
                 guard let self = self else { return }

@@ -17,6 +17,7 @@ public struct SignerStruct: CustomStringConvertible {
     let dateAdded:Date
     let lifeHash:Data
     let fingerprint:String
+    let cosigner:String?
     
     init(dictionary: [String: Any]) {
         id = dictionary["id"] as! UUID
@@ -26,6 +27,7 @@ public struct SignerStruct: CustomStringConvertible {
         dateAdded = dictionary["dateAdded"] as! Date
         lifeHash = dictionary["lifeHash"] as! Data
         fingerprint = dictionary["fingerprint"] as! String
+        cosigner = dictionary["cosigner"] as? String
     }
     
     public var description: String {

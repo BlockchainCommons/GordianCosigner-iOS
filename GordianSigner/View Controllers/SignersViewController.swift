@@ -115,8 +115,7 @@ class SignersViewController: UIViewController {
             
             let title = "Edit Signer label"
             let message = ""
-            let style = UIAlertController.Style.alert
-            let alert = UIAlertController(title: title, message: message, preferredStyle: style)
+            let alert = UIAlertController(title: title, message: message, preferredStyle: .alert)
             
             let save = UIAlertAction(title: "Save", style: .default) { [weak self] (alertAction) in
                 guard let self = self else { return }
@@ -125,7 +124,7 @@ class SignersViewController: UIViewController {
                 
                 guard let updatedLabel = textField1, updatedLabel != "" else { return }
                 
-                self.updateLabel(signer.id, updatedLabel)
+                self.updateLabel(signer.id, updatedLabel, signer.cosigner ?? "?")
             }
             
             alert.addTextField { (textField) in
@@ -136,18 +135,64 @@ class SignersViewController: UIViewController {
             
             alert.addAction(save)
             
-            let cancel = UIAlertAction(title: "Cancel", style: .default) { (alertAction) in }
-            alert.addAction(cancel)
+            alert.addAction(UIAlertAction(title: "Cancel", style: .cancel, handler: { action in
+                self.loadData()
+            }))
             
             self.present(alert, animated:true, completion: nil)
         }
     }
     
-    private func updateLabel(_ id: UUID, _ label: String) {
+    private func updateLabel(_ id: UUID, _ label: String, _ cosigner: String) {
         CoreDataService.updateEntity(id: id, keyToUpdate: "label", newValue: label, entityName: .signer) { (success, errorDescription) in
             guard success else { showAlert(self, "Label not saved!", "There was an error updating your label, please let us know about it: \(errorDescription ?? "unknown")"); return }
             
-            self.loadData()
+            self.updateCosignerLabelToo(cosigner, label)
+            //self.loadData()
+        }
+    }
+    
+    private func updateCosignerLabelToo(_ keyset: String, _ label: String) {
+        DispatchQueue.main.async { [weak self] in
+            guard let self = self else { return }
+            
+            let alert = UIAlertController(title: "Update cosigner?", message: "The seed label has been updated, would you also like to update the corresponding cosigner label?", preferredStyle: .alert)
+            
+            alert.addAction(UIAlertAction(title: "Update", style: .default, handler: { action in
+                CoreDataService.retrieveEntity(entityName: .keyset) { (cosigners, errorDescription) in
+                    guard let cosigners = cosigners, cosigners.count > 0 else { self.loadData(); return }
+                    
+                    var id:UUID?
+                    for cosigner in cosigners {
+                        let csStruct = KeysetStruct(dictionary: cosigner)
+                        if csStruct.bip48SegwitAccount == keyset {
+                            id = csStruct.id
+                        }
+                    }
+                    if id != nil {
+                        CoreDataService.updateEntity(id: id!, keyToUpdate: "label", newValue: label, entityName: .keyset) { (success, errorDescription) in
+                            guard success else {
+                                self.loadData()
+                                showAlert(self, "", "Cosigner label not updated! There was a problem saving the new label.")
+                                return
+                            }
+                            
+                            self.loadData()
+                            showAlert(self, "", "Cosigner label updated ✓")
+                        }
+                    } else {
+                        self.loadData()
+                        showAlert(self, "", "No corresponding cosigner exists")
+                    }
+                    
+                }
+            }))
+            
+            alert.addAction(UIAlertAction(title: "Cancel", style: .cancel, handler: { action in
+                self.loadData()
+            }))
+            alert.popoverPresentationController?.sourceView = self.view
+            self.present(alert, animated: true, completion: nil)
         }
     }
 
