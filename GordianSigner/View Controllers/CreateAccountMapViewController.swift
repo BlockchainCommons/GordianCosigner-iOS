@@ -47,8 +47,8 @@ class CreateAccountMapViewController: UIViewController, UIPickerViewDelegate, UI
     }
     
     @IBAction func createAction(_ sender: Any) {
-        let m = totalParticipants
-        let n = totalRequiredSigs
+        let m = mPickerView.selectedRow(inComponent: 0) + 1
+        let n = nPickerView.selectedRow(inComponent: 0) + 1
         
         var desc = "wsh(sortedmulti(\(m),"
         

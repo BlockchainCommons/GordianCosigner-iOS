@@ -1349,7 +1349,7 @@
                                 <nil key="highlightedColor"/>
                             </label>
                             <stackView opaque="NO" contentMode="scaleToFill" axis="vertical" distribution="equalSpacing" spacing="4" translatesAutoresizingMaskIntoConstraints="NO" id="e5i-uP-Exq">
-                                <rect key="frame" x="16" y="163" width="382" height="439"/>
+                                <rect key="frame" x="16" y="163" width="382" height="391"/>
                                 <subviews>
                                     <textField opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="left" contentVerticalAlignment="center" borderStyle="roundedRect" placeholder="Alias" textAlignment="natural" minimumFontSize="17" translatesAutoresizingMaskIntoConstraints="NO" id="As0-hz-B43">
                                         <rect key="frame" x="0.0" y="0.0" width="382" height="34"/>
@@ -1381,28 +1381,31 @@
                                             <constraint firstAttribute="height" constant="150" id="SxQ-fk-mh1"/>
                                         </constraints>
                                     </pickerView>
-                                    <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="XEe-8F-g3c">
-                                        <rect key="frame" x="0.0" y="395" width="382" height="44"/>
-                                        <color key="backgroundColor" cocoaTouchSystemColor="viewFlipsideBackgroundColor"/>
-                                        <constraints>
-                                            <constraint firstAttribute="height" constant="44" id="aSm-5s-ghA"/>
-                                        </constraints>
-                                        <state key="normal" title="create now">
-                                            <color key="titleColor" systemColor="systemTealColor" red="0.35294117650000001" green="0.7843137255" blue="0.98039215690000003" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
-                                        </state>
-                                        <connections>
-                                            <action selector="createAction:" destination="Iuy-9M-v3m" eventType="touchUpInside" id="00Z-qi-UPv"/>
-                                        </connections>
-                                    </button>
                                 </subviews>
                             </stackView>
+                            <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" showsTouchWhenHighlighted="YES" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="XEe-8F-g3c">
+                                <rect key="frame" x="16" y="800" width="382" height="44"/>
+                                <color key="backgroundColor" cocoaTouchSystemColor="viewFlipsideBackgroundColor"/>
+                                <constraints>
+                                    <constraint firstAttribute="height" constant="44" id="aSm-5s-ghA"/>
+                                </constraints>
+                                <state key="normal" title="create now">
+                                    <color key="titleColor" systemColor="systemTealColor" red="0.35294117650000001" green="0.7843137255" blue="0.98039215690000003" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+                                </state>
+                                <connections>
+                                    <action selector="createAction:" destination="Iuy-9M-v3m" eventType="touchUpInside" id="00Z-qi-UPv"/>
+                                </connections>
+                            </button>
                         </subviews>
                         <color key="backgroundColor" white="0.0" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                         <constraints>
                             <constraint firstItem="m1M-Gn-itD" firstAttribute="trailing" secondItem="e5i-uP-Exq" secondAttribute="trailing" constant="16" id="7x2-fd-Lft"/>
+                            <constraint firstItem="XEe-8F-g3c" firstAttribute="leading" secondItem="m1M-Gn-itD" secondAttribute="leading" constant="16" id="Nbw-0s-bT9"/>
                             <constraint firstItem="e5i-uP-Exq" firstAttribute="leading" secondItem="m1M-Gn-itD" secondAttribute="leading" constant="16" id="Q2W-gT-ifU"/>
                             <constraint firstItem="fHH-FD-tqM" firstAttribute="leading" secondItem="m1M-Gn-itD" secondAttribute="leading" constant="20" id="R39-GQ-Re3"/>
+                            <constraint firstItem="m1M-Gn-itD" firstAttribute="bottom" secondItem="XEe-8F-g3c" secondAttribute="bottom" constant="18" id="abO-ly-MRs"/>
                             <constraint firstItem="fHH-FD-tqM" firstAttribute="top" secondItem="m1M-Gn-itD" secondAttribute="top" constant="20" id="ezg-cM-tuV"/>
+                            <constraint firstItem="m1M-Gn-itD" firstAttribute="trailing" secondItem="XEe-8F-g3c" secondAttribute="trailing" constant="16" id="wc8-EZ-9EE"/>
                             <constraint firstItem="e5i-uP-Exq" firstAttribute="top" secondItem="fHH-FD-tqM" secondAttribute="bottom" constant="20" id="xYF-un-LV1"/>
                         </constraints>
                         <viewLayoutGuide key="safeArea" id="m1M-Gn-itD"/>
@@ -1580,8 +1583,8 @@
     <inferredMetricsTieBreakers>
         <segue reference="c3G-hh-8KG"/>
         <segue reference="85c-zM-18T"/>
-        <segue reference="WEQ-0q-dcz"/>
-        <segue reference="hPq-I8-kVg"/>
+        <segue reference="2q9-qh-fxy"/>
+        <segue reference="hha-MU-QkB"/>
     </inferredMetricsTieBreakers>
     <resources>
         <image name="Fingerprint" width="128" height="128"/>
