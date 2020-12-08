@@ -1,4 +1,5 @@
 # Blockchain Commons GordianSigner-Catalyst
+### _by Peter Denton and Christopher Allen_
 
 ![](images/logos/gordian-signer-screen.jpg)
 
