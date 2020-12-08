@@ -115,7 +115,6 @@ class KeysetsViewController: UIViewController, UITableViewDelegate, UITableViewD
     private func refresh(_ section: Int) {
         spinner.add(vc: self, description: "")
         keysets.removeAll()
-        lifehashes.removeAll()
         
         CoreDataService.retrieveEntity(entityName: .keyset) { [weak self] (keysets, errorDescription) in
             guard let self = self else { return }

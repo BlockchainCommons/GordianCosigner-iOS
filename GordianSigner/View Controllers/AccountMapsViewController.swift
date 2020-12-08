@@ -70,6 +70,10 @@ class AccountMapsViewController: UIViewController, UITableViewDelegate, UITableV
                 let amStruct = accountMap["accountMap"] as! AccountMapStruct
                 self.accountMaps[i]["canSign"] = false
                 
+                if !amStruct.descriptor.contains("keyset") {
+                    self.accountMaps[i]["lifeHash"] = LifeHash.image(amStruct.descriptor)
+                }
+                
                 var participants = ""
                 for (k, keyset) in keysets.enumerated() {
                     let keysetStruct = KeysetStruct(dictionary: keyset)
@@ -89,7 +93,7 @@ class AccountMapsViewController: UIViewController, UITableViewDelegate, UITableV
                                         if signerStruct.entropy != nil {
                                             if keysetStruct.fingerprint == signerStruct.fingerprint {
                                                 self.accountMaps[i]["canSign"] = true
-                                                self.accountMaps[i]["lifeHash"] = signerStruct.lifeHash
+                                                self.accountMaps[i]["signerLifeHash"] = signerStruct.lifeHash
                                             }
                                         }
                                     }
@@ -153,22 +157,23 @@ class AccountMapsViewController: UIViewController, UITableViewDelegate, UITableV
         let isCompleteImage = cell.viewWithTag(5) as! UIImageView
         let completeLabel = cell.viewWithTag(12) as! UILabel
         if accountMap.descriptor.contains("keyset") {
+            isCompleteImage.alpha = 1
             isCompleteImage.image = UIImage(systemName: "circle.lefthalf.fill")
             isCompleteImage.tintColor = .systemYellow
-            completeLabel.text = "Account incomplete, needs more cosigners"
+            completeLabel.text = "Account incomplete!"
         } else {
-            isCompleteImage.image = UIImage(systemName: "circle.fill")
+            isCompleteImage.alpha = 0
             isCompleteImage.tintColor = .systemGreen
-            completeLabel.text = "Account complete"
+            completeLabel.text = ""
         }
         
         let signerLifeHash = cell.viewWithTag(6) as! UIImageView
         signerLifeHash.clipsToBounds = true
         signerLifeHash.layer.cornerRadius = 8
-        if let lifehash = accountMaps[indexPath.section]["lifeHash"] as? Data {
+        if let lifehash = accountMaps[indexPath.section]["signerLifeHash"] as? Data {
             signerLifeHash.image = UIImage(data: lifehash)
         } else {
-            signerLifeHash.image = UIImage(systemName: "person.crop.circle.fill.badge.xmark")
+            signerLifeHash.image = UIImage(systemName: "questionmark.circle")
             signerLifeHash.tintColor = .darkGray
         }
         
@@ -184,6 +189,16 @@ class AccountMapsViewController: UIViewController, UITableViewDelegate, UITableV
         
         let date = cell.viewWithTag(11) as! UILabel
         date.text = accountMap.dateAdded.formatted()
+        
+        let lifehash = cell.viewWithTag(13) as! UIImageView
+        lifehash.clipsToBounds = true
+        lifehash.layer.cornerRadius = 8
+        if let image = accountMaps[indexPath.section]["lifeHash"] as? UIImage {
+            lifehash.image = image
+        } else {
+            lifehash.image = UIImage(systemName: "rectangle.badge.xmark")
+            lifehash.tintColor = .darkGray
+        }
         
         return cell
     }
