@@ -145,7 +145,12 @@ class KeysetsViewController: UIViewController, UITableViewDelegate, UITableViewD
             label.text = keyset.label
             
             let fingerprintLabel = cell.viewWithTag(2) as! UILabel
-            fingerprintLabel.text = keyset.fingerprint
+            if let key = keyset.bip48SegwitAccount {
+                let arr = key.split(separator: "]")
+                fingerprintLabel.text = "\(String(describing: arr[0]))]"
+            } else {
+                fingerprintLabel.text = keyset.fingerprint
+            }
             
             let (_, _, lifeHash) = canSign(keyset)
             
