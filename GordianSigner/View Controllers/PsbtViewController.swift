@@ -271,7 +271,7 @@ class PsbtViewController: UIViewController, UITableViewDelegate, UITableViewData
             }
             
             alert.addTextField { (textField) in
-                textField.placeholder = "new label"
+                textField.placeholder = psbt.label
                 textField.isSecureTextEntry = false
                 textField.keyboardAppearance = .dark
             }

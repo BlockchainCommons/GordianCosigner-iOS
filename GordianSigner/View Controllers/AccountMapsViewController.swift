@@ -216,7 +216,7 @@ class AccountMapsViewController: UIViewController, UITableViewDelegate, UITableV
             }
             
             alert.addTextField { (textField) in
-                textField.placeholder = "new label"
+                textField.placeholder = am.label
                 textField.isSecureTextEntry = false
                 textField.keyboardAppearance = .dark
             }

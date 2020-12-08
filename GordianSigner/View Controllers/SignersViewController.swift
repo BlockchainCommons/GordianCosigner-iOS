@@ -129,7 +129,7 @@ class SignersViewController: UIViewController {
             }
             
             alert.addTextField { (textField) in
-                textField.placeholder = "new label"
+                textField.text = signer.label
                 textField.isSecureTextEntry = false
                 textField.keyboardAppearance = .dark
             }

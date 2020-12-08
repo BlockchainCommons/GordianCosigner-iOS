@@ -137,22 +137,6 @@ class KeysetsViewController: UIViewController, UITableViewDelegate, UITableViewD
         
         let (_, _, lifeHash) = canSign(keyset)
         
-//        let isHotImage = cell.viewWithTag(3) as! UIImageView
-//        if isHot {
-//            isHotImage.alpha = 1
-//        } else {
-//            isHotImage.alpha = 0
-//        }
-        
-//        let isMineImage = cell.viewWithTag(4) as! UIImageView
-//        if isMine {
-//            isMineImage.image = UIImage(systemName: "person.crop.circle.fill.badge.checkmark")
-//            isMineImage.tintColor = .systemGreen
-//        } else {
-//            isMineImage.image = UIImage(systemName: "person.crop.circle.fill.badge.xmark")
-//            isMineImage.tintColor = .systemOrange
-//        }
-        
         let lifeHashImage = cell.viewWithTag(6) as! UIImageView
         configureView(lifeHashImage)
         if lifeHash != nil {
@@ -292,7 +276,7 @@ class KeysetsViewController: UIViewController, UITableViewDelegate, UITableViewD
             }
             
             alert.addTextField { (textField) in
-                textField.placeholder = "new label"
+                textField.placeholder = keyset.label
                 textField.isSecureTextEntry = false
                 textField.keyboardAppearance = .dark
             }
