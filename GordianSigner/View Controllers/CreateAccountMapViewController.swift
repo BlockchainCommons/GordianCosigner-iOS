@@ -69,7 +69,7 @@ class CreateAccountMapViewController: UIViewController, UIPickerViewDelegate, UI
         
         desc += keystores + "))"
         
-        let accountMap = ["descriptor":desc, "blockheight":0, "label":"Policy Map"] as [String : Any]
+        let accountMap = ["descriptor":desc, "blockheight":0, "label":label] as [String : Any]
         let json = accountMap.json() ?? ""
         
         var map = [String:Any]()
