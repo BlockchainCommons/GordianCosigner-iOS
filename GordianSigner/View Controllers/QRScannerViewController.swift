@@ -45,6 +45,14 @@ class QRScannerViewController: UIViewController {
         scanNow()
     }
     
+    @IBAction func closeAction(_ sender: Any) {
+        DispatchQueue.main.async { [weak self] in
+            guard let self = self else { return }
+            
+            self.dismiss(animated: true, completion: nil)
+        }
+    }
+    
     private func scanNow() {
         DispatchQueue.main.async { [weak self] in
             guard let self = self else { return }

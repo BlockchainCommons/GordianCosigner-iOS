@@ -204,7 +204,47 @@ class AccountMapsViewController: UIViewController, UITableViewDelegate, UITableV
     }
     
     func tableView(_ tableView: UITableView, heightForRowAt indexPath: IndexPath) -> CGFloat {
-        return 267
+        var height = 247
+        let accountMap = accountMaps[indexPath.section]["accountMap"] as! AccountMapStruct
+        let descParser = DescriptorParser()
+        let descStruct = descParser.descriptor(accountMap.descriptor)
+        let hack = descStruct.mOfNType.replacingOccurrences(of: " of ", with: "*")
+        let arr = hack.split(separator: "*")
+        if arr.count > 0 {
+            if let numberOfCosigners = Int("\(arr[1])") {
+                switch numberOfCosigners {
+                case _ where numberOfCosigners == 3:
+                    height = 257
+                case _ where numberOfCosigners == 4:
+                    height = 267
+                case _ where numberOfCosigners == 5:
+                    height = 277
+                case _ where numberOfCosigners == 6:
+                    height = 287
+                case _ where numberOfCosigners == 7:
+                    height = 297
+                case _ where numberOfCosigners == 8:
+                    height = 307
+                case _ where numberOfCosigners == 9:
+                    height = 317
+                case _ where numberOfCosigners == 10:
+                    height = 327
+                case _ where numberOfCosigners == 11:
+                    height = 337
+                case _ where numberOfCosigners == 12:
+                    height = 347
+                case _ where numberOfCosigners == 13:
+                    height = 357
+                case _ where numberOfCosigners == 14:
+                    height = 367
+                case _ where numberOfCosigners == 15:
+                    height = 377
+                default:
+                    break
+                }
+            }
+        }
+        return CGFloat(height)
     }
     
     @objc func editLabel(_ sender: UIButton) {
@@ -231,7 +271,7 @@ class AccountMapsViewController: UIViewController, UITableViewDelegate, UITableV
             }
             
             alert.addTextField { (textField) in
-                textField.placeholder = am.label
+                textField.text = am.label
                 textField.isSecureTextEntry = false
                 textField.keyboardAppearance = .dark
             }

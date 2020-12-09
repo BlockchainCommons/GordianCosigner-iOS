@@ -299,7 +299,7 @@ class KeysetsViewController: UIViewController, UITableViewDelegate, UITableViewD
             }
             
             alert.addTextField { (textField) in
-                textField.placeholder = keyset.label
+                textField.text = keyset.label
                 textField.isSecureTextEntry = false
                 textField.keyboardAppearance = .dark
             }

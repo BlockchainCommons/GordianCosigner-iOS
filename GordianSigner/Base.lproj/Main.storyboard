@@ -356,14 +356,30 @@
                                 </constraints>
                                 <blurEffect style="regular"/>
                             </visualEffectView>
+                            <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" showsTouchWhenHighlighted="YES" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="2gb-qB-VbP">
+                                <rect key="frame" x="187.5" y="20" width="39" height="40"/>
+                                <constraints>
+                                    <constraint firstAttribute="width" constant="39" id="CWh-KB-URW"/>
+                                    <constraint firstAttribute="height" constant="40" id="msK-Za-2hZ"/>
+                                </constraints>
+                                <color key="tintColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+                                <state key="normal" image="chevron.down" catalog="system">
+                                    <preferredSymbolConfiguration key="preferredSymbolConfiguration" scale="large" weight="bold"/>
+                                </state>
+                                <connections>
+                                    <action selector="closeAction:" destination="4dz-cW-ULS" eventType="touchUpInside" id="NKG-HL-I4a"/>
+                                </connections>
+                            </button>
                         </subviews>
                         <color key="backgroundColor" systemColor="systemBackgroundColor" cocoaTouchSystemColor="whiteColor"/>
                         <constraints>
                             <constraint firstItem="11N-cd-oai" firstAttribute="trailing" secondItem="in4-ZL-XAA" secondAttribute="trailing" id="5pU-pY-v5t"/>
                             <constraint firstItem="11N-cd-oai" firstAttribute="top" secondItem="in4-ZL-XAA" secondAttribute="top" id="94M-7z-8kk"/>
                             <constraint firstItem="in4-ZL-XAA" firstAttribute="trailing" secondItem="3vK-q4-XRq" secondAttribute="trailing" constant="20" id="CR7-oK-zc8"/>
+                            <constraint firstItem="2gb-qB-VbP" firstAttribute="top" secondItem="in4-ZL-XAA" secondAttribute="top" constant="20" id="GA9-E6-zCS"/>
                             <constraint firstItem="in4-ZL-XAA" firstAttribute="bottom" secondItem="3vK-q4-XRq" secondAttribute="bottom" constant="49" id="QW4-bZ-YAK"/>
                             <constraint firstItem="3vK-q4-XRq" firstAttribute="leading" secondItem="in4-ZL-XAA" secondAttribute="leading" constant="20" id="RQr-ex-pBh"/>
+                            <constraint firstItem="2gb-qB-VbP" firstAttribute="centerX" secondItem="vUa-HR-41x" secondAttribute="centerX" id="aCN-y8-Ab2"/>
                             <constraint firstItem="11N-cd-oai" firstAttribute="leading" secondItem="in4-ZL-XAA" secondAttribute="leading" id="dA7-Rr-xJS"/>
                             <constraint firstAttribute="bottom" secondItem="11N-cd-oai" secondAttribute="bottom" id="zHV-aJ-rbg"/>
                         </constraints>
@@ -378,7 +394,7 @@
                 </viewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="nGe-Oo-lxv" userLabel="First Responder" customClass="UIResponder" sceneMemberID="firstResponder"/>
             </objects>
-            <point key="canvasLocation" x="-417" y="145"/>
+            <point key="canvasLocation" x="-417.39130434782612" y="144.64285714285714"/>
         </scene>
         <!--Displayer View Controller-->
         <scene sceneID="5aD-nS-0Jx">
@@ -504,7 +520,7 @@
         <!--Signer View Controller-->
         <scene sceneID="Osb-Av-Gef">
             <objects>
-                <viewController restorationIdentifier="signerVc" storyboardIdentifier="signerVc" extendedLayoutIncludesOpaqueBars="YES" hidesBottomBarWhenPushed="YES" id="EM0-dh-3fz" customClass="SignerViewController" customModule="GordianSigner" sceneMemberID="viewController">
+                <viewController restorationIdentifier="signerVc" storyboardIdentifier="signerVc" extendedLayoutIncludesOpaqueBars="YES" hidesBottomBarWhenPushed="YES" id="EM0-dh-3fz" customClass="SignerViewController" customModule="Gordian_Cosigner" customModuleProvider="target" sceneMemberID="viewController">
                     <view key="view" contentMode="scaleToFill" id="niS-Hx-hLU">
                         <rect key="frame" x="0.0" y="0.0" width="414" height="896"/>
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
@@ -531,7 +547,7 @@
                                             <color key="titleColor" systemColor="systemTealColor" red="0.35294117650000001" green="0.7843137255" blue="0.98039215690000003" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
                                         </state>
                                         <connections>
-                                            <action selector="importViaFilesAction:" destination="EM0-dh-3fz" eventType="touchUpInside" id="GYd-Sc-enp"/>
+                                            <action selector="importFileAction:" destination="EM0-dh-3fz" eventType="touchUpInside" id="4ID-P9-vGT"/>
                                         </connections>
                                     </button>
                                     <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" showsTouchWhenHighlighted="YES" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="h7v-HZ-MWy">
@@ -541,7 +557,7 @@
                                             <color key="titleColor" systemColor="systemTealColor" red="0.35294117650000001" green="0.7843137255" blue="0.98039215690000003" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
                                         </state>
                                         <connections>
-                                            <action selector="pasteAction:" destination="EM0-dh-3fz" eventType="touchUpInside" id="v59-6O-X0z"/>
+                                            <action selector="pasteAction:" destination="EM0-dh-3fz" eventType="touchUpInside" id="BoF-fh-zSy"/>
                                         </connections>
                                     </button>
                                     <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" showsTouchWhenHighlighted="YES" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="uHl-cG-gez">
@@ -551,7 +567,7 @@
                                             <color key="titleColor" systemColor="systemTealColor" red="0.35294117650000001" green="0.7843137255" blue="0.98039215690000003" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
                                         </state>
                                         <connections>
-                                            <action selector="qrAction:" destination="EM0-dh-3fz" eventType="touchUpInside" id="KVs-Cx-As4"/>
+                                            <action selector="qrAction:" destination="EM0-dh-3fz" eventType="touchUpInside" id="W3t-4k-e9S"/>
                                         </connections>
                                     </button>
                                 </subviews>
@@ -1660,12 +1676,13 @@
         <segue reference="c3G-hh-8KG"/>
         <segue reference="85c-zM-18T"/>
         <segue reference="WEQ-0q-dcz"/>
-        <segue reference="hPq-I8-kVg"/>
+        <segue reference="hWh-uj-ExK"/>
     </inferredMetricsTieBreakers>
     <resources>
         <image name="Fingerprint" width="128" height="128"/>
         <image name="arrow.clockwise" catalog="system" width="115" height="128"/>
         <image name="bitcoinsign.circle" catalog="system" width="128" height="121"/>
+        <image name="chevron.down" catalog="system" width="128" height="72"/>
         <image name="chevron.right" catalog="system" width="96" height="128"/>
         <image name="doc.on.clipboard" catalog="system" width="117" height="128"/>
         <image name="doc.on.doc" catalog="system" width="117" height="128"/>

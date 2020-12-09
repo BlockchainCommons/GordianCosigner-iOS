@@ -39,6 +39,7 @@ class QRDisplayerViewController: UIViewController {
         spinner.add(vc: self, description: "")
         headerLabel.text = header
         textView.text = descriptionText
+        imageView.isUserInteractionEnabled = true
         
         if isPsbt {
             animateOutlet.alpha = 1
@@ -139,14 +140,6 @@ class QRDisplayerViewController: UIViewController {
             partIndex += 1
         } else {
             partIndex = 0
-        }
-    }
-    
-    @IBAction func closeAction(_ sender: Any) {
-        DispatchQueue.main.async { [weak self] in
-            guard let self = self else { return }
-            
-            self.dismiss(animated: true, completion: nil)
         }
     }
     

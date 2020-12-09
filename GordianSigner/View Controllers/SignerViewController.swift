@@ -29,7 +29,7 @@ class SignerViewController: UIViewController {
         
     }
     
-    @IBAction func importViaFilesAction(_ sender: Any) {
+    @IBAction func importFileAction(_ sender: Any) {
         DispatchQueue.main.async { [weak self] in
             guard let self = self else { return }
             
