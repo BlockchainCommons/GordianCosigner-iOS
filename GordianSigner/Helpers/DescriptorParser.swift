@@ -252,71 +252,72 @@ class DescriptorParser {
             if descriptor.contains("[") && descriptor.contains("]") {
                 
                 let arr1 = descriptor.split(separator: "[")
-                dict["keysWithPath"] = ["[" + "\(arr1[1])"]
-                let arr2 = arr1[1].split(separator: "]")
-                let derivation = arr2[0]
-                dict["prefix"] = "[\(derivation)]"
-                dict["fingerprint"] = "\((derivation.split(separator: "/"))[0])"
-                let extendedKeyWithPath = arr2[1]
-                let arr4 = extendedKeyWithPath.split(separator: "/")
-                let extendedKey = arr4[0]
-                if extendedKey.contains("tpub") || extendedKey.contains("xpub") {
-                    dict["accountXpub"] = "\(extendedKey.replacingOccurrences(of: ")", with: ""))"
-                } else if extendedKey.contains("tprv") || extendedKey.contains("xprv") {
-                    dict["accountXprv"] = "\(extendedKey.replacingOccurrences(of: ")", with: ""))"
-                }
-                
-                let arr3 = derivation.split(separator: "/")
-                var path = "m"
-                
-                for (i, item) in arr3.enumerated() {
-                    switch i {
-                        
-                    case 1:
-                        path += "/" + item
-                        
-                    default:
-                        if i != 0 {
+                if arr1.count > 0 {
+                    dict["keysWithPath"] = ["[" + "\(arr1[1])"]
+                    let arr2 = arr1[1].split(separator: "]")
+                    let derivation = arr2[0]
+                    dict["prefix"] = "[\(derivation)]"
+                    dict["fingerprint"] = "\((derivation.split(separator: "/"))[0])"
+                    let extendedKeyWithPath = arr2[1]
+                    let arr4 = extendedKeyWithPath.split(separator: "/")
+                    let extendedKey = arr4[0]
+                    if extendedKey.contains("tpub") || extendedKey.contains("xpub") {
+                        dict["accountXpub"] = "\(extendedKey.replacingOccurrences(of: ")", with: ""))"
+                    } else if extendedKey.contains("tprv") || extendedKey.contains("xprv") {
+                        dict["accountXprv"] = "\(extendedKey.replacingOccurrences(of: ")", with: ""))"
+                    }
+                    
+                    let arr3 = derivation.split(separator: "/")
+                    var path = "m"
+                    
+                    for (i, item) in arr3.enumerated() {
+                        switch i {
+                            
+                        case 1:
                             path += "/" + item
                             
-                            if i + 1 == arr3.count {
+                        default:
+                            if i != 0 {
+                                path += "/" + item
                                 
-                                dict["derivation"] = path
-                                
-                                switch path {
-                                                        
-                                case "m/44'/0'/0'", "m/44'/1'/0'":
-                                    dict["isBIP44"] = true
-                                    dict["isP2PKH"] = true
-                                    dict["isAccount"] = true
+                                if i + 1 == arr3.count {
                                     
-                                case "m/84'/0'/0'", "m/84'/1'/0'":
-                                    dict["isBIP84"] = true
-                                    dict["isP2WPKH"] = true
-                                    dict["isAccount"] = true
+                                    dict["derivation"] = path
                                     
-                                case "m/49'/0'/0'", "m/49'/1'/0'":
-                                    dict["isBIP49"] = true
-                                    dict["isP2SHP2WPKH"] = true
-                                    dict["isAccount"] = true
-                                    
-                                default:
-                                    
-                                    break
+                                    switch path {
+                                                            
+                                    case "m/44'/0'/0'", "m/44'/1'/0'":
+                                        dict["isBIP44"] = true
+                                        dict["isP2PKH"] = true
+                                        dict["isAccount"] = true
+                                        
+                                    case "m/84'/0'/0'", "m/84'/1'/0'":
+                                        dict["isBIP84"] = true
+                                        dict["isP2WPKH"] = true
+                                        dict["isAccount"] = true
+                                        
+                                    case "m/49'/0'/0'", "m/49'/1'/0'":
+                                        dict["isBIP49"] = true
+                                        dict["isP2SHP2WPKH"] = true
+                                        dict["isAccount"] = true
+                                        
+                                    default:
+                                        
+                                        break
+                                        
+                                    }
                                     
                                 }
                                 
+                            } else {
+                                break
+                                
                             }
-                            
-                        } else {
-                            break
                             
                         }
                         
                     }
-                    
                 }
-                
             }
             
             if descriptor.contains("combo") {

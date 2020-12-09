@@ -156,15 +156,18 @@ class AccountMapsViewController: UIViewController, UITableViewDelegate, UITableV
         
         let isCompleteImage = cell.viewWithTag(5) as! UIImageView
         let completeLabel = cell.viewWithTag(12) as! UILabel
+        let addButton = cell.viewWithTag(14) as! UIButton
         if accountMap.descriptor.contains("keyset") {
             isCompleteImage.alpha = 1
             isCompleteImage.image = UIImage(systemName: "circle.lefthalf.fill")
             isCompleteImage.tintColor = .systemYellow
             completeLabel.text = "Account incomplete!"
+            addButton.alpha = 1
         } else {
             isCompleteImage.alpha = 0
             isCompleteImage.tintColor = .systemGreen
             completeLabel.text = ""
+            addButton.alpha = 0
         }
         
         let signerLifeHash = cell.viewWithTag(6) as! UIImageView

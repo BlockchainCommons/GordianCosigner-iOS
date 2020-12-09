@@ -129,7 +129,7 @@ class QRDisplayerViewController: UIViewController {
         } else {
             timer?.invalidate()
             timer = nil
-            timer = Timer.scheduledTimer(timeInterval: 1.0, target: self, selector: #selector(animate), userInfo: nil, repeats: true)
+            timer = Timer.scheduledTimer(timeInterval: 0.3, target: self, selector: #selector(animate), userInfo: nil, repeats: true)
         }
     }
     

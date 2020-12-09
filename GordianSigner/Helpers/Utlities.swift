@@ -90,6 +90,15 @@ extension DispatchQueue {
     }
 }
 
+public extension UIView {
+    #if targetEnvironment(macCatalyst)
+    @objc(_focusRingType)
+    var focusRingType: UInt {
+        return 1 //NSFocusRingTypeNone
+    }
+    #endif
+}
+
 extension Notification.Name {
     public static let psbtSaved = Notification.Name(rawValue: "psbtSaved")
     public static let cosignerAdded = Notification.Name(rawValue: "cosignerAdded")
