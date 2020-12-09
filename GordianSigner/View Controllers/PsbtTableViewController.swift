@@ -131,79 +131,98 @@ class PsbtTableViewController: UIViewController, UITableViewDelegate, UITableVie
             DispatchQueue.background(background: {
                 for (i, inputDictArray) in self.inputsArray.enumerated() {
                     let input = inputDictArray["input"] as! PSBTInput
-                    var pubkeyArray = inputDictArray["pubKeyArray"] as! [[String:Any]]
-                    
-                    for (p, pubkeyDict) in pubkeyArray.enumerated() {
-                        var updatedDict = pubkeyDict
-                        
-                        let originalPubkey = pubkeyDict["pubkey"] as! String
-                        let fullPath = pubkeyDict["fullPath"] as! BIP32Path
-                        
-                        
-                        func loopKeysets() {
-                            for (k, keyset) in keysets.enumerated() {
-                                let keysetStruct = KeysetStruct(dictionary: keyset)
-                                
-                                if let descriptor = keysetStruct.bip48SegwitAccount {
-                                    let arr = descriptor.split(separator: "]")
-                                    var xpub = ""
+                    if var pubkeyArray = inputDictArray["pubKeyArray"] as? [[String:Any]] {
+                        for (p, pubkeyDict) in pubkeyArray.enumerated() {
+                            var updatedDict = pubkeyDict
+                            
+                            let originalPubkey = pubkeyDict["pubkey"] as! String
+                            let fullPath = pubkeyDict["fullPath"] as! BIP32Path
+                            
+                            
+                            func loopKeysets() {
+                                for (k, keyset) in keysets.enumerated() {
+                                    let keysetStruct = KeysetStruct(dictionary: keyset)
                                     
-                                    if arr.count > 0 {
-                                        xpub = "\(arr[1])"
-                                    }
-                                    
-                                    if let path = pubkeyDict["path"] as? BIP32Path,
-                                        let hdkey = try? HDKey(base58: xpub),
-                                        let childKey = try? hdkey.derive(using: path) {
+                                    if let descriptor = keysetStruct.bip48SegwitAccount {
+                                        let arr = descriptor.split(separator: "]")
+                                        var xpub = ""
                                         
-                                        if originalPubkey == childKey.pubKey.data.hexString {
-                                            updatedDict["keysetLabel"] = keysetStruct.label
-                                            if let desc = keysetStruct.bip48SegwitAccount {
-                                                let dp = DescriptorParser()
-                                                let ds = dp.descriptor("wsh(\(desc))")
-                                                let xfp = ds.fingerprint
-                                                updatedDict["keysetOrigin"] = "[" + fullPath.description.replacingOccurrences(of: "m", with: xfp) + "]"
-                                            }
+                                        if arr.count > 0 {
+                                            xpub = "\(arr[1])"
+                                        }
+                                        
+                                        if let path = pubkeyDict["path"] as? BIP32Path,
+                                            let hdkey = try? HDKey(base58: xpub),
+                                            let childKey = try? hdkey.derive(using: path) {
                                             
-                                            pubkeyArray[p] = updatedDict
-                                            
-                                            if let sigs = input.signatures {
+                                            if originalPubkey == childKey.pubKey.data.hexString {
+                                                updatedDict["keysetLabel"] = keysetStruct.label
+                                                if let desc = keysetStruct.bip48SegwitAccount {
+                                                    let dp = DescriptorParser()
+                                                    let ds = dp.descriptor("wsh(\(desc))")
+                                                    let xfp = ds.fingerprint
+                                                    updatedDict["keysetOrigin"] = "[" + fullPath.description.replacingOccurrences(of: "m", with: xfp) + "]"
+                                                }
                                                 
-                                                for (s, sig) in sigs.enumerated() {
-                                                    let signedKey = sig.key.data.hexString
+                                                pubkeyArray[p] = updatedDict
+                                                
+                                                if let sigs = input.signatures {
                                                     
-                                                    if signedKey == originalPubkey {
-                                                        updatedDict["hasSigned"] = true
-                                                        pubkeyArray[p] = updatedDict
-                                                        self.inputsArray[i]["pubKeyArray"] = pubkeyArray
-                                                    }
-                                                    
-                                                    if self.signedFor.count > 0 {
+                                                    for (s, sig) in sigs.enumerated() {
+                                                        let signedKey = sig.key.data.hexString
                                                         
-                                                        for (x, signed) in self.signedFor.enumerated() {
+                                                        if signedKey == originalPubkey {
+                                                            updatedDict["hasSigned"] = true
+                                                            pubkeyArray[p] = updatedDict
+                                                            self.inputsArray[i]["pubKeyArray"] = pubkeyArray
+                                                        }
+                                                        
+                                                        if self.signedFor.count > 0 {
                                                             
-                                                            if signed == originalPubkey {
-                                                                updatedDict["hasSigned"] = true
-                                                                pubkeyArray[p] = updatedDict
-                                                                self.inputsArray[i]["pubKeyArray"] = pubkeyArray
+                                                            for (x, signed) in self.signedFor.enumerated() {
+                                                                
+                                                                if signed == originalPubkey {
+                                                                    updatedDict["hasSigned"] = true
+                                                                    pubkeyArray[p] = updatedDict
+                                                                    self.inputsArray[i]["pubKeyArray"] = pubkeyArray
+                                                                }
+                                                                
+                                                                if k + 1 == keysets.count && p + 1 == pubkeyArray.count && i + 1 == self.inputsArray.count && s + 1 == sigs.count && x + 1 == self.signedFor.count {
+                                                                    self.parseOutputs(completion: completion)
+                                                                }
                                                             }
                                                             
-                                                            if k + 1 == keysets.count && p + 1 == pubkeyArray.count && i + 1 == self.inputsArray.count && s + 1 == sigs.count && x + 1 == self.signedFor.count {
+                                                        } else {
+                                                            self.inputsArray[i]["pubKeyArray"] = pubkeyArray
+                                                            
+                                                            if k + 1 == keysets.count && p + 1 == pubkeyArray.count && i + 1 == self.inputsArray.count && s + 1 == sigs.count {
                                                                 self.parseOutputs(completion: completion)
                                                             }
                                                         }
-                                                        
-                                                    } else {
-                                                        self.inputsArray[i]["pubKeyArray"] = pubkeyArray
-                                                        
-                                                        if k + 1 == keysets.count && p + 1 == pubkeyArray.count && i + 1 == self.inputsArray.count && s + 1 == sigs.count {
-                                                            self.parseOutputs(completion: completion)
-                                                        }
+                                                    }
+                                                    
+                                                } else {
+                                                    self.inputsArray[i]["pubKeyArray"] = pubkeyArray
+                                                    
+                                                    if k + 1 == keysets.count && p + 1 == pubkeyArray.count && i + 1 == self.inputsArray.count {
+                                                        self.parseOutputs(completion: completion)
                                                     }
                                                 }
                                                 
                                             } else {
-                                                self.inputsArray[i]["pubKeyArray"] = pubkeyArray
+                                                // It is an unknown keyset
+                                                if let sigs = input.signatures {
+                                                    for sig in sigs {
+                                                        let signedKey = sig.key.data.hexString
+                                                        if signedKey == originalPubkey {
+                                                            updatedDict["hasSigned"] = true
+                                                            pubkeyArray[p] = updatedDict
+                                                            self.inputsArray[i]["pubKeyArray"] = pubkeyArray
+                                                        }
+                                                    }
+                                                } else {
+                                                    self.inputsArray[i]["pubKeyArray"] = pubkeyArray
+                                                }
                                                 
                                                 if k + 1 == keysets.count && p + 1 == pubkeyArray.count && i + 1 == self.inputsArray.count {
                                                     self.parseOutputs(completion: completion)
@@ -211,78 +230,60 @@ class PsbtTableViewController: UIViewController, UITableViewDelegate, UITableVie
                                             }
                                             
                                         } else {
-                                            // It is an unknown keyset
-                                            if let sigs = input.signatures {
-                                                for sig in sigs {
-                                                    let signedKey = sig.key.data.hexString
-                                                    if signedKey == originalPubkey {
-                                                        updatedDict["hasSigned"] = true
-                                                        pubkeyArray[p] = updatedDict
-                                                        self.inputsArray[i]["pubKeyArray"] = pubkeyArray
-                                                    }
-                                                }
-                                            } else {
-                                                self.inputsArray[i]["pubKeyArray"] = pubkeyArray
-                                            }
+                                            self.inputsArray[i]["pubKeyArray"] = pubkeyArray
                                             
                                             if k + 1 == keysets.count && p + 1 == pubkeyArray.count && i + 1 == self.inputsArray.count {
                                                 self.parseOutputs(completion: completion)
                                             }
                                         }
-                                        
-                                    } else {
-                                        self.inputsArray[i]["pubKeyArray"] = pubkeyArray
-                                        
-                                        if k + 1 == keysets.count && p + 1 == pubkeyArray.count && i + 1 == self.inputsArray.count {
-                                            self.parseOutputs(completion: completion)
-                                        }
                                     }
                                 }
                             }
-                        }
-                        
-                        
-                        CoreDataService.retrieveEntity(entityName: .signer) { (signers, errorDescription) in
-                            if let signers = signers, signers.count > 0 {
-                                
-                                for (s, signer) in signers.enumerated() {
-                                    let signerStruct = SignerStruct(dictionary: signer)
-                                    if let entropy = signerStruct.entropy {
-                                        if let decryptedEntropy = Encryption.decrypt(entropy) {
-                                            let e = BIP39Mnemonic.Entropy(decryptedEntropy)
-                                            if let mnemonic = try? BIP39Mnemonic(entropy: e) {
-                                                var passphrase = ""
-                                                if let encryptedPassphrase = signerStruct.passphrase {
-                                                    if let decryptedPassphrase = Encryption.decrypt(encryptedPassphrase) {
-                                                        passphrase = decryptedPassphrase.utf8
+                            
+                            
+                            CoreDataService.retrieveEntity(entityName: .signer) { (signers, errorDescription) in
+                                if let signers = signers, signers.count > 0 {
+                                    
+                                    for (s, signer) in signers.enumerated() {
+                                        let signerStruct = SignerStruct(dictionary: signer)
+                                        if let entropy = signerStruct.entropy {
+                                            if let decryptedEntropy = Encryption.decrypt(entropy) {
+                                                let e = BIP39Mnemonic.Entropy(decryptedEntropy)
+                                                if let mnemonic = try? BIP39Mnemonic(entropy: e) {
+                                                    var passphrase = ""
+                                                    if let encryptedPassphrase = signerStruct.passphrase {
+                                                        if let decryptedPassphrase = Encryption.decrypt(encryptedPassphrase) {
+                                                            passphrase = decryptedPassphrase.utf8
+                                                        }
                                                     }
-                                                }
-                                                
-                                                let seedHex = mnemonic.seedHex(passphrase: passphrase)
-                                                
-                                                if let hdMasterKey = try? HDKey(seed: seedHex, network: .mainnet) {
-                                                    if let childKey = try? hdMasterKey.derive(using: fullPath) {
-                                                        if childKey.pubKey.data.hexString == originalPubkey {
-                                                            self.canSign = true
-                                                            updatedDict["lifeHash"] = UIImage(data: signerStruct.lifeHash)
+                                                    
+                                                    let seedHex = mnemonic.seedHex(passphrase: passphrase)
+                                                    
+                                                    if let hdMasterKey = try? HDKey(seed: seedHex, network: .mainnet) {
+                                                        if let childKey = try? hdMasterKey.derive(using: fullPath) {
+                                                            if childKey.pubKey.data.hexString == originalPubkey {
+                                                                self.canSign = true
+                                                                updatedDict["lifeHash"] = UIImage(data: signerStruct.lifeHash)
+                                                            }
                                                         }
                                                     }
                                                 }
                                             }
                                         }
+                                        if s + 1 == signers.count {
+                                            loopKeysets()
+                                        }
                                     }
-                                    if s + 1 == signers.count {
-                                        loopKeysets()
-                                    }
+                                } else {
+                                    loopKeysets()
                                 }
-                            } else {
-                                loopKeysets()
                             }
-                        }
 
+                        }
+                    } else {
+                        self.parseOutputs(completion: completion)
                     }
                 }
-                
             }, completion: {})
         }
     }
@@ -522,12 +523,8 @@ class PsbtTableViewController: UIViewController, UITableViewDelegate, UITableVie
                     
                     if participant != "unknown" {
                         isMine = true
-                        //isMineImageView.image = UIImage(systemName: "person.crop.circle.fill.badge.checkmark")
                         if let lifehash = pubkey["lifeHash"] as? UIImage {
-                            //isMineImageView.image = lifehash
                             image = lifehash
-                        } else {
-                            
                         }
                     }
                 }
@@ -540,7 +537,8 @@ class PsbtTableViewController: UIViewController, UITableViewDelegate, UITableVie
                         isMineImageView.image = image
                     } else {
                         isMineImageView.tintColor = .systemGreen
-                    }                    
+                        isMineImageView.image = UIImage(systemName: "person.crop.circle.fill.badge.checkmark")
+                    }
                 }
                 
                 numberOfSigsLabel.text = "\(numberOfSigs) signatures"

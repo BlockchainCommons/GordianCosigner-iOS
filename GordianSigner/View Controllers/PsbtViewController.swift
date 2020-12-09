@@ -360,6 +360,7 @@ class PsbtViewController: UIViewController, UITableViewDelegate, UITableViewData
             }
             
             DispatchQueue.main.async { [weak self] in
+                self?.amounts.remove(at: section)
                 self?.psbts.remove(at: section)
                 self?.lifeHashes.remove(at: section)
                 self?.completes.remove(at: section)

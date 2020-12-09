@@ -179,6 +179,10 @@ class SignersViewController: UIViewController {
                             
                             self.loadData()
                             showAlert(self, "", "Cosigner label updated ✓")
+                            
+                            DispatchQueue.main.async {
+                                NotificationCenter.default.post(name: .cosignerAdded, object: nil, userInfo: nil)
+                            }
                         }
                     } else {
                         self.loadData()
