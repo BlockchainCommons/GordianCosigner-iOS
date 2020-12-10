@@ -24,6 +24,7 @@
 		D04D4986252C509400D7383E /* QRGenerator.swift in Sources */ = {isa = PBXBuildFile; fileRef = D04D4985252C509400D7383E /* QRGenerator.swift */; };
 		D064BCC6252D5BD700D42D66 /* URKit in Frameworks */ = {isa = PBXBuildFile; productRef = D064BCC5252D5BD700D42D66 /* URKit */; };
 		D064BCC8252D62FD00D42D66 /* URHelper.swift in Sources */ = {isa = PBXBuildFile; fileRef = D064BCC7252D62FD00D42D66 /* URHelper.swift */; };
+		D06F44572581B86200B42DEB /* AddressesViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = D06F44562581B86200B42DEB /* AddressesViewController.swift */; };
 		D090963B2560FE540098013A /* KeysetStruct.swift in Sources */ = {isa = PBXBuildFile; fileRef = D090963A2560FE540098013A /* KeysetStruct.swift */; };
 		D090963D25610D440098013A /* KeysetsViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = D090963C25610D440098013A /* KeysetsViewController.swift */; };
 		D090963F256256500098013A /* AccountMapsViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = D090963E2562564F0098013A /* AccountMapsViewController.swift */; };
@@ -104,6 +105,7 @@
 		D04D4983252C4FEF00D7383E /* QRDisplayerViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = QRDisplayerViewController.swift; sourceTree = "<group>"; };
 		D04D4985252C509400D7383E /* QRGenerator.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = QRGenerator.swift; sourceTree = "<group>"; };
 		D064BCC7252D62FD00D42D66 /* URHelper.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = URHelper.swift; sourceTree = "<group>"; };
+		D06F44562581B86200B42DEB /* AddressesViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AddressesViewController.swift; sourceTree = "<group>"; };
 		D090963A2560FE540098013A /* KeysetStruct.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = KeysetStruct.swift; sourceTree = "<group>"; };
 		D090963C25610D440098013A /* KeysetsViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = KeysetsViewController.swift; sourceTree = "<group>"; };
 		D090963E2562564F0098013A /* AccountMapsViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AccountMapsViewController.swift; sourceTree = "<group>"; };
@@ -195,6 +197,7 @@
 				D090963E2562564F0098013A /* AccountMapsViewController.swift */,
 				D01ACBA32563EA8100B5B4E5 /* PsbtViewController.swift */,
 				D0E0EA012567A10900F2403C /* CreateAccountMapViewController.swift */,
+				D06F44562581B86200B42DEB /* AddressesViewController.swift */,
 			);
 			path = "View Controllers";
 			sourceTree = "<group>";
@@ -460,6 +463,7 @@
 				D090963F256256500098013A /* AccountMapsViewController.swift in Sources */,
 				D01ACBA42563EA8100B5B4E5 /* PsbtViewController.swift in Sources */,
 				D04D4984252C4FEF00D7383E /* QRDisplayerViewController.swift in Sources */,
+				D06F44572581B86200B42DEB /* AddressesViewController.swift in Sources */,
 				D0974A5E255B93500013DC60 /* Entities.swift in Sources */,
 				D04B029C2524A9F800C249B8 /* AddSignerViewController.swift in Sources */,
 				D0B4DDD725258B25009C8624 /* Bip39Words.swift in Sources */,

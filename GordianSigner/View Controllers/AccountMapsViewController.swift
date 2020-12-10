@@ -15,6 +15,7 @@ class AccountMapsViewController: UIViewController, UITableViewDelegate, UITableV
     var accountMaps = [[String:Any]]()
     let descriptorParser = DescriptorParser()
     var mapToExport = [String:Any]()
+    var addressesAm:AccountMapStruct!
     
     @IBOutlet weak var accountMapTable: UITableView!
     
@@ -160,17 +161,23 @@ class AccountMapsViewController: UIViewController, UITableViewDelegate, UITableV
         addButton.addTarget(self, action: #selector(addCosigner(_:)), for: .touchUpInside)
         addButton.restorationIdentifier = "\(indexPath.section)"
         
+        let addressesButton = cell.viewWithTag(15) as! UIButton
+        addressesButton.addTarget(self, action: #selector(seeAddresses(_:)), for: .touchUpInside)
+        addressesButton.restorationIdentifier = "\(indexPath.section)"
+        
         if accountMap.descriptor.contains("keyset") {
             isCompleteImage.alpha = 1
             isCompleteImage.image = UIImage(systemName: "circle.lefthalf.fill")
             isCompleteImage.tintColor = .systemYellow
             completeLabel.text = "Account incomplete!"
             addButton.alpha = 1
+            addressesButton.alpha = 0
         } else {
             isCompleteImage.alpha = 0
             isCompleteImage.tintColor = .systemGreen
             completeLabel.text = ""
             addButton.alpha = 0
+            addressesButton.alpha = 1
         }
         
         let signerLifeHash = cell.viewWithTag(6) as! UIImageView
@@ -251,6 +258,17 @@ class AccountMapsViewController: UIViewController, UITableViewDelegate, UITableV
             }
         }
         return CGFloat(height)
+    }
+    
+    @objc func seeAddresses(_ sender: UIButton) {
+        guard let sectionString = sender.restorationIdentifier, let int = Int(sectionString) else { return }
+        
+        let am = accountMaps[int]["accountMap"] as! AccountMapStruct
+        
+        DispatchQueue.main.async {
+            self.addressesAm = am
+            self.performSegue(withIdentifier: "segueToAddresses", sender: self)
+        }
     }
     
     @objc func addCosigner(_ sender: UIButton) {
@@ -600,6 +618,12 @@ class AccountMapsViewController: UIViewController, UITableViewDelegate, UITableV
                 vc.descriptionText = mapToExport.json() ?? ""
                 vc.isPsbt = false
                 vc.text = mapToExport.json() ?? ""
+            }
+        }
+        
+        if segue.identifier == "segueToAddresses" {
+            if let vc = segue.destination as? AddressesViewController {
+                vc.accountMap = self.addressesAm
             }
         }
     }
