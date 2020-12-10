@@ -157,6 +157,9 @@ class AccountMapsViewController: UIViewController, UITableViewDelegate, UITableV
         let isCompleteImage = cell.viewWithTag(5) as! UIImageView
         let completeLabel = cell.viewWithTag(12) as! UILabel
         let addButton = cell.viewWithTag(14) as! UIButton
+        addButton.addTarget(self, action: #selector(addCosigner(_:)), for: .touchUpInside)
+        addButton.restorationIdentifier = "\(indexPath.section)"
+        
         if accountMap.descriptor.contains("keyset") {
             isCompleteImage.alpha = 1
             isCompleteImage.image = UIImage(systemName: "circle.lefthalf.fill")
@@ -248,6 +251,92 @@ class AccountMapsViewController: UIViewController, UITableViewDelegate, UITableV
             }
         }
         return CGFloat(height)
+    }
+    
+    @objc func addCosigner(_ sender: UIButton) {
+        guard let sectionString = sender.restorationIdentifier, let int = Int(sectionString) else { return }
+        
+        let am = accountMaps[int]["accountMap"] as! AccountMapStruct
+        
+        CoreDataService.retrieveEntity(entityName: .keyset) { (keysets, errorDescription) in
+            guard let keysets = keysets, keysets.count > 0 else { return }
+            
+            DispatchQueue.main.async { [weak self] in
+                guard let self = self else { return }
+                
+                var alertStyle = UIAlertController.Style.actionSheet
+                if (UIDevice.current.userInterfaceIdiom == .pad) {
+                  alertStyle = UIAlertController.Style.alert
+                }
+                
+                let alert = UIAlertController(title: "Which Account?", message: "Select the Account you want this cosigner to join.", preferredStyle: alertStyle)
+                
+                for keyset in keysets {
+                    let keysetStruct = KeysetStruct(dictionary: keyset)
+                    alert.addAction(UIAlertAction(title: keysetStruct.label, style: .default, handler: { action in
+                        self.updateAccountMap(am, keysetStruct, int)
+                    }))
+                }
+                                
+                alert.addAction(UIAlertAction(title: "Cancel", style: .cancel, handler: { action in }))
+                alert.popoverPresentationController?.sourceView = self.view
+                self.present(alert, animated: true, completion: nil)
+            }
+        }
+    }
+    
+    private func updateAccountMap(_ accountMap: AccountMapStruct, _ keyset: KeysetStruct, _ section: Int) {
+        var desc = accountMap.descriptor
+        let descriptorParser = DescriptorParser()
+        let descStruct = descriptorParser.descriptor(desc)
+        var mofn = descStruct.mOfNType
+        mofn = mofn.replacingOccurrences(of: " of ", with: "*")
+        let arr = mofn.split(separator: "*")
+        guard let n = Int(arr[1]) else { return }
+        
+        for i in 0...n - 1 {
+            if desc.contains("<keyset #\(i + 1)>") {
+                desc = desc.replacingOccurrences(of: "<keyset #\(i + 1)>", with: keyset.bip48SegwitAccount!)
+                break
+            }
+        }
+        
+        guard var dict = try? JSONSerialization.jsonObject(with: accountMap.accountMap, options: []) as? [String:Any] else { return }
+        dict["descriptor"] = desc
+        
+        let updatedMap = (dict.json() ?? "").utf8
+        
+        CoreDataService.updateEntity(id: accountMap.id, keyToUpdate: "descriptor", newValue: desc, entityName: .accountMap) { (success, errorDesc) in
+            guard success else {
+                showAlert(self, "Account Map updating failed...", "Please let us know about this bug.")
+                return
+            }
+            
+            CoreDataService.updateEntity(id: accountMap.id, keyToUpdate: "accountMap", newValue: updatedMap, entityName: .accountMap) { (success, errorDesc) in
+                guard success else {
+                    showAlert(self, "Account Map updating failed...", "Please let us know about this bug.")
+                    return
+                }
+                
+                CoreDataService.updateEntity(id: keyset.id, keyToUpdate: "sharedWith", newValue: accountMap.id, entityName: .keyset) { (success, errorDescription) in
+                    guard success else {
+                        showAlert(self, "Account Map updating failed...", "Please let us know about this bug.")
+                        return
+                    }
+                    
+                    CoreDataService.updateEntity(id: keyset.id, keyToUpdate: "dateShared", newValue: Date(), entityName: .keyset) { (success, errorDescription) in
+                        guard success else {
+                            showAlert(self, "Account Map updating failed...", "Please let us know about this bug.")
+                            return
+                        }
+                        
+                        showAlert(self, "Account Map updated ✓", "")
+                        
+                        self.load()
+                    }
+                }
+            }
+        }
     }
     
     @objc func editLabel(_ sender: UIButton) {
