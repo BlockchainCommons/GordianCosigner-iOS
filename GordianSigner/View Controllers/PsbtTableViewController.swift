@@ -455,7 +455,7 @@ class PsbtTableViewController: UIViewController, UITableViewDelegate, UITableVie
                 label.text = "Signatures required"
                 icon.image = UIImage(systemName: "exclamationmark.square")
                 icon.tintColor = .systemPink
-                export = false
+                //export = false
             }
         } else {
             if psbt.isComplete {
@@ -467,7 +467,7 @@ class PsbtTableViewController: UIViewController, UITableViewDelegate, UITableVie
                 label.text = "Signatures required"
                 icon.image = UIImage(systemName: "exclamationmark.square")
                 icon.tintColor = .systemPink
-                export = false
+                //export = false
             }
         }        
         

@@ -33,7 +33,6 @@ class AddressesViewController: UIViewController, UITableViewDelegate, UITableVie
         
         for i in 0 ... 999 {
             var pubkeys = [PubKey]()
-            var pubkeyStrings = [String]()
             
             for (k, key) in keys.enumerated() {
                 let hdKey = try? HDKey(base58: key)
@@ -45,7 +44,6 @@ class AddressesViewController: UIViewController, UITableViewDelegate, UITableVie
                 }
                 
                 pubkeys.append(key.pubKey)
-                pubkeyStrings.append("#\(k + 1): \(key.pubKey.data.hexString)")
                 
                 if k + 1 == keys.count {
                     let scriptPubKey = ScriptPubKey(multisig: pubkeys, threshold: sigsRequired, isBIP67: true)
@@ -64,7 +62,6 @@ class AddressesViewController: UIViewController, UITableViewDelegate, UITableVie
                 }
             }
         }
-        
     }
     
     func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
