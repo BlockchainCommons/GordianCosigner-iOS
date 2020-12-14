@@ -212,10 +212,12 @@ class KeysetsViewController: UIViewController, UITableViewDelegate, UITableViewD
             copyTextButton.addTarget(self, action: #selector(copyText(_:)), for: .touchUpInside)
             copyTextButton.restorationIdentifier = "\(indexPath.section)"
             
-            let keysetLifehash = cell.viewWithTag(16) as! UIImageView
-            keysetLifehash.layer.magnificationFilter = .nearest
-            configureView(keysetLifehash)
-            keysetLifehash.image = lifehashes[indexPath.section]
+            let keysetLifehash = cell.viewWithTag(16) as! LifehashSeedView
+            keysetLifehash.backgroundColor = cell.backgroundColor
+            keysetLifehash.background.backgroundColor = cell.backgroundColor
+            keysetLifehash.lifehashImage.image = lifehashes[indexPath.section]
+            keysetLifehash.iconImage.image = UIImage(systemName: "person.2")
+            keysetLifehash.iconLabel.text = "cosigner"
             
             return cell
         } else {
@@ -224,7 +226,7 @@ class KeysetsViewController: UIViewController, UITableViewDelegate, UITableViewD
     }
     
     func tableView(_ tableView: UITableView, heightForRowAt indexPath: IndexPath) -> CGFloat {
-        return 215
+        return 266
     }
     
     func tableView(_ tableView: UITableView, commit editingStyle: UITableViewCell.EditingStyle, forRowAt indexPath: IndexPath) {

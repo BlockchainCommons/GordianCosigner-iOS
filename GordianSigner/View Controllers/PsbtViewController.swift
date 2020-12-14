@@ -184,10 +184,12 @@ class PsbtViewController: UIViewController, UITableViewDelegate, UITableViewData
             let dateAdded = cell.viewWithTag(6) as! UILabel
             dateAdded.text = psbt.dateAdded.formatted()
             
-            let lifehash = cell.viewWithTag(7) as! UIImageView
-            configureView(lifehash)
-            lifehash.contentMode = .scaleAspectFit
-            lifehash.image = lifeHashes[indexPath.section]
+            let lifehash = cell.viewWithTag(7) as! LifehashSeedView
+            lifehash.backgroundColor = cell.backgroundColor
+            lifehash.background.backgroundColor = cell.backgroundColor
+            lifehash.lifehashImage.image = lifeHashes[indexPath.section]
+            lifehash.iconLabel.text = "payment"
+            lifehash.iconImage.image = UIImage(systemName: "bitcoinsign.circle")
             
             let editButton = cell.viewWithTag(8) as! UIButton
             editButton.addTarget(self, action: #selector(editLabel(_:)), for: .touchUpInside)
@@ -273,7 +275,7 @@ class PsbtViewController: UIViewController, UITableViewDelegate, UITableViewData
     
     func tableView(_ tableView: UITableView, heightForRowAt indexPath: IndexPath) -> CGFloat {
         if psbts.count > 0 {
-            return 228
+            return 249
         } else {
             return 100
         }

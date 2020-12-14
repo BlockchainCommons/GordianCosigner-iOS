@@ -13,7 +13,8 @@ class LifehashSeedView: UIView {
     @IBOutlet weak var background: UIView!
     @IBOutlet weak var containerView: UIView!
     @IBOutlet weak var lifehashImage: UIImageView!
-    
+    @IBOutlet weak var iconImage: UIImageView!
+    @IBOutlet weak var iconLabel: UILabel!
     
     let nibName = "LifehashSeedView"
     

@@ -11,6 +11,8 @@
             <connections>
                 <outlet property="background" destination="YPw-DV-kKD" id="xgs-6x-Hxo"/>
                 <outlet property="containerView" destination="iN0-l3-epB" id="Ybt-lU-nJX"/>
+                <outlet property="iconImage" destination="qc5-b6-Fzc" id="JFE-3N-cUV"/>
+                <outlet property="iconLabel" destination="3cX-8d-faP" id="bWY-20-aA7"/>
                 <outlet property="lifehashImage" destination="98r-dG-EID" id="Lc3-tx-HWi"/>
             </connections>
         </placeholder>
@@ -30,15 +32,15 @@
                             </constraints>
                         </imageView>
                         <imageView clipsSubviews="YES" userInteractionEnabled="NO" contentMode="scaleAspectFit" horizontalHuggingPriority="251" verticalHuggingPriority="251" image="person.crop.circle" catalog="system" translatesAutoresizingMaskIntoConstraints="NO" id="qc5-b6-Fzc">
-                            <rect key="frame" x="88" y="0.5" width="40" height="39"/>
+                            <rect key="frame" x="88" y="0.5" width="32" height="29"/>
                             <color key="tintColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                             <constraints>
-                                <constraint firstAttribute="height" constant="40" id="KvV-Eb-25f"/>
-                                <constraint firstAttribute="width" constant="40" id="uyB-lJ-pxt"/>
+                                <constraint firstAttribute="height" constant="30" id="KvV-Eb-25f"/>
+                                <constraint firstAttribute="width" constant="32" id="uyB-lJ-pxt"/>
                             </constraints>
                         </imageView>
                         <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="seed" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="3cX-8d-faP">
-                            <rect key="frame" x="96.5" y="42.5" width="23.5" height="12"/>
+                            <rect key="frame" x="93" y="34" width="23.5" height="12"/>
                             <fontDescription key="fontDescription" type="system" pointSize="10"/>
                             <color key="textColor" white="0.66666666669999997" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                             <nil key="highlightedColor"/>
@@ -47,11 +49,11 @@
                     <color key="backgroundColor" white="0.0" alpha="0.0" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                     <constraints>
                         <constraint firstItem="98r-dG-EID" firstAttribute="leading" secondItem="YPw-DV-kKD" secondAttribute="leading" id="6ni-vi-qit"/>
-                        <constraint firstItem="3cX-8d-faP" firstAttribute="centerX" secondItem="qc5-b6-Fzc" secondAttribute="centerX" id="HJ5-Kb-j1b"/>
+                        <constraint firstItem="3cX-8d-faP" firstAttribute="centerX" secondItem="qc5-b6-Fzc" secondAttribute="centerX" constant="0.75" id="HJ5-Kb-j1b"/>
                         <constraint firstAttribute="width" constant="128" id="Ria-ZL-eV1"/>
                         <constraint firstItem="98r-dG-EID" firstAttribute="top" secondItem="YPw-DV-kKD" secondAttribute="top" id="XAu-OV-Nef"/>
                         <constraint firstItem="qc5-b6-Fzc" firstAttribute="leading" secondItem="98r-dG-EID" secondAttribute="trailing" constant="8" id="XaX-G1-Gbp"/>
-                        <constraint firstItem="3cX-8d-faP" firstAttribute="top" secondItem="qc5-b6-Fzc" secondAttribute="bottom" constant="2.5" id="ZuK-gE-1qH"/>
+                        <constraint firstItem="3cX-8d-faP" firstAttribute="top" secondItem="qc5-b6-Fzc" secondAttribute="bottom" constant="4" id="ZuK-gE-1qH"/>
                         <constraint firstAttribute="height" constant="80" id="g3o-wm-N6c"/>
                         <constraint firstAttribute="bottom" secondItem="98r-dG-EID" secondAttribute="bottom" id="hRw-Sx-0Kl"/>
                         <constraint firstItem="qc5-b6-Fzc" firstAttribute="top" secondItem="YPw-DV-kKD" secondAttribute="top" id="w4y-GF-3D4"/>

@@ -204,15 +204,21 @@ class AccountMapsViewController: UIViewController, UITableViewDelegate, UITableV
         let date = cell.viewWithTag(11) as! UILabel
         date.text = accountMap.dateAdded.formatted()
         
-        let lifehash = cell.viewWithTag(13) as! UIImageView
-        lifehash.layer.magnificationFilter = .nearest
-        lifehash.clipsToBounds = true
-        lifehash.layer.cornerRadius = 8
+        let lifehash = cell.viewWithTag(13) as! LifehashSeedView
+        lifehash.background.backgroundColor = cell.backgroundColor
+        lifehash.backgroundColor = cell.backgroundColor
+        
         if let image = accountMaps[indexPath.section]["lifeHash"] as? UIImage {
-            lifehash.image = image
+            lifehash.lifehashImage.image = image
+            lifehash.iconImage.image = UIImage(systemName: "person.2.square.stack")
+            lifehash.iconLabel.text = "account"
+            lifehash.iconImage.alpha = 1
+            lifehash.iconLabel.alpha = 1
         } else {
-            lifehash.image = UIImage(systemName: "rectangle.badge.xmark")
-            lifehash.tintColor = .darkGray
+            lifehash.lifehashImage.image = UIImage(systemName: "rectangle.badge.xmark")
+            lifehash.lifehashImage.tintColor = .darkGray
+            lifehash.iconImage.alpha = 0
+            lifehash.iconLabel.alpha = 0
         }
         
         return cell
