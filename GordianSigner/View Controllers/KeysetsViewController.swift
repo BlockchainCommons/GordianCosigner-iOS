@@ -165,13 +165,16 @@ class KeysetsViewController: UIViewController, UITableViewDelegate, UITableViewD
             
             let (_, _, lifeHash) = canSign(keyset)
             
-            let lifeHashImage = cell.viewWithTag(6) as! UIImageView
-            configureView(lifeHashImage)
+            let lifeHashView = cell.viewWithTag(6) as! LifehashSeedSecondary
+            lifeHashView.backgroundColor = cell.backgroundColor
+            lifeHashView.background.backgroundColor = cell.backgroundColor
             if lifeHash != nil {
-                lifeHashImage.image = lifeHash
+                lifeHashView.lifehashImage.image = lifeHash
+                lifeHashView.alpha = 1
             } else {
-                lifeHashImage.image = UIImage(systemName: "questionmark.circle")
-                lifeHashImage.tintColor = .lightGray
+//                lifeHashImage.image = UIImage(systemName: "questionmark.circle")
+//                lifeHashImage.tintColor = .lightGray
+                lifeHashView.alpha = 0
             }
             
             let dateAddedLabel = cell.viewWithTag(7) as! UILabel
@@ -210,6 +213,7 @@ class KeysetsViewController: UIViewController, UITableViewDelegate, UITableViewD
             copyTextButton.restorationIdentifier = "\(indexPath.section)"
             
             let keysetLifehash = cell.viewWithTag(16) as! UIImageView
+            keysetLifehash.layer.magnificationFilter = .nearest
             configureView(keysetLifehash)
             keysetLifehash.image = lifehashes[indexPath.section]
             

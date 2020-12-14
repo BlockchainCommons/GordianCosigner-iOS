@@ -70,12 +70,17 @@ class AddressesViewController: UIViewController, UITableViewDelegate, UITableVie
     
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         let cell = tableView.dequeueReusableCell(withIdentifier: "addressCell", for: indexPath)
-        cell.selectionStyle = .none
-        cell.textLabel?.text = "#\(indexPath.row + 1): " + addresses[indexPath.row]
-        cell.textLabel?.lineBreakMode = .byCharWrapping
-        cell.textLabel?.textColor = .lightGray
-        cell.textLabel?.numberOfLines = 0
+        cell.selectionStyle = .default
+        
+        let label = cell.viewWithTag(1) as! UILabel
+        label.text = "#\(indexPath.row): " + addresses[indexPath.row]
+        
         return cell
+    }
+    
+    func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
+        UIPasteboard.general.string = addresses[indexPath.row]
+        showAlert(self, "", "Address copied ✓")
     }
     
     func tableView(_ tableView: UITableView, heightForRowAt indexPath: IndexPath) -> CGFloat {

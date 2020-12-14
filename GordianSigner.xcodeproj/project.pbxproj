@@ -15,6 +15,11 @@
 		D03175742576023C0014DC41 /* CLibWally.xcframework in Frameworks */ = {isa = PBXBuildFile; fileRef = D03175722576023C0014DC41 /* CLibWally.xcframework */; };
 		D0317576257602400014DC41 /* LibWally.xcframework in Frameworks */ = {isa = PBXBuildFile; fileRef = D03175732576023C0014DC41 /* LibWally.xcframework */; };
 		D0317577257602400014DC41 /* LibWally.xcframework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = D03175732576023C0014DC41 /* LibWally.xcframework */; settings = {ATTRIBUTES = (CodeSignOnCopy, ); }; };
+		D04423F325837A8700A25179 /* PaymentHash.swift in Sources */ = {isa = PBXBuildFile; fileRef = D04423F225837A8700A25179 /* PaymentHash.swift */; };
+		D04423F52586F2CC00A25179 /* LifehashSeedView.swift in Sources */ = {isa = PBXBuildFile; fileRef = D04423F42586F2CC00A25179 /* LifehashSeedView.swift */; };
+		D04423F72586F2F700A25179 /* LifehashSeedView.xib in Resources */ = {isa = PBXBuildFile; fileRef = D04423F62586F2F700A25179 /* LifehashSeedView.xib */; };
+		D04423FB258705B900A25179 /* LifehashSeedSecondary.swift in Sources */ = {isa = PBXBuildFile; fileRef = D04423FA258705B900A25179 /* LifehashSeedSecondary.swift */; };
+		D04423FD258705D900A25179 /* LifehashSeedSecondary.xib in Resources */ = {isa = PBXBuildFile; fileRef = D04423FC258705D900A25179 /* LifehashSeedSecondary.xib */; };
 		D04B029825249EEB00C249B8 /* SignerViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = D04B029725249EEB00C249B8 /* SignerViewController.swift */; };
 		D04B029A2524A18100C249B8 /* SignersViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = D04B02992524A18100C249B8 /* SignersViewController.swift */; };
 		D04B029C2524A9F800C249B8 /* AddSignerViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = D04B029B2524A9F800C249B8 /* AddSignerViewController.swift */; };
@@ -97,6 +102,11 @@
 		D0246DDA256B667800F812A5 /* base58.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; path = base58.c; sourceTree = "<group>"; };
 		D03175722576023C0014DC41 /* CLibWally.xcframework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcframework; path = CLibWally.xcframework; sourceTree = SOURCE_ROOT; };
 		D03175732576023C0014DC41 /* LibWally.xcframework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcframework; path = LibWally.xcframework; sourceTree = SOURCE_ROOT; };
+		D04423F225837A8700A25179 /* PaymentHash.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PaymentHash.swift; sourceTree = "<group>"; };
+		D04423F42586F2CC00A25179 /* LifehashSeedView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LifehashSeedView.swift; sourceTree = "<group>"; };
+		D04423F62586F2F700A25179 /* LifehashSeedView.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = LifehashSeedView.xib; sourceTree = "<group>"; };
+		D04423FA258705B900A25179 /* LifehashSeedSecondary.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LifehashSeedSecondary.swift; sourceTree = "<group>"; };
+		D04423FC258705D900A25179 /* LifehashSeedSecondary.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = LifehashSeedSecondary.xib; sourceTree = "<group>"; };
 		D04B029725249EEB00C249B8 /* SignerViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SignerViewController.swift; sourceTree = "<group>"; };
 		D04B02992524A18100C249B8 /* SignersViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SignersViewController.swift; sourceTree = "<group>"; };
 		D04B029B2524A9F800C249B8 /* AddSignerViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AddSignerViewController.swift; sourceTree = "<group>"; };
@@ -172,6 +182,33 @@
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
+		D04423F82587058600A25179 /* Sub Views */ = {
+			isa = PBXGroup;
+			children = (
+				D04423F92587059900A25179 /* Lifehash Seed Primary */,
+				D04423FE258705E200A25179 /* Lifehash Seed Secondary */,
+			);
+			path = "Sub Views";
+			sourceTree = "<group>";
+		};
+		D04423F92587059900A25179 /* Lifehash Seed Primary */ = {
+			isa = PBXGroup;
+			children = (
+				D04423F42586F2CC00A25179 /* LifehashSeedView.swift */,
+				D04423F62586F2F700A25179 /* LifehashSeedView.xib */,
+			);
+			path = "Lifehash Seed Primary";
+			sourceTree = "<group>";
+		};
+		D04423FE258705E200A25179 /* Lifehash Seed Secondary */ = {
+			isa = PBXGroup;
+			children = (
+				D04423FA258705B900A25179 /* LifehashSeedSecondary.swift */,
+				D04423FC258705D900A25179 /* LifehashSeedSecondary.xib */,
+			);
+			path = "Lifehash Seed Secondary";
+			sourceTree = "<group>";
+		};
 		D0974A5F255B99CF0013DC60 /* Structs */ = {
 			isa = PBXGroup;
 			children = (
@@ -247,6 +284,7 @@
 				D0CF1E71252301030059C541 /* Helpers */,
 				D0974A60255B9C870013DC60 /* View Controllers */,
 				D0974A5F255B99CF0013DC60 /* Structs */,
+				D04423F82587058600A25179 /* Sub Views */,
 			);
 			path = GordianSigner;
 			sourceTree = "<group>";
@@ -299,6 +337,7 @@
 				D0246DD6256B660100F812A5 /* Base58.swift */,
 				D0246DD8256B663800F812A5 /* base58.h */,
 				D0246DDA256B667800F812A5 /* base58.c */,
+				D04423F225837A8700A25179 /* PaymentHash.swift */,
 			);
 			path = Helpers;
 			sourceTree = "<group>";
@@ -419,9 +458,11 @@
 			files = (
 				D0974A64255BB3C00013DC60 /* icons8-key-24.png in Resources */,
 				D0B4DDD92525AC18009C8624 /* whiteFingerPrint.png in Resources */,
+				D04423FD258705D900A25179 /* LifehashSeedSecondary.xib in Resources */,
 				D0CF1E432522E2140059C541 /* LaunchScreen.storyboard in Resources */,
 				D0CF1E402522E2140059C541 /* Assets.xcassets in Resources */,
 				D0CF1E3B2522E20C0059C541 /* Main.storyboard in Resources */,
+				D04423F72586F2F700A25179 /* LifehashSeedView.xib in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -457,6 +498,7 @@
 				D0CF1E77252303370059C541 /* Utlities.swift in Sources */,
 				D090964125625CC30098013A /* DescriptorParser.swift in Sources */,
 				D0E0EA022567A10900F2403C /* CreateAccountMapViewController.swift in Sources */,
+				D04423FB258705B900A25179 /* LifehashSeedSecondary.swift in Sources */,
 				D0974A5C255B93130013DC60 /* CoreDataService.swift in Sources */,
 				D0CF1E362522E20C0059C541 /* SceneDelegate.swift in Sources */,
 				D090963B2560FE540098013A /* KeysetStruct.swift in Sources */,
@@ -465,6 +507,7 @@
 				D04D4984252C4FEF00D7383E /* QRDisplayerViewController.swift in Sources */,
 				D06F44572581B86200B42DEB /* AddressesViewController.swift in Sources */,
 				D0974A5E255B93500013DC60 /* Entities.swift in Sources */,
+				D04423F52586F2CC00A25179 /* LifehashSeedView.swift in Sources */,
 				D04B029C2524A9F800C249B8 /* AddSignerViewController.swift in Sources */,
 				D0B4DDD725258B25009C8624 /* Bip39Words.swift in Sources */,
 				D0CF1E79252360EC0059C541 /* Signer.swift in Sources */,
@@ -472,6 +515,7 @@
 				D04B029A2524A18100C249B8 /* SignersViewController.swift in Sources */,
 				D0CF1E75252302A00059C541 /* Encryption.swift in Sources */,
 				D01C2955255CE33F00C5ED55 /* PsbtTableViewController.swift in Sources */,
+				D04423F325837A8700A25179 /* PaymentHash.swift in Sources */,
 				D04D4986252C509400D7383E /* QRGenerator.swift in Sources */,
 				D0246DD7256B660100F812A5 /* Base58.swift in Sources */,
 				D0974A62255BA1B90013DC60 /* LifeHash.swift in Sources */,

@@ -180,14 +180,15 @@ class AccountMapsViewController: UIViewController, UITableViewDelegate, UITableV
             addressesButton.alpha = 1
         }
         
-        let signerLifeHash = cell.viewWithTag(6) as! UIImageView
-        signerLifeHash.clipsToBounds = true
-        signerLifeHash.layer.cornerRadius = 8
+        let signerLifeHash = cell.viewWithTag(6) as! LifehashSeedSecondary
+        signerLifeHash.backgroundColor = cell.backgroundColor
+        signerLifeHash.background.backgroundColor = cell.backgroundColor
+        
         if let lifehash = accountMaps[indexPath.section]["signerLifeHash"] as? Data {
-            signerLifeHash.image = UIImage(data: lifehash)
+            signerLifeHash.lifehashImage.image = UIImage(data: lifehash)
+            signerLifeHash.alpha = 1
         } else {
-            signerLifeHash.image = UIImage(systemName: "questionmark.circle")
-            signerLifeHash.tintColor = .darkGray
+            signerLifeHash.alpha = 0
         }
         
         let editButton = cell.viewWithTag(9) as! UIButton
@@ -204,6 +205,7 @@ class AccountMapsViewController: UIViewController, UITableViewDelegate, UITableV
         date.text = accountMap.dateAdded.formatted()
         
         let lifehash = cell.viewWithTag(13) as! UIImageView
+        lifehash.layer.magnificationFilter = .nearest
         lifehash.clipsToBounds = true
         lifehash.layer.cornerRadius = 8
         if let image = accountMaps[indexPath.section]["lifeHash"] as? UIImage {

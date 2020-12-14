@@ -205,7 +205,7 @@ class SignersViewController: UIViewController {
 extension SignersViewController: UITableViewDelegate {
     
     func tableView(_ tableView: UITableView, heightForRowAt indexPath: IndexPath) -> CGFloat {
-        return 105
+        return 169
     }
     
     func tableView(_ tableView: UITableView, canEditRowAt indexPath: IndexPath) -> Bool {
@@ -240,7 +240,7 @@ extension SignersViewController: UITableViewDataSource {
         
         let label = cell.viewWithTag(1) as! UILabel
         let dateAdded = cell.viewWithTag(2) as! UILabel
-        let imageView = cell.viewWithTag(3) as! UIImageView
+        let lifehashView = cell.viewWithTag(3) as! LifehashSeedView
         let fingerprintLabel = cell.viewWithTag(4) as! UILabel
         
         let editButton = cell.viewWithTag(6) as! UIButton
@@ -251,12 +251,15 @@ extension SignersViewController: UITableViewDataSource {
         let signer = signerStructs[indexPath.section]
         
         label.text = signer.label
-        imageView.image = UIImage(data: signer.lifeHash)
+        //imageView.image = UIImage(data: signer.lifeHash)
+        lifehashView.lifehashImage.image = UIImage(data: signer.lifeHash)
         dateAdded.text = signer.dateAdded.formatted()
         fingerprintLabel.text = signer.fingerprint
             
-        imageView.clipsToBounds = true
-        imageView.layer.cornerRadius = 8
+        lifehashView.background.clipsToBounds = true
+        //lifehashView.background.layer.cornerRadius = 8
+        lifehashView.background.backgroundColor = cell.backgroundColor
+        lifehashView.backgroundColor = cell.backgroundColor
         
         return cell
     }

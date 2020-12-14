@@ -478,7 +478,8 @@ class PsbtTableViewController: UIViewController, UITableViewDelegate, UITableVie
         let cell = tableView.dequeueReusableCell(withIdentifier: "inputCell", for: indexPath)
         configureCell(cell)
         
-        let isMineImageView = cell.viewWithTag(1) as! UIImageView
+        let lifehashView = cell.viewWithTag(1) as! LifehashSeedSecondary
+        
         let amountLabel = cell.viewWithTag(2) as! UILabel
         let participantsTextView = cell.viewWithTag(3) as! UITextView
         let numberOfSigsLabel = cell.viewWithTag(6) as! UILabel
@@ -486,7 +487,6 @@ class PsbtTableViewController: UIViewController, UITableViewDelegate, UITableVie
         
         inputNumberLabel.text = "Input #\(indexPath.row + 1)"
         
-        configureView(isMineImageView)
         configureView(participantsTextView)
         
         let inputDict = inputsArray[indexPath.row]
@@ -504,7 +504,6 @@ class PsbtTableViewController: UIViewController, UITableViewDelegate, UITableVie
                 var image:UIImage?
                 
                 for pubkey in pubkeyArray {
-                    //keysetOrigin
                     let participant = pubkey["keysetLabel"] as! String
                     let hasSigned = pubkey["hasSigned"] as! Bool
                     let fullPath = pubkey["fullPath"] as! BIP32Path
@@ -530,29 +529,28 @@ class PsbtTableViewController: UIViewController, UITableViewDelegate, UITableVie
                 }
                 
                 if !isMine {
-                    isMineImageView.image = UIImage(systemName: "questionmark.circle")
-                    isMineImageView.tintColor = .systemGray
+                    lifehashView.alpha = 0
                 } else {
+                    lifehashView.alpha = 1
                     if image != nil {
-                        isMineImageView.image = image
+                        //isMineImageView.image = image
+                        lifehashView.lifehashImage.image = image
                     } else {
-                        isMineImageView.tintColor = .systemGreen
-                        isMineImageView.image = UIImage(systemName: "person.crop.circle.fill.badge.checkmark")
+                        lifehashView.lifehashImage.tintColor = .systemGreen
+                        lifehashView.lifehashImage.image = UIImage(systemName: "person.crop.circle.fill.badge.checkmark")
                     }
                 }
                 
                 numberOfSigsLabel.text = "\(numberOfSigs) signatures"
                 
             } else {
-                isMineImageView.image = UIImage(systemName: "questionmark.circle")
-                isMineImageView.tintColor = .systemGray
+                lifehashView.alpha = 0
                 numberOfSigsLabel.text = "?"
             }
             
             
         } else {
-            isMineImageView.image = UIImage(systemName: "questionmark.circle")
-            isMineImageView.tintColor = .systemGray
+            lifehashView.alpha = 0
             numberOfSigsLabel.text = "?"
             participantsTextView.text = "unknown"
         }
@@ -569,7 +567,10 @@ class PsbtTableViewController: UIViewController, UITableViewDelegate, UITableVie
         configureCell(cell)
         
         let outputLabel = cell.viewWithTag(1) as! UILabel
+        
         let isMineImageView = cell.viewWithTag(2) as! UIImageView
+        isMineImageView.layer.magnificationFilter = .nearest
+        
         let amountLabel = cell.viewWithTag(3) as! UILabel
         let addressLabel = cell.viewWithTag(4) as! UILabel
         let accountMapLabel = cell.viewWithTag(5) as! UILabel

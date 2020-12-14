@@ -11,6 +11,12 @@ import CryptoKit
 
 enum Encryption {
     
+    static func sha256hash(_ text: String) -> String {
+        let digest = SHA256.hash(data: text.utf8)
+        
+        return digest.map { String(format: "%02hhx", $0) }.joined()
+    }
+    
     static func checksum(_ data: Data) -> String {
         let hash = SHA256.hash(data: Data(SHA256.hash(data: data)))
         let checksum = Data(hash).subdata(in: Range(0...3))

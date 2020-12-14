@@ -18,6 +18,7 @@ class PsbtViewController: UIViewController, UITableViewDelegate, UITableViewData
     private var lifeHashes = [UIImage]()
     private var completes = [Bool]()
     private var amounts = [Double]()
+    private var weSigned = [Bool]()
     private var psbtToExport = ""
     var addButton = UIBarButtonItem()
     var editButton = UIBarButtonItem()
@@ -64,18 +65,62 @@ class PsbtViewController: UIViewController, UITableViewDelegate, UITableViewData
             
             DispatchQueue.background(background: {
                 
-                for psbt in psbts {
+                for (p, psbt) in psbts.enumerated() {
                     let psbtStruct = PsbtStruct(dictionary: psbt)
                     self.psbts.append(psbtStruct)
                     
-                    guard let image = LifeHash.image(psbtStruct.psbt) else { self.spinner.remove(); return }
-                                        
                     guard let psbtWally = Keys.psbt(psbtStruct.psbt.base64EncodedString(), .mainnet) else { self.spinner.remove(); return }
                     
+                    guard let image = LifeHash.image(PaymentId.id(psbtWally).utf8) else { self.spinner.remove(); return }
+                    
                     var amount = 0.0
+                    self.weSigned.append(false)
+                    
                     for input in psbtWally.inputs {
                         if let inputAmount = input.amount {
                             amount += Double(inputAmount) / 100000000.0
+                        }
+                        
+                        if let origins = input.origins {
+                            CoreDataService.retrieveEntity(entityName: .signer) { (signers, errorDescription) in
+                                if let signers = signers, signers.count > 0 {
+                                    for origin in origins {
+                                        let originalPubkey = origin.key.data.hexString
+                                        for signer in signers {
+                                            let signerStruct = SignerStruct(dictionary: signer)
+                                            if let entropy = signerStruct.entropy {
+                                                if let decryptedEntropy = Encryption.decrypt(entropy) {
+                                                    let e = BIP39Mnemonic.Entropy(decryptedEntropy)
+                                                    if let mnemonic = try? BIP39Mnemonic(entropy: e) {
+                                                        var passphrase = ""
+                                                        if let encryptedPassphrase = signerStruct.passphrase {
+                                                            if let decryptedPassphrase = Encryption.decrypt(encryptedPassphrase) {
+                                                                passphrase = decryptedPassphrase.utf8
+                                                            }
+                                                        }
+                                                        let seedHex = mnemonic.seedHex(passphrase: passphrase)
+                                                        if let hdMasterKey = try? HDKey(seed: seedHex, network: .mainnet) {
+                                                            if let childKey = try? hdMasterKey.derive(using: origin.value.path) {
+                                                                if childKey.pubKey.data.hexString == originalPubkey {
+                                                                    // CAN SIGN
+                                                                    if let sigs = input.signatures {
+                                                                        for sig in sigs {
+                                                                            if sig.key.data.hexString == originalPubkey {
+                                                                                // DID SIGN
+                                                                                self.weSigned[p] = true
+                                                                            }
+                                                                        }
+                                                                    }
+                                                                }
+                                                            }
+                                                        }
+                                                    }
+                                                }
+                                            }
+                                        }
+                                    }
+                                }
+                            }
                         }
                     }
                     
@@ -164,6 +209,16 @@ class PsbtViewController: UIViewController, UITableViewDelegate, UITableViewData
             
             let amountLabel = cell.viewWithTag(11) as! UILabel
             amountLabel.text = amounts[indexPath.section].avoidNotation
+            
+            let signedByUsImageView = cell.viewWithTag(12) as! UIImageView
+            let signedByUsLabel = cell.viewWithTag(13) as! UILabel
+            if weSigned[indexPath.section] {
+                signedByUsImageView.alpha = 1
+                signedByUsLabel.alpha = 1
+            } else {
+                signedByUsLabel.alpha = 0
+                signedByUsImageView.alpha = 0
+            }
             
             return cell
         } else {

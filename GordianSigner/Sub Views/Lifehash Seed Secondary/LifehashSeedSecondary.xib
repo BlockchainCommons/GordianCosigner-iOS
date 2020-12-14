@@ -1,0 +1,70 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<document type="com.apple.InterfaceBuilder3.CocoaTouch.XIB" version="3.0" toolsVersion="16096" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" useSafeAreas="YES" colorMatched="YES">
+    <device id="retina6_1" orientation="portrait" appearance="light"/>
+    <dependencies>
+        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="16087"/>
+        <capability name="Safe area layout guides" minToolsVersion="9.0"/>
+        <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
+    </dependencies>
+    <objects>
+        <placeholder placeholderIdentifier="IBFilesOwner" id="-1" userLabel="File's Owner" customClass="LifehashSeedSecondary" customModule="Gordian_Cosigner" customModuleProvider="target">
+            <connections>
+                <outlet property="background" destination="0bB-bz-LCy" id="xim-AF-zIS"/>
+                <outlet property="lifehashImage" destination="n5I-xB-CRW" id="itF-6x-IRk"/>
+            </connections>
+        </placeholder>
+        <placeholder placeholderIdentifier="IBFirstResponder" id="-2" customClass="UIResponder"/>
+        <view contentMode="scaleToFill" id="iN0-l3-epB">
+            <rect key="frame" x="0.0" y="0.0" width="68" height="41"/>
+            <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
+            <subviews>
+                <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="0bB-bz-LCy">
+                    <rect key="frame" x="0.0" y="0.0" width="68" height="41"/>
+                    <subviews>
+                        <imageView clipsSubviews="YES" userInteractionEnabled="NO" contentMode="scaleAspectFit" horizontalHuggingPriority="251" verticalHuggingPriority="251" ambiguous="YES" translatesAutoresizingMaskIntoConstraints="NO" id="n5I-xB-CRW">
+                            <rect key="frame" x="0.0" y="0.0" width="40" height="40"/>
+                            <constraints>
+                                <constraint firstAttribute="height" constant="40" id="0we-1L-N94"/>
+                                <constraint firstAttribute="width" constant="40" id="cN3-kz-liR"/>
+                            </constraints>
+                        </imageView>
+                        <imageView clipsSubviews="YES" userInteractionEnabled="NO" contentMode="scaleAspectFit" horizontalHuggingPriority="251" verticalHuggingPriority="251" ambiguous="YES" image="person.crop.circle" catalog="system" translatesAutoresizingMaskIntoConstraints="NO" id="nwa-nn-zIn">
+                            <rect key="frame" x="45" y="0.5" width="20" height="20"/>
+                            <color key="tintColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+                            <constraints>
+                                <constraint firstAttribute="width" constant="20" id="lrt-nB-pdQ"/>
+                                <constraint firstAttribute="height" constant="21" id="wed-DL-Jfg"/>
+                            </constraints>
+                        </imageView>
+                        <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" ambiguous="YES" text="seed" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="pRQ-Me-t9D">
+                            <rect key="frame" x="46.5" y="22" width="17" height="9"/>
+                            <fontDescription key="fontDescription" type="system" pointSize="7"/>
+                            <color key="textColor" white="0.66666666669999997" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+                            <nil key="highlightedColor"/>
+                        </label>
+                    </subviews>
+                    <color key="backgroundColor" white="0.0" alpha="0.0" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+                    <constraints>
+                        <constraint firstAttribute="width" constant="68" id="aOV-4D-7rP"/>
+                        <constraint firstItem="nwa-nn-zIn" firstAttribute="leading" secondItem="n5I-xB-CRW" secondAttribute="trailing" constant="5" id="aYO-Nh-Yzp"/>
+                        <constraint firstItem="pRQ-Me-t9D" firstAttribute="top" secondItem="nwa-nn-zIn" secondAttribute="bottom" constant="1" id="az6-29-hHo"/>
+                        <constraint firstItem="pRQ-Me-t9D" firstAttribute="centerX" secondItem="nwa-nn-zIn" secondAttribute="centerX" id="mpZ-AW-psk"/>
+                    </constraints>
+                </view>
+            </subviews>
+            <color key="backgroundColor" white="0.0" alpha="0.0" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+            <constraints>
+                <constraint firstItem="0bB-bz-LCy" firstAttribute="top" secondItem="iN0-l3-epB" secondAttribute="top" id="NAW-gH-Dq2"/>
+                <constraint firstAttribute="trailing" secondItem="0bB-bz-LCy" secondAttribute="trailing" id="OAt-CE-O01"/>
+                <constraint firstItem="vUN-kp-3ea" firstAttribute="bottom" secondItem="0bB-bz-LCy" secondAttribute="bottom" id="buc-wM-Jvb"/>
+                <constraint firstItem="0bB-bz-LCy" firstAttribute="leading" secondItem="iN0-l3-epB" secondAttribute="leading" id="pYT-mM-tA2"/>
+            </constraints>
+            <freeformSimulatedSizeMetrics key="simulatedDestinationMetrics"/>
+            <viewLayoutGuide key="safeArea" id="vUN-kp-3ea"/>
+            <point key="canvasLocation" x="-86.956521739130437" y="338.50446428571428"/>
+        </view>
+    </objects>
+    <resources>
+        <image name="person.crop.circle" catalog="system" width="128" height="121"/>
+    </resources>
+</document>
