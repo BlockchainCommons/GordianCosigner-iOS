@@ -185,28 +185,28 @@
 		D04423F82587058600A25179 /* Sub Views */ = {
 			isa = PBXGroup;
 			children = (
-				D04423F92587059900A25179 /* Lifehash Seed Primary */,
-				D04423FE258705E200A25179 /* Lifehash Seed Secondary */,
+				D04423F92587059900A25179 /* Lifehash Primary */,
+				D04423FE258705E200A25179 /* Lifehash Secondary */,
 			);
 			path = "Sub Views";
 			sourceTree = "<group>";
 		};
-		D04423F92587059900A25179 /* Lifehash Seed Primary */ = {
+		D04423F92587059900A25179 /* Lifehash Primary */ = {
 			isa = PBXGroup;
 			children = (
 				D04423F42586F2CC00A25179 /* LifehashSeedView.swift */,
 				D04423F62586F2F700A25179 /* LifehashSeedView.xib */,
 			);
-			path = "Lifehash Seed Primary";
+			path = "Lifehash Primary";
 			sourceTree = "<group>";
 		};
-		D04423FE258705E200A25179 /* Lifehash Seed Secondary */ = {
+		D04423FE258705E200A25179 /* Lifehash Secondary */ = {
 			isa = PBXGroup;
 			children = (
 				D04423FA258705B900A25179 /* LifehashSeedSecondary.swift */,
 				D04423FC258705D900A25179 /* LifehashSeedSecondary.xib */,
 			);
-			path = "Lifehash Seed Secondary";
+			path = "Lifehash Secondary";
 			sourceTree = "<group>";
 		};
 		D0974A5F255B99CF0013DC60 /* Structs */ = {

@@ -10,6 +10,8 @@ import UIKit
 
 class LifehashSeedSecondary: UIView {
 
+    @IBOutlet weak var iconText: UILabel!
+    @IBOutlet weak var iconImage: UIImageView!
     @IBOutlet weak var background: UIView!
     @IBOutlet weak var lifehashImage: UIImageView!
     let nibName = "LifehashSeedSecondary"

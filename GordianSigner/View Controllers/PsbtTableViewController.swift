@@ -71,6 +71,13 @@ class PsbtTableViewController: UIViewController, UITableViewDelegate, UITableVie
         }
     }
     
+    @IBAction func closeAction(_ sender: Any) {
+        DispatchQueue.main.async {
+            self.dismiss(animated: true, completion: nil)
+        }
+    }
+    
+    
     private func load(completion: @escaping ((Bool) -> Void)) {
         inputsArray.removeAll()
         outputsArray.removeAll()
@@ -390,40 +397,84 @@ class PsbtTableViewController: UIViewController, UITableViewDelegate, UITableVie
     }
     
     func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-        switch section {
-        case 1:
-            return psbt.inputs.count
-        case 2:
-            return psbt.outputs.count
-        default:
-            return 1
+        if tableView.tag == 3 {
+            return (inputsArray[section]["pubKeyArray"] as? [[String:Any]] ?? [[:]]).count
+        } else {
+            switch section {
+            case 1:
+                return psbt.inputs.count
+            case 2:
+                return psbt.outputs.count
+            default:
+                return 1
+            }
         }
     }
     
     func numberOfSections(in tableView: UITableView) -> Int {
-        return 4
+        if tableView.tag == 3 {
+            return 1
+        } else {
+            return 4
+        }
     }
     
+    private func cosisgnersCell(_ table: UITableView, _ indexPath: IndexPath) -> UITableViewCell {
+        let cell = table.dequeueReusableCell(withIdentifier: "participantsCell", for: indexPath)
+        let label = cell.viewWithTag(1) as! UILabel
+        let lifeHashView = cell.viewWithTag(2) as! LifehashSeedSecondary
+        let sigImage = cell.viewWithTag(3) as! UIImageView
+        lifeHashView.alpha = 0
+        sigImage.tintColor = .systemPink
+        
+        if let participants = inputsArray[indexPath.section]["pubKeyArray"] as? [[String:Any]] {
+            let participant = participants[indexPath.row]
+            let cosignerLabel = participant["keysetLabel"] as! String
+            let hasSigned = participant["hasSigned"] as! Bool
+            
+            if hasSigned {
+                sigImage.image = UIImage(systemName: "signature")
+                sigImage.tintColor = .systemGreen
+            } else {
+                sigImage.image = UIImage(systemName: "exclamationmark.square")
+            }
+            
+            if cosignerLabel != "unknown" {
+                if let lifehash = participant["lifeHash"] as? UIImage {
+                    lifeHashView.lifehashImage.image = lifehash
+                    lifeHashView.alpha = 1
+                }
+            }
+            label.text = cosignerLabel
+        }
+        
+        return cell
+    }
+ 
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
-        switch indexPath.section {
-        case 0:
-            return completeCell(indexPath)
-        case 1:
-            if inputsArray.count > 0 {
-                return inputCell(indexPath)
-            } else {
+        if tableView.tag == 3 {
+            return cosisgnersCell(tableView, indexPath)
+        } else {
+            switch indexPath.section {
+            case 0:
+                return completeCell(indexPath)
+            case 1:
+                if inputsArray.count > 0 {
+                    return inputCell(indexPath)
+                } else {
+                    return UITableViewCell()
+                }
+            case 2:
+                if outputsArray.count > 0 {
+                    return outputCell(indexPath)
+                } else {
+                    return UITableViewCell()
+                }
+            case 3:
+                return feeCell(indexPath)
+            default:
                 return UITableViewCell()
             }
-        case 2:
-            if outputsArray.count > 0 {
-                return outputCell(indexPath)
-            } else {
-                return UITableViewCell()
-            }
-        case 3:
-            return feeCell(indexPath)
-        default:
-            return UITableViewCell()
         }
     }
     
@@ -477,82 +528,47 @@ class PsbtTableViewController: UIViewController, UITableViewDelegate, UITableVie
     private func inputCell(_ indexPath: IndexPath) -> UITableViewCell {
         let cell = tableView.dequeueReusableCell(withIdentifier: "inputCell", for: indexPath)
         configureCell(cell)
-        
-        let lifehashView = cell.viewWithTag(1) as! LifehashSeedSecondary
-        
+                
         let amountLabel = cell.viewWithTag(2) as! UILabel
-        let participantsTextView = cell.viewWithTag(3) as! UITextView
+        let participantsTableView = cell.viewWithTag(3) as! UITableView
+        participantsTableView.delegate = self
+        participantsTableView.frame = CGRect(x: 0, y: 0, width: tableView.frame.width, height: 300)
         let numberOfSigsLabel = cell.viewWithTag(6) as! UILabel
+        
+        let pathLabel = cell.viewWithTag(8) as! UILabel
+        pathLabel.text = "path unknown"
+        
         let inputNumberLabel = cell.viewWithTag(7) as! UILabel
-        
         inputNumberLabel.text = "Input #\(indexPath.row + 1)"
-        
-        configureView(participantsTextView)
-        
+                
         let inputDict = inputsArray[indexPath.row]
         let input = inputDict["input"] as! PSBTInput
         
         if let pubkeyArray = inputDict["pubKeyArray"] as? [[String:Any]] {
-            var isMine = false
-            
-            participantsTextView.text = ""
             numberOfSigsLabel.text = "?"
             
             if pubkeyArray.count > 0 {
                 var numberOfSigs = 0
-                
-                var image:UIImage?
-                
+                                
                 for pubkey in pubkeyArray {
-                    let participant = pubkey["keysetLabel"] as! String
                     let hasSigned = pubkey["hasSigned"] as! Bool
                     let fullPath = pubkey["fullPath"] as! BIP32Path
                     
-                    var path = fullPath.description
-                    
                     if hasSigned {
-                        if let keysetOrigin = pubkey["keysetOrigin"] as? String {
-                            path = keysetOrigin
-                        }
-                        participantsTextView.text += "Signed: " + participant + " - \(path)\n"
                         numberOfSigs += 1
-                    } else {
-                        participantsTextView.text += "NOT signed: " + participant + " - \(path)\n"
                     }
                     
-                    if participant != "unknown" {
-                        isMine = true
-                        if let lifehash = pubkey["lifeHash"] as? UIImage {
-                            image = lifehash
-                        }
-                    }
-                }
-                
-                if !isMine {
-                    lifehashView.alpha = 0
-                } else {
-                    lifehashView.alpha = 1
-                    if image != nil {
-                        //isMineImageView.image = image
-                        lifehashView.lifehashImage.image = image
-                    } else {
-                        lifehashView.lifehashImage.tintColor = .systemGreen
-                        lifehashView.lifehashImage.image = UIImage(systemName: "person.crop.circle.fill.badge.checkmark")
-                    }
+                    pathLabel.text = fullPath.description
                 }
                 
                 numberOfSigsLabel.text = "\(numberOfSigs) signatures"
                 
             } else {
-                lifehashView.alpha = 0
                 numberOfSigsLabel.text = "?"
             }
             
-            
         } else {
-            lifehashView.alpha = 0
             numberOfSigsLabel.text = "?"
-            participantsTextView.text = "unknown"
         }
         
         if let amount = input.amount {
@@ -568,8 +584,9 @@ class PsbtTableViewController: UIViewController, UITableViewDelegate, UITableVie
         
         let outputLabel = cell.viewWithTag(1) as! UILabel
         
-        let isMineImageView = cell.viewWithTag(2) as! UIImageView
-        isMineImageView.layer.magnificationFilter = .nearest
+        let lifehashView = cell.viewWithTag(2) as! LifehashSeedSecondary
+        lifehashView.backgroundColor = cell.backgroundColor
+        lifehashView.background.backgroundColor = cell.backgroundColor
         
         let amountLabel = cell.viewWithTag(3) as! UILabel
         let addressLabel = cell.viewWithTag(4) as! UILabel
@@ -582,15 +599,19 @@ class PsbtTableViewController: UIViewController, UITableViewDelegate, UITableVie
         
         let isMine = outputDict["isMine"] as! Bool
         if isMine {
-            isMineImageView.image = UIImage(systemName: "person.crop.circle.fill.badge.checkmark")
+            lifehashView.lifehashImage.image = UIImage(systemName: "person.crop.circle.fill.badge.checkmark")
+            lifehashView.iconImage.image = UIImage(systemName: "person.2.square.stack")
+            lifehashView.iconText.text = "account"
             if let lifehash = outputDict["lifeHash"] as? UIImage {
-                isMineImageView.image = lifehash
+                lifehashView.lifehashImage.image = lifehash
             } else {
-                isMineImageView.tintColor = .systemGreen
-            }            
+                lifehashView.lifehashImage.tintColor = .systemGreen
+            }
+            lifehashView.alpha = 1
         } else {
-            isMineImageView.image = UIImage(systemName: "questionmark.circle")
-            isMineImageView.tintColor = .systemGray
+//            lifehashView.image = UIImage(systemName: "questionmark.circle")
+//            isMineImageView.tintColor = .systemGray
+            lifehashView.alpha = 0
         }
         
         amountLabel.text = (Double(output.txOutput.amount) / 100000000.0).avoidNotation + " btc"
@@ -626,50 +647,62 @@ class PsbtTableViewController: UIViewController, UITableViewDelegate, UITableVie
     }
     
     func tableView(_ tableView: UITableView, heightForRowAt indexPath: IndexPath) -> CGFloat {
-        switch indexPath.section {
-        case 0:
-            return 44
-        case 1:
-            return 168
-        case 2:
-            return 156
-        case 3:
-            return 44
-        default:
-            return 80
+         if tableView.tag == 3 {
+            return 60
+         } else {
+            switch indexPath.section {
+            case 0:
+                return 44
+            case 1:
+                return 300
+            case 2:
+                return 156
+            case 3:
+                return 44
+            default:
+                return 80
+            }
         }
     }
     
     func tableView(_ tableView: UITableView, heightForHeaderInSection section: Int) -> CGFloat {
-        return 50
+        if tableView.tag == 3 {
+            return 0
+        } else {
+            return 50
+        }
     }
     
     func tableView(_ tableView: UITableView, viewForHeaderInSection section: Int) -> UIView? {
-        let header = UIView()
-        header.backgroundColor = UIColor.clear
-        header.frame = CGRect(x: 0, y: 0, width: view.frame.size.width - 32, height: 50)
-        
-        let textLabel = UILabel()
-        textLabel.textAlignment = .left
-        textLabel.font = UIFont.systemFont(ofSize: 20, weight: .regular)
-        textLabel.textColor = .white
-        textLabel.frame = CGRect(x: 0, y: 0, width: 300, height: 50)
-        
-        switch section {
-        case 0:
-            textLabel.text = "Status"
-        case 1:
-            textLabel.text = "Inputs"
-        case 2:
-            textLabel.text = "Outputs"
-        case 3:
-            textLabel.text = "Mining Fee"
-        default:
-            break
+        if tableView.tag != 3 {
+            let header = UIView()
+            header.backgroundColor = UIColor.clear
+            header.frame = CGRect(x: 0, y: 0, width: view.frame.size.width - 32, height: 50)
+            
+            let textLabel = UILabel()
+            textLabel.textAlignment = .left
+            textLabel.font = UIFont.systemFont(ofSize: 20, weight: .regular)
+            textLabel.textColor = .white
+            textLabel.frame = CGRect(x: 0, y: 0, width: 300, height: 50)
+            
+            switch section {
+            case 0:
+                textLabel.text = "Status"
+            case 1:
+                textLabel.text = "Inputs"
+            case 2:
+                textLabel.text = "Outputs"
+            case 3:
+                textLabel.text = "Mining Fee"
+            default:
+                break
+            }
+            
+            header.addSubview(textLabel)
+            return header
+        } else {
+            return nil
         }
-        
-        header.addSubview(textLabel)
-        return header
     }
     
     private func sign() {

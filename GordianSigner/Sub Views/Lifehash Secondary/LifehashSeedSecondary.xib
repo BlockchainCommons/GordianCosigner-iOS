@@ -10,6 +10,8 @@
         <placeholder placeholderIdentifier="IBFilesOwner" id="-1" userLabel="File's Owner" customClass="LifehashSeedSecondary" customModule="Gordian_Cosigner" customModuleProvider="target">
             <connections>
                 <outlet property="background" destination="0bB-bz-LCy" id="xim-AF-zIS"/>
+                <outlet property="iconImage" destination="nwa-nn-zIn" id="oto-D4-mYV"/>
+                <outlet property="iconText" destination="pRQ-Me-t9D" id="Kju-ct-G12"/>
                 <outlet property="lifehashImage" destination="n5I-xB-CRW" id="itF-6x-IRk"/>
             </connections>
         </placeholder>

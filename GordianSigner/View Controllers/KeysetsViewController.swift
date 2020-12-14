@@ -14,6 +14,7 @@ class KeysetsViewController: UIViewController, UITableViewDelegate, UITableViewD
     var editButton = UIBarButtonItem()
     private var keysets = [KeysetStruct]()
     private var signers = [SignerStruct]()
+    private var accountMaps = [AccountMapStruct]()
     private var keysetToExport = ""
     private var headerText = ""
     private var subheaderText = ""
@@ -37,28 +38,28 @@ class KeysetsViewController: UIViewController, UITableViewDelegate, UITableViewD
     }
     
     override func viewDidAppear(_ animated: Bool) {
-        guard let pasteBoard = UIPasteboard.general.string, pasteBoard.lowercased().hasPrefix("ur:crypto-account") else { return }
-        
-        if let account = URHelper.accountUr(pasteBoard) {
-            DispatchQueue.main.async { [weak self] in
-                guard let self = self else { return }
-                
-                var alertStyle = UIAlertController.Style.actionSheet
-                if (UIDevice.current.userInterfaceIdiom == .pad) {
-                  alertStyle = UIAlertController.Style.alert
-                }
-                
-                let alert = UIAlertController(title: "Import keyset?", message: "You have a valid keyset on your clipboard, would you like to import it?", preferredStyle: alertStyle)
-                
-                alert.addAction(UIAlertAction(title: "Yes", style: .default, handler: { action in
-                    self.addKeyset(account)
-                }))
-                                
-                alert.addAction(UIAlertAction(title: "Cancel", style: .cancel, handler: { action in }))
-                alert.popoverPresentationController?.sourceView = self.view
-                self.present(alert, animated: true, completion: nil)
-            }
-        }
+//        guard let pasteBoard = UIPasteboard.general.string, pasteBoard.lowercased().hasPrefix("ur:crypto-account") else { return }
+//
+//        if let account = URHelper.accountUr(pasteBoard) {
+//            DispatchQueue.main.async { [weak self] in
+//                guard let self = self else { return }
+//
+//                var alertStyle = UIAlertController.Style.actionSheet
+//                if (UIDevice.current.userInterfaceIdiom == .pad) {
+//                  alertStyle = UIAlertController.Style.alert
+//                }
+//
+//                let alert = UIAlertController(title: "Import keyset?", message: "You have a valid keyset on your clipboard, would you like to import it?", preferredStyle: alertStyle)
+//
+//                alert.addAction(UIAlertAction(title: "Yes", style: .default, handler: { action in
+//                    self.addKeyset(account)
+//                }))
+//
+//                alert.addAction(UIAlertAction(title: "Cancel", style: .cancel, handler: { action in }))
+//                alert.popoverPresentationController?.sourceView = self.view
+//                self.present(alert, animated: true, completion: nil)
+//            }
+//        }
     }
     
     @objc func add() {
@@ -78,6 +79,15 @@ class KeysetsViewController: UIViewController, UITableViewDelegate, UITableViewD
         keysets.removeAll()
         lifehashes.removeAll()
         signers.removeAll()
+        accountMaps.removeAll()
+        
+        CoreDataService.retrieveEntity(entityName: .accountMap) { (accountMaps, err) in
+            if let accountMaps = accountMaps {
+                for accountMap in accountMaps {
+                    self.accountMaps.append(AccountMapStruct(dictionary: accountMap))
+                }
+            }
+        }
         
         CoreDataService.retrieveEntity(entityName: .signer) { (signers, errorDescription) in
             guard let signers = signers else { return }
@@ -197,6 +207,11 @@ class KeysetsViewController: UIViewController, UITableViewDelegate, UITableViewD
                 isSharedImage.tintColor = .systemPink
                 sharedText.text = "used"
                 sharedText.textColor = .systemPink
+                for account in accountMaps {
+                    if account.id == keyset.sharedWith {
+                        sharedText.text = account.label
+                    }
+                }
             } else {
                 isSharedImage.image = UIImage(systemName: "person")
                 isSharedImage.tintColor = .systemBlue

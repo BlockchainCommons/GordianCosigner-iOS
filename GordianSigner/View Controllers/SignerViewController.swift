@@ -29,6 +29,13 @@ class SignerViewController: UIViewController {
         
     }
     
+    @IBAction func closeAction(_ sender: Any) {
+        DispatchQueue.main.async {
+            self.dismiss(animated: true, completion: nil)
+        }
+    }
+    
+    
     @IBAction func importFileAction(_ sender: Any) {
         DispatchQueue.main.async { [weak self] in
             guard let self = self else { return }
