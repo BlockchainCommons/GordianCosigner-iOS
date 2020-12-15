@@ -419,7 +419,7 @@ class PsbtTableViewController: UIViewController, UITableViewDelegate, UITableVie
         }
     }
     
-    private func cosisgnersCell(_ table: UITableView, _ indexPath: IndexPath) -> UITableViewCell {
+    private func cosignersCell(_ table: UITableView, _ indexPath: IndexPath) -> UITableViewCell {
         let cell = table.dequeueReusableCell(withIdentifier: "participantsCell", for: indexPath)
         let label = cell.viewWithTag(1) as! UILabel
         let lifeHashView = cell.viewWithTag(2) as! LifehashSeedSecondary
@@ -453,7 +453,7 @@ class PsbtTableViewController: UIViewController, UITableViewDelegate, UITableVie
  
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         if tableView.tag == 3 {
-            return cosisgnersCell(tableView, indexPath)
+            return cosignersCell(tableView, indexPath)
         } else {
             switch indexPath.section {
             case 0:
@@ -571,6 +571,10 @@ class PsbtTableViewController: UIViewController, UITableViewDelegate, UITableVie
         
         if let amount = input.amount {
             amountLabel.text = "\(Double(amount) / 100000000.0) btc"
+        }
+        
+        DispatchQueue.main.async {
+            participantsTableView.reloadData()
         }
         
         return cell
