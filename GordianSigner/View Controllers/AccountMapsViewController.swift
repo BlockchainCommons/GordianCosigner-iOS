@@ -46,7 +46,7 @@ class AccountMapsViewController: UIViewController, UITableViewDelegate, UITableV
             
             guard let accountMaps = accountMaps, accountMaps.count > 0 else {
                 if UserDefaults.standard.object(forKey: "createDefaults") == nil {
-                    self.createSigner()
+                    self.promptToCreate()
                 }
                 return
             }
@@ -165,6 +165,16 @@ class AccountMapsViewController: UIViewController, UITableViewDelegate, UITableV
         addressesButton.addTarget(self, action: #selector(seeAddresses(_:)), for: .touchUpInside)
         addressesButton.restorationIdentifier = "\(indexPath.section)"
         
+        let editButton = cell.viewWithTag(9) as! UIButton
+        editButton.addTarget(self, action: #selector(editLabel(_:)), for: .touchUpInside)
+        editButton.restorationIdentifier = "\(indexPath.section)"
+        
+        let exportButton = cell.viewWithTag(10) as! UIButton
+        exportButton.clipsToBounds = true
+        exportButton.layer.cornerRadius = 8
+        exportButton.restorationIdentifier = "\(indexPath.section)"
+        exportButton.addTarget(self, action: #selector(exportQr(_:)), for: .touchUpInside)
+        
         if accountMap.descriptor.contains("keyset") {
             isCompleteImage.alpha = 1
             isCompleteImage.image = UIImage(systemName: "circle.lefthalf.fill")
@@ -172,7 +182,11 @@ class AccountMapsViewController: UIViewController, UITableViewDelegate, UITableV
             completeLabel.text = "Account incomplete!"
             addButton.alpha = 1
             addressesButton.alpha = 0
+            editButton.alpha = 0
+            exportButton.alpha = 0
         } else {
+            editButton.alpha = 1
+            exportButton.alpha = 1
             isCompleteImage.alpha = 0
             isCompleteImage.tintColor = .systemGreen
             completeLabel.text = ""
@@ -190,16 +204,6 @@ class AccountMapsViewController: UIViewController, UITableViewDelegate, UITableV
         } else {
             signerLifeHash.alpha = 0
         }
-        
-        let editButton = cell.viewWithTag(9) as! UIButton
-        editButton.addTarget(self, action: #selector(editLabel(_:)), for: .touchUpInside)
-        editButton.restorationIdentifier = "\(indexPath.section)"
-        
-        let exportButton = cell.viewWithTag(10) as! UIButton
-        exportButton.clipsToBounds = true
-        exportButton.layer.cornerRadius = 8
-        exportButton.restorationIdentifier = "\(indexPath.section)"
-        exportButton.addTarget(self, action: #selector(exportQr(_:)), for: .touchUpInside)
         
         let date = cell.viewWithTag(11) as! UILabel
         date.text = accountMap.dateAdded.formatted()
@@ -232,34 +236,35 @@ class AccountMapsViewController: UIViewController, UITableViewDelegate, UITableV
         let hack = descStruct.mOfNType.replacingOccurrences(of: " of ", with: "*")
         let arr = hack.split(separator: "*")
         if arr.count > 0 {
+            
             if let numberOfCosigners = Int("\(arr[1])") {
                 switch numberOfCosigners {
                 case _ where numberOfCosigners == 3:
                     height = 257
                 case _ where numberOfCosigners == 4:
-                    height = 267
-                case _ where numberOfCosigners == 5:
                     height = 277
-                case _ where numberOfCosigners == 6:
+                case _ where numberOfCosigners == 5:
                     height = 287
-                case _ where numberOfCosigners == 7:
+                case _ where numberOfCosigners == 6:
                     height = 297
-                case _ where numberOfCosigners == 8:
+                case _ where numberOfCosigners == 7:
                     height = 307
-                case _ where numberOfCosigners == 9:
+                case _ where numberOfCosigners == 8:
                     height = 317
-                case _ where numberOfCosigners == 10:
+                case _ where numberOfCosigners == 9:
                     height = 327
-                case _ where numberOfCosigners == 11:
+                case _ where numberOfCosigners == 10:
                     height = 337
-                case _ where numberOfCosigners == 12:
+                case _ where numberOfCosigners == 11:
                     height = 347
-                case _ where numberOfCosigners == 13:
+                case _ where numberOfCosigners == 12:
                     height = 357
-                case _ where numberOfCosigners == 14:
+                case _ where numberOfCosigners == 13:
                     height = 367
-                case _ where numberOfCosigners == 15:
+                case _ where numberOfCosigners == 14:
                     height = 377
+                case _ where numberOfCosigners == 15:
+                    height = 387
                 default:
                     break
                 }
@@ -645,6 +650,22 @@ class AccountMapsViewController: UIViewController, UITableViewDelegate, UITableV
     }
     
     // MARK: - Never used the app before
+    
+    private func promptToCreate() {
+        DispatchQueue.main.async { [weak self] in
+            guard let self = self else { return }
+            
+            let alert = UIAlertController(title: "Create defaults?", message: "Would you like the app to create a default cosigner for this device?", preferredStyle: .alert)
+            
+            alert.addAction(UIAlertAction(title: "Create", style: .default, handler: { action in
+                self.createSigner()
+            }))
+                            
+            alert.addAction(UIAlertAction(title: "Cancel", style: .cancel, handler: { action in }))
+            alert.popoverPresentationController?.sourceView = self.view
+            self.present(alert, animated: true, completion: nil)
+        }
+    }
     
     private func createSigner() {
         guard let words = Keys.seed(),

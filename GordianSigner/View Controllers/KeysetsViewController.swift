@@ -555,6 +555,7 @@ class KeysetsViewController: UIViewController, UITableViewDelegate, UITableViewD
                 self?.lifehashes.remove(at: section)
                 self?.keysets.remove(at: section)
                 self?.keysetsTable.deleteSections(IndexSet.init(arrayLiteral: section), with: .fade)
+                self?.keysetsTable.reloadData()
             }
             
             showAlert(self, "", "Cosigner deleted ✓")

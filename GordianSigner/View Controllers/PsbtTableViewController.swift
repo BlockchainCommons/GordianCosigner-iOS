@@ -116,6 +116,19 @@ class PsbtTableViewController: UIViewController, UITableViewDelegate, UITableVie
                     
                     if o + 1 == origins.count {
                         self.inputsArray[i]["pubKeyArray"] = pubkeysArray
+                        
+                        // Need ability to determine threshhold from input in order to produce an address.
+                        
+//                        var pubKeys = [Key]()
+//                        for pk in pubkeysArray {
+//                            let pubkey = pk["pubkey"] as! String
+//                            if let k = try? Key(Data(value: pubkey), network: .mainnet) {
+//                                pubKeys.append(k)
+//                            }
+//                        }
+//
+//                        let script = ScriptPubKey(multisig: <#T##[PubKey]#>, threshold: <#T##UInt#>, isBIP67: <#T##Bool#>)
+                        
                     }
                     
                     if i + 1 == inputs.count && o + 1 == origins.count {
@@ -426,6 +439,8 @@ class PsbtTableViewController: UIViewController, UITableViewDelegate, UITableVie
         let lifeHashView = cell.viewWithTag(2) as! LifehashSeedSecondary
         let sigImage = cell.viewWithTag(3) as! UIImageView
         lifeHashView.alpha = 0
+        lifeHashView.backgroundColor = cell.backgroundColor
+        lifeHashView.background.backgroundColor = cell.backgroundColor
         sigImage.tintColor = .systemPink
         
         if let participants = inputsArray[indexPath.section]["pubKeyArray"] as? [[String:Any]] {
@@ -454,6 +469,7 @@ class PsbtTableViewController: UIViewController, UITableViewDelegate, UITableVie
  
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         if tableView.tag == 3 {
+            tableView.layer.cornerRadius = 8
             return cosignersCell(tableView, indexPath)
         } else {
             switch indexPath.section {
