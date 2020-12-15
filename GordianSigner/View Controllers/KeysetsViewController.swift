@@ -42,34 +42,33 @@ class KeysetsViewController: UIViewController, UITableViewDelegate, UITableViewD
     }
     
     private func getPasteboard() {
-        guard let pasteBoard = UIPasteboard.general.string, pasteBoard.lowercased().hasPrefix("ur:crypto-account") else {
-            showAlert(self, "Invalid cosigner text", "We accept UR crypto-account or [<fingerprint>/48h/0h/0h/2h]xpub.....")
-            return
-        }
-        
-        if let account = URHelper.accountUr(pasteBoard) {
-            DispatchQueue.main.async { [weak self] in
-                guard let self = self else { return }
-                
-                var alertStyle = UIAlertController.Style.actionSheet
-                if (UIDevice.current.userInterfaceIdiom == .pad) {
-                    alertStyle = UIAlertController.Style.alert
+        if let pasteBoard = UIPasteboard.general.string {
+            if let account = URHelper.accountUr(pasteBoard) {
+                DispatchQueue.main.async { [weak self] in
+                    guard let self = self else { return }
+                    
+                    var alertStyle = UIAlertController.Style.actionSheet
+                    if (UIDevice.current.userInterfaceIdiom == .pad) {
+                        alertStyle = UIAlertController.Style.alert
+                    }
+                    
+                    let alert = UIAlertController(title: "Import keyset?", message: "You have a valid keyset on your clipboard, would you like to import it?", preferredStyle: alertStyle)
+                    
+                    alert.addAction(UIAlertAction(title: "Yes", style: .default, handler: { action in
+                        self.addKeyset(account)
+                    }))
+                    
+                    alert.addAction(UIAlertAction(title: "Cancel", style: .cancel, handler: { action in }))
+                    alert.popoverPresentationController?.sourceView = self.view
+                    self.present(alert, animated: true, completion: nil)
                 }
-                
-                let alert = UIAlertController(title: "Import keyset?", message: "You have a valid keyset on your clipboard, would you like to import it?", preferredStyle: alertStyle)
-                
-                alert.addAction(UIAlertAction(title: "Yes", style: .default, handler: { action in
-                    self.addKeyset(account)
-                }))
-                
-                alert.addAction(UIAlertAction(title: "Cancel", style: .cancel, handler: { action in }))
-                alert.popoverPresentationController?.sourceView = self.view
-                self.present(alert, animated: true, completion: nil)
+            } else if pasteBoard.contains("48h/0h/0h/2h") {
+                self.addKeyset(pasteBoard)
+            } else {
+                showAlert(self, "", "Invalid cosigner text, we accept UR crypto-account or [<fingerprint>/48h/0h/0h/2h]xpub.....")
             }
-        } else if pasteBoard.contains("48h/0h/0h/2h") {
-            self.addKeyset(pasteBoard)
         } else {
-            showAlert(self, "", "Invalid cosigner text, we accept UR crypto-account or [<fingerprint>/48h/0h/0h/2h]xpub.....")
+            showAlert(self, "Invalid cosigner text", "We accept UR crypto-account or [<fingerprint>/48h/0h/0h/2h]xpub.....")
         }
     }
     
@@ -238,10 +237,7 @@ class KeysetsViewController: UIViewController, UITableViewDelegate, UITableViewD
                 //sharedText.text = "used"
                 sharedText.textColor = .systemPink
                 for account in accountMaps {
-                    print("account.id: \(account.id)")
-                    print("keyset.sharedWith: \(keyset.sharedWith)")
                     if account.id == keyset.sharedWith {
-                        print("account.label: \(account.label)")
                         sharedText.text = account.label
                     }
                 }

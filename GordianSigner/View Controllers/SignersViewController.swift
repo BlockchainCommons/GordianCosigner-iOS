@@ -15,6 +15,7 @@ class SignersViewController: UIViewController {
     var addButton = UIBarButtonItem()
     var editButton = UIBarButtonItem()
     var signerStructs = [SignerStruct]()
+    var signer:SignerStruct!
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -199,6 +200,26 @@ class SignersViewController: UIViewController {
             self.present(alert, animated: true, completion: nil)
         }
     }
+    
+    @objc func seeDetail(_ sender: UIButton) {
+        guard let sectionString = sender.restorationIdentifier, let int = Int(sectionString) else { return }
+        
+        signer = signerStructs[int]
+        
+        DispatchQueue.main.async { [weak self] in
+            guard let self = self else { return }
+            
+            self.performSegue(withIdentifier: "segueToSeedDetail", sender: self)
+        }
+    }
+    
+    override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
+        if segue.identifier == "segueToSeedDetail" {
+            if let vc = segue.destination as? SeedDetailViewController {
+                vc.signer = signer
+            }
+        }
+    }
 
 }
 
@@ -242,6 +263,7 @@ extension SignersViewController: UITableViewDataSource {
         let dateAdded = cell.viewWithTag(2) as! UILabel
         let lifehashView = cell.viewWithTag(3) as! LifehashSeedView
         let fingerprintLabel = cell.viewWithTag(4) as! UILabel
+        let detailButton = cell.viewWithTag(5) as! UIButton
         
         let editButton = cell.viewWithTag(6) as! UIButton
         editButton.addTarget(self, action: #selector(editLabel(_:)), for: .touchUpInside)
@@ -251,15 +273,17 @@ extension SignersViewController: UITableViewDataSource {
         let signer = signerStructs[indexPath.section]
         
         label.text = signer.label
-        //imageView.image = UIImage(data: signer.lifeHash)
         lifehashView.lifehashImage.image = UIImage(data: signer.lifeHash)
         dateAdded.text = signer.dateAdded.formatted()
         fingerprintLabel.text = signer.fingerprint
             
         lifehashView.background.clipsToBounds = true
-        //lifehashView.background.layer.cornerRadius = 8
         lifehashView.background.backgroundColor = cell.backgroundColor
         lifehashView.backgroundColor = cell.backgroundColor
+        
+        detailButton.showsTouchWhenHighlighted = true
+        detailButton.restorationIdentifier = "\(indexPath.section)"
+        detailButton.addTarget(self, action: #selector(seeDetail(_:)), for: .touchUpInside)
         
         return cell
     }
