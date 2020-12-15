@@ -46,10 +46,6 @@ class PsbtViewController: UIViewController, UITableViewDelegate, UITableViewData
     
     private func refresh() {
         spinner.add(vc: self, description: "refreshing...")
-        psbts.removeAll()
-        completes.removeAll()
-        lifeHashes.removeAll()
-        amounts.removeAll()
         load()
     }
     
@@ -58,6 +54,12 @@ class PsbtViewController: UIViewController, UITableViewDelegate, UITableViewData
     }
     
     private func load() {
+        psbts.removeAll()
+        completes.removeAll()
+        lifeHashes.removeAll()
+        amounts.removeAll()
+        weSigned.removeAll()
+        
         CoreDataService.retrieveEntity(entityName: .psbt) { [weak self] (psbts, errorDescription) in
             guard let self = self else { return }
             
@@ -421,6 +423,7 @@ class PsbtViewController: UIViewController, UITableViewDelegate, UITableViewData
                 self?.psbts.remove(at: section)
                 self?.lifeHashes.remove(at: section)
                 self?.completes.remove(at: section)
+                self?.weSigned.remove(at: section)
                 self?.psbtTable.deleteSections(IndexSet.init(arrayLiteral: section), with: .fade)
             }
         }

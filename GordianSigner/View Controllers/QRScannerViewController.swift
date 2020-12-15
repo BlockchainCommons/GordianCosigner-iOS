@@ -356,34 +356,30 @@ extension QRScannerViewController: AVCaptureMetadataOutputObjectsDelegate {
     
     func metadataOutput(_ output: AVCaptureMetadataOutput, didOutput metadataObjects: [AVMetadataObject], from connection: AVCaptureConnection) {
         if !isRunning {
+            guard metadataObjects.count > 0,
+                let machineReadableCode = metadataObjects[0] as? AVMetadataMachineReadableCodeObject,
+                machineReadableCode.type == AVMetadataObject.ObjectType.qr,
+                let string = machineReadableCode.stringValue else {
+                    isRunning = false
+                    return
+            }
             
-        guard metadataObjects.count > 0,
-            let machineReadableCode = metadataObjects[0] as? AVMetadataMachineReadableCodeObject,
-            machineReadableCode.type == AVMetadataObject.ObjectType.qr,
-            let string = machineReadableCode.stringValue else {
-                isRunning = false
-                return
-        }
+            DispatchQueue.main.async { [weak self] in
+                guard let self = self else { return }
+                
+                self.avCaptureSession.stopRunning()
+            }
             
             isRunning = true
-        
-        DispatchQueue.main.async { [weak self] in
-            guard let self = self else { return }
             
-            self.avCaptureSession.stopRunning()
-        }
-        
-        process(text: string)
+            process(text: string)
             
-            if keepRunning {
-                isRunning = false
-                DispatchQueue.main.asyncAfter(deadline: .now() + 0.3) { [weak self] in
-                    guard let self = self else { return }
-                    
-                    self.avCaptureSession.startRunning()
-                }
+            DispatchQueue.main.asyncAfter(deadline: .now() + 0.3) { [weak self] in
+                guard let self = self else { return }
+                
+                self.avCaptureSession.startRunning()
             }
-    }
+        }
     }
     
 }

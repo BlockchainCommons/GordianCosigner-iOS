@@ -39,6 +39,8 @@ class PsbtTableViewController: UIViewController, UITableViewDelegate, UITableVie
           alertStyle = UIAlertController.Style.alert
         }
         
+        spinner.add(vc: self, description: "loading...")
+        
         if psbtText != "" {
             psbt = try? PSBT(psbt: psbtText, network: .mainnet)
             
@@ -59,7 +61,6 @@ class PsbtTableViewController: UIViewController, UITableViewDelegate, UITableVie
     }
     
     override func viewDidAppear(_ animated: Bool) {
-        spinner.add(vc: self, description: "loading...")
         load { success in
             if success {
                 DispatchQueue.main.async { [weak self] in
@@ -719,8 +720,9 @@ class PsbtTableViewController: UIViewController, UITableViewDelegate, UITableVie
             
             self.signedFor = signedFor
             
+            self.save(signedPsbt)
+            
             if let psbtToFinalize = try? signedPsbt.finalized() {
-                self.save(psbtToFinalize)
                 if psbtToFinalize.isComplete {
                     if let final = psbtToFinalize.transactionFinal {
                         if let hex = final.description {
@@ -728,8 +730,6 @@ class PsbtTableViewController: UIViewController, UITableViewDelegate, UITableVie
                         }
                     }
                 }
-            } else {
-                self.save(signedPsbt)
             }
             
             DispatchQueue.main.async {
@@ -749,10 +749,10 @@ class PsbtTableViewController: UIViewController, UITableViewDelegate, UITableVie
         }
     }
     
-    private func save(_ psbt: PSBT) {
+    private func save(_ psbtToSave: PSBT) {
         var dict = [String:Any]()
         dict["dateAdded"] = Date()
-        dict["psbt"] = psbt.data
+        dict["psbt"] = psbtToSave.data
         dict["label"] = "Signed PSBT"
         dict["id"] = UUID()
         
