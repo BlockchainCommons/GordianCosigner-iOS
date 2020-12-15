@@ -506,7 +506,6 @@ class PsbtTableViewController: UIViewController, UITableViewDelegate, UITableVie
                 label.text = "Signatures required"
                 icon.image = UIImage(systemName: "exclamationmark.square")
                 icon.tintColor = .systemPink
-                //export = false
             }
         } else {
             if psbt.isComplete {
@@ -518,7 +517,6 @@ class PsbtTableViewController: UIViewController, UITableViewDelegate, UITableVie
                 label.text = "Signatures required"
                 icon.image = UIImage(systemName: "exclamationmark.square")
                 icon.tintColor = .systemPink
-                //export = false
             }
         }        
         
@@ -609,8 +607,6 @@ class PsbtTableViewController: UIViewController, UITableViewDelegate, UITableVie
             }
             lifehashView.alpha = 1
         } else {
-//            lifehashView.image = UIImage(systemName: "questionmark.circle")
-//            isMineImageView.tintColor = .systemGray
             lifehashView.alpha = 0
         }
         
@@ -720,25 +716,27 @@ class PsbtTableViewController: UIViewController, UITableViewDelegate, UITableVie
             self.signedFor = signedFor
             
             if let psbtToFinalize = try? signedPsbt.finalized() {
+                self.save(psbtToFinalize)
                 if psbtToFinalize.isComplete {
                     if let final = psbtToFinalize.transactionFinal {
                         if let hex = final.description {
                             self.rawTx = hex
-                            self.save(signedPsbt)
                         }
                     }
                 }
+            } else {
+                self.save(signedPsbt)
             }
             
             DispatchQueue.main.async {
                 self.export = true
                 self.psbt = signedPsbt
+                self.signButtonOutlet.setTitle("export", for: .normal)
                 self.load { success in
                     DispatchQueue.main.async {
                         self.tableView.reloadData()
                     }
                 }
-                self.signButtonOutlet.setTitle("export", for: .normal)
             }
             
             self.spinner.remove()
