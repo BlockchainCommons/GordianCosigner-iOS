@@ -38,35 +38,67 @@ class KeysetsViewController: UIViewController, UITableViewDelegate, UITableViewD
     }
     
     override func viewDidAppear(_ animated: Bool) {
-//        guard let pasteBoard = UIPasteboard.general.string, pasteBoard.lowercased().hasPrefix("ur:crypto-account") else { return }
-//
-//        if let account = URHelper.accountUr(pasteBoard) {
-//            DispatchQueue.main.async { [weak self] in
-//                guard let self = self else { return }
-//
-//                var alertStyle = UIAlertController.Style.actionSheet
-//                if (UIDevice.current.userInterfaceIdiom == .pad) {
-//                  alertStyle = UIAlertController.Style.alert
-//                }
-//
-//                let alert = UIAlertController(title: "Import keyset?", message: "You have a valid keyset on your clipboard, would you like to import it?", preferredStyle: alertStyle)
-//
-//                alert.addAction(UIAlertAction(title: "Yes", style: .default, handler: { action in
-//                    self.addKeyset(account)
-//                }))
-//
-//                alert.addAction(UIAlertAction(title: "Cancel", style: .cancel, handler: { action in }))
-//                alert.popoverPresentationController?.sourceView = self.view
-//                self.present(alert, animated: true, completion: nil)
-//            }
-//        }
+
+    }
+    
+    private func getPasteboard() {
+        guard let pasteBoard = UIPasteboard.general.string, pasteBoard.lowercased().hasPrefix("ur:crypto-account") else {
+            showAlert(self, "Invalid cosigner text", "We accept UR crypto-account or [<fingerprint>/48h/0h/0h/2h]xpub.....")
+            return
+        }
+        
+        if let account = URHelper.accountUr(pasteBoard) {
+            DispatchQueue.main.async { [weak self] in
+                guard let self = self else { return }
+                
+                var alertStyle = UIAlertController.Style.actionSheet
+                if (UIDevice.current.userInterfaceIdiom == .pad) {
+                    alertStyle = UIAlertController.Style.alert
+                }
+                
+                let alert = UIAlertController(title: "Import keyset?", message: "You have a valid keyset on your clipboard, would you like to import it?", preferredStyle: alertStyle)
+                
+                alert.addAction(UIAlertAction(title: "Yes", style: .default, handler: { action in
+                    self.addKeyset(account)
+                }))
+                
+                alert.addAction(UIAlertAction(title: "Cancel", style: .cancel, handler: { action in }))
+                alert.popoverPresentationController?.sourceView = self.view
+                self.present(alert, animated: true, completion: nil)
+            }
+        } else if pasteBoard.contains("48h/0h/0h/2h") {
+            self.addKeyset(pasteBoard)
+        } else {
+            showAlert(self, "", "Invalid cosigner text, we accept UR crypto-account or [<fingerprint>/48h/0h/0h/2h]xpub.....")
+        }
     }
     
     @objc func add() {
         DispatchQueue.main.async { [weak self] in
             guard let self = self else { return }
             
-            self.performSegue(withIdentifier: "segueToScanKeyset", sender: self)
+            var alertStyle = UIAlertController.Style.actionSheet
+            if (UIDevice.current.userInterfaceIdiom == .pad) {
+                alertStyle = UIAlertController.Style.alert
+            }
+            
+            let alert = UIAlertController(title: "Import cosigner?", message: "You may either paste one in text format or scan a QR code", preferredStyle: alertStyle)
+            
+            alert.addAction(UIAlertAction(title: "paste", style: .default, handler: { action in
+                self.getPasteboard()
+            }))
+            
+            alert.addAction(UIAlertAction(title: "scan QR", style: .default, handler: { action in
+                DispatchQueue.main.async { [weak self] in
+                    guard let self = self else { return }
+                    
+                    self.performSegue(withIdentifier: "segueToScanKeyset", sender: self)
+                }
+            }))
+            
+            alert.addAction(UIAlertAction(title: "Cancel", style: .cancel, handler: { action in }))
+            alert.popoverPresentationController?.sourceView = self.view
+            self.present(alert, animated: true, completion: nil)
         }
     }
     
@@ -182,8 +214,6 @@ class KeysetsViewController: UIViewController, UITableViewDelegate, UITableViewD
                 lifeHashView.lifehashImage.image = lifeHash
                 lifeHashView.alpha = 1
             } else {
-//                lifeHashImage.image = UIImage(systemName: "questionmark.circle")
-//                lifeHashImage.tintColor = .lightGray
                 lifeHashView.alpha = 0
             }
             
@@ -205,10 +235,13 @@ class KeysetsViewController: UIViewController, UITableViewDelegate, UITableViewD
             if keyset.sharedWith != nil {
                 isSharedImage.image = UIImage(systemName: "person.2.square.stack")
                 isSharedImage.tintColor = .systemPink
-                sharedText.text = "used"
+                //sharedText.text = "used"
                 sharedText.textColor = .systemPink
                 for account in accountMaps {
+                    print("account.id: \(account.id)")
+                    print("keyset.sharedWith: \(keyset.sharedWith)")
                     if account.id == keyset.sharedWith {
+                        print("account.label: \(account.label)")
                         sharedText.text = account.label
                     }
                 }

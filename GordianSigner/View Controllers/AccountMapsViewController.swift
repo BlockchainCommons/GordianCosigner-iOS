@@ -407,6 +407,10 @@ class AccountMapsViewController: UIViewController, UITableViewDelegate, UITableV
         CoreDataService.updateEntity(id: id, keyToUpdate: "label", newValue: label, entityName: .accountMap) { (success, errorDescription) in
             guard success else { showAlert(self, "Label not saved!", "There was an error updating your label, please let us know about it: \(errorDescription ?? "unknown")"); return }
             
+            DispatchQueue.main.async {
+                NotificationCenter.default.post(name: .cosignerAdded, object: nil, userInfo: nil)
+            }
+            
             self.load()
         }
     }
@@ -499,6 +503,10 @@ class AccountMapsViewController: UIViewController, UITableViewDelegate, UITableV
             DispatchQueue.main.async { [weak self] in
                 self?.accountMaps.remove(at: section)
                 self?.accountMapTable.deleteSections(IndexSet.init(arrayLiteral: section), with: .fade)
+            }
+            
+            DispatchQueue.main.async {
+                NotificationCenter.default.post(name: .cosignerAdded, object: nil, userInfo: nil)
             }
             
             showAlert(self, "", "Account Map deleted ✓")

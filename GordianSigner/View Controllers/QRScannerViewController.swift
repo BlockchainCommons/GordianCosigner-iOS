@@ -20,7 +20,6 @@ class QRScannerViewController: UIViewController {
     let closeButton = UIButton()
     let imagePicker = UIImagePickerController()
     let avCaptureSession = AVCaptureSession()
-    var keepRunning = false
     var decoder:URDecoder!
     var doneBlock : ((String?) -> Void)?
     let spinner = Spinner()
@@ -167,10 +166,10 @@ class QRScannerViewController: UIViewController {
     }
     
     private func process(text: String) {
-        isRunning = false
+        isRunning = true
         
         if !isAccountMap(text) && !isCryptoAccount(text) && !isKeyset(text) {
-            keepRunning = true
+            //keepRunning = true
             // Stop if we're already done with the decode.
             guard decoder.result == nil else {
                 guard let result = try? decoder.result?.get(), let psbt = URHelper.psbtUrToBase64Text(result) else { return }
@@ -194,6 +193,8 @@ class QRScannerViewController: UIViewController {
                 stopScanning(psbt)
                 return
             }
+            
+            self.isRunning = false
             
             let percentageCompletion = "\(Int(decoder.estimatedPercentComplete * 100))% complete"
             
