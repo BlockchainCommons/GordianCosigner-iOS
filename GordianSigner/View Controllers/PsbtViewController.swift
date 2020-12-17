@@ -54,6 +54,7 @@ class PsbtViewController: UIViewController, UITableViewDelegate, UITableViewData
     }
     
     private func load() {
+        print("load")
         psbts.removeAll()
         completes.removeAll()
         lifeHashes.removeAll()
@@ -71,45 +72,49 @@ class PsbtViewController: UIViewController, UITableViewDelegate, UITableViewData
                     let psbtStruct = PsbtStruct(dictionary: psbt)
                     self.psbts.append(psbtStruct)
                     
-                    guard let psbtWally = Keys.psbt(psbtStruct.psbt.base64EncodedString(), .mainnet) else { self.spinner.remove(); return }
+                    print("psbtStruct.psbt: \(psbtStruct.psbt.base64EncodedString())")
                     
-                    guard let image = LifeHash.image(PaymentId.id(psbtWally).utf8) else { self.spinner.remove(); return }
-                    
-                    var amount = 0.0
-                    self.weSigned.append(false)
-                    
-                    for input in psbtWally.inputs {
-                        if let inputAmount = input.amount {
-                            amount += Double(inputAmount) / 100000000.0
-                        }
+                    if let psbtWally = Keys.psbt(psbtStruct.psbt, .mainnet) {
+                        print("psbtWally: \(psbtWally)")
                         
-                        if let origins = input.origins {
-                            CoreDataService.retrieveEntity(entityName: .signer) { (signers, errorDescription) in
-                                if let signers = signers, signers.count > 0 {
-                                    for origin in origins {
-                                        let originalPubkey = origin.key.data.hexString
-                                        for signer in signers {
-                                            let signerStruct = SignerStruct(dictionary: signer)
-                                            if let entropy = signerStruct.entropy {
-                                                if let decryptedEntropy = Encryption.decrypt(entropy) {
-                                                    let e = BIP39Mnemonic.Entropy(decryptedEntropy)
-                                                    if let mnemonic = try? BIP39Mnemonic(entropy: e) {
-                                                        var passphrase = ""
-                                                        if let encryptedPassphrase = signerStruct.passphrase {
-                                                            if let decryptedPassphrase = Encryption.decrypt(encryptedPassphrase) {
-                                                                passphrase = decryptedPassphrase.utf8
+                        guard let image = LifeHash.image(PaymentId.id(psbtWally).utf8) else { self.spinner.remove(); return }
+                        
+                        var amount = 0.0
+                        self.weSigned.append(false)
+                        
+                        for input in psbtWally.inputs {
+                            if let inputAmount = input.amount {
+                                amount += Double(inputAmount) / 100000000.0
+                            }
+                            
+                            if let origins = input.origins {
+                                CoreDataService.retrieveEntity(entityName: .signer) { (signers, errorDescription) in
+                                    if let signers = signers, signers.count > 0 {
+                                        for origin in origins {
+                                            let originalPubkey = origin.key.data.hexString
+                                            for signer in signers {
+                                                let signerStruct = SignerStruct(dictionary: signer)
+                                                if let entropy = signerStruct.entropy {
+                                                    if let decryptedEntropy = Encryption.decrypt(entropy) {
+                                                        let e = BIP39Mnemonic.Entropy(decryptedEntropy)
+                                                        if let mnemonic = try? BIP39Mnemonic(entropy: e) {
+                                                            var passphrase = ""
+                                                            if let encryptedPassphrase = signerStruct.passphrase {
+                                                                if let decryptedPassphrase = Encryption.decrypt(encryptedPassphrase) {
+                                                                    passphrase = decryptedPassphrase.utf8
+                                                                }
                                                             }
-                                                        }
-                                                        let seedHex = mnemonic.seedHex(passphrase: passphrase)
-                                                        if let hdMasterKey = try? HDKey(seed: seedHex, network: .mainnet) {
-                                                            if let childKey = try? hdMasterKey.derive(using: origin.value.path) {
-                                                                if childKey.pubKey.data.hexString == originalPubkey {
-                                                                    // CAN SIGN
-                                                                    if let sigs = input.signatures {
-                                                                        for sig in sigs {
-                                                                            if sig.key.data.hexString == originalPubkey {
-                                                                                // DID SIGN
-                                                                                self.weSigned[p] = true
+                                                            let seedHex = mnemonic.seedHex(passphrase: passphrase)
+                                                            if let hdMasterKey = try? HDKey(seed: seedHex, network: .mainnet) {
+                                                                if let childKey = try? hdMasterKey.derive(using: origin.value.path) {
+                                                                    if childKey.pubKey.data.hexString == originalPubkey {
+                                                                        // CAN SIGN
+                                                                        if let sigs = input.signatures {
+                                                                            for sig in sigs {
+                                                                                if sig.key.data.hexString == originalPubkey {
+                                                                                    // DID SIGN
+                                                                                    self.weSigned[p] = true
+                                                                                }
                                                                             }
                                                                         }
                                                                     }
@@ -124,17 +129,19 @@ class PsbtViewController: UIViewController, UITableViewDelegate, UITableViewData
                                 }
                             }
                         }
-                    }
-                    
-                    self.amounts.append(amount)
-                    
-                    if let finalized = try? psbtWally.finalized() {
-                        self.completes.append(finalized.isComplete)
+                        
+                        self.amounts.append(amount)
+                        
+                        if let finalized = try? psbtWally.finalized() {
+                            self.completes.append(finalized.isComplete)
+                        } else {
+                            self.completes.append(psbtWally.isComplete)
+                        }
+                        
+                        self.lifeHashes.append(image)
                     } else {
-                        self.completes.append(psbtWally.isComplete)
+                        showAlert(self, "", "There was an issue converting your psbt.")
                     }
-                    
-                    self.lifeHashes.append(image)
                 }
                 
             }, completion: { [weak self] in

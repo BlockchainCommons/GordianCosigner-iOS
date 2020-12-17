@@ -88,7 +88,10 @@ class PsbtTableViewController: UIViewController, UITableViewDelegate, UITableVie
             if accountMaps != nil {
                 if accountMaps!.count > 0 {
                     for accountMap in accountMaps! {
-                        self.accountMaps.append(AccountMapStruct(dictionary: accountMap))
+                        let str = AccountMapStruct(dictionary: accountMap)
+                        if !str.descriptor.contains("keyset") {
+                            self.accountMaps.append(AccountMapStruct(dictionary: accountMap))
+                        }
                     }
                 }
             }
@@ -327,45 +330,47 @@ class PsbtTableViewController: UIViewController, UITableViewDelegate, UITableVie
                 
                 for (a, accountMap) in accountMaps.enumerated() {
                     let descriptor = accountMap.descriptor
-                    let descriptorParser = DescriptorParser()
-                    let descriptorStruct = descriptorParser.descriptor(descriptor)
-                    let keys = descriptorStruct.multiSigKeys
-                    let sigsRequired = descriptorStruct.sigsRequired
-                    
-                    if let origins = output.origins {
-                        for (x, origin) in origins.enumerated() {
-                            let path = origin.value.path
-                            self.outputsArray[o]["path"] = path.description
-                            var pubkeys = [PubKey]()
-                            
-                            for (k, key) in keys.enumerated() {
-                                if let hdkey = try? HDKey(base58: key), let pubkey = try? hdkey.derive(using: path.chop(depth: 4)) {
-                                    pubkeys.append(pubkey.pubKey)
-                                    
-                                    if k + 1 == keys.count {
-                                        let scriptPubKey = ScriptPubKey(multisig: pubkeys, threshold: sigsRequired, isBIP67: true)
-                                        guard let multiSigAddress = try? Address(scriptPubKey: scriptPubKey, network: .mainnet) else { return }
-                                                                        
-                                        if multiSigAddress.description == address {
-                                            self.outputsArray[o]["isMine"] = true
-                                            self.outputsArray[o]["accountMap"] = accountMap.label
-                                            self.outputsArray[o]["lifeHash"] = LifeHash.image(descriptor)
-                                        }
+                    if !descriptor.contains("keyset") {
+                        let descriptorParser = DescriptorParser()
+                        let descriptorStruct = descriptorParser.descriptor(descriptor)
+                        let keys = descriptorStruct.multiSigKeys
+                        let sigsRequired = descriptorStruct.sigsRequired
+                        
+                        if let origins = output.origins {
+                            for (x, origin) in origins.enumerated() {
+                                let path = origin.value.path
+                                self.outputsArray[o]["path"] = path.description
+                                var pubkeys = [PubKey]()
+                                
+                                for (k, key) in keys.enumerated() {
+                                    if let hdkey = try? HDKey(base58: key), let pubkey = try? hdkey.derive(using: path.chop(depth: 4)) {
+                                        pubkeys.append(pubkey.pubKey)
                                         
-                                        if a + 1 == accountMaps.count && o + 1 == outputs.count && x + 1 == origins.count {
+                                        if k + 1 == keys.count {
+                                            let scriptPubKey = ScriptPubKey(multisig: pubkeys, threshold: sigsRequired, isBIP67: true)
+                                            guard let multiSigAddress = try? Address(scriptPubKey: scriptPubKey, network: .mainnet) else { return }
+                                                                            
+                                            if multiSigAddress.description == address {
+                                                self.outputsArray[o]["isMine"] = true
+                                                self.outputsArray[o]["accountMap"] = accountMap.label
+                                                self.outputsArray[o]["lifeHash"] = LifeHash.image(descriptor)
+                                            }
+                                            
+                                            if a + 1 == accountMaps.count && o + 1 == outputs.count && x + 1 == origins.count {
+                                                completion(true)
+                                            }
+                                        }
+                                    } else {
+                                        if k + 1 == keys.count && a + 1 == accountMaps.count && o + 1 == outputs.count && x + 1 == origins.count {
                                             completion(true)
                                         }
                                     }
-                                } else {
-                                    if k + 1 == keys.count && a + 1 == accountMaps.count && o + 1 == outputs.count && x + 1 == origins.count {
-                                        completion(true)
-                                    }
                                 }
                             }
-                        }
-                    } else {
-                        if a + 1 == accountMaps.count && o + 1 == outputs.count {
-                            completion(true)
+                        } else {
+                            if a + 1 == accountMaps.count && o + 1 == outputs.count {
+                                completion(true)
+                            }
                         }
                     }
                 }

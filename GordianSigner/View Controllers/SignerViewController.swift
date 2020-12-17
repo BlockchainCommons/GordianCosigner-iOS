@@ -25,10 +25,6 @@ class SignerViewController: UIViewController {
         }
     }
     
-    override func viewDidAppear(_ animated: Bool) {
-        
-    }
-    
     @IBAction func closeAction(_ sender: Any) {
         DispatchQueue.main.async {
             self.dismiss(animated: true, completion: nil)
@@ -109,6 +105,7 @@ class SignerViewController: UIViewController {
     }
     
     private func save(_ psbt: PSBT) {
+        print("save")
         var dict = [String:Any]()
         dict["dateAdded"] = Date()
         dict["psbt"] = psbt.data

@@ -32,10 +32,22 @@ class AccountMapsViewController: UIViewController, UITableViewDelegate, UITableV
         if !FirstTime.firstTimeHere() {
             showAlert(self, "Fatal error", "We were unable to set and save an encryption key to your secure enclave, the app will not function without this key.")
         }
+        
+        if UserDefaults.standard.object(forKey: "seenIntro") == nil {
+            self.segueToIntro()
+        }
     }
     
     override func viewDidAppear(_ animated: Bool) {
         load()
+    }
+    
+    private func segueToIntro() {
+        DispatchQueue.main.async { [weak self] in
+            guard let self = self else { return }
+            
+            self.performSegue(withIdentifier: "segueToIntro", sender: self)
+        }
     }
     
     private func load() {
@@ -45,9 +57,12 @@ class AccountMapsViewController: UIViewController, UITableViewDelegate, UITableV
             guard let self = self else { return }
             
             guard let accountMaps = accountMaps, accountMaps.count > 0 else {
-                if UserDefaults.standard.object(forKey: "createDefaults") == nil {
+                if UserDefaults.standard.object(forKey: "seenIntro") == nil {
+                    self.segueToIntro()
+                } else if UserDefaults.standard.object(forKey: "createDefaults") == nil {
                     self.promptToCreate()
                 }
+                
                 return
             }
             
@@ -673,7 +688,8 @@ class AccountMapsViewController: UIViewController, UITableViewDelegate, UITableV
             let encryptedData = Encryption.encrypt(entropy),
             let masterKey = Keys.masterXprv(words, ""),
             let fingerprint = Keys.fingerprint(masterKey),
-            let lifeHash = LifeHash.hash(entropy) else {
+            let lifeHash = LifeHash.hash(entropy),
+            let cosigner = Keys.bip48SegwitAccount(masterKey, "main") else {
                 showAlert(self, "Error ⚠️", "Something went wrong, private keys not saved!")
                 return
         }
@@ -685,6 +701,7 @@ class AccountMapsViewController: UIViewController, UITableViewDelegate, UITableV
         dict["lifeHash"] = lifeHash
         dict["fingerprint"] = fingerprint
         dict["entropy"] = encryptedData
+        dict["cosigner"] = cosigner
         
         CoreDataService.saveEntity(dict: dict, entityName: .signer) { [weak self] (success, errorDescription) in
             guard let self = self else { return }

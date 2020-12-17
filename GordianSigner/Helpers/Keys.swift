@@ -112,6 +112,11 @@ enum Keys {
         return try? PSBT(psbt: psbt, network: network)
     }
     
+    static func psbt(_ psbt: Data, _ network: Network) -> PSBT? {
+        
+        return try? PSBT(psbt: psbt, network: network)
+    }
+    
     static func bip44Account(_ masterKey: String, _ network: String) -> String? {
         var coinType = "1"
         

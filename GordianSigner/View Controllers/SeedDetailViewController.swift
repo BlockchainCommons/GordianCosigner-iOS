@@ -62,6 +62,8 @@ class SeedDetailViewController: UIViewController {
             }
         }
         
+        print("signer.cosigner: \(signer.cosigner)")
+        
         guard let cosigner = signer.cosigner else {
             DispatchQueue.main.async { [weak self] in
                 guard let self = self else { return }
@@ -70,6 +72,8 @@ class SeedDetailViewController: UIViewController {
             }
             return
         }
+        
+        print("cosigner: \(cosigner)")
         
         DispatchQueue.main.async { [weak self] in
             guard let self = self else { return }

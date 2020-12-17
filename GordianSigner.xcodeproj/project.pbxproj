@@ -7,6 +7,15 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		D00F4981258B239500941DBA /* Intro1ViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = D00F4980258B239500941DBA /* Intro1ViewController.swift */; };
+		D00F4983258B243D00941DBA /* Intro2ViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = D00F4982258B243D00941DBA /* Intro2ViewController.swift */; };
+		D00F4985258B24D200941DBA /* Intro3ViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = D00F4984258B24D200941DBA /* Intro3ViewController.swift */; };
+		D00F4987258B253A00941DBA /* Intro4ViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = D00F4986258B253A00941DBA /* Intro4ViewController.swift */; };
+		D00F4989258B259C00941DBA /* Intro5ViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = D00F4988258B259C00941DBA /* Intro5ViewController.swift */; };
+		D00F498D258B2ACD00941DBA /* accounts.png in Resources */ = {isa = PBXBuildFile; fileRef = D00F498C258B2ACD00941DBA /* accounts.png */; };
+		D00F498F258B2AFE00941DBA /* seeds.png in Resources */ = {isa = PBXBuildFile; fileRef = D00F498E258B2AFD00941DBA /* seeds.png */; };
+		D00F4991258B2B6D00941DBA /* cosigners.png in Resources */ = {isa = PBXBuildFile; fileRef = D00F4990258B2B6D00941DBA /* cosigners.png */; };
+		D00F4993258B2B9300941DBA /* payments.png in Resources */ = {isa = PBXBuildFile; fileRef = D00F4992258B2B9300941DBA /* payments.png */; };
 		D01ACBA42563EA8100B5B4E5 /* PsbtViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = D01ACBA32563EA8100B5B4E5 /* PsbtViewController.swift */; };
 		D01ACBA62563ED3200B5B4E5 /* Psbt.swift in Sources */ = {isa = PBXBuildFile; fileRef = D01ACBA52563ED3200B5B4E5 /* Psbt.swift */; };
 		D01C2955255CE33F00C5ED55 /* PsbtTableViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = D01C2954255CE33F00C5ED55 /* PsbtTableViewController.swift */; };
@@ -94,6 +103,15 @@
 /* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
+		D00F4980258B239500941DBA /* Intro1ViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Intro1ViewController.swift; sourceTree = "<group>"; };
+		D00F4982258B243D00941DBA /* Intro2ViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Intro2ViewController.swift; sourceTree = "<group>"; };
+		D00F4984258B24D200941DBA /* Intro3ViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Intro3ViewController.swift; sourceTree = "<group>"; };
+		D00F4986258B253A00941DBA /* Intro4ViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Intro4ViewController.swift; sourceTree = "<group>"; };
+		D00F4988258B259C00941DBA /* Intro5ViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Intro5ViewController.swift; sourceTree = "<group>"; };
+		D00F498C258B2ACD00941DBA /* accounts.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = accounts.png; sourceTree = "<group>"; };
+		D00F498E258B2AFD00941DBA /* seeds.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = seeds.png; sourceTree = "<group>"; };
+		D00F4990258B2B6D00941DBA /* cosigners.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = cosigners.png; sourceTree = "<group>"; };
+		D00F4992258B2B9300941DBA /* payments.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = payments.png; sourceTree = "<group>"; };
 		D01ACBA32563EA8100B5B4E5 /* PsbtViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PsbtViewController.swift; sourceTree = "<group>"; };
 		D01ACBA52563ED3200B5B4E5 /* Psbt.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Psbt.swift; sourceTree = "<group>"; };
 		D01C2954255CE33F00C5ED55 /* PsbtTableViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PsbtTableViewController.swift; sourceTree = "<group>"; };
@@ -238,6 +256,11 @@
 				D0E0EA012567A10900F2403C /* CreateAccountMapViewController.swift */,
 				D06F44562581B86200B42DEB /* AddressesViewController.swift */,
 				D02E51EF258860C200A479A0 /* SeedDetailViewController.swift */,
+				D00F4980258B239500941DBA /* Intro1ViewController.swift */,
+				D00F4982258B243D00941DBA /* Intro2ViewController.swift */,
+				D00F4984258B24D200941DBA /* Intro3ViewController.swift */,
+				D00F4986258B253A00941DBA /* Intro4ViewController.swift */,
+				D00F4988258B259C00941DBA /* Intro5ViewController.swift */,
 			);
 			path = "View Controllers";
 			sourceTree = "<group>";
@@ -245,6 +268,10 @@
 		D0974A65255BD2500013DC60 /* Images */ = {
 			isa = PBXGroup;
 			children = (
+				D00F4992258B2B9300941DBA /* payments.png */,
+				D00F4990258B2B6D00941DBA /* cosigners.png */,
+				D00F498E258B2AFD00941DBA /* seeds.png */,
+				D00F498C258B2ACD00941DBA /* accounts.png */,
 				D0974A63255BB3C00013DC60 /* icons8-key-24.png */,
 				D0B4DDD82525AC18009C8624 /* whiteFingerPrint.png */,
 			);
@@ -460,12 +487,16 @@
 			buildActionMask = 2147483647;
 			files = (
 				D0974A64255BB3C00013DC60 /* icons8-key-24.png in Resources */,
+				D00F4993258B2B9300941DBA /* payments.png in Resources */,
+				D00F4991258B2B6D00941DBA /* cosigners.png in Resources */,
+				D00F498F258B2AFE00941DBA /* seeds.png in Resources */,
 				D0B4DDD92525AC18009C8624 /* whiteFingerPrint.png in Resources */,
 				D04423FD258705D900A25179 /* LifehashSeedSecondary.xib in Resources */,
 				D0CF1E432522E2140059C541 /* LaunchScreen.storyboard in Resources */,
 				D0CF1E402522E2140059C541 /* Assets.xcassets in Resources */,
 				D0CF1E3B2522E20C0059C541 /* Main.storyboard in Resources */,
 				D04423F72586F2F700A25179 /* LifehashSeedView.xib in Resources */,
+				D00F498D258B2ACD00941DBA /* accounts.png in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -491,9 +522,11 @@
 			buildActionMask = 2147483647;
 			files = (
 				D064BCC8252D62FD00D42D66 /* URHelper.swift in Sources */,
+				D00F4981258B239500941DBA /* Intro1ViewController.swift in Sources */,
 				D0CF1E732523012A0059C541 /* FirstTime.swift in Sources */,
 				D090964325625CED0098013A /* Descriptor.swift in Sources */,
 				D090963D25610D440098013A /* KeysetsViewController.swift in Sources */,
+				D00F4989258B259C00941DBA /* Intro5ViewController.swift in Sources */,
 				D0974A58255B8E8D0013DC60 /* SignerStruct.swift in Sources */,
 				D0CF1E342522E20C0059C541 /* AppDelegate.swift in Sources */,
 				D0CF1E3E2522E20C0059C541 /* GordianSigner.xcdatamodeld in Sources */,
@@ -502,11 +535,13 @@
 				D090964125625CC30098013A /* DescriptorParser.swift in Sources */,
 				D0E0EA022567A10900F2403C /* CreateAccountMapViewController.swift in Sources */,
 				D04423FB258705B900A25179 /* LifehashSeedSecondary.swift in Sources */,
+				D00F4985258B24D200941DBA /* Intro3ViewController.swift in Sources */,
 				D0974A5C255B93130013DC60 /* CoreDataService.swift in Sources */,
 				D0CF1E362522E20C0059C541 /* SceneDelegate.swift in Sources */,
 				D090963B2560FE540098013A /* KeysetStruct.swift in Sources */,
 				D090963F256256500098013A /* AccountMapsViewController.swift in Sources */,
 				D01ACBA42563EA8100B5B4E5 /* PsbtViewController.swift in Sources */,
+				D00F4983258B243D00941DBA /* Intro2ViewController.swift in Sources */,
 				D04D4984252C4FEF00D7383E /* QRDisplayerViewController.swift in Sources */,
 				D06F44572581B86200B42DEB /* AddressesViewController.swift in Sources */,
 				D0974A5E255B93500013DC60 /* Entities.swift in Sources */,
@@ -517,6 +552,7 @@
 				D0CF1E70252300B80059C541 /* Keychain.swift in Sources */,
 				D04B029A2524A18100C249B8 /* SignersViewController.swift in Sources */,
 				D0CF1E75252302A00059C541 /* Encryption.swift in Sources */,
+				D00F4987258B253A00941DBA /* Intro4ViewController.swift in Sources */,
 				D01C2955255CE33F00C5ED55 /* PsbtTableViewController.swift in Sources */,
 				D04423F325837A8700A25179 /* PaymentHash.swift in Sources */,
 				D04D4986252C509400D7383E /* QRGenerator.swift in Sources */,
@@ -704,7 +740,7 @@
 				CLANG_ENABLE_MODULES = YES;
 				CODE_SIGN_ENTITLEMENTS = GordianSigner/GordianSigner.entitlements;
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 0.1.0;
+				CURRENT_PROJECT_VERSION = 0.1.1;
 				DEVELOPMENT_TEAM = YZHG975W3A;
 				ENABLE_BITCODE = NO;
 				INFOPLIST_FILE = GordianSigner/Info.plist;
@@ -713,7 +749,7 @@
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				MARKETING_VERSION = 0.1.0;
+				MARKETING_VERSION = 0.1.1;
 				PRODUCT_BUNDLE_IDENTIFIER = com.blockchaincommons.GordianSigner;
 				PRODUCT_NAME = "Gordian Cosigner";
 				SUPPORTS_MACCATALYST = YES;
@@ -731,7 +767,7 @@
 				CLANG_ENABLE_MODULES = YES;
 				CODE_SIGN_ENTITLEMENTS = GordianSigner/GordianSigner.entitlements;
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 0.1.0;
+				CURRENT_PROJECT_VERSION = 0.1.1;
 				DEVELOPMENT_TEAM = YZHG975W3A;
 				ENABLE_BITCODE = NO;
 				INFOPLIST_FILE = GordianSigner/Info.plist;
@@ -740,7 +776,7 @@
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				MARKETING_VERSION = 0.1.0;
+				MARKETING_VERSION = 0.1.1;
 				PRODUCT_BUNDLE_IDENTIFIER = com.blockchaincommons.GordianSigner;
 				PRODUCT_NAME = "Gordian Cosigner";
 				SUPPORTS_MACCATALYST = YES;

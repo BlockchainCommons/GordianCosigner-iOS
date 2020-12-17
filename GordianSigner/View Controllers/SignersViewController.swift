@@ -100,6 +100,9 @@ class SignersViewController: UIViewController {
             DispatchQueue.main.async { [weak self] in
                 self?.signerStructs.remove(at: section)
                 self?.signerTable.deleteSections(IndexSet.init(arrayLiteral: section), with: .fade)
+                self?.signerTable.reloadData()
+                
+                NotificationCenter.default.post(name: .cosignerAdded, object: nil, userInfo: nil)
             }
             
             showAlert(self, "", "Signer deleted ✓")

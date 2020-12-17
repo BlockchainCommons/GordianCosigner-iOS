@@ -333,7 +333,7 @@ class KeysetsViewController: UIViewController, UITableViewDelegate, UITableViewD
         DispatchQueue.main.async { [weak self] in
             guard let self = self else { return }
             
-            let title = "Edit keyset label"
+            let title = "Edit cosigner label"
             let message = ""
             let style = UIAlertController.Style.alert
             let alert = UIAlertController(title: title, message: message, preferredStyle: style)
