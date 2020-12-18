@@ -10,10 +10,13 @@ import UIKit
 
 class Intro4ViewController: UIViewController {
 
+    @IBOutlet weak var button: UIButton!
+    
     override func viewDidLoad() {
         super.viewDidLoad()
 
         // Do any additional setup after loading the view.
+        button.layer.cornerRadius = 8
     }
     
     @IBAction func segueTo5(_ sender: Any) {

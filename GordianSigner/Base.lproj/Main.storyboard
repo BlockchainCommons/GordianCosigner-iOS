@@ -336,11 +336,11 @@ Tap "next" to see a brief explanation of how it works:</string>
                                 <nil key="highlightedColor"/>
                             </label>
                             <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" showsTouchWhenHighlighted="YES" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="Wne-mL-mq6">
-                                <rect key="frame" x="16" y="818" width="382" height="44"/>
+                                <rect key="frame" x="137" y="798" width="132" height="44"/>
                                 <color key="backgroundColor" cocoaTouchSystemColor="viewFlipsideBackgroundColor"/>
                                 <constraints>
-                                    <constraint firstAttribute="width" constant="382" id="3Sw-vs-7Hh"/>
                                     <constraint firstAttribute="height" constant="44" id="Pr7-hF-lA0"/>
+                                    <constraint firstAttribute="width" constant="132" id="UBA-8l-1Gw"/>
                                 </constraints>
                                 <state key="normal" title="next">
                                     <color key="titleColor" systemColor="systemTealColor" red="0.35294117650000001" green="0.7843137255" blue="0.98039215690000003" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
@@ -354,17 +354,18 @@ Tap "next" to see a brief explanation of how it works:</string>
                         <constraints>
                             <constraint firstItem="Lgx-fa-xe6" firstAttribute="leading" secondItem="OcS-e1-iIV" secondAttribute="leading" constant="20" id="6Wz-gB-cs1"/>
                             <constraint firstItem="J2D-HF-XOD" firstAttribute="leading" secondItem="OcS-e1-iIV" secondAttribute="leading" constant="20" id="PHo-pu-Jca"/>
-                            <constraint firstItem="Wne-mL-mq6" firstAttribute="bottom" secondItem="OcS-e1-iIV" secondAttribute="bottom" id="R6u-xW-EgT"/>
+                            <constraint firstItem="Wne-mL-mq6" firstAttribute="bottom" secondItem="OcS-e1-iIV" secondAttribute="bottom" constant="-20" id="R6u-xW-EgT"/>
                             <constraint firstItem="Lgx-fa-xe6" firstAttribute="top" secondItem="J2D-HF-XOD" secondAttribute="bottom" constant="32" id="RTb-SY-brf"/>
                             <constraint firstItem="OcS-e1-iIV" firstAttribute="trailing" secondItem="J2D-HF-XOD" secondAttribute="trailing" constant="20" id="YNE-nB-UZN"/>
                             <constraint firstItem="J2D-HF-XOD" firstAttribute="top" secondItem="OcS-e1-iIV" secondAttribute="top" constant="20" id="mtG-Ic-DRo"/>
                             <constraint firstItem="OcS-e1-iIV" firstAttribute="trailing" secondItem="Lgx-fa-xe6" secondAttribute="trailing" constant="20" id="r44-Ea-4GB"/>
-                            <constraint firstItem="Wne-mL-mq6" firstAttribute="centerX" secondItem="6K0-36-x6n" secondAttribute="centerX" id="ywP-GT-bWF"/>
+                            <constraint firstItem="Wne-mL-mq6" firstAttribute="centerX" secondItem="6K0-36-x6n" secondAttribute="centerX" constant="-4" id="ywP-GT-bWF"/>
                         </constraints>
                         <viewLayoutGuide key="safeArea" id="OcS-e1-iIV"/>
                     </view>
                     <navigationItem key="navigationItem" id="AXF-D0-Xf5"/>
                     <connections>
+                        <outlet property="button" destination="Wne-mL-mq6" id="wIV-UJ-sc4"/>
                         <segue destination="alp-1I-UBc" kind="show" identifier="segueTo2" id="6Sm-VK-bHl"/>
                     </connections>
                 </viewController>
@@ -380,21 +381,7 @@ Tap "next" to see a brief explanation of how it works:</string>
                         <rect key="frame" x="0.0" y="0.0" width="414" height="896"/>
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                         <subviews>
-                            <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" showsTouchWhenHighlighted="YES" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="fGQ-Fp-Snb">
-                                <rect key="frame" x="16" y="818" width="382" height="44"/>
-                                <color key="backgroundColor" cocoaTouchSystemColor="viewFlipsideBackgroundColor"/>
-                                <constraints>
-                                    <constraint firstAttribute="width" constant="382" id="iTQ-sC-8uP"/>
-                                    <constraint firstAttribute="height" constant="44" id="l2e-ij-Yvk"/>
-                                </constraints>
-                                <state key="normal" title="next">
-                                    <color key="titleColor" systemColor="systemTealColor" red="0.35294117650000001" green="0.7843137255" blue="0.98039215690000003" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
-                                </state>
-                                <connections>
-                                    <action selector="segueTo3:" destination="alp-1I-UBc" eventType="touchUpInside" id="6Vq-zh-aeG"/>
-                                </connections>
-                            </button>
-                            <imageView clipsSubviews="YES" userInteractionEnabled="NO" contentMode="scaleAspectFill" horizontalHuggingPriority="251" verticalHuggingPriority="251" image="accounts.png" translatesAutoresizingMaskIntoConstraints="NO" id="e0P-kC-ByU">
+                            <imageView clipsSubviews="YES" userInteractionEnabled="NO" contentMode="scaleAspectFit" horizontalHuggingPriority="251" verticalHuggingPriority="251" image="accounts.png" translatesAutoresizingMaskIntoConstraints="NO" id="e0P-kC-ByU">
                                 <rect key="frame" x="0.0" y="88" width="414" height="372"/>
                                 <constraints>
                                     <constraint firstAttribute="height" constant="372" id="4yh-6K-k15"/>
@@ -410,21 +397,36 @@ With Gordian Cosigner you can create an incomplete account, adding cosigners to 
                                 <color key="textColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                                 <nil key="highlightedColor"/>
                             </label>
+                            <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" showsTouchWhenHighlighted="YES" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="fGQ-Fp-Snb">
+                                <rect key="frame" x="141" y="798" width="132" height="44"/>
+                                <color key="backgroundColor" cocoaTouchSystemColor="viewFlipsideBackgroundColor"/>
+                                <constraints>
+                                    <constraint firstAttribute="width" constant="132" id="FOY-Ed-Ygx"/>
+                                    <constraint firstAttribute="height" constant="44" id="l2e-ij-Yvk"/>
+                                </constraints>
+                                <state key="normal" title="next">
+                                    <color key="titleColor" systemColor="systemTealColor" red="0.35294117650000001" green="0.7843137255" blue="0.98039215690000003" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+                                </state>
+                                <connections>
+                                    <action selector="segueTo3:" destination="alp-1I-UBc" eventType="touchUpInside" id="6Vq-zh-aeG"/>
+                                </connections>
+                            </button>
                         </subviews>
                         <color key="backgroundColor" white="0.0" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                         <constraints>
                             <constraint firstItem="L39-3G-n4u" firstAttribute="top" secondItem="e0P-kC-ByU" secondAttribute="bottom" constant="8" id="3Wp-RG-BXp"/>
                             <constraint firstItem="e0P-kC-ByU" firstAttribute="top" secondItem="Gin-U2-189" secondAttribute="top" id="8yj-Qp-sfZ"/>
+                            <constraint firstItem="Gin-U2-189" firstAttribute="bottom" secondItem="fGQ-Fp-Snb" secondAttribute="bottom" constant="20" id="Atg-3G-A5Y"/>
                             <constraint firstItem="Gin-U2-189" firstAttribute="trailing" secondItem="L39-3G-n4u" secondAttribute="trailing" constant="20" id="DIc-il-Qp6"/>
                             <constraint firstItem="fGQ-Fp-Snb" firstAttribute="centerX" secondItem="8wf-il-zz6" secondAttribute="centerX" id="UBC-1b-lAp"/>
                             <constraint firstItem="L39-3G-n4u" firstAttribute="leading" secondItem="Gin-U2-189" secondAttribute="leading" constant="20" id="XOY-Pg-l2G"/>
                             <constraint firstItem="e0P-kC-ByU" firstAttribute="centerX" secondItem="8wf-il-zz6" secondAttribute="centerX" id="bdQ-4d-k9R"/>
-                            <constraint firstItem="fGQ-Fp-Snb" firstAttribute="bottom" secondItem="Gin-U2-189" secondAttribute="bottom" id="t3t-SF-fXZ"/>
                         </constraints>
                         <viewLayoutGuide key="safeArea" id="Gin-U2-189"/>
                     </view>
                     <navigationItem key="navigationItem" id="pq9-Bh-f5T"/>
                     <connections>
+                        <outlet property="button" destination="fGQ-Fp-Snb" id="p3o-yy-wpO"/>
                         <segue destination="U7O-zu-CQL" kind="show" identifier="segueTo3" id="TWV-Of-mhF"/>
                     </connections>
                 </viewController>
@@ -440,21 +442,7 @@ With Gordian Cosigner you can create an incomplete account, adding cosigners to 
                         <rect key="frame" x="0.0" y="0.0" width="414" height="896"/>
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                         <subviews>
-                            <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" showsTouchWhenHighlighted="YES" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="U9l-vC-j1G">
-                                <rect key="frame" x="16" y="818" width="382" height="44"/>
-                                <color key="backgroundColor" cocoaTouchSystemColor="viewFlipsideBackgroundColor"/>
-                                <constraints>
-                                    <constraint firstAttribute="height" constant="44" id="9Nc-h5-PoI"/>
-                                    <constraint firstAttribute="width" constant="382" id="De3-8z-fd4"/>
-                                </constraints>
-                                <state key="normal" title="next">
-                                    <color key="titleColor" systemColor="systemTealColor" red="0.35294117650000001" green="0.7843137255" blue="0.98039215690000003" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
-                                </state>
-                                <connections>
-                                    <action selector="segueTo4:" destination="U7O-zu-CQL" eventType="touchUpInside" id="PsX-aZ-9EX"/>
-                                </connections>
-                            </button>
-                            <imageView clipsSubviews="YES" userInteractionEnabled="NO" contentMode="scaleAspectFill" horizontalHuggingPriority="251" verticalHuggingPriority="251" image="seeds.png" translatesAutoresizingMaskIntoConstraints="NO" id="4zb-aq-1pG">
+                            <imageView clipsSubviews="YES" userInteractionEnabled="NO" contentMode="scaleAspectFit" horizontalHuggingPriority="251" verticalHuggingPriority="251" image="seeds.png" translatesAutoresizingMaskIntoConstraints="NO" id="4zb-aq-1pG">
                                 <rect key="frame" x="0.0" y="88" width="414" height="277"/>
                                 <constraints>
                                     <constraint firstAttribute="height" constant="277" id="3tM-oP-sak"/>
@@ -471,14 +459,28 @@ Gordian Cosigner uses seeds to derive private keys to sign payments.</string>
                                 <color key="textColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                                 <nil key="highlightedColor"/>
                             </label>
+                            <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" showsTouchWhenHighlighted="YES" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="U9l-vC-j1G">
+                                <rect key="frame" x="141" y="798" width="132" height="44"/>
+                                <color key="backgroundColor" cocoaTouchSystemColor="viewFlipsideBackgroundColor"/>
+                                <constraints>
+                                    <constraint firstAttribute="height" constant="44" id="9Nc-h5-PoI"/>
+                                    <constraint firstAttribute="width" constant="132" id="O4A-GZ-oWv"/>
+                                </constraints>
+                                <state key="normal" title="next">
+                                    <color key="titleColor" systemColor="systemTealColor" red="0.35294117650000001" green="0.7843137255" blue="0.98039215690000003" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+                                </state>
+                                <connections>
+                                    <action selector="segueTo4:" destination="U7O-zu-CQL" eventType="touchUpInside" id="PsX-aZ-9EX"/>
+                                </connections>
+                            </button>
                         </subviews>
                         <color key="backgroundColor" white="0.0" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                         <constraints>
+                            <constraint firstItem="zDQ-Ps-nIa" firstAttribute="bottom" secondItem="U9l-vC-j1G" secondAttribute="bottom" constant="20" id="2KB-iI-jxv"/>
                             <constraint firstItem="FbQ-Fq-Lb0" firstAttribute="top" secondItem="4zb-aq-1pG" secondAttribute="bottom" constant="8" id="3qC-ZB-9Pp"/>
                             <constraint firstItem="4zb-aq-1pG" firstAttribute="leading" secondItem="zDQ-Ps-nIa" secondAttribute="leading" id="5Dt-vD-6Pm"/>
                             <constraint firstItem="4zb-aq-1pG" firstAttribute="top" secondItem="zDQ-Ps-nIa" secondAttribute="top" id="88P-38-1cB"/>
                             <constraint firstItem="zDQ-Ps-nIa" firstAttribute="trailing" secondItem="FbQ-Fq-Lb0" secondAttribute="trailing" constant="20" id="Iff-VQ-sfF"/>
-                            <constraint firstItem="U9l-vC-j1G" firstAttribute="bottom" secondItem="zDQ-Ps-nIa" secondAttribute="bottom" id="T75-Gj-Fla"/>
                             <constraint firstItem="FbQ-Fq-Lb0" firstAttribute="leading" secondItem="zDQ-Ps-nIa" secondAttribute="leading" constant="20" id="ch8-gN-ihX"/>
                             <constraint firstItem="4zb-aq-1pG" firstAttribute="trailing" secondItem="zDQ-Ps-nIa" secondAttribute="trailing" id="rNh-PO-6qf"/>
                             <constraint firstItem="U9l-vC-j1G" firstAttribute="centerX" secondItem="rTL-mQ-oy9" secondAttribute="centerX" id="su8-n9-Buk"/>
@@ -487,6 +489,7 @@ Gordian Cosigner uses seeds to derive private keys to sign payments.</string>
                     </view>
                     <navigationItem key="navigationItem" id="sTV-ZZ-sWh"/>
                     <connections>
+                        <outlet property="button" destination="U9l-vC-j1G" id="2b7-p1-0Df"/>
                         <segue destination="meE-yg-nef" kind="show" identifier="segueTo4" id="mSv-xF-TL4"/>
                     </connections>
                 </viewController>
@@ -515,12 +518,18 @@ An individual cosigner can not reveal any transaction history or balances if it 
                                 <color key="textColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                                 <nil key="highlightedColor"/>
                             </label>
+                            <imageView clipsSubviews="YES" userInteractionEnabled="NO" contentMode="scaleAspectFit" horizontalHuggingPriority="251" verticalHuggingPriority="251" image="cosigners.png" translatesAutoresizingMaskIntoConstraints="NO" id="6tg-OK-DKL">
+                                <rect key="frame" x="0.0" y="88" width="414" height="360"/>
+                                <constraints>
+                                    <constraint firstAttribute="height" constant="360" id="eLc-qv-vv9"/>
+                                </constraints>
+                            </imageView>
                             <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" showsTouchWhenHighlighted="YES" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="t4U-Ji-d3U">
-                                <rect key="frame" x="16" y="818" width="382" height="44"/>
+                                <rect key="frame" x="141" y="798" width="132" height="44"/>
                                 <color key="backgroundColor" cocoaTouchSystemColor="viewFlipsideBackgroundColor"/>
                                 <constraints>
                                     <constraint firstAttribute="height" constant="44" id="9Ba-u2-d1J"/>
-                                    <constraint firstAttribute="width" constant="382" id="nKA-2l-Dbe"/>
+                                    <constraint firstAttribute="width" constant="132" id="z6v-zL-HCF"/>
                                 </constraints>
                                 <state key="normal" title="next">
                                     <color key="titleColor" systemColor="systemTealColor" red="0.35294117650000001" green="0.7843137255" blue="0.98039215690000003" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
@@ -529,12 +538,6 @@ An individual cosigner can not reveal any transaction history or balances if it 
                                     <action selector="segueTo5:" destination="meE-yg-nef" eventType="touchUpInside" id="OcA-wd-4KC"/>
                                 </connections>
                             </button>
-                            <imageView clipsSubviews="YES" userInteractionEnabled="NO" contentMode="scaleAspectFill" horizontalHuggingPriority="251" verticalHuggingPriority="251" image="cosigners.png" translatesAutoresizingMaskIntoConstraints="NO" id="6tg-OK-DKL">
-                                <rect key="frame" x="0.0" y="88" width="414" height="360"/>
-                                <constraints>
-                                    <constraint firstAttribute="height" constant="360" id="eLc-qv-vv9"/>
-                                </constraints>
-                            </imageView>
                         </subviews>
                         <color key="backgroundColor" white="0.0" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                         <constraints>
@@ -545,12 +548,13 @@ An individual cosigner can not reveal any transaction history or balances if it 
                             <constraint firstItem="72R-77-o1q" firstAttribute="top" secondItem="6tg-OK-DKL" secondAttribute="bottom" constant="8" id="Vuz-Gh-m14"/>
                             <constraint firstItem="t4U-Ji-d3U" firstAttribute="centerX" secondItem="u58-xj-hcH" secondAttribute="centerX" id="WQo-qH-0Ub"/>
                             <constraint firstItem="6tg-OK-DKL" firstAttribute="trailing" secondItem="Mrp-3p-JDN" secondAttribute="trailing" id="YCk-8u-2HZ"/>
-                            <constraint firstItem="t4U-Ji-d3U" firstAttribute="bottom" secondItem="Mrp-3p-JDN" secondAttribute="bottom" id="yzp-bu-J0I"/>
+                            <constraint firstItem="Mrp-3p-JDN" firstAttribute="bottom" secondItem="t4U-Ji-d3U" secondAttribute="bottom" constant="20" id="cSC-ZV-SkL"/>
                         </constraints>
                         <viewLayoutGuide key="safeArea" id="Mrp-3p-JDN"/>
                     </view>
                     <navigationItem key="navigationItem" id="bhX-8Y-cLb"/>
                     <connections>
+                        <outlet property="button" destination="t4U-Ji-d3U" id="iMW-Sk-sVl"/>
                         <segue destination="xml-Lq-6pR" kind="show" identifier="segueTo5" id="GZm-ai-Q4s"/>
                     </connections>
                 </viewController>
@@ -566,21 +570,7 @@ An individual cosigner can not reveal any transaction history or balances if it 
                         <rect key="frame" x="0.0" y="0.0" width="414" height="896"/>
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                         <subviews>
-                            <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" showsTouchWhenHighlighted="YES" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="A9a-0H-C4D">
-                                <rect key="frame" x="16" y="818" width="382" height="44"/>
-                                <color key="backgroundColor" cocoaTouchSystemColor="viewFlipsideBackgroundColor"/>
-                                <constraints>
-                                    <constraint firstAttribute="width" constant="382" id="buR-YK-g3P"/>
-                                    <constraint firstAttribute="height" constant="44" id="q3m-fn-geb"/>
-                                </constraints>
-                                <state key="normal" title="done">
-                                    <color key="titleColor" systemColor="systemTealColor" red="0.35294117650000001" green="0.7843137255" blue="0.98039215690000003" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
-                                </state>
-                                <connections>
-                                    <action selector="dismissAction:" destination="xml-Lq-6pR" eventType="touchUpInside" id="Ssv-wo-ZKC"/>
-                                </connections>
-                            </button>
-                            <imageView clipsSubviews="YES" userInteractionEnabled="NO" contentMode="scaleAspectFill" horizontalHuggingPriority="251" verticalHuggingPriority="251" image="payments.png" translatesAutoresizingMaskIntoConstraints="NO" id="Tlp-lD-1f0">
+                            <imageView clipsSubviews="YES" userInteractionEnabled="NO" contentMode="scaleAspectFit" horizontalHuggingPriority="251" verticalHuggingPriority="251" image="payments.png" translatesAutoresizingMaskIntoConstraints="NO" id="Tlp-lD-1f0">
                                 <rect key="frame" x="0.0" y="88" width="414" height="369"/>
                                 <constraints>
                                     <constraint firstAttribute="height" constant="369" id="Iba-cl-b7B"/>
@@ -601,10 +591,23 @@ Signing is always done 100% offline.</string>
                                 <color key="textColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                                 <nil key="highlightedColor"/>
                             </label>
+                            <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" showsTouchWhenHighlighted="YES" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="A9a-0H-C4D">
+                                <rect key="frame" x="141" y="802" width="132" height="44"/>
+                                <color key="backgroundColor" cocoaTouchSystemColor="viewFlipsideBackgroundColor"/>
+                                <constraints>
+                                    <constraint firstAttribute="width" constant="132" id="buR-YK-g3P"/>
+                                    <constraint firstAttribute="height" constant="44" id="q3m-fn-geb"/>
+                                </constraints>
+                                <state key="normal" title="done">
+                                    <color key="titleColor" systemColor="systemTealColor" red="0.35294117650000001" green="0.7843137255" blue="0.98039215690000003" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+                                </state>
+                                <connections>
+                                    <action selector="dismissAction:" destination="xml-Lq-6pR" eventType="touchUpInside" id="Ssv-wo-ZKC"/>
+                                </connections>
+                            </button>
                         </subviews>
                         <color key="backgroundColor" white="0.0" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                         <constraints>
-                            <constraint firstItem="A9a-0H-C4D" firstAttribute="bottom" secondItem="Zc7-em-ACu" secondAttribute="bottom" id="7pP-MC-GDr"/>
                             <constraint firstItem="Zc7-em-ACu" firstAttribute="trailing" secondItem="4fW-vV-Y7Z" secondAttribute="trailing" constant="20" id="G77-qm-xsv"/>
                             <constraint firstItem="4fW-vV-Y7Z" firstAttribute="leading" secondItem="Zc7-em-ACu" secondAttribute="leading" constant="20" id="GGT-Sz-ep6"/>
                             <constraint firstItem="4fW-vV-Y7Z" firstAttribute="top" secondItem="Tlp-lD-1f0" secondAttribute="bottom" constant="8" id="Kbb-CX-O1U"/>
@@ -612,10 +615,14 @@ Signing is always done 100% offline.</string>
                             <constraint firstItem="Tlp-lD-1f0" firstAttribute="top" secondItem="Zc7-em-ACu" secondAttribute="top" id="aEv-Oq-Ktu"/>
                             <constraint firstItem="Tlp-lD-1f0" firstAttribute="leading" secondItem="Zc7-em-ACu" secondAttribute="leading" id="dwZ-3S-u2c"/>
                             <constraint firstItem="A9a-0H-C4D" firstAttribute="centerX" secondItem="kzk-JS-PtZ" secondAttribute="centerX" id="egd-zH-Sd4"/>
+                            <constraint firstItem="Zc7-em-ACu" firstAttribute="bottom" secondItem="A9a-0H-C4D" secondAttribute="bottom" constant="16" id="zz6-3h-S17"/>
                         </constraints>
                         <viewLayoutGuide key="safeArea" id="Zc7-em-ACu"/>
                     </view>
                     <navigationItem key="navigationItem" id="mMt-IH-jTR"/>
+                    <connections>
+                        <outlet property="button" destination="A9a-0H-C4D" id="XO6-qZ-dvJ"/>
+                    </connections>
                 </viewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="UPA-pv-8tw" userLabel="First Responder" customClass="UIResponder" sceneMemberID="firstResponder"/>
             </objects>

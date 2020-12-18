@@ -10,10 +10,13 @@ import UIKit
 
 class Intro5ViewController: UIViewController {
 
+    @IBOutlet weak var button: UIButton!
+    
     override func viewDidLoad() {
         super.viewDidLoad()
 
         // Do any additional setup after loading the view.
+        button.layer.cornerRadius = 8
     }
     
     @IBAction func dismissAction(_ sender: Any) {

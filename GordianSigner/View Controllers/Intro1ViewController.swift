@@ -10,11 +10,14 @@ import UIKit
 
 class Intro1ViewController: UIViewController {
 
+    @IBOutlet weak var button: UIButton!
+    
     override func viewDidLoad() {
         super.viewDidLoad()
 
         // Do any additional setup after loading the view.
         UserDefaults.standard.set(true, forKey: "seenIntro")
+        button.layer.cornerRadius = 8
     }
     
     @IBAction func segueTo2(_ sender: Any) {

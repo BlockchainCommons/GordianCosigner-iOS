@@ -33,9 +33,6 @@ class AccountMapsViewController: UIViewController, UITableViewDelegate, UITableV
             showAlert(self, "Fatal error", "We were unable to set and save an encryption key to your secure enclave, the app will not function without this key.")
         }
         
-        if UserDefaults.standard.object(forKey: "seenIntro") == nil {
-            self.segueToIntro()
-        }
     }
     
     override func viewDidAppear(_ animated: Bool) {
