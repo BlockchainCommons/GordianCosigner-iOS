@@ -54,7 +54,6 @@ class PsbtViewController: UIViewController, UITableViewDelegate, UITableViewData
     }
     
     private func load() {
-        print("load")
         psbts.removeAll()
         completes.removeAll()
         lifeHashes.removeAll()
@@ -71,12 +70,8 @@ class PsbtViewController: UIViewController, UITableViewDelegate, UITableViewData
                 for (p, psbt) in psbts.enumerated() {
                     let psbtStruct = PsbtStruct(dictionary: psbt)
                     self.psbts.append(psbtStruct)
-                    
-                    print("psbtStruct.psbt: \(psbtStruct.psbt.base64EncodedString())")
-                    
+                                        
                     if let psbtWally = Keys.psbt(psbtStruct.psbt, .mainnet) {
-                        print("psbtWally: \(psbtWally)")
-                        
                         guard let image = LifeHash.image(PaymentId.id(psbtWally).utf8) else { self.spinner.remove(); return }
                         
                         var amount = 0.0
@@ -166,29 +161,29 @@ class PsbtViewController: UIViewController, UITableViewDelegate, UITableViewData
     }
     
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
-        if lifeHashes.count > 0 {
+        if psbts.count > 0 {
             let cell = tableView.dequeueReusableCell(withIdentifier: "psbtCell", for: indexPath)
             configureCell(cell)
             let psbt = psbts[indexPath.section]
             
-            let copyTextButton = cell.viewWithTag(1) as! UIButton
-            copyTextButton.restorationIdentifier = "\(indexPath.section)"
-            copyTextButton.addTarget(self, action: #selector(copyText(_:)), for: .touchUpInside)
-            
-            let exportFileButton = cell.viewWithTag(2) as! UIButton
-            exportFileButton.restorationIdentifier = "\(indexPath.section)"
-            exportFileButton.addTarget(self, action: #selector(exportAsFile(_:)), for: .touchUpInside)
+//            let copyTextButton = cell.viewWithTag(1) as! UIButton
+//            copyTextButton.restorationIdentifier = "\(indexPath.section)"
+//            copyTextButton.addTarget(self, action: #selector(copyText(_:)), for: .touchUpInside)
+//
+//            let exportFileButton = cell.viewWithTag(2) as! UIButton
+//            exportFileButton.restorationIdentifier = "\(indexPath.section)"
+//            exportFileButton.addTarget(self, action: #selector(exportAsFile(_:)), for: .touchUpInside)
             
             let detailButton = cell.viewWithTag(3) as! UIButton
             detailButton.addTarget(self, action: #selector(seeDetail(_:)), for: .touchUpInside)
             detailButton.restorationIdentifier = "\(indexPath.section)"
             
-            let exportQrButton = cell.viewWithTag(4) as! UIButton
-            exportQrButton.restorationIdentifier = "\(indexPath.section)"
-            exportQrButton.addTarget(self, action: #selector(exportQr(_:)), for: .touchUpInside)
+//            let exportQrButton = cell.viewWithTag(4) as! UIButton
+//            exportQrButton.restorationIdentifier = "\(indexPath.section)"
+//            exportQrButton.addTarget(self, action: #selector(exportQr(_:)), for: .touchUpInside)
             
-            let label = cell.viewWithTag(5) as! UILabel
-            label.text = psbt.label
+//            let label = cell.viewWithTag(5) as! UILabel
+//            label.text = psbt.label
             
             let dateAdded = cell.viewWithTag(6) as! UILabel
             dateAdded.text = psbt.dateAdded.formatted()
@@ -197,7 +192,7 @@ class PsbtViewController: UIViewController, UITableViewDelegate, UITableViewData
             lifehash.backgroundColor = cell.backgroundColor
             lifehash.background.backgroundColor = cell.backgroundColor
             lifehash.lifehashImage.image = lifeHashes[indexPath.section]
-            lifehash.iconLabel.text = "payment"
+            lifehash.iconLabel.text = psbt.label
             lifehash.iconImage.image = UIImage(systemName: "bitcoinsign.circle")
             
             let editButton = cell.viewWithTag(8) as! UIButton
@@ -233,11 +228,9 @@ class PsbtViewController: UIViewController, UITableViewDelegate, UITableViewData
             
             return cell
         } else {
-            let defaultCell = UITableViewCell()
-            defaultCell.textLabel?.text = "No payments added yet, use Gordian Wallet to create an unsigned payment and add it here."
-            defaultCell.textLabel?.textColor = .lightGray
-            defaultCell.textLabel?.numberOfLines = 0
-            defaultCell.sizeToFit()
+            let defaultCell = tableView.dequeueReusableCell(withIdentifier: "psbtDefaultCell", for: indexPath)
+            let button = defaultCell.viewWithTag(1) as! UIButton
+            button.addTarget(self, action: #selector(add), for: .touchUpInside)
             return defaultCell
         }
      }
@@ -286,7 +279,7 @@ class PsbtViewController: UIViewController, UITableViewDelegate, UITableViewData
         if psbts.count > 0 {
             return 249
         } else {
-            return 100
+            return 44
         }
     }
     
@@ -431,7 +424,12 @@ class PsbtViewController: UIViewController, UITableViewDelegate, UITableViewData
                 self?.lifeHashes.remove(at: section)
                 self?.completes.remove(at: section)
                 self?.weSigned.remove(at: section)
-                self?.psbtTable.deleteSections(IndexSet.init(arrayLiteral: section), with: .fade)
+                if self?.psbts.count ?? 0 > 0 {
+                    self?.psbtTable.deleteSections(IndexSet.init(arrayLiteral: section), with: .fade)
+                } else {
+                    self?.editPsbts()
+                    self?.psbtTable.reloadData()
+                }
             }
         }
     }

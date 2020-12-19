@@ -12,6 +12,7 @@ class CreateAccountMapViewController: UIViewController, UIPickerViewDelegate, UI
     
     var totalParticipants = 15
     var totalRequiredSigs = 15
+    var doneBlock:((String?) -> Void)?
     
     @IBOutlet weak var textField: UITextField!
     @IBOutlet weak var nPickerView: UIPickerView!
@@ -47,13 +48,17 @@ class CreateAccountMapViewController: UIViewController, UIPickerViewDelegate, UI
     }
     
     @IBAction func createAction(_ sender: Any) {
-        guard let label = textField.text, label != "" else {
+        guard var label = textField.text else {
             showAlert(self, "Add a label first", "Add a label to the Alias field above so you may easily identify this Account, then try again.")
             return
         }
         
         let m = mPickerView.selectedRow(inComponent: 0) + 1
         let n = nPickerView.selectedRow(inComponent: 0) + 1
+        
+        if label == "" {
+            label = "\(m) of \(n)"
+        }
         
         var desc = "wsh(sortedmulti(\(m),"
         
@@ -82,23 +87,16 @@ class CreateAccountMapViewController: UIViewController, UIPickerViewDelegate, UI
         map["descriptor"] = desc
         
         CoreDataService.saveEntity(dict: map, entityName: .accountMap) { [weak self] (success, errorDescription) in
-            guard let self = self, success else { return }
+            guard let self = self else { return }
+            
+            guard success else {
+                showAlert(self, "Account creation failed", "")
+                return
+            }
             
             DispatchQueue.main.async { [weak self] in
-                guard let self = self else { return }
-                
-                let alertStyle = UIAlertController.Style.alert
-                
-                let alert = UIAlertController(title: "Policy Map created ✓", message: "Tap done to go back", preferredStyle: alertStyle)
-                
-                alert.addAction(UIAlertAction(title: "Done", style: .cancel, handler: { action in
-                    DispatchQueue.main.async { [weak self] in
-                        self?.navigationController?.popViewController(animated: true)
-                    }
-                }))
-            
-                alert.popoverPresentationController?.sourceView = self.view
-                self.present(alert, animated: true, completion: nil)
+                self?.navigationController?.popViewController(animated: true)
+                self?.doneBlock!(json)
             }
         }
     }

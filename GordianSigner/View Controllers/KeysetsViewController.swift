@@ -81,13 +81,13 @@ class KeysetsViewController: UIViewController, UITableViewDelegate, UITableViewD
                 alertStyle = UIAlertController.Style.alert
             }
             
-            let alert = UIAlertController(title: "Import cosigner?", message: "You may either paste one in text format or scan a QR code", preferredStyle: alertStyle)
+            let alert = UIAlertController(title: "Import Cosigner", message: "You may either paste one as text or scan a QR code.", preferredStyle: alertStyle)
             
-            alert.addAction(UIAlertAction(title: "paste", style: .default, handler: { action in
+            alert.addAction(UIAlertAction(title: "Paste", style: .default, handler: { action in
                 self.getPasteboard()
             }))
             
-            alert.addAction(UIAlertAction(title: "scan QR", style: .default, handler: { action in
+            alert.addAction(UIAlertAction(title: "Scan QR", style: .default, handler: { action in
                 DispatchQueue.main.async { [weak self] in
                     guard let self = self else { return }
                     
@@ -179,7 +179,11 @@ class KeysetsViewController: UIViewController, UITableViewDelegate, UITableViewD
     }
     
     func numberOfSections(in tableView: UITableView) -> Int {
-        return keysets.count
+        if keysets.count > 0 {
+            return keysets.count
+        } else {
+            return 1
+        }
     }
     
     func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
@@ -187,14 +191,12 @@ class KeysetsViewController: UIViewController, UITableViewDelegate, UITableViewD
     }
     
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
+        if keysets.count > 0 {
         let cell = tableView.dequeueReusableCell(withIdentifier: "keysetCell", for: indexPath)
         configureCell(cell)
         
         if keysets.count > 0 && indexPath.section < keysets.count && lifehashes.count > 0 && indexPath.section < lifehashes.count {
             let keyset = keysets[indexPath.section]
-            
-            let label = cell.viewWithTag(1) as! UILabel
-            label.text = keyset.label
             
             let fingerprintLabel = cell.viewWithTag(2) as! UILabel
             if let key = keyset.bip48SegwitAccount {
@@ -261,16 +263,27 @@ class KeysetsViewController: UIViewController, UITableViewDelegate, UITableViewD
             keysetLifehash.background.backgroundColor = cell.backgroundColor
             keysetLifehash.lifehashImage.image = lifehashes[indexPath.section]
             keysetLifehash.iconImage.image = UIImage(systemName: "person.2")
-            keysetLifehash.iconLabel.text = "cosigner"
+            keysetLifehash.iconLabel.text = keyset.label
             
             return cell
         } else {
             return UITableViewCell()
         }
+            
+        } else {
+            let cell = tableView.dequeueReusableCell(withIdentifier: "cosognerDefaultCell", for: indexPath)
+            let button = cell.viewWithTag(1) as! UIButton
+            button.addTarget(self, action: #selector(add), for: .touchUpInside)
+            return cell
+        }
     }
     
     func tableView(_ tableView: UITableView, heightForRowAt indexPath: IndexPath) -> CGFloat {
-        return 266
+        if keysets.count > 0 {
+            return 266
+        } else {
+            return 44
+        }
     }
     
     func tableView(_ tableView: UITableView, commit editingStyle: UITableViewCell.EditingStyle, forRowAt indexPath: IndexPath) {
@@ -510,7 +523,7 @@ class KeysetsViewController: UIViewController, UITableViewDelegate, UITableViewD
         guard let account = keyset.bip48SegwitAccount else { return }
         
         keysetToExport = account
-        headerText = "Multi-sig keyset"
+        headerText = "Cosigner"
         subheaderText = account
         export()
     }
@@ -554,11 +567,14 @@ class KeysetsViewController: UIViewController, UITableViewDelegate, UITableViewD
             DispatchQueue.main.async { [weak self] in
                 self?.lifehashes.remove(at: section)
                 self?.keysets.remove(at: section)
-                self?.keysetsTable.deleteSections(IndexSet.init(arrayLiteral: section), with: .fade)
-                self?.keysetsTable.reloadData()
-            }
-            
-            showAlert(self, "", "Cosigner deleted ✓")
+                if self?.keysets.count ?? 0 > 0 {
+                    self?.keysetsTable.deleteSections(IndexSet.init(arrayLiteral: section), with: .fade)
+                } else {
+                    self?.editKeysets()
+                    self?.keysetsTable.reloadData()
+                }
+                
+            }            
         }
     }
     
@@ -581,7 +597,7 @@ class KeysetsViewController: UIViewController, UITableViewDelegate, UITableViewD
         
         var keyset = [String:Any]()
         keyset["id"] = UUID()
-        keyset["label"] = "keyset"
+        keyset["label"] = "Cosigner"
         keyset["bip48SegwitAccount"] = account
         keyset["dateAdded"] = Date()
         keyset["fingerprint"] = ds.fingerprint

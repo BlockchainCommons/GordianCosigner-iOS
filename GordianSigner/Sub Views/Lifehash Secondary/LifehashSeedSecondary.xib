@@ -11,7 +11,6 @@
             <connections>
                 <outlet property="background" destination="0bB-bz-LCy" id="xim-AF-zIS"/>
                 <outlet property="iconImage" destination="nwa-nn-zIn" id="oto-D4-mYV"/>
-                <outlet property="iconText" destination="pRQ-Me-t9D" id="Kju-ct-G12"/>
                 <outlet property="lifehashImage" destination="n5I-xB-CRW" id="itF-6x-IRk"/>
             </connections>
         </placeholder>
@@ -38,20 +37,12 @@
                                 <constraint firstAttribute="width" constant="20" id="a4V-TX-QqP"/>
                             </constraints>
                         </imageView>
-                        <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="seed" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="pRQ-Me-t9D">
-                            <rect key="frame" x="48.5" y="22" width="15" height="7.5"/>
-                            <fontDescription key="fontDescription" type="system" pointSize="6"/>
-                            <color key="textColor" white="0.66666666669999997" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
-                            <nil key="highlightedColor"/>
-                        </label>
                     </subviews>
                     <color key="backgroundColor" white="0.0" alpha="0.0" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                     <constraints>
                         <constraint firstItem="nwa-nn-zIn" firstAttribute="top" secondItem="0bB-bz-LCy" secondAttribute="top" id="2Mu-j8-kZI"/>
                         <constraint firstAttribute="trailing" secondItem="nwa-nn-zIn" secondAttribute="trailing" constant="4" id="G2K-bD-hBR"/>
-                        <constraint firstItem="pRQ-Me-t9D" firstAttribute="centerX" secondItem="nwa-nn-zIn" secondAttribute="centerX" id="eaS-7Z-x7q"/>
                         <constraint firstItem="n5I-xB-CRW" firstAttribute="leading" secondItem="0bB-bz-LCy" secondAttribute="leading" id="ovL-ku-Vmj"/>
-                        <constraint firstItem="pRQ-Me-t9D" firstAttribute="top" secondItem="nwa-nn-zIn" secondAttribute="bottom" constant="1" id="qdV-FZ-fjJ"/>
                         <constraint firstItem="n5I-xB-CRW" firstAttribute="top" secondItem="0bB-bz-LCy" secondAttribute="top" id="zsw-Qh-7no"/>
                     </constraints>
                 </view>

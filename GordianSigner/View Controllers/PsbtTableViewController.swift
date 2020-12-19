@@ -625,7 +625,6 @@ class PsbtTableViewController: UIViewController, UITableViewDelegate, UITableVie
         if isMine {
             lifehashView.lifehashImage.image = UIImage(systemName: "person.crop.circle.fill.badge.checkmark")
             lifehashView.iconImage.image = UIImage(systemName: "person.2.square.stack")
-            lifehashView.iconText.text = "account"
             if let lifehash = outputDict["lifeHash"] as? UIImage {
                 lifehashView.lifehashImage.image = lifehash
             } else {

@@ -44,6 +44,7 @@ class AddSignerViewController: UIViewController {
             self.textField.text = words
             self.processTextfieldInput()
             self.validWordsAdded()
+            self.view.endEditing(true)
         }
     }
     

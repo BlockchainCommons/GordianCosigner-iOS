@@ -78,7 +78,7 @@ class SignersViewController: UIViewController {
               alertStyle = UIAlertController.Style.alert
             }
             
-            let alert = UIAlertController(title: "Delete signer?", message: "This action is undoable! The signer will be gone forever.", preferredStyle: alertStyle)
+            let alert = UIAlertController(title: "Delete seed?", message: "The seed will be gone forever.", preferredStyle: alertStyle)
             
             alert.addAction(UIAlertAction(title: "Delete", style: .destructive, handler: { action in
                 self.deleteSeedNow(id, section)
@@ -93,19 +93,21 @@ class SignersViewController: UIViewController {
     private func deleteSeedNow(_ id: UUID, _ section: Int) {
         CoreDataService.deleteEntity(id: id, entityName: .signer) { (success, errorDescription) in
             guard success else {
-                showAlert(self, "Error deleting signer", "We were unable to delete that signer!")
+                showAlert(self, "Error deleting seed", "We were unable to delete that seed!")
                 return
             }
             
             DispatchQueue.main.async { [weak self] in
                 self?.signerStructs.remove(at: section)
-                self?.signerTable.deleteSections(IndexSet.init(arrayLiteral: section), with: .fade)
-                self?.signerTable.reloadData()
+                if self?.signerStructs.count ?? 0 > 0 {
+                    self?.signerTable.deleteSections(IndexSet.init(arrayLiteral: section), with: .fade)
+                } else {
+                    self?.editSigners()
+                    self?.signerTable.reloadData()
+                }
                 
                 NotificationCenter.default.post(name: .cosignerAdded, object: nil, userInfo: nil)
-            }
-            
-            showAlert(self, "", "Signer deleted ✓")
+            }            
         }
     }
     
@@ -152,7 +154,6 @@ class SignersViewController: UIViewController {
             guard success else { showAlert(self, "Label not saved!", "There was an error updating your label, please let us know about it: \(errorDescription ?? "unknown")"); return }
             
             self.updateCosignerLabelToo(cosigner, label)
-            //self.loadData()
         }
     }
     
@@ -229,7 +230,11 @@ class SignersViewController: UIViewController {
 extension SignersViewController: UITableViewDelegate {
     
     func tableView(_ tableView: UITableView, heightForRowAt indexPath: IndexPath) -> CGFloat {
-        return 169
+        if signerStructs.count > 0 {
+            return 169
+        } else {
+            return 44
+        }
     }
     
     func tableView(_ tableView: UITableView, canEditRowAt indexPath: IndexPath) -> Bool {
@@ -248,7 +253,11 @@ extension SignersViewController: UITableViewDelegate {
 extension SignersViewController: UITableViewDataSource {
     
     func numberOfSections(in tableView: UITableView) -> Int {
-        return signerStructs.count
+        if signerStructs.count > 0 {
+            return signerStructs.count
+        } else {
+            return 1
+        }
     }
     
     func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
@@ -256,39 +265,45 @@ extension SignersViewController: UITableViewDataSource {
     }
     
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
-        let cell = tableView.dequeueReusableCell(withIdentifier: "signerCell", for: indexPath)
-        cell.selectionStyle = .none
-        cell.layer.cornerRadius = 8
-        cell.layer.borderColor = UIColor.darkGray.cgColor
-        cell.layer.borderWidth = 0.5
-        
-        let label = cell.viewWithTag(1) as! UILabel
-        let dateAdded = cell.viewWithTag(2) as! UILabel
-        let lifehashView = cell.viewWithTag(3) as! LifehashSeedView
-        let fingerprintLabel = cell.viewWithTag(4) as! UILabel
-        let detailButton = cell.viewWithTag(5) as! UIButton
-        
-        let editButton = cell.viewWithTag(6) as! UIButton
-        editButton.addTarget(self, action: #selector(editLabel(_:)), for: .touchUpInside)
-        editButton.restorationIdentifier = "\(indexPath.section)"
-        editButton.showsTouchWhenHighlighted = true
-        
-        let signer = signerStructs[indexPath.section]
-        
-        label.text = signer.label
-        lifehashView.lifehashImage.image = UIImage(data: signer.lifeHash)
-        dateAdded.text = signer.dateAdded.formatted()
-        fingerprintLabel.text = signer.fingerprint
+        if signerStructs.count > 0 {
+            let cell = tableView.dequeueReusableCell(withIdentifier: "signerCell", for: indexPath)
+            cell.selectionStyle = .none
+            cell.layer.cornerRadius = 8
+            cell.layer.borderColor = UIColor.darkGray.cgColor
+            cell.layer.borderWidth = 0.5
             
-        lifehashView.background.clipsToBounds = true
-        lifehashView.background.backgroundColor = cell.backgroundColor
-        lifehashView.backgroundColor = cell.backgroundColor
-        
-        detailButton.showsTouchWhenHighlighted = true
-        detailButton.restorationIdentifier = "\(indexPath.section)"
-        detailButton.addTarget(self, action: #selector(seeDetail(_:)), for: .touchUpInside)
-        
-        return cell
+            let dateAdded = cell.viewWithTag(2) as! UILabel
+            let lifehashView = cell.viewWithTag(3) as! LifehashSeedView
+            let fingerprintLabel = cell.viewWithTag(4) as! UILabel
+            let detailButton = cell.viewWithTag(5) as! UIButton
+            
+            let editButton = cell.viewWithTag(6) as! UIButton
+            editButton.addTarget(self, action: #selector(editLabel(_:)), for: .touchUpInside)
+            editButton.restorationIdentifier = "\(indexPath.section)"
+            editButton.showsTouchWhenHighlighted = true
+            
+            let signer = signerStructs[indexPath.section]
+            
+            lifehashView.lifehashImage.image = UIImage(data: signer.lifeHash)
+            dateAdded.text = signer.dateAdded.formatted()
+            fingerprintLabel.text = signer.fingerprint
+            lifehashView.iconLabel.text = signer.label
+            
+            lifehashView.background.clipsToBounds = true
+            lifehashView.background.backgroundColor = cell.backgroundColor
+            lifehashView.backgroundColor = cell.backgroundColor
+            
+            detailButton.showsTouchWhenHighlighted = true
+            detailButton.restorationIdentifier = "\(indexPath.section)"
+            detailButton.addTarget(self, action: #selector(seeDetail(_:)), for: .touchUpInside)
+            
+            return cell
+        } else {
+            let cell = tableView.dequeueReusableCell(withIdentifier: "signerDefaultCell", for: indexPath)
+            let button = cell.viewWithTag(1) as! UIButton
+            button.addTarget(self, action: #selector(add), for: .touchUpInside)
+            return cell
+        }
     }
     
 }

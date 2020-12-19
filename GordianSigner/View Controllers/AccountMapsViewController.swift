@@ -32,19 +32,11 @@ class AccountMapsViewController: UIViewController, UITableViewDelegate, UITableV
         if !FirstTime.firstTimeHere() {
             showAlert(self, "Fatal error", "We were unable to set and save an encryption key to your secure enclave, the app will not function without this key.")
         }
-        
+                
     }
     
     override func viewDidAppear(_ animated: Bool) {
         load()
-    }
-    
-    private func segueToIntro() {
-        DispatchQueue.main.async { [weak self] in
-            guard let self = self else { return }
-            
-            self.performSegue(withIdentifier: "segueToIntro", sender: self)
-        }
     }
     
     private func load() {
@@ -53,18 +45,11 @@ class AccountMapsViewController: UIViewController, UITableViewDelegate, UITableV
         CoreDataService.retrieveEntity(entityName: .accountMap) { [weak self] (accountMaps, errorDescription) in
             guard let self = self else { return }
             
-            guard let accountMaps = accountMaps, accountMaps.count > 0 else {
-                if UserDefaults.standard.object(forKey: "seenIntro") == nil {
-                    self.segueToIntro()
-                } else if UserDefaults.standard.object(forKey: "createDefaults") == nil {
-                    self.promptToCreate()
-                }
-                
-                return
-            }
+            guard let accountMaps = accountMaps, accountMaps.count > 0 else { return }
             
             for accountMap in accountMaps {
                 let str = AccountMapStruct(dictionary: accountMap)
+                print("am: \(accountMap)")
                 
                 self.accountMaps.append(["accountMap": str])
             }
@@ -77,7 +62,25 @@ class AccountMapsViewController: UIViewController, UITableViewDelegate, UITableV
         CoreDataService.retrieveEntity(entityName: .keyset) { [weak self] (keysets, errorDescription) in
             guard let self = self else { return }
             
-            guard let keysets = keysets, keysets.count > 0 else { return }
+            guard let keysets = keysets, keysets.count > 0 else {
+                
+                for (i, accountMap) in self.accountMaps.enumerated() {
+                    let amStruct = accountMap["accountMap"] as! AccountMapStruct
+                    self.accountMaps[i]["canSign"] = false
+                    
+                    if !amStruct.descriptor.contains("keyset") {
+                        self.accountMaps[i]["lifeHash"] = LifeHash.image(amStruct.descriptor)
+                    }
+                                        
+                    if i + 1 == self.accountMaps.count {
+                        DispatchQueue.main.async {
+                            self.accountMapTable.reloadData()
+                        }
+                    }
+                }
+                
+                return
+            }
             
             for (i, accountMap) in self.accountMaps.enumerated() {
                 let amStruct = accountMap["accountMap"] as! AccountMapStruct
@@ -134,7 +137,11 @@ class AccountMapsViewController: UIViewController, UITableViewDelegate, UITableV
     }
     
     func numberOfSections(in tableView: UITableView) -> Int {
-        return accountMaps.count
+        if accountMaps.count > 0 {
+            return accountMaps.count
+        } else {
+            return 1
+        }
     }
     
     func tableView(_ tableView: UITableView, commit editingStyle: UITableViewCell.EditingStyle, forRowAt indexPath: IndexPath) {
@@ -144,8 +151,8 @@ class AccountMapsViewController: UIViewController, UITableViewDelegate, UITableV
         }
     }
     
-    func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
-        let cell = tableView.dequeueReusableCell(withIdentifier: "accountMapCell", for: indexPath)
+    private func accountMapCell(_ indexPath: IndexPath) -> UITableViewCell {
+        let cell = accountMapTable.dequeueReusableCell(withIdentifier: "accountMapCell", for: indexPath)
         cell.selectionStyle = .none
         cell.layer.cornerRadius = 8
         cell.layer.borderColor = UIColor.darkGray.cgColor
@@ -155,8 +162,8 @@ class AccountMapsViewController: UIViewController, UITableViewDelegate, UITableV
         let descriptor = accountMap.descriptor
         let descriptorStruct = descriptorParser.descriptor(descriptor)
         
-        let label = cell.viewWithTag(1) as! UILabel
-        label.text = accountMap.label
+//        let label = cell.viewWithTag(1) as! UILabel
+//        label.text = accountMap.label
         
         let policy = cell.viewWithTag(2) as! UILabel
         policy.text = descriptorStruct.mOfNType
@@ -164,8 +171,13 @@ class AccountMapsViewController: UIViewController, UITableViewDelegate, UITableV
         let script = cell.viewWithTag(3) as! UILabel
         script.text = descriptorStruct.format
         
-        let participants = cell.viewWithTag(4) as! UILabel
-        participants.text = (accountMaps[indexPath.section]["participants"] as! String)
+        let participantsLabel = cell.viewWithTag(4) as! UILabel
+        if let participants = accountMaps[indexPath.section]["participants"] as? String {
+            participantsLabel.text = participants
+        } else {
+            participantsLabel.text = ""
+        }
+        
         
         let isCompleteImage = cell.viewWithTag(5) as! UIImageView
         let completeLabel = cell.viewWithTag(12) as! UILabel
@@ -227,7 +239,7 @@ class AccountMapsViewController: UIViewController, UITableViewDelegate, UITableV
         if let image = accountMaps[indexPath.section]["lifeHash"] as? UIImage {
             lifehash.lifehashImage.image = image
             lifehash.iconImage.image = UIImage(systemName: "person.2.square.stack")
-            lifehash.iconLabel.text = "account"
+            lifehash.iconLabel.text = accountMap.label
             lifehash.iconImage.alpha = 1
             lifehash.iconLabel.alpha = 1
         } else {
@@ -240,7 +252,25 @@ class AccountMapsViewController: UIViewController, UITableViewDelegate, UITableV
         return cell
     }
     
+    private func defaultCell(_ indexPath: IndexPath) -> UITableViewCell {
+        let cell = accountMapTable.dequeueReusableCell(withIdentifier: "accountMapDefaultCell", for: indexPath)
+        let button = cell.viewWithTag(1) as! UIButton
+        button.addTarget(self, action: #selector(add), for: .touchUpInside)
+        return cell
+    }
+    
+    func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
+        if accountMaps.count > 0 {
+            return accountMapCell(indexPath)
+        } else {
+            return defaultCell(indexPath)
+        }
+    }
+    
     func tableView(_ tableView: UITableView, heightForRowAt indexPath: IndexPath) -> CGFloat {
+        if accountMaps.count > 0 {
+            
+        
         var height = 247
         let accountMap = accountMaps[indexPath.section]["accountMap"] as! AccountMapStruct
         let descParser = DescriptorParser()
@@ -283,6 +313,9 @@ class AccountMapsViewController: UIViewController, UITableViewDelegate, UITableV
             }
         }
         return CGFloat(height)
+        } else {
+            return 44
+        }
     }
     
     @objc func seeAddresses(_ sender: UIButton) {
@@ -300,30 +333,48 @@ class AccountMapsViewController: UIViewController, UITableViewDelegate, UITableV
         guard let sectionString = sender.restorationIdentifier, let int = Int(sectionString) else { return }
         
         let am = accountMaps[int]["accountMap"] as! AccountMapStruct
+        var vettedCosigners = [KeysetStruct]()
         
         CoreDataService.retrieveEntity(entityName: .keyset) { (keysets, errorDescription) in
-            guard let keysets = keysets, keysets.count > 0 else { return }
+            guard let keysets = keysets, keysets.count > 0 else {
+                showAlert(self, "", "No cosigners added yet, either create a seed or add a cosigner first.")
+                return
+            }
             
-            DispatchQueue.main.async { [weak self] in
-                guard let self = self else { return }
-                
-                var alertStyle = UIAlertController.Style.actionSheet
-                if (UIDevice.current.userInterfaceIdiom == .pad) {
-                  alertStyle = UIAlertController.Style.alert
+            for (i, keyset) in keysets.enumerated() {
+                let keysetStruct = KeysetStruct(dictionary: keyset)
+                if !am.descriptor.contains(keysetStruct.bip48SegwitAccount!) {
+                    vettedCosigners.append(keysetStruct)
                 }
                 
-                let alert = UIAlertController(title: "Which Account?", message: "Select the Account you want this cosigner to join.", preferredStyle: alertStyle)
-                
-                for keyset in keysets {
-                    let keysetStruct = KeysetStruct(dictionary: keyset)
-                    alert.addAction(UIAlertAction(title: keysetStruct.label, style: .default, handler: { action in
-                        self.updateAccountMap(am, keysetStruct, int)
-                    }))
+                if i + 1 == keysets.count {
+                    
+                    if vettedCosigners.count > 0 {
+                        DispatchQueue.main.async { [weak self] in
+                            guard let self = self else { return }
+                            
+                            var alertStyle = UIAlertController.Style.actionSheet
+                            if (UIDevice.current.userInterfaceIdiom == .pad) {
+                              alertStyle = UIAlertController.Style.alert
+                            }
+                            
+                            let alert = UIAlertController(title: "Which Cosigner?", message: "Select the cosigner to be added.", preferredStyle: alertStyle)
+                            
+                            for vettedCosigner in vettedCosigners {
+                                alert.addAction(UIAlertAction(title: keysetStruct.label, style: .default, handler: { action in
+                                    self.updateAccountMap(am, vettedCosigner, int)
+                                }))
+                            }
+                                            
+                            alert.addAction(UIAlertAction(title: "Cancel", style: .cancel, handler: { action in }))
+                            alert.popoverPresentationController?.sourceView = self.view
+                            self.present(alert, animated: true, completion: nil)
+                        }
+                    } else {
+                        showAlert(self, "", "You can not add duplicate Cosigners to an account, add more Cosigners first.")
+                    }
+                    
                 }
-                                
-                alert.addAction(UIAlertAction(title: "Cancel", style: .cancel, handler: { action in }))
-                alert.popoverPresentationController?.sourceView = self.view
-                self.present(alert, animated: true, completion: nil)
             }
         }
     }
@@ -351,29 +402,29 @@ class AccountMapsViewController: UIViewController, UITableViewDelegate, UITableV
         
         CoreDataService.updateEntity(id: accountMap.id, keyToUpdate: "descriptor", newValue: desc, entityName: .accountMap) { (success, errorDesc) in
             guard success else {
-                showAlert(self, "Account Map updating failed...", "Please let us know about this bug.")
+                showAlert(self, "Account updating failed...", "Please let us know about this bug.")
                 return
             }
             
             CoreDataService.updateEntity(id: accountMap.id, keyToUpdate: "accountMap", newValue: updatedMap, entityName: .accountMap) { (success, errorDesc) in
                 guard success else {
-                    showAlert(self, "Account Map updating failed...", "Please let us know about this bug.")
+                    showAlert(self, "Account updating failed...", "Please let us know about this bug.")
                     return
                 }
                 
                 CoreDataService.updateEntity(id: keyset.id, keyToUpdate: "sharedWith", newValue: accountMap.id, entityName: .keyset) { (success, errorDescription) in
                     guard success else {
-                        showAlert(self, "Account Map updating failed...", "Please let us know about this bug.")
+                        showAlert(self, "Account updating failed...", "Please let us know about this bug.")
                         return
                     }
                     
                     CoreDataService.updateEntity(id: keyset.id, keyToUpdate: "dateShared", newValue: Date(), entityName: .keyset) { (success, errorDescription) in
                         guard success else {
-                            showAlert(self, "Account Map updating failed...", "Please let us know about this bug.")
+                            showAlert(self, "Account updating failed...", "Please let us know about this bug.")
                             return
                         }
                         
-                        showAlert(self, "Account Map updated ✓", "")
+                        showAlert(self, "", "Account updated ✓")
                         
                         self.load()
                     }
@@ -457,7 +508,7 @@ class AccountMapsViewController: UIViewController, UITableViewDelegate, UITableV
               alertStyle = UIAlertController.Style.alert
             }
             
-            let alert = UIAlertController(title: "Add Account Map", message: "You may either create a new account map or import one.", preferredStyle: alertStyle)
+            let alert = UIAlertController(title: "Add Account", message: "You may either create a new account or import one.", preferredStyle: alertStyle)
             
             alert.addAction(UIAlertAction(title: "Import", style: .default, handler: { action in
                 DispatchQueue.main.async { [weak self] in
@@ -498,7 +549,7 @@ class AccountMapsViewController: UIViewController, UITableViewDelegate, UITableV
               alertStyle = UIAlertController.Style.alert
             }
             
-            let alert = UIAlertController(title: "Delete Account Map?", message: "", preferredStyle: alertStyle)
+            let alert = UIAlertController(title: "Delete Account?", message: "", preferredStyle: alertStyle)
             
             alert.addAction(UIAlertAction(title: "Delete", style: .destructive, handler: { action in
                 self.deleteAccountMapNow(id, section)
@@ -513,32 +564,30 @@ class AccountMapsViewController: UIViewController, UITableViewDelegate, UITableV
     private func deleteAccountMapNow(_ id: UUID, _ section: Int) {
         CoreDataService.deleteEntity(id: id, entityName: .accountMap) { (success, errorDescription) in
             guard success else {
-                showAlert(self, "Error deleting Account Map", "We were unable to delete that signer!")
+                showAlert(self, "Error deleting Account", "")
                 return
             }
             
             DispatchQueue.main.async { [weak self] in
                 self?.accountMaps.remove(at: section)
-                self?.accountMapTable.deleteSections(IndexSet.init(arrayLiteral: section), with: .fade)
+                if self?.accountMaps.count == 0 {
+                    self?.editAccounts()
+                    self?.accountMapTable.reloadData()
+                } else {
+                    self?.accountMapTable.deleteSections(IndexSet.init(arrayLiteral: section), with: .fade)
+                }
             }
             
             DispatchQueue.main.async {
                 NotificationCenter.default.post(name: .cosignerAdded, object: nil, userInfo: nil)
             }
-            
-            showAlert(self, "", "Account Map deleted ✓")
         }
     }
     
     private func parseAccountMap(_ accountMap: String) {
         guard let dict = try? JSONSerialization.jsonObject(with: accountMap.utf8, options: []) as? [String:Any] else { return }
         
-        guard var descriptor = dict["descriptor"] as? String else { return }
-        
-        guard !descriptor.contains("keyset") else {
-            showAlert(self, "Policy maps not yet supported", "You can only create Policy Map's for now, importing is for Account Map's only.")
-            return
-        }
+        guard var descriptor = dict["descriptor"] as? String, !descriptor.contains("keyset") else { return }
         
         let accountMapId = UUID()
         
@@ -657,6 +706,16 @@ class AccountMapsViewController: UIViewController, UITableViewDelegate, UITableV
         if segue.identifier == "segueToAddresses" {
             if let vc = segue.destination as? AddressesViewController {
                 vc.accountMap = self.addressesAm
+            }
+        }
+        
+        if segue.identifier == "createAccountMap" {
+            if let vc = segue.destination as? CreateAccountMapViewController {
+                vc.doneBlock = { [weak self] accountMap in
+                    guard let self = self, let accountMap = accountMap else { return }
+                                        
+                    self.parseAccountMap(accountMap)
+                }
             }
         }
     }
