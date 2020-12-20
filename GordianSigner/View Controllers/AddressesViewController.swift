@@ -35,7 +35,7 @@ class AddressesViewController: UIViewController, UITableViewDelegate, UITableVie
             var pubkeys = [PubKey]()
             
             for (k, key) in keys.enumerated() {
-                let hdKey = try? HDKey(base58: key)
+                let hdKey = try? HDKey(base58: key.condenseWhitespace())
                 let path = "0" + "/" + "\(i)"
                 
                 guard let bip32path = try? BIP32Path(string: path), let key = try? hdKey?.derive(using: bip32path) else {

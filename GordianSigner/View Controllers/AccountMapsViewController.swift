@@ -49,8 +49,6 @@ class AccountMapsViewController: UIViewController, UITableViewDelegate, UITableV
             
             for accountMap in accountMaps {
                 let str = AccountMapStruct(dictionary: accountMap)
-                print("am: \(accountMap)")
-                
                 self.accountMaps.append(["accountMap": str])
             }
             
@@ -637,7 +635,7 @@ class AccountMapsViewController: UIViewController, UITableViewDelegate, UITableV
                 
                 var keyset = [String:Any]()
                 keyset["id"] = UUID()
-                keyset["label"] = "account map keyset"
+                keyset["label"] = "Cosigner"
                 keyset["bip48SegwitAccount"] = fullKey.replacingOccurrences(of: "/0/*", with: "")
                 keyset["dateAdded"] = Date()
                 keyset["fingerprint"] = ds.fingerprint
@@ -665,7 +663,7 @@ class AccountMapsViewController: UIViewController, UITableViewDelegate, UITableV
         map["dateAdded"] = Date()
         map["complete"] = descStruct.complete
         map["lifehash"] = LifeHash.hash(descriptor.utf8)
-        map["descriptor"] = descriptor
+        map["descriptor"] = descriptor.condenseWhitespace()
         
         CoreDataService.saveEntity(dict: map, entityName: .accountMap) { [weak self] (success, errorDescription) in
             guard let self = self, success else { return }
