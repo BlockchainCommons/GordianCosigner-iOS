@@ -7,6 +7,7 @@
 //
 
 import UIKit
+import LibWally
 
 class KeysetsViewController: UIViewController, UITableViewDelegate, UITableViewDataSource {
     
@@ -594,6 +595,11 @@ class KeysetsViewController: UIViewController, UITableViewDelegate, UITableViewD
         let hack = "wsh(\(account)/0/*)"
         let dp = DescriptorParser()
         let ds = dp.descriptor(hack)
+                
+        guard let _ = try? HDKey(base58: ds.accountXpub) else {
+            showAlert(self, "Invalid key", "Gordian Cosigner is not yet compatible with slip132, please ensure you are adding a valid xpub and try again.")
+            return
+        }
         
         var keyset = [String:Any]()
         keyset["id"] = UUID()

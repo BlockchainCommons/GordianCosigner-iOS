@@ -7,6 +7,7 @@
 //
 
 import UIKit
+import LibWally
 
 class AccountMapsViewController: UIViewController, UITableViewDelegate, UITableViewDataSource {
     
@@ -615,7 +616,14 @@ class AccountMapsViewController: UIViewController, UITableViewDelegate, UITableV
             for keyWithPath in descStruct.keysWithPath {
                 let arr = keyWithPath.split(separator: "]")
                 if arr.count > 1 {
-                    let dict = ["path":"\(arr[0])]", "key": "\(arr[1].replacingOccurrences(of: "))", with: ""))"]
+                    let xpubString = "\(arr[1].replacingOccurrences(of: "))", with: ""))"
+                    
+                    guard let xpub = try? HDKey(base58: xpubString) else {
+                        showAlert(self, "Key invalid", "Gordian Cosigner does not yet support slip0132 keys. Please ensure your xpub is valid then try again.")
+                        return
+                    }
+                    
+                    let dict = ["path":"\(arr[0])]", "key": xpub.description]
                     dictArray.append(dict)
                 }
             }

@@ -22,6 +22,7 @@ class AddressesViewController: UIViewController, UITableViewDelegate, UITableVie
         addressesTable.delegate = self
         addressesTable.dataSource = self
         load()
+        showAlert(self, "⚠️ Verify first!", "To avoid any loss of funds ensure the first few addresses match what your other multisig wallet is showing.")
     }
     
     private func load() {
@@ -35,10 +36,14 @@ class AddressesViewController: UIViewController, UITableViewDelegate, UITableVie
             var pubkeys = [PubKey]()
             
             for (k, key) in keys.enumerated() {
-                let hdKey = try? HDKey(base58: key.condenseWhitespace())
+                guard let hdKey = try? HDKey(base58: key.condenseWhitespace()) else {
+                    showAlert(self, "Invalid key", "Gordian Cosigner does not yet support slip132, please ensure your xpub is valid and try again.")
+                    return
+                }
+                
                 let path = "0" + "/" + "\(i)"
                 
-                guard let bip32path = try? BIP32Path(string: path), let key = try? hdKey?.derive(using: bip32path) else {
+                guard let bip32path = try? BIP32Path(string: path), let key = try? hdKey.derive(using: bip32path) else {
                     showAlert(self, "", "There was an error deriving your addresses")
                     return
                 }
