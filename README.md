@@ -16,11 +16,27 @@ Gordian Cosigner is a multiplatform utility that's also available as:
 * [GordianCosigner for Android](https://github.com/BlockchainCommons/GordianSigner-Android)
 * [GordianCosigner for MacOS](https://github.com/BlockchainCommons/GordianSigner-macOS)
 
-## Status - Active Development
+## Status - Late Alpha
 
-GordianCosigner-Catalyst is currently under active development. It should not be used for production tasks until it has had further testing and auditing.
+GordianCosigner-Catalyst is currently a late alpha. It should not be used for production tasks until it has had further testing and auditing. Though it now supports mainnet interactions, it should be considered _very risky_ to use, and minimal Bitcoin funds should be used for testing.
 
 At current, this Catalyst repo is only used for our iOS release, but we hope to eventually use it for the MacOS release as well. (A security lock on the MacOS camera currently prevents us from doing so.)
+
+## Installation
+
+**Gordian Cosigner** is available for testing from Testflight.
+
+## Usage
+
+To use **Gordian Cosigner**, you should:
+
+1. Record any seeds you'll be signing with using the **seeds** tab.
+1. Record the xpubs of any seeds not present using the **cosigners** tab.
+1. Collect the seeds and cosigners to define multisignatures on the **accounts** tab.
+1. Receive funds using the addresses generated from the **accounts** tab.
+1. Make payments from your multi-sig account on the **payments** tab.
+
+See [Gordian Cosigner User Stories](Docs/Stories.md) for reasons that you might use multisignatures to ensure the [#SmartCustody](https://www.smartcustody.com/) of your funds.
 
 ## Origin, Authors, Copyright & Licenses
 
