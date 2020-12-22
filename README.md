@@ -36,7 +36,7 @@ To use **Gordian Cosigner**, you should:
 1. Receive funds using the addresses generated from the **accounts** tab.
 1. Make payments from your multi-sig account on the **payments** tab.
 
-See [Gordian Cosigner User Stories](Docs/Stories.md) for reasons that you might use multisignatures to ensure the [#SmartCustody](https://www.smartcustody.com/) of your funds.
+See [Gordian Cosigner User Scenarios](Docs/Scenarios.md) for reasons that you might use multisignatures to ensure the [#SmartCustody](https://www.smartcustody.com/) of your funds.
 
 ## Origin, Authors, Copyright & Licenses
 
