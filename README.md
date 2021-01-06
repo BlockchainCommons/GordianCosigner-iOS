@@ -1,9 +1,9 @@
-# Blockchain Commons GordianSigner-Catalyst
+# Blockchain Commons GordianCosigner-Catalyst
 ### _by Peter Denton and Christopher Allen_
 
 ![](images/logos/gordian-signer-screen.jpg)
 
-**Gordian Signer** allows users to participate in a multisig by adding a signature to an otherwise unsigned or partially signed PSBT, where they did not initiate the transaction. It can also be used for signing a single-signature PSBT. It's largely intended as an offline signing tool, which allows signing without the usage of a full node: a real wallet is need to both initiate an account map and to initiate a transaction.
+**Gordian Cosigner** allows users to participate in a multisig by adding a signature to an otherwise unsigned or partially signed PSBT, where they did not initiate the transaction. It can also be used for signing a single-signature PSBT. It's largely intended as an offline signing tool, which allows signing without the usage of a full node: a real wallet is need to both initiate an account map and to initiate a transaction.
 
 ## Additional Information
 
@@ -11,16 +11,32 @@ This is a companion app for the Gordian system:
 
 * [Gordian system](https://github.com/BlockchainCommons/Gordian) — A self-sovereign Bitcoin wallet and node
 
-Gordian Signer is a multiplatform utility that's also available as:
+Gordian Cosigner is a multiplatform utility that's also available as:
 
-* [GordianSigner for Android](https://github.com/BlockchainCommons/GordianSigner-Android)
-* [GordianSigner for MacOS](https://github.com/BlockchainCommons/GordianSigner-macOS)
+* [GordianCosigner for Android](https://github.com/BlockchainCommons/GordianSigner-Android)
+* [GordianCosigner for MacOS](https://github.com/BlockchainCommons/GordianSigner-macOS)
 
-## Status - Active Development
+## Status - Late Alpha
 
-GordianSigner-Catalyst is currently under active development. It should not be used for production tasks until it has had further testing and auditing.
+GordianCosigner-Catalyst is currently a late alpha. It should not be used for production tasks until it has had further testing and auditing. Though it now supports mainnet interactions, it should be considered _very risky_ to use, and minimal Bitcoin funds should be used for testing.
 
 At current, this Catalyst repo is only used for our iOS release, but we hope to eventually use it for the MacOS release as well. (A security lock on the MacOS camera currently prevents us from doing so.)
+
+## Installation
+
+**Gordian Cosigner** is available for testing from Testflight.
+
+## Usage
+
+To use **Gordian Cosigner**, you should:
+
+1. Record any seeds you'll be signing with using the **seeds** tab.
+1. Record the xpubs of any seeds not present using the **cosigners** tab.
+1. Collect the seeds and cosigners to define multisignatures on the **accounts** tab.
+1. Receive funds using the addresses generated from the **accounts** tab.
+1. Make payments from your multi-sig account on the **payments** tab.
+
+See [Gordian Cosigner User Scenarios](Docs/Scenarios.md) for reasons that you might use multisignatures to ensure the [#SmartCustody](https://www.smartcustody.com/) of your funds.
 
 ## Origin, Authors, Copyright & Licenses
 
@@ -36,20 +52,20 @@ This table below also establishes provenance (repository of origin, permalink, a
 
 ### Dependencies
 
-To build GordianSigner-Catalyst you'll need to use the following tools:
+To build GordianCosigner-Catalyst you'll need to use the following tools:
 
 - Xcode - ([Xcode](https://apps.apple.com/id/app/xcode/id497799835?mt=12)).
 - macOS 10.15 or iOS 13
 
 ### Derived from…
 
-This GordianSigner-Catalyst project is either derived from or was inspired by:
+This GordianCosigner-Catalyst project is either derived from or was inspired by:
 
 - [BlockchainCommons/GordianWallet-iOS](https://github.com/BlockchainCommons/GordianWallet-iOS) — Bitcoin wallet powered by your own node over Tor, from [BlockchainCommons](https://github.com/BlockchainCommons).
 
 ### Used with…
 
-These are other projects that work with or leverage GordianSigner-Catalyst:
+These are other projects that work with or leverage GordianCosigner-Catalyst:
 
 - [BlockchainCommons/bc-libwally-core](https://github.com/BlockchainCommons/bc-libwally-core) — Used for signing PSBT's offline, from [ElementsProject](https://github.com/ElementsProject).
 
@@ -57,9 +73,9 @@ These are other projects that work with or leverage GordianSigner-Catalyst:
 
 ## Financial Support
 
-GordianSigner-Catalyst is a project of [Blockchain Commons](https://www.blockchaincommons.com/). We are proudly a "not-for-profit" social benefit corporation committed to open source & open development. Our work is funded entirely by donations and collaborative partnerships with people like you. Every contribution will be spent on building open tools, technologies, and techniques that sustain and advance blockchain and internet security infrastructure and promote an open web.
+GordianCosigner-Catalyst is a project of [Blockchain Commons](https://www.blockchaincommons.com/). We are proudly a "not-for-profit" social benefit corporation committed to open source & open development. Our work is funded entirely by donations and collaborative partnerships with people like you. Every contribution will be spent on building open tools, technologies, and techniques that sustain and advance blockchain and internet security infrastructure and promote an open web.
 
-To financially support further development of GordianSigner-Catalyst and other projects, please consider becoming a Patron of Blockchain Commons through ongoing monthly patronage as a [GitHub Sponsor](https://github.com/sponsors/BlockchainCommons). You can also support Blockchain Commons with bitcoins at our [BTCPay Server](https://btcpay.blockchaincommons.com/).
+To financially support further development of GordianCosigner-Catalyst and other projects, please consider becoming a Patron of Blockchain Commons through ongoing monthly patronage as a [GitHub Sponsor](https://github.com/sponsors/BlockchainCommons). You can also support Blockchain Commons with bitcoins at our [BTCPay Server](https://btcpay.blockchaincommons.com/).
 
 ## Contributing
 
