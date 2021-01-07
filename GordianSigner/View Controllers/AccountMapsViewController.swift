@@ -37,7 +37,13 @@ class AccountMapsViewController: UIViewController, UITableViewDelegate, UITableV
     }
     
     override func viewDidAppear(_ animated: Bool) {
-        load()
+        if UserDefaults.standard.object(forKey: "acceptDisclaimer") == nil {
+            DispatchQueue.main.async {
+                self.performSegue(withIdentifier: "segueToDisclaimer", sender: self)
+            }
+        } else {
+            load()
+        }
     }
     
     private func load() {
@@ -360,7 +366,7 @@ class AccountMapsViewController: UIViewController, UITableViewDelegate, UITableV
                             let alert = UIAlertController(title: "Which Cosigner?", message: "Select the cosigner to be added.", preferredStyle: alertStyle)
                             
                             for vettedCosigner in vettedCosigners {
-                                alert.addAction(UIAlertAction(title: keysetStruct.label, style: .default, handler: { action in
+                                alert.addAction(UIAlertAction(title: vettedCosigner.label, style: .default, handler: { action in
                                     self.updateAccountMap(am, vettedCosigner, int)
                                 }))
                             }

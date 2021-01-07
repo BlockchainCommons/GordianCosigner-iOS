@@ -1364,7 +1364,7 @@ Cosigners contain an xpub and origin info.</string>
         <!--Account Maps View Controller-->
         <scene sceneID="cCB-AA-CPG">
             <objects>
-                <viewController id="wCx-A7-8Dm" customClass="AccountMapsViewController" customModule="Gordian_Cosigner" customModuleProvider="target" sceneMemberID="viewController">
+                <viewController wantsFullScreenLayout="YES" id="wCx-A7-8Dm" customClass="AccountMapsViewController" customModule="Gordian_Cosigner" customModuleProvider="target" sceneMemberID="viewController">
                     <view key="view" contentMode="scaleToFill" id="CUw-dd-MTq">
                         <rect key="frame" x="0.0" y="0.0" width="414" height="808"/>
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
@@ -1620,6 +1620,7 @@ Create an incomplete account, adding cosigners to it, when complete you can rece
                         <segue destination="9Vu-3O-YNg" kind="show" identifier="segueToExportAccountMap" id="WEQ-0q-dcz"/>
                         <segue destination="Iuy-9M-v3m" kind="show" identifier="createAccountMap" id="0RT-ZT-Efi"/>
                         <segue destination="6NQ-R2-fha" kind="show" identifier="segueToAddresses" id="Co5-jp-gAi"/>
+                        <segue destination="SMV-jN-46G" kind="presentation" identifier="segueToDisclaimer" modalPresentationStyle="fullScreen" id="fVt-4A-86J"/>
                     </connections>
                 </viewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="QYQ-Sd-lrs" userLabel="First Responder" customClass="UIResponder" sceneMemberID="firstResponder"/>
@@ -2056,11 +2057,114 @@ Create an incomplete account, adding cosigners to it, when complete you can rece
             </objects>
             <point key="canvasLocation" x="2918.840579710145" y="874.55357142857144"/>
         </scene>
+        <!--License Disclaimer View Controller-->
+        <scene sceneID="K4P-aW-QHg">
+            <objects>
+                <viewController extendedLayoutIncludesOpaqueBars="YES" hidesBottomBarWhenPushed="YES" id="SMV-jN-46G" customClass="LicenseDisclaimerViewController" customModule="Gordian_Cosigner" customModuleProvider="target" sceneMemberID="viewController">
+                    <view key="view" contentMode="scaleToFill" id="MEn-fm-rug">
+                        <rect key="frame" x="0.0" y="0.0" width="414" height="896"/>
+                        <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
+                        <subviews>
+                            <stackView opaque="NO" contentMode="scaleToFill" spacing="10" translatesAutoresizingMaskIntoConstraints="NO" id="Pbn-mh-qpI">
+                                <rect key="frame" x="132" y="812" width="150" height="30"/>
+                                <subviews>
+                                    <button opaque="NO" clipsSubviews="YES" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="H0R-xX-k9m">
+                                        <rect key="frame" x="0.0" y="0.0" width="70" height="30"/>
+                                        <color key="backgroundColor" white="0.33333333329999998" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+                                        <constraints>
+                                            <constraint firstAttribute="width" constant="70" id="3JM-rW-Qy1"/>
+                                        </constraints>
+                                        <color key="tintColor" systemColor="systemRedColor" red="1" green="0.23137254900000001" blue="0.18823529410000001" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+                                        <state key="normal" title="Decline"/>
+                                        <connections>
+                                            <action selector="declineAction:" destination="SMV-jN-46G" eventType="touchUpInside" id="hfe-Kq-tIO"/>
+                                        </connections>
+                                    </button>
+                                    <button opaque="NO" clipsSubviews="YES" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="4oZ-lb-UDr">
+                                        <rect key="frame" x="80" y="0.0" width="70" height="30"/>
+                                        <color key="backgroundColor" white="0.33333333329999998" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+                                        <constraints>
+                                            <constraint firstAttribute="width" constant="70" id="dcM-vx-drR"/>
+                                        </constraints>
+                                        <color key="tintColor" systemColor="systemGreenColor" red="0.20392156859999999" green="0.78039215689999997" blue="0.34901960780000002" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+                                        <state key="normal" title="Accept"/>
+                                        <connections>
+                                            <action selector="acceptAction:" destination="SMV-jN-46G" eventType="touchUpInside" id="gMe-6l-1SM"/>
+                                        </connections>
+                                    </button>
+                                </subviews>
+                                <constraints>
+                                    <constraint firstAttribute="width" constant="150" id="a8I-4c-0Ay"/>
+                                    <constraint firstAttribute="height" constant="30" id="qaZ-go-osN"/>
+                                </constraints>
+                            </stackView>
+                            <imageView clipsSubviews="YES" userInteractionEnabled="NO" contentMode="scaleAspectFit" horizontalHuggingPriority="251" verticalHuggingPriority="251" image="exclamationmark.bubble" catalog="system" translatesAutoresizingMaskIntoConstraints="NO" id="3Ms-zy-4zH">
+                                <rect key="frame" x="16" y="79.5" width="25" height="25"/>
+                                <color key="tintColor" systemColor="systemOrangeColor" red="1" green="0.58431372550000005" blue="0.0" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+                                <constraints>
+                                    <constraint firstAttribute="width" constant="25" id="503-RD-79K"/>
+                                    <constraint firstAttribute="height" constant="25.5" id="sLu-Hk-a1f"/>
+                                </constraints>
+                            </imageView>
+                            <label opaque="NO" userInteractionEnabled="NO" contentMode="TopLeft" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="License &amp; Disclaimer" lineBreakMode="tailTruncation" numberOfLines="0" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="k1N-w2-AD8">
+                                <rect key="frame" x="49" y="64" width="349" height="55"/>
+                                <constraints>
+                                    <constraint firstAttribute="height" constant="55" id="xQE-b2-tB1"/>
+                                </constraints>
+                                <fontDescription key="fontDescription" type="boldSystem" pointSize="20"/>
+                                <color key="textColor" white="0.66666666669999997" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+                                <nil key="highlightedColor"/>
+                            </label>
+                            <textView clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="scaleToFill" editable="NO" textAlignment="natural" translatesAutoresizingMaskIntoConstraints="NO" id="Nhp-d8-eCA">
+                                <rect key="frame" x="16" y="127" width="382" height="677"/>
+                                <color key="backgroundColor" white="0.0" alpha="0.0" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+                                <mutableString key="text">WARNING!
+
+Gordian cosigner is an alpha release! Because it operates on mainnet, this means that you could lose real money if there are any bugs or problems! (And there might be!)
+
+We are very grateful for your usage, and for any bugs, comments, or fixes, which you can file as Issues or PRs in the BlockchainCommons/GordianCosigner-Catalyst github. However, please do your testing with small amounts of bitcoins because of the dangers implicit in this being an alpha product.
+
+Please read and accept the terms of our disclaimer:
+
+The use of Gordian Cosigner is under the "BSD 2-Clause Plus Patent License" (https://spdx.org/licenses/BSD-2-Clause-Patent.html). Copyright © 2019 BlockchainCommons. All rights reserved. With the disclaimer: THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDERS OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.</mutableString>
+                                <color key="textColor" white="0.66666666669999997" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+                                <fontDescription key="fontDescription" type="system" pointSize="14"/>
+                                <textInputTraits key="textInputTraits" autocapitalizationType="sentences"/>
+                            </textView>
+                        </subviews>
+                        <color key="backgroundColor" red="0.0" green="0.0" blue="0.0" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+                        <constraints>
+                            <constraint firstItem="Pbn-mh-qpI" firstAttribute="top" secondItem="Nhp-d8-eCA" secondAttribute="bottom" constant="8" id="18Z-15-zLn"/>
+                            <constraint firstItem="Nhp-d8-eCA" firstAttribute="top" secondItem="k1N-w2-AD8" secondAttribute="bottom" constant="8" id="C2C-rU-xbY"/>
+                            <constraint firstItem="Nhp-d8-eCA" firstAttribute="leading" secondItem="nn1-Xw-ioh" secondAttribute="leading" constant="16" id="Deu-lM-BcM"/>
+                            <constraint firstItem="nn1-Xw-ioh" firstAttribute="bottom" secondItem="Pbn-mh-qpI" secondAttribute="bottom" constant="20" id="GMm-V2-eZa"/>
+                            <constraint firstItem="nn1-Xw-ioh" firstAttribute="trailing" secondItem="Nhp-d8-eCA" secondAttribute="trailing" constant="16" id="HMi-YV-gAC"/>
+                            <constraint firstItem="Pbn-mh-qpI" firstAttribute="centerX" secondItem="MEn-fm-rug" secondAttribute="centerX" id="f7I-fK-U6T"/>
+                            <constraint firstItem="3Ms-zy-4zH" firstAttribute="centerY" secondItem="k1N-w2-AD8" secondAttribute="centerY" id="jI6-dM-dsd"/>
+                            <constraint firstItem="k1N-w2-AD8" firstAttribute="leading" secondItem="3Ms-zy-4zH" secondAttribute="trailing" constant="8" id="kcY-xO-nNu"/>
+                            <constraint firstItem="3Ms-zy-4zH" firstAttribute="leading" secondItem="nn1-Xw-ioh" secondAttribute="leading" constant="16" id="s3S-FB-JhY"/>
+                            <constraint firstItem="nn1-Xw-ioh" firstAttribute="trailing" secondItem="k1N-w2-AD8" secondAttribute="trailing" constant="16" id="tkM-yb-xIt"/>
+                            <constraint firstItem="k1N-w2-AD8" firstAttribute="top" secondItem="nn1-Xw-ioh" secondAttribute="top" constant="20" id="wdT-yf-f0Q"/>
+                        </constraints>
+                        <viewLayoutGuide key="safeArea" id="nn1-Xw-ioh"/>
+                    </view>
+                    <navigationItem key="navigationItem" id="MsR-bl-1SL"/>
+                    <connections>
+                        <outlet property="acceptOutlet" destination="4oZ-lb-UDr" id="MLS-YJ-bhC"/>
+                        <outlet property="declineOutlet" destination="H0R-xX-k9m" id="Iqe-3A-jEn"/>
+                        <outlet property="textView" destination="Nhp-d8-eCA" id="v0I-9c-6Hz"/>
+                        <outlet property="titleLabel" destination="k1N-w2-AD8" id="zc3-a4-yli"/>
+                    </connections>
+                </viewController>
+                <placeholder placeholderIdentifier="IBFirstResponder" id="QMy-7u-FbY" userLabel="First Responder" customClass="UIResponder" sceneMemberID="firstResponder"/>
+            </objects>
+            <point key="canvasLocation" x="7417" y="421"/>
+        </scene>
     </scenes>
     <inferredMetricsTieBreakers>
         <segue reference="c3G-hh-8KG"/>
         <segue reference="KzM-QC-ivF"/>
-        <segue reference="no9-tq-P7U"/>
+        <segue reference="WEQ-0q-dcz"/>
         <segue reference="hPq-I8-kVg"/>
     </inferredMetricsTieBreakers>
     <resources>
@@ -2071,6 +2175,7 @@ Create an incomplete account, adding cosigners to it, when complete you can rece
         <image name="chevron.right" catalog="system" width="96" height="128"/>
         <image name="doc.on.clipboard" catalog="system" width="117" height="128"/>
         <image name="doc.on.doc" catalog="system" width="117" height="128"/>
+        <image name="exclamationmark.bubble" catalog="system" width="128" height="110"/>
         <image name="exclamationmark.triangle" catalog="system" width="128" height="112"/>
         <image name="folder" catalog="system" width="128" height="95"/>
         <image name="list.number" catalog="system" width="128" height="97"/>
