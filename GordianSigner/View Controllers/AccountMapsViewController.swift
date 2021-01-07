@@ -33,7 +33,6 @@ class AccountMapsViewController: UIViewController, UITableViewDelegate, UITableV
         if !FirstTime.firstTimeHere() {
             showAlert(self, "Fatal error", "We were unable to set and save an encryption key to your secure enclave, the app will not function without this key.")
         }
-                
     }
     
     override func viewDidAppear(_ animated: Bool) {
@@ -275,49 +274,48 @@ class AccountMapsViewController: UIViewController, UITableViewDelegate, UITableV
     func tableView(_ tableView: UITableView, heightForRowAt indexPath: IndexPath) -> CGFloat {
         if accountMaps.count > 0 {
             
-        
-        var height = 247
-        let accountMap = accountMaps[indexPath.section]["accountMap"] as! AccountMapStruct
-        let descParser = DescriptorParser()
-        let descStruct = descParser.descriptor(accountMap.descriptor)
-        let hack = descStruct.mOfNType.replacingOccurrences(of: " of ", with: "*")
-        let arr = hack.split(separator: "*")
-        if arr.count > 0 {
-            
-            if let numberOfCosigners = Int("\(arr[1])") {
-                switch numberOfCosigners {
-                case _ where numberOfCosigners == 3:
-                    height = 257
-                case _ where numberOfCosigners == 4:
-                    height = 277
-                case _ where numberOfCosigners == 5:
-                    height = 287
-                case _ where numberOfCosigners == 6:
-                    height = 297
-                case _ where numberOfCosigners == 7:
-                    height = 307
-                case _ where numberOfCosigners == 8:
-                    height = 317
-                case _ where numberOfCosigners == 9:
-                    height = 327
-                case _ where numberOfCosigners == 10:
-                    height = 337
-                case _ where numberOfCosigners == 11:
-                    height = 347
-                case _ where numberOfCosigners == 12:
-                    height = 357
-                case _ where numberOfCosigners == 13:
-                    height = 367
-                case _ where numberOfCosigners == 14:
-                    height = 377
-                case _ where numberOfCosigners == 15:
-                    height = 387
-                default:
-                    break
+            var height = 247
+            let accountMap = accountMaps[indexPath.section]["accountMap"] as! AccountMapStruct
+            let descParser = DescriptorParser()
+            let descStruct = descParser.descriptor(accountMap.descriptor)
+            let hack = descStruct.mOfNType.replacingOccurrences(of: " of ", with: "*")
+            let arr = hack.split(separator: "*")
+            if arr.count > 0 {
+                
+                if let numberOfCosigners = Int("\(arr[1])") {
+                    switch numberOfCosigners {
+                    case _ where numberOfCosigners == 3:
+                        height = 257
+                    case _ where numberOfCosigners == 4:
+                        height = 277
+                    case _ where numberOfCosigners == 5:
+                        height = 287
+                    case _ where numberOfCosigners == 6:
+                        height = 297
+                    case _ where numberOfCosigners == 7:
+                        height = 307
+                    case _ where numberOfCosigners == 8:
+                        height = 317
+                    case _ where numberOfCosigners == 9:
+                        height = 327
+                    case _ where numberOfCosigners == 10:
+                        height = 337
+                    case _ where numberOfCosigners == 11:
+                        height = 347
+                    case _ where numberOfCosigners == 12:
+                        height = 357
+                    case _ where numberOfCosigners == 13:
+                        height = 367
+                    case _ where numberOfCosigners == 14:
+                        height = 377
+                    case _ where numberOfCosigners == 15:
+                        height = 387
+                    default:
+                        break
+                    }
                 }
             }
-        }
-        return CGFloat(height)
+            return CGFloat(height)
         } else {
             return 44
         }
@@ -407,26 +405,30 @@ class AccountMapsViewController: UIViewController, UITableViewDelegate, UITableV
         
         CoreDataService.updateEntity(id: accountMap.id, keyToUpdate: "descriptor", newValue: desc, entityName: .accountMap) { (success, errorDesc) in
             guard success else {
-                showAlert(self, "Account updating failed...", "Please let us know about this bug.")
+                showAlert(self, "Descriptor updating failed...", "Please let us know about this bug.")
                 return
             }
             
             CoreDataService.updateEntity(id: accountMap.id, keyToUpdate: "accountMap", newValue: updatedMap, entityName: .accountMap) { (success, errorDesc) in
                 guard success else {
-                    showAlert(self, "Account updating failed...", "Please let us know about this bug.")
+                    showAlert(self, "Account map updating failed...", "Please let us know about this bug.")
                     return
                 }
                 
                 CoreDataService.updateEntity(id: keyset.id, keyToUpdate: "sharedWith", newValue: accountMap.id, entityName: .keyset) { (success, errorDescription) in
                     guard success else {
-                        showAlert(self, "Account updating failed...", "Please let us know about this bug.")
+                        showAlert(self, "sharedWith updating failed...", "Please let us know about this bug.")
                         return
                     }
                     
                     CoreDataService.updateEntity(id: keyset.id, keyToUpdate: "dateShared", newValue: Date(), entityName: .keyset) { (success, errorDescription) in
                         guard success else {
-                            showAlert(self, "Account updating failed...", "Please let us know about this bug.")
+                            showAlert(self, "dateShared updating failed...", "Please let us know about this bug.")
                             return
+                        }
+                        
+                        DispatchQueue.main.async {
+                            NotificationCenter.default.post(name: .cosignerAdded, object: nil, userInfo: nil)
                         }
                         
                         showAlert(self, "", "Account updated ✓")
