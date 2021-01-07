@@ -162,7 +162,7 @@ class QRScannerViewController: UIViewController {
     }
     
     private func isKeyset(_ text: String) -> Bool {
-        return text.contains("48h/0h/0h/2h")
+        return text.contains("48h/\(Keys.coinType)h/0h/2h")
     }
     
     private func process(text: String) {

@@ -53,7 +53,7 @@ class KeysetsViewController: UIViewController, UITableViewDelegate, UITableViewD
                         alertStyle = UIAlertController.Style.alert
                     }
                     
-                    let alert = UIAlertController(title: "Import keyset?", message: "You have a valid keyset on your clipboard, would you like to import it?", preferredStyle: alertStyle)
+                    let alert = UIAlertController(title: "Import cosigner?", message: "You have a valid cosigner on your clipboard, would you like to import it?", preferredStyle: alertStyle)
                     
                     alert.addAction(UIAlertAction(title: "Yes", style: .default, handler: { action in
                         self.addKeyset(account)
@@ -63,13 +63,13 @@ class KeysetsViewController: UIViewController, UITableViewDelegate, UITableViewD
                     alert.popoverPresentationController?.sourceView = self.view
                     self.present(alert, animated: true, completion: nil)
                 }
-            } else if pasteBoard.contains("48h/0h/0h/2h") {
+            } else if pasteBoard.contains("48h/\(Keys.coinType)h/0h/2h") || pasteBoard.contains("48'/\(Keys.coinType)'/0'/2'") {
                 self.addKeyset(pasteBoard)
             } else {
-                showAlert(self, "", "Invalid cosigner text, we accept UR crypto-account or [<fingerprint>/48h/0h/0h/2h]xpub.....")
+                showAlert(self, "", "Invalid cosigner text, we accept UR crypto-account or [<fingerprint>/48h/\(Keys.coinType)h/0h/2h]xpub.....")
             }
         } else {
-            showAlert(self, "Invalid cosigner text", "We accept UR crypto-account or [<fingerprint>/48h/0h/0h/2h]xpub.....")
+            showAlert(self, "Invalid cosigner text", "We accept UR crypto-account or [<fingerprint>/48h/\(Keys.coinType)h/0h/2h]xpub.....")
         }
     }
     
@@ -561,7 +561,7 @@ class KeysetsViewController: UIViewController, UITableViewDelegate, UITableViewD
     private func deleteKeysetNow(_ id: UUID, _ section: Int) {
         CoreDataService.deleteEntity(id: id, entityName: .keyset) { (success, errorDescription) in
             guard success else {
-                showAlert(self, "Error deleting signer", "We were unable to delete that cosigner!")
+                showAlert(self, "Error deleting cosigner", "We were unable to delete that cosigner!")
                 return
             }
             
@@ -598,6 +598,11 @@ class KeysetsViewController: UIViewController, UITableViewDelegate, UITableViewD
                 
         guard let _ = try? HDKey(base58: ds.accountXpub) else {
             showAlert(self, "Invalid key", "Gordian Cosigner is not yet compatible with slip132, please ensure you are adding a valid xpub and try again.")
+            return
+        }
+        
+        guard account.contains("/48h/\(Keys.coinType)h/0h/2h") || account.contains("/48'/\(Keys.coinType)'/0'/2'") else {
+            showAlert(self, "Unsupported Cosigner", "Gordian Cosigner currently only supports the m/48h/\(Keys.coinType)h/0h/2h key origin.")
             return
         }
         
@@ -662,10 +667,10 @@ class KeysetsViewController: UIViewController, UITableViewDelegate, UITableViewD
                     
                     if let account = URHelper.accountUr(result) {
                         self.addKeyset(account)
-                    } else if result.contains("48h/0h/0h/2h") {
+                    } else if result.contains("48h/\(Keys.coinType)h/0h/2h") || result.contains("48'/\(Keys.coinType)'/0'/2'") {
                         self.addKeyset(result)
                     } else {
-                        showAlert(self, "Cosigner not recognized!", "Currently Gordian Cosigner only supports native segwit multisig derivations.")
+                        showAlert(self, "Cosigner not recognized!", "Gordian Cosigner currently only supports the m/48h/\(Keys.coinType)h/0h/2h key origin.")
                     }
                 }
             }
