@@ -622,6 +622,10 @@ class AccountMapsViewController: UIViewController, UITableViewDelegate, UITableV
             var dictArray = [[String:String]]()
             
             for keyWithPath in descStruct.keysWithPath {
+                guard keyWithPath.contains("/48h/\(Keys.coinType)h/0h/2h") || keyWithPath.contains("/48'/\(Keys.coinType)'/0'/2'") else {
+                    showAlert(self, "Unsupported key origin", "Gordian Cosigner currently only supports the m/48'/\(Keys.coinType)'/0'/2' origin.")
+                    return
+                }
                 let arr = keyWithPath.split(separator: "]")
                 if arr.count > 1 {
                     var xpubString = "\(arr[1].replacingOccurrences(of: "))", with: ""))"
@@ -652,7 +656,7 @@ class AccountMapsViewController: UIViewController, UITableViewDelegate, UITableV
                 
                 var keyset = [String:Any]()
                 keyset["id"] = UUID()
-                keyset["label"] = "Cosigner"
+                keyset["label"] = "Cosigner #\(i + 1)"
                 keyset["bip48SegwitAccount"] = account
                 keyset["dateAdded"] = Date()
                 keyset["fingerprint"] = ds.fingerprint
