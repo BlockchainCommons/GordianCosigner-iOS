@@ -622,8 +622,8 @@ class AccountMapsViewController: UIViewController, UITableViewDelegate, UITableV
             for keyWithPath in descStruct.keysWithPath {
                 let arr = keyWithPath.split(separator: "]")
                 if arr.count > 1 {
-                    let xpubString = "\(arr[1].replacingOccurrences(of: "))", with: ""))"
-                    
+                    var xpubString = "\(arr[1].replacingOccurrences(of: "))", with: ""))"
+                    xpubString = xpubString.replacingOccurrences(of: "/0/*", with: "")
                     guard let xpub = try? HDKey(base58: xpubString) else {
                         showAlert(self, "Key invalid", "Gordian Cosigner does not yet support slip0132 keys. Please ensure your xpub is valid then try again.")
                         return
