@@ -646,17 +646,41 @@ class AccountMapsViewController: UIViewController, UITableViewDelegate, UITableV
                 let hack = "wsh(\(fullKey)/0/*)"
                 let dp = DescriptorParser()
                 let ds = dp.descriptor(hack)
+                let account = fullKey.replacingOccurrences(of: "/0/*", with: "")
                 
                 var keyset = [String:Any]()
                 keyset["id"] = UUID()
                 keyset["label"] = "Cosigner"
-                keyset["bip48SegwitAccount"] = fullKey.replacingOccurrences(of: "/0/*", with: "")
+                keyset["bip48SegwitAccount"] = account
                 keyset["dateAdded"] = Date()
                 keyset["fingerprint"] = ds.fingerprint
                 keyset["sharedWith"] = accountMapId
                 keyset["dateShared"] = Date()
                 
-                CoreDataService.saveEntity(dict: keyset, entityName: .keyset) { (_, _) in }
+                // First fetch all existing cosigners to ensure we do not save duplicates
+                CoreDataService.retrieveEntity(entityName: .keyset) { (cosigners, errorDescription) in
+                    var alreadyExists = false
+                    
+                    if let cosigners = cosigners, cosigners.count > 0 {
+                        for (i, cosigner) in cosigners.enumerated() {
+                            let cosignerStruct = KeysetStruct(dictionary: cosigner)
+                            
+                            if cosignerStruct.bip48SegwitAccount != nil {
+                                if cosignerStruct.bip48SegwitAccount! == account {
+                                    alreadyExists = true
+                                }
+                            }
+                            
+                            if i + 1 == cosigners.count {
+                                if !alreadyExists {
+                                    CoreDataService.saveEntity(dict: keyset, entityName: .keyset) { (_, _) in }
+                                }
+                            }
+                        }
+                    } else {
+                        CoreDataService.saveEntity(dict: keyset, entityName: .keyset) { (_, _) in }
+                    }
+                }
                 
                 sortedKeys += fullKey
                 
