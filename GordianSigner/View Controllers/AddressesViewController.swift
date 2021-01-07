@@ -53,7 +53,7 @@ class AddressesViewController: UIViewController, UITableViewDelegate, UITableVie
                 if k + 1 == keys.count {
                     let scriptPubKey = ScriptPubKey(multisig: pubkeys, threshold: sigsRequired, isBIP67: true)
                     
-                    if let multiSigAddress = try? Address(scriptPubKey: scriptPubKey, network: .mainnet) {
+                    if let multiSigAddress = try? Address(scriptPubKey: scriptPubKey, network: Keys.chain) {
                         addresses.append(multiSigAddress.description)
                     }
                     
