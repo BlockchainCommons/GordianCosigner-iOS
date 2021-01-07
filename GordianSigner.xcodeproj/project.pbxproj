@@ -45,6 +45,7 @@
 		D090963F256256500098013A /* AccountMapsViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = D090963E2562564F0098013A /* AccountMapsViewController.swift */; };
 		D090964125625CC30098013A /* DescriptorParser.swift in Sources */ = {isa = PBXBuildFile; fileRef = D090964025625CC30098013A /* DescriptorParser.swift */; };
 		D090964325625CED0098013A /* Descriptor.swift in Sources */ = {isa = PBXBuildFile; fileRef = D090964225625CED0098013A /* Descriptor.swift */; };
+		D093E2A925A6E4C50038B59A /* InfoViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = D093E2A825A6E4C40038B59A /* InfoViewController.swift */; };
 		D0974A56255B8E300013DC60 /* LifeHash in Frameworks */ = {isa = PBXBuildFile; productRef = D0974A55255B8E300013DC60 /* LifeHash */; };
 		D0974A58255B8E8D0013DC60 /* SignerStruct.swift in Sources */ = {isa = PBXBuildFile; fileRef = D0974A57255B8E8D0013DC60 /* SignerStruct.swift */; };
 		D0974A5A255B90A10013DC60 /* AccountMapStruct.swift in Sources */ = {isa = PBXBuildFile; fileRef = D0974A59255B90A10013DC60 /* AccountMapStruct.swift */; };
@@ -142,6 +143,7 @@
 		D090963E2562564F0098013A /* AccountMapsViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AccountMapsViewController.swift; sourceTree = "<group>"; };
 		D090964025625CC30098013A /* DescriptorParser.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DescriptorParser.swift; sourceTree = "<group>"; };
 		D090964225625CED0098013A /* Descriptor.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Descriptor.swift; sourceTree = "<group>"; };
+		D093E2A825A6E4C40038B59A /* InfoViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = InfoViewController.swift; sourceTree = "<group>"; };
 		D0974A57255B8E8D0013DC60 /* SignerStruct.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SignerStruct.swift; sourceTree = "<group>"; };
 		D0974A59255B90A10013DC60 /* AccountMapStruct.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AccountMapStruct.swift; sourceTree = "<group>"; };
 		D0974A5B255B93130013DC60 /* CoreDataService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CoreDataService.swift; sourceTree = "<group>"; };
@@ -264,6 +266,7 @@
 				D00F4984258B24D200941DBA /* Intro3ViewController.swift */,
 				D00F4986258B253A00941DBA /* Intro4ViewController.swift */,
 				D00F4988258B259C00941DBA /* Intro5ViewController.swift */,
+				D093E2A825A6E4C40038B59A /* InfoViewController.swift */,
 			);
 			path = "View Controllers";
 			sourceTree = "<group>";
@@ -546,6 +549,7 @@
 				D01ACBA42563EA8100B5B4E5 /* PsbtViewController.swift in Sources */,
 				D00F4983258B243D00941DBA /* Intro2ViewController.swift in Sources */,
 				D04D4984252C4FEF00D7383E /* QRDisplayerViewController.swift in Sources */,
+				D093E2A925A6E4C50038B59A /* InfoViewController.swift in Sources */,
 				D06F44572581B86200B42DEB /* AddressesViewController.swift in Sources */,
 				D0974A5E255B93500013DC60 /* Entities.swift in Sources */,
 				D04423F52586F2CC00A25179 /* LifehashSeedView.swift in Sources */,

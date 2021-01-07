@@ -28,6 +28,14 @@ class SignersViewController: UIViewController {
     
     override func viewDidAppear(_ animated: Bool) {
         loadData()
+        if UserDefaults.standard.object(forKey: "seenSeedInfo") == nil {
+            showInfo()
+            UserDefaults.standard.set(true, forKey: "seenSeedInfo")
+        }
+    }
+    
+    @IBAction func infoAction(_ sender: Any) {
+        showInfo()
     }
     
     @objc func add() {
@@ -217,10 +225,24 @@ class SignersViewController: UIViewController {
         }
     }
     
+    private func showInfo() {
+        DispatchQueue.main.async { [weak self] in
+            guard let self = self else { return }
+            
+            self.performSegue(withIdentifier: "segueToSeedsInfo", sender: self)
+        }
+    }
+    
     override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
         if segue.identifier == "segueToSeedDetail" {
             if let vc = segue.destination as? SeedDetailViewController {
                 vc.signer = signer
+            }
+        }
+        
+        if segue.identifier == "segueToSeedsInfo" {
+            if let vc = segue.destination as? InfoViewController {
+                vc.isSeed = true
             }
         }
     }

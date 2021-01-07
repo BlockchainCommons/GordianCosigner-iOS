@@ -40,6 +40,13 @@ class PsbtViewController: UIViewController, UITableViewDelegate, UITableViewData
         load()
     }
     
+    override func viewDidAppear(_ animated: Bool) {
+        if UserDefaults.standard.object(forKey: "seenPaymentInfo") == nil {
+            showInfo()
+            UserDefaults.standard.set(true, forKey: "seenPaymentInfo")
+        }
+    }
+    
     @objc func reload() {
         refresh()
     }
@@ -433,6 +440,18 @@ class PsbtViewController: UIViewController, UITableViewDelegate, UITableViewData
             }
         }
     }
+    
+    @IBAction func infoAction(_ sender: Any) {
+        showInfo()
+    }
+    
+    private func showInfo() {
+        DispatchQueue.main.async { [weak self] in
+            guard let self = self else { return }
+            
+            self.performSegue(withIdentifier: "segueToPaymentsInfo", sender: self)
+        }
+    }
 
     
     // MARK: - Navigation
@@ -451,6 +470,12 @@ class PsbtViewController: UIViewController, UITableViewDelegate, UITableViewData
             if let vc = segue.destination as? QRDisplayerViewController {
                 vc.isPsbt = true
                 vc.text = psbtToExport
+            }
+        }
+        
+        if segue.identifier == "segueToPaymentsInfo" {
+            if let vc = segue.destination as? InfoViewController {
+                vc.isPayment = true
             }
         }
     }

@@ -89,7 +89,7 @@
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                         <subviews>
                             <tableView clipsSubviews="YES" contentMode="scaleToFill" alwaysBounceVertical="YES" dataMode="prototypes" style="insetGrouped" separatorStyle="default" rowHeight="-1" estimatedRowHeight="-1" sectionHeaderHeight="18" sectionFooterHeight="18" translatesAutoresizingMaskIntoConstraints="NO" id="4Kz-Kd-0Fb">
-                                <rect key="frame" x="20" y="201" width="374" height="524"/>
+                                <rect key="frame" x="20" y="68" width="374" height="657"/>
                                 <color key="backgroundColor" white="0.0" alpha="0.0" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                                 <prototypes>
                                     <tableViewCell clipsSubviews="YES" contentMode="scaleToFill" insetsLayoutMarginsFromSafeArea="NO" selectionStyle="blue" hidesAccessoryWhenEditing="NO" indentationLevel="1" indentationWidth="0.0" reuseIdentifier="psbtCell" rowHeight="249" id="Lwr-sC-usj">
@@ -253,37 +253,26 @@
                                 <color key="textColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                                 <nil key="highlightedColor"/>
                             </label>
-                            <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" textAlignment="natural" lineBreakMode="tailTruncation" numberOfLines="0" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="4fW-vV-Y7Z">
-                                <rect key="frame" x="20" y="68" width="374" height="124.5"/>
-                                <string key="text">Payments are "partially signed bitcoin transactions". 
-
-Add payments via animated QR codes, text, or files. 
-
-Sign, export, and view details.
-
-Signing is always done offline. Payments are auto saved when you add one or sign.</string>
-                                <fontDescription key="fontDescription" type="system" pointSize="13"/>
-                                <color key="textColor" white="0.66666666666666663" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
-                                <nil key="highlightedColor"/>
-                            </label>
                         </subviews>
                         <color key="backgroundColor" white="0.0" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                         <constraints>
                             <constraint firstItem="7d6-vW-Ixa" firstAttribute="top" secondItem="QxW-X5-ygV" secondAttribute="top" constant="20" id="1XT-cy-Kkl"/>
                             <constraint firstItem="4Kz-Kd-0Fb" firstAttribute="leading" secondItem="QxW-X5-ygV" secondAttribute="leading" constant="20" id="37K-3n-cef"/>
-                            <constraint firstItem="4fW-vV-Y7Z" firstAttribute="leading" secondItem="QxW-X5-ygV" secondAttribute="leading" constant="20" id="D2T-vO-pcR"/>
                             <constraint firstItem="QxW-X5-ygV" firstAttribute="trailing" secondItem="4Kz-Kd-0Fb" secondAttribute="trailing" constant="20" id="Eo5-h8-1b7"/>
                             <constraint firstItem="7d6-vW-Ixa" firstAttribute="leading" secondItem="QxW-X5-ygV" secondAttribute="leading" constant="20" id="GFc-NI-WTe"/>
-                            <constraint firstItem="4Kz-Kd-0Fb" firstAttribute="top" secondItem="4fW-vV-Y7Z" secondAttribute="bottom" constant="8.5" id="Iy3-1Q-NvJ"/>
+                            <constraint firstItem="4Kz-Kd-0Fb" firstAttribute="top" secondItem="7d6-vW-Ixa" secondAttribute="bottom" constant="8" id="QZm-PZ-pLc"/>
                             <constraint firstItem="4Kz-Kd-0Fb" firstAttribute="bottom" secondItem="QxW-X5-ygV" secondAttribute="bottom" id="cWs-l2-qlU"/>
                             <constraint firstItem="7YZ-5P-IrG" firstAttribute="leading" secondItem="7d6-vW-Ixa" secondAttribute="trailing" constant="8" id="ceE-ot-Rae"/>
-                            <constraint firstItem="QxW-X5-ygV" firstAttribute="trailing" secondItem="4fW-vV-Y7Z" secondAttribute="trailing" constant="20" id="lhf-DC-3z0"/>
                             <constraint firstItem="7YZ-5P-IrG" firstAttribute="centerY" secondItem="7d6-vW-Ixa" secondAttribute="centerY" id="owE-b6-opH"/>
-                            <constraint firstItem="4fW-vV-Y7Z" firstAttribute="top" secondItem="7d6-vW-Ixa" secondAttribute="bottom" constant="8" id="q0d-io-9za"/>
                         </constraints>
                         <viewLayoutGuide key="safeArea" id="QxW-X5-ygV"/>
                     </view>
                     <navigationItem key="navigationItem" id="NxX-NZ-h8V">
+                        <barButtonItem key="leftBarButtonItem" image="info.circle" catalog="system" id="Il9-0H-Vk7">
+                            <connections>
+                                <action selector="infoAction:" destination="tIM-97-jRz" id="CKc-QM-biO"/>
+                            </connections>
+                        </barButtonItem>
                         <barButtonItem key="rightBarButtonItem" systemItem="add" id="Bht-1C-jjw">
                             <connections>
                                 <action selector="addAction:" destination="tIM-97-jRz" id="ful-3Q-wlX"/>
@@ -295,6 +284,7 @@ Signing is always done offline. Payments are auto saved when you add one or sign
                         <segue destination="zVW-ac-A1r" kind="show" identifier="segueToPsbtDetail" id="KzM-QC-ivF"/>
                         <segue destination="EM0-dh-3fz" kind="show" identifier="addPsbtSegue" id="YOJ-tU-XDe"/>
                         <segue destination="9Vu-3O-YNg" kind="show" identifier="segueToShowPsbtQR" id="no9-tq-P7U"/>
+                        <segue destination="swD-W5-MAD" kind="presentation" identifier="segueToPaymentsInfo" id="sdO-iP-xRE"/>
                     </connections>
                 </viewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="Bsg-pq-Bw9" userLabel="First Responder" customClass="UIResponder" sceneMemberID="firstResponder"/>
@@ -964,7 +954,7 @@ Signing is always done offline. Payments are auto saved when you add one or sign
                                 </constraints>
                             </imageView>
                             <tableView clipsSubviews="YES" contentMode="scaleToFill" alwaysBounceVertical="YES" dataMode="prototypes" style="insetGrouped" separatorStyle="default" rowHeight="-1" estimatedRowHeight="-1" sectionHeaderHeight="18" sectionFooterHeight="18" translatesAutoresizingMaskIntoConstraints="NO" id="SJ3-p2-cJf">
-                                <rect key="frame" x="20" y="253.5" width="374" height="559.5"/>
+                                <rect key="frame" x="20" y="152" width="374" height="661"/>
                                 <color key="backgroundColor" white="0.0" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                                 <color key="separatorColor" white="0.33333333329999998" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                                 <prototypes>
@@ -1084,39 +1074,32 @@ Signing is always done offline. Payments are auto saved when you add one or sign
                                 <color key="textColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                                 <nil key="highlightedColor"/>
                             </label>
-                            <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" textAlignment="natural" lineBreakMode="tailTruncation" numberOfLines="0" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="FbQ-Fq-Lb0">
-                                <rect key="frame" x="20" y="152" width="374" height="93.5"/>
-                                <string key="text">Seeds can be imported or created and always adhere to BIP39. 
-
-Private keys are derived from seeds to sign payments.
-
-Seeds are always encrypted before being saved.</string>
-                                <fontDescription key="fontDescription" type="system" pointSize="13"/>
-                                <color key="textColor" white="0.66666666666666663" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
-                                <nil key="highlightedColor"/>
-                            </label>
                         </subviews>
                         <color key="backgroundColor" white="0.0" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                         <constraints>
                             <constraint firstItem="yQw-La-rAX" firstAttribute="trailing" secondItem="SJ3-p2-cJf" secondAttribute="trailing" constant="20" id="7bQ-dc-nkO"/>
-                            <constraint firstItem="FbQ-Fq-Lb0" firstAttribute="top" secondItem="1HM-F4-pEG" secondAttribute="bottom" constant="8" id="DZJ-Mj-GDf"/>
                             <constraint firstItem="HBp-D1-ile" firstAttribute="leading" secondItem="1HM-F4-pEG" secondAttribute="trailing" constant="8" id="Fwx-xZ-kSx"/>
                             <constraint firstItem="1HM-F4-pEG" firstAttribute="leading" secondItem="yQw-La-rAX" secondAttribute="leading" constant="16" id="OAD-Fm-KX5"/>
                             <constraint firstItem="HBp-D1-ile" firstAttribute="centerY" secondItem="1HM-F4-pEG" secondAttribute="centerY" constant="0.5" id="dUe-7I-Zdz"/>
-                            <constraint firstItem="FbQ-Fq-Lb0" firstAttribute="leading" secondItem="yQw-La-rAX" secondAttribute="leading" constant="20" id="fmj-1f-zIT"/>
-                            <constraint firstItem="SJ3-p2-cJf" firstAttribute="top" secondItem="FbQ-Fq-Lb0" secondAttribute="bottom" constant="8" id="gcw-aZ-KFF"/>
+                            <constraint firstItem="SJ3-p2-cJf" firstAttribute="top" secondItem="1HM-F4-pEG" secondAttribute="bottom" constant="8" id="nTb-1Z-eg3"/>
                             <constraint firstItem="SJ3-p2-cJf" firstAttribute="bottom" secondItem="yQw-La-rAX" secondAttribute="bottom" id="nlo-fG-UNC"/>
                             <constraint firstItem="SJ3-p2-cJf" firstAttribute="leading" secondItem="yQw-La-rAX" secondAttribute="leading" constant="20" id="pDI-aY-lGd"/>
-                            <constraint firstItem="yQw-La-rAX" firstAttribute="trailing" secondItem="FbQ-Fq-Lb0" secondAttribute="trailing" constant="20" id="qo1-lT-Rkb"/>
                             <constraint firstItem="1HM-F4-pEG" firstAttribute="top" secondItem="yQw-La-rAX" secondAttribute="top" constant="16" id="sLX-fR-dV0"/>
                         </constraints>
                         <viewLayoutGuide key="safeArea" id="yQw-La-rAX"/>
                     </view>
-                    <navigationItem key="navigationItem" id="OSG-Z9-yEP"/>
+                    <navigationItem key="navigationItem" id="OSG-Z9-yEP">
+                        <barButtonItem key="leftBarButtonItem" image="info.circle" catalog="system" id="Pgy-6G-eUQ">
+                            <connections>
+                                <action selector="infoAction:" destination="A5d-PE-VBa" id="ePD-E7-KHB"/>
+                            </connections>
+                        </barButtonItem>
+                    </navigationItem>
                     <connections>
                         <outlet property="signerTable" destination="SJ3-p2-cJf" id="4Do-vL-2hL"/>
                         <segue destination="vZg-oW-Ek8" kind="show" identifier="segueToAddASigner" id="c3G-hh-8KG"/>
                         <segue destination="iug-s9-0PF" kind="show" identifier="segueToSeedDetail" id="U5Q-Rb-Pf5"/>
+                        <segue destination="swD-W5-MAD" kind="presentation" identifier="segueToSeedsInfo" id="9Z7-el-QsX"/>
                     </connections>
                 </viewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="Wqg-nK-VnE" userLabel="First Responder" customClass="UIResponder" sceneMemberID="firstResponder"/>
@@ -1132,7 +1115,7 @@ Seeds are always encrypted before being saved.</string>
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                         <subviews>
                             <tableView clipsSubviews="YES" contentMode="scaleToFill" alwaysBounceVertical="YES" dataMode="prototypes" style="insetGrouped" separatorStyle="default" rowHeight="-1" estimatedRowHeight="-1" sectionHeaderHeight="18" sectionFooterHeight="18" translatesAutoresizingMaskIntoConstraints="NO" id="MwK-VP-A9M">
-                                <rect key="frame" x="20" y="181" width="374" height="544"/>
+                                <rect key="frame" x="20" y="64" width="374" height="661"/>
                                 <color key="backgroundColor" white="0.0" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                                 <color key="separatorColor" white="0.33333333329999998" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                                 <prototypes>
@@ -1322,39 +1305,32 @@ Seeds are always encrypted before being saved.</string>
                                 <color key="textColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                                 <nil key="highlightedColor"/>
                             </label>
-                            <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" textAlignment="natural" lineBreakMode="tailTruncation" numberOfLines="0" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="72R-77-o1q">
-                                <rect key="frame" x="20" y="64" width="374" height="109"/>
-                                <string key="text">Cosigners represent the individuals or devices which make up your account.
-
-A cosigner will be automatically derived from seeds and imported accounts.
-
-Cosigners contain an xpub and origin info.</string>
-                                <fontDescription key="fontDescription" type="system" pointSize="13"/>
-                                <color key="textColor" white="0.66666666666666663" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
-                                <nil key="highlightedColor"/>
-                            </label>
                         </subviews>
                         <color key="backgroundColor" white="0.0" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                         <constraints>
                             <constraint firstItem="iS9-Hq-6ma" firstAttribute="top" secondItem="6iA-4d-gNe" secondAttribute="top" constant="16" id="0T9-aU-MfE"/>
-                            <constraint firstItem="72R-77-o1q" firstAttribute="top" secondItem="iS9-Hq-6ma" secondAttribute="bottom" constant="8" id="26g-0j-NgX"/>
-                            <constraint firstItem="MwK-VP-A9M" firstAttribute="top" secondItem="72R-77-o1q" secondAttribute="bottom" constant="8" id="KSQ-6I-OGm"/>
                             <constraint firstItem="0Jw-zJ-UV2" firstAttribute="leading" secondItem="iS9-Hq-6ma" secondAttribute="trailing" constant="8" id="TD8-81-NjK"/>
+                            <constraint firstItem="MwK-VP-A9M" firstAttribute="top" secondItem="iS9-Hq-6ma" secondAttribute="bottom" constant="8" id="WmZ-mq-9Os"/>
                             <constraint firstItem="MwK-VP-A9M" firstAttribute="trailing" secondItem="ZXS-sm-UBJ" secondAttribute="trailing" constant="-20" id="e3i-MO-bms"/>
                             <constraint firstItem="iS9-Hq-6ma" firstAttribute="leading" secondItem="ZXS-sm-UBJ" secondAttribute="leading" constant="16" id="ew9-BP-BKl"/>
-                            <constraint firstItem="ZXS-sm-UBJ" firstAttribute="trailing" secondItem="72R-77-o1q" secondAttribute="trailing" constant="20" id="j9R-mv-IaX"/>
-                            <constraint firstItem="72R-77-o1q" firstAttribute="leading" secondItem="ZXS-sm-UBJ" secondAttribute="leading" constant="20" id="qaj-wo-vOv"/>
                             <constraint firstItem="0Jw-zJ-UV2" firstAttribute="centerY" secondItem="iS9-Hq-6ma" secondAttribute="centerY" constant="0.5" id="s73-ty-6Db"/>
                             <constraint firstItem="MwK-VP-A9M" firstAttribute="bottom" secondItem="ZXS-sm-UBJ" secondAttribute="bottom" id="wLd-6B-Z9p"/>
                             <constraint firstItem="MwK-VP-A9M" firstAttribute="leading" secondItem="ZXS-sm-UBJ" secondAttribute="leading" constant="20" id="wah-lj-Cpr"/>
                         </constraints>
                         <viewLayoutGuide key="safeArea" id="ZXS-sm-UBJ"/>
                     </view>
-                    <navigationItem key="navigationItem" id="EWg-zu-rzB"/>
+                    <navigationItem key="navigationItem" id="EWg-zu-rzB">
+                        <barButtonItem key="leftBarButtonItem" image="info.circle" catalog="system" id="IlK-rd-fB9">
+                            <connections>
+                                <action selector="infoAction:" destination="50H-8w-bzV" id="Yp0-Qh-GuX"/>
+                            </connections>
+                        </barButtonItem>
+                    </navigationItem>
                     <connections>
                         <outlet property="keysetsTable" destination="MwK-VP-A9M" id="3JO-uw-bHb"/>
                         <segue destination="9Vu-3O-YNg" kind="show" identifier="exportKeyset" id="2q9-qh-fxy"/>
                         <segue destination="4dz-cW-ULS" kind="presentation" identifier="segueToScanKeyset" id="hha-MU-QkB"/>
+                        <segue destination="swD-W5-MAD" kind="presentation" identifier="segueToCosignersInfo" id="6Tx-hX-bdn"/>
                     </connections>
                 </viewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="gRC-G0-bbK" userLabel="First Responder" customClass="UIResponder" sceneMemberID="firstResponder"/>
@@ -1383,17 +1359,8 @@ Cosigners contain an xpub and origin info.</string>
                                 <color key="textColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                                 <nil key="highlightedColor"/>
                             </label>
-                            <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" textAlignment="natural" lineBreakMode="wordWrap" numberOfLines="0" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="Ihc-wb-czK">
-                                <rect key="frame" x="20" y="66" width="374" height="93.5"/>
-                                <string key="text">An account consists of multiple cosigners, requiring a certain number of signatures to approve (sign) a payment before it can be spent.
-
-Create an incomplete account, adding cosigners to it, when complete you can receive payments.</string>
-                                <fontDescription key="fontDescription" type="system" pointSize="13"/>
-                                <color key="textColor" white="0.66666666666666663" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
-                                <nil key="highlightedColor"/>
-                            </label>
                             <tableView clipsSubviews="YES" contentMode="scaleToFill" alwaysBounceVertical="YES" dataMode="prototypes" style="insetGrouped" separatorStyle="default" rowHeight="-1" estimatedRowHeight="-1" sectionHeaderHeight="18" sectionFooterHeight="18" translatesAutoresizingMaskIntoConstraints="NO" id="QUk-qt-fbj">
-                                <rect key="frame" x="20" y="167.5" width="374" height="557.5"/>
+                                <rect key="frame" x="20" y="68" width="374" height="657"/>
                                 <color key="backgroundColor" white="0.0" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                                 <color key="separatorColor" white="0.33333333329999998" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                                 <color key="sectionIndexBackgroundColor" red="0.081456218274111647" green="0.081456218274111647" blue="0.081456218274111647" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
@@ -1602,18 +1569,21 @@ Create an incomplete account, adding cosigners to it, when complete you can rece
                             <constraint firstItem="QUk-qt-fbj" firstAttribute="trailing" secondItem="oc1-7g-yRC" secondAttribute="trailing" constant="-20" id="A33-Gg-xWa"/>
                             <constraint firstItem="muN-v4-i0X" firstAttribute="centerY" secondItem="SPg-6E-hGO" secondAttribute="centerY" constant="0.5" id="A8B-mV-eDY"/>
                             <constraint firstItem="muN-v4-i0X" firstAttribute="leading" secondItem="SPg-6E-hGO" secondAttribute="trailing" constant="8" id="CZk-80-cwH"/>
-                            <constraint firstItem="Ihc-wb-czK" firstAttribute="top" secondItem="SPg-6E-hGO" secondAttribute="bottom" constant="6" id="FRc-yb-JNp"/>
                             <constraint firstItem="SPg-6E-hGO" firstAttribute="leading" secondItem="oc1-7g-yRC" secondAttribute="leading" constant="20" id="Kj5-AV-7Ts"/>
                             <constraint firstItem="QUk-qt-fbj" firstAttribute="bottom" secondItem="oc1-7g-yRC" secondAttribute="bottom" id="Mfe-kz-iep"/>
-                            <constraint firstItem="Ihc-wb-czK" firstAttribute="leading" secondItem="oc1-7g-yRC" secondAttribute="leading" constant="20" id="Pes-DC-Co1"/>
+                            <constraint firstItem="QUk-qt-fbj" firstAttribute="top" secondItem="SPg-6E-hGO" secondAttribute="bottom" constant="8" id="NMN-Hp-mEQ"/>
                             <constraint firstItem="QUk-qt-fbj" firstAttribute="leading" secondItem="oc1-7g-yRC" secondAttribute="leading" constant="20" id="ae3-le-6IY"/>
-                            <constraint firstItem="QUk-qt-fbj" firstAttribute="top" secondItem="Ihc-wb-czK" secondAttribute="bottom" constant="8" id="g1e-Aa-5we"/>
                             <constraint firstItem="SPg-6E-hGO" firstAttribute="top" secondItem="oc1-7g-yRC" secondAttribute="top" constant="20" id="utG-tY-5KH"/>
-                            <constraint firstItem="oc1-7g-yRC" firstAttribute="trailing" secondItem="Ihc-wb-czK" secondAttribute="trailing" constant="20" id="xJq-Am-1d8"/>
                         </constraints>
                         <viewLayoutGuide key="safeArea" id="oc1-7g-yRC"/>
                     </view>
-                    <navigationItem key="navigationItem" id="IBD-Nb-A9w"/>
+                    <navigationItem key="navigationItem" id="IBD-Nb-A9w">
+                        <barButtonItem key="leftBarButtonItem" image="info.circle" catalog="system" id="wwV-Vy-azx">
+                            <connections>
+                                <action selector="infoAction:" destination="wCx-A7-8Dm" id="moL-FB-4BK"/>
+                            </connections>
+                        </barButtonItem>
+                    </navigationItem>
                     <connections>
                         <outlet property="accountMapTable" destination="QUk-qt-fbj" id="zUN-YT-zzC"/>
                         <segue destination="4dz-cW-ULS" kind="presentation" identifier="segueToAddAccountMap" id="hPq-I8-kVg"/>
@@ -1621,6 +1591,7 @@ Create an incomplete account, adding cosigners to it, when complete you can rece
                         <segue destination="Iuy-9M-v3m" kind="show" identifier="createAccountMap" id="0RT-ZT-Efi"/>
                         <segue destination="6NQ-R2-fha" kind="show" identifier="segueToAddresses" id="Co5-jp-gAi"/>
                         <segue destination="SMV-jN-46G" kind="presentation" identifier="segueToDisclaimer" modalPresentationStyle="fullScreen" id="fVt-4A-86J"/>
+                        <segue destination="swD-W5-MAD" kind="presentation" identifier="segueToAccountsInfo" id="Shp-nC-lxd"/>
                     </connections>
                 </viewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="QYQ-Sd-lrs" userLabel="First Responder" customClass="UIResponder" sceneMemberID="firstResponder"/>
@@ -2057,6 +2028,86 @@ Create an incomplete account, adding cosigners to it, when complete you can rece
             </objects>
             <point key="canvasLocation" x="2918.840579710145" y="874.55357142857144"/>
         </scene>
+        <!--Info View Controller-->
+        <scene sceneID="TLs-Nc-Pg9">
+            <objects>
+                <viewController id="swD-W5-MAD" customClass="InfoViewController" customModule="Gordian_Cosigner" customModuleProvider="target" sceneMemberID="viewController">
+                    <view key="view" contentMode="scaleToFill" id="q2q-sN-AOu">
+                        <rect key="frame" x="0.0" y="0.0" width="414" height="842"/>
+                        <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
+                        <subviews>
+                            <imageView clipsSubviews="YES" userInteractionEnabled="NO" contentMode="scaleAspectFit" horizontalHuggingPriority="251" verticalHuggingPriority="251" translatesAutoresizingMaskIntoConstraints="NO" id="S4t-z2-KRf">
+                                <rect key="frame" x="20" y="20" width="40" height="40"/>
+                                <constraints>
+                                    <constraint firstAttribute="width" constant="40" id="iXC-so-yF1"/>
+                                    <constraint firstAttribute="height" constant="40" id="qDP-1U-lbt"/>
+                                </constraints>
+                            </imageView>
+                            <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Accounts" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="mSc-cR-fOn">
+                                <rect key="frame" x="68" y="22.5" width="129.5" height="35"/>
+                                <fontDescription key="fontDescription" type="boldSystem" pointSize="29"/>
+                                <color key="textColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+                                <nil key="highlightedColor"/>
+                            </label>
+                            <textView clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="scaleToFill" editable="NO" text="blurb" textAlignment="natural" selectable="NO" translatesAutoresizingMaskIntoConstraints="NO" id="na8-AO-gaK">
+                                <rect key="frame" x="20" y="68" width="374" height="693"/>
+                                <color key="backgroundColor" white="0.0" alpha="0.0" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+                                <color key="textColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+                                <fontDescription key="fontDescription" type="system" pointSize="14"/>
+                                <textInputTraits key="textInputTraits" autocapitalizationType="sentences"/>
+                            </textView>
+                            <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="xtG-2W-fag">
+                                <rect key="frame" x="165.5" y="769" width="83" height="39"/>
+                                <constraints>
+                                    <constraint firstAttribute="width" constant="83" id="Jgo-Be-Vuh"/>
+                                    <constraint firstAttribute="height" constant="39" id="OPO-2k-B7N"/>
+                                </constraints>
+                                <state key="normal" title="OK">
+                                    <color key="titleColor" red="0.25174289789999998" green="0.82675522769999998" blue="1" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+                                </state>
+                                <connections>
+                                    <action selector="okAction:" destination="swD-W5-MAD" eventType="touchUpInside" id="k8u-UW-ogx"/>
+                                </connections>
+                            </button>
+                            <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="qsI-a2-d5U">
+                                <rect key="frame" x="354" y="20" width="40" height="40"/>
+                                <constraints>
+                                    <constraint firstAttribute="height" constant="40" id="GVf-Bd-3kN"/>
+                                    <constraint firstAttribute="width" constant="40" id="IVk-0G-jKl"/>
+                                </constraints>
+                                <state key="normal" image="xmark.circle" catalog="system"/>
+                                <connections>
+                                    <action selector="closeAction:" destination="swD-W5-MAD" eventType="touchUpInside" id="lp0-zu-RNI"/>
+                                </connections>
+                            </button>
+                        </subviews>
+                        <color key="backgroundColor" white="0.0" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+                        <constraints>
+                            <constraint firstItem="na8-AO-gaK" firstAttribute="top" secondItem="S4t-z2-KRf" secondAttribute="bottom" constant="8" id="HOo-EX-kiI"/>
+                            <constraint firstItem="mSc-cR-fOn" firstAttribute="centerY" secondItem="S4t-z2-KRf" secondAttribute="centerY" id="J45-w8-ygz"/>
+                            <constraint firstItem="xtG-2W-fag" firstAttribute="top" secondItem="na8-AO-gaK" secondAttribute="bottom" constant="8" id="N5I-o3-1H4"/>
+                            <constraint firstItem="qsI-a2-d5U" firstAttribute="top" secondItem="61I-rY-shf" secondAttribute="top" constant="20" id="OBw-J6-gZ1"/>
+                            <constraint firstItem="na8-AO-gaK" firstAttribute="leading" secondItem="61I-rY-shf" secondAttribute="leading" constant="20" id="cJf-H8-IRB"/>
+                            <constraint firstItem="mSc-cR-fOn" firstAttribute="leading" secondItem="S4t-z2-KRf" secondAttribute="trailing" constant="8" id="ez9-fL-xpZ"/>
+                            <constraint firstItem="xtG-2W-fag" firstAttribute="centerX" secondItem="q2q-sN-AOu" secondAttribute="centerX" id="gHS-Mu-k5U"/>
+                            <constraint firstItem="xtG-2W-fag" firstAttribute="bottom" secondItem="61I-rY-shf" secondAttribute="bottom" id="lZx-qj-ls5"/>
+                            <constraint firstItem="61I-rY-shf" firstAttribute="trailing" secondItem="na8-AO-gaK" secondAttribute="trailing" constant="20" id="ltC-Ie-38W"/>
+                            <constraint firstItem="S4t-z2-KRf" firstAttribute="leading" secondItem="61I-rY-shf" secondAttribute="leading" constant="20" id="qpV-lI-GCE"/>
+                            <constraint firstItem="S4t-z2-KRf" firstAttribute="top" secondItem="61I-rY-shf" secondAttribute="top" constant="20" id="uji-zi-cg1"/>
+                            <constraint firstItem="61I-rY-shf" firstAttribute="trailing" secondItem="qsI-a2-d5U" secondAttribute="trailing" constant="20" id="vz9-Fl-fy3"/>
+                        </constraints>
+                        <viewLayoutGuide key="safeArea" id="61I-rY-shf"/>
+                    </view>
+                    <connections>
+                        <outlet property="blurb" destination="na8-AO-gaK" id="h6p-kS-lcZ"/>
+                        <outlet property="header" destination="mSc-cR-fOn" id="5ah-k4-yEM"/>
+                        <outlet property="icon" destination="S4t-z2-KRf" id="8Dn-aR-31r"/>
+                    </connections>
+                </viewController>
+                <placeholder placeholderIdentifier="IBFirstResponder" id="TrR-6x-2OP" userLabel="First Responder" customClass="UIResponder" sceneMemberID="firstResponder"/>
+            </objects>
+            <point key="canvasLocation" x="7395.652173913044" y="-273.21428571428572"/>
+        </scene>
         <!--License Disclaimer View Controller-->
         <scene sceneID="K4P-aW-QHg">
             <objects>
@@ -2118,7 +2169,7 @@ Create an incomplete account, adding cosigners to it, when complete you can rece
                             <textView clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="scaleToFill" editable="NO" textAlignment="natural" translatesAutoresizingMaskIntoConstraints="NO" id="Nhp-d8-eCA">
                                 <rect key="frame" x="16" y="127" width="382" height="677"/>
                                 <color key="backgroundColor" white="0.0" alpha="0.0" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
-                                <mutableString key="text">WARNING!
+                                <string key="text">WARNING!
 
 Gordian cosigner is an alpha release! Because it operates on mainnet, this means that you could lose real money if there are any bugs or problems! (And there might be!)
 
@@ -2126,7 +2177,7 @@ We are very grateful for your usage, and for any bugs, comments, or fixes, which
 
 Please read and accept the terms of our disclaimer:
 
-The use of Gordian Cosigner is under the "BSD 2-Clause Plus Patent License" (https://spdx.org/licenses/BSD-2-Clause-Patent.html). Copyright © 2019 BlockchainCommons. All rights reserved. With the disclaimer: THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDERS OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.</mutableString>
+The use of Gordian Cosigner is under the "BSD 2-Clause Plus Patent License" (https://spdx.org/licenses/BSD-2-Clause-Patent.html). Copyright © 2019 BlockchainCommons. All rights reserved. With the disclaimer: THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDERS OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.</string>
                                 <color key="textColor" white="0.66666666669999997" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                                 <fontDescription key="fontDescription" type="system" pointSize="14"/>
                                 <textInputTraits key="textInputTraits" autocapitalizationType="sentences"/>
@@ -2162,6 +2213,7 @@ The use of Gordian Cosigner is under the "BSD 2-Clause Plus Patent License" (htt
         </scene>
     </scenes>
     <inferredMetricsTieBreakers>
+        <segue reference="Shp-nC-lxd"/>
         <segue reference="c3G-hh-8KG"/>
         <segue reference="KzM-QC-ivF"/>
         <segue reference="WEQ-0q-dcz"/>
@@ -2178,6 +2230,7 @@ The use of Gordian Cosigner is under the "BSD 2-Clause Plus Patent License" (htt
         <image name="exclamationmark.bubble" catalog="system" width="128" height="110"/>
         <image name="exclamationmark.triangle" catalog="system" width="128" height="112"/>
         <image name="folder" catalog="system" width="128" height="95"/>
+        <image name="info.circle" catalog="system" width="128" height="121"/>
         <image name="list.number" catalog="system" width="128" height="97"/>
         <image name="minus.rectangle" catalog="system" width="128" height="93"/>
         <image name="pencil" catalog="system" width="128" height="113"/>
@@ -2191,5 +2244,6 @@ The use of Gordian Cosigner is under the "BSD 2-Clause Plus Patent License" (htt
         <image name="qrcode.viewfinder" catalog="system" width="128" height="114"/>
         <image name="signature" catalog="system" width="128" height="90"/>
         <image name="square.and.arrow.up" catalog="system" width="115" height="128"/>
+        <image name="xmark.circle" catalog="system" width="128" height="121"/>
     </resources>
 </document>

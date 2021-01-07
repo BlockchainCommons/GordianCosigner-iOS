@@ -42,7 +42,15 @@ class AccountMapsViewController: UIViewController, UITableViewDelegate, UITableV
             }
         } else {
             load()
+            if UserDefaults.standard.object(forKey: "seenAccountInfo") == nil {
+                showInfo()
+                UserDefaults.standard.set(true, forKey: "seenAccountInfo")
+            }
         }
+    }
+    
+    @IBAction func infoAction(_ sender: Any) {
+        showInfo()
     }
     
     private func load() {
@@ -720,6 +728,14 @@ class AccountMapsViewController: UIViewController, UITableViewDelegate, UITableV
         }
     }
     
+    private func showInfo() {
+        DispatchQueue.main.async { [weak self] in
+            guard let self = self else { return }
+            
+            self.performSegue(withIdentifier: "segueToAccountsInfo", sender: self)
+        }
+    }
+    
     // MARK: - Navigation
 
     // In a storyboard-based application, you will often want to do a little preparation before navigation
@@ -758,6 +774,12 @@ class AccountMapsViewController: UIViewController, UITableViewDelegate, UITableV
                                         
                     self.parseAccountMap(accountMap)
                 }
+            }
+        }
+        
+        if segue.identifier == "segueToAccountsInfo" {
+            if let vc = segue.destination as? InfoViewController {
+                vc.isAccount = true
             }
         }
     }

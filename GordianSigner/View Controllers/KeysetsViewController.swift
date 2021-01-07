@@ -39,7 +39,14 @@ class KeysetsViewController: UIViewController, UITableViewDelegate, UITableViewD
     }
     
     override func viewDidAppear(_ animated: Bool) {
-
+        if UserDefaults.standard.object(forKey: "seenCosignerInfo") == nil {
+            showInfo()
+            UserDefaults.standard.set(true, forKey: "seenCosignerInfo")
+        }
+    }
+    
+    @IBAction func infoAction(_ sender: Any) {
+        showInfo()
     }
     
     private func getPasteboard() {
@@ -645,6 +652,14 @@ class KeysetsViewController: UIViewController, UITableViewDelegate, UITableViewD
         }
     }
     
+    private func showInfo() {
+        DispatchQueue.main.async { [weak self] in
+            guard let self = self else { return }
+            
+            self.performSegue(withIdentifier: "segueToCosignersInfo", sender: self)
+        }
+    }
+    
     // MARK: - Navigation
 
     // In a storyboard-based application, you will often want to do a little preparation before navigation
@@ -673,6 +688,12 @@ class KeysetsViewController: UIViewController, UITableViewDelegate, UITableViewD
                         showAlert(self, "Cosigner not recognized!", "Gordian Cosigner currently only supports the m/48h/\(Keys.coinType)h/0h/2h key origin.")
                     }
                 }
+            }
+        }
+        
+        if segue.identifier == "segueToCosignersInfo" {
+            if let vc = segue.destination as? InfoViewController {
+                vc.isCosigner = true
             }
         }
     }
