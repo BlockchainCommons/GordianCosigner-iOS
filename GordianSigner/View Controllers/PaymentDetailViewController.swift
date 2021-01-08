@@ -24,7 +24,7 @@ class PsbtTableViewController: UIViewController, UITableViewDelegate, UITableVie
     var inputsArray = [[String:Any]]()
     var outputsArray = [[String:Any]]()
     var signedFor = [String]()
-    var accountMaps = [AccountMapStruct]()
+    var accounts = [AccountStruct]()
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -42,7 +42,7 @@ class PsbtTableViewController: UIViewController, UITableViewDelegate, UITableVie
         spinner.add(vc: self, description: "loading...")
         
         if psbtText != "" {
-            psbt = try? PSBT(psbt: psbtText, network: .mainnet)
+            psbt = try? PSBT(psbt: psbtText, network: Keys.chain)
             
             if let psbtToFinalize = try? psbt.finalized() {
                 if psbtToFinalize.isComplete {
@@ -82,15 +82,15 @@ class PsbtTableViewController: UIViewController, UITableViewDelegate, UITableVie
     private func load(completion: @escaping ((Bool) -> Void)) {
         inputsArray.removeAll()
         outputsArray.removeAll()
-        accountMaps.removeAll()
+        accounts.removeAll()
         
-        CoreDataService.retrieveEntity(entityName: .accountMap) { (accountMaps, errorDescription) in
-            if accountMaps != nil {
-                if accountMaps!.count > 0 {
-                    for accountMap in accountMaps! {
-                        let str = AccountMapStruct(dictionary: accountMap)
+        CoreDataService.retrieveEntity(entityName: .account) { (accounts, errorDescription) in
+            if accounts != nil {
+                if accounts!.count > 0 {
+                    for account in accounts! {
+                        let str = AccountStruct(dictionary: account)
                         if !str.descriptor.contains("keyset") {
-                            self.accountMaps.append(AccountMapStruct(dictionary: accountMap))
+                            self.accounts.append(AccountStruct(dictionary: account))
                         }
                     }
                 }
@@ -110,9 +110,9 @@ class PsbtTableViewController: UIViewController, UITableViewDelegate, UITableVie
                     var dict:[String:Any]!
                     
                     if let path = try? origin.value.path.chop(depth: 4) {
-                        dict = ["pubkey":pubkey, "hasSigned": false, "keysetLabel": "unknown", "path": path, "fullPath": origin.value.path] as [String : Any]
+                        dict = ["pubkey":pubkey, "hasSigned": false, "cosignerLabel": "unknown", "path": path, "fullPath": origin.value.path] as [String : Any]
                     } else {
-                        dict = ["pubkey":pubkey, "hasSigned": false, "keysetLabel": "unknown", "fullPath": origin.value.path] as [String : Any]
+                        dict = ["pubkey":pubkey, "hasSigned": false, "cosignerLabel": "unknown", "fullPath": origin.value.path] as [String : Any]
                     }
                     
                     pubkeysArray.append(dict)
@@ -147,10 +147,10 @@ class PsbtTableViewController: UIViewController, UITableViewDelegate, UITableVie
     }
     
     private func parsePubkeys(completion: @escaping ((Bool) -> Void)) {
-        CoreDataService.retrieveEntity(entityName: .keyset) { [weak self] (keysets, errorDescription) in
+        CoreDataService.retrieveEntity(entityName: .cosigner) { [weak self] (cosigners, errorDescription) in
             guard let self = self else { completion(false); return }
             
-            guard let keysets = keysets, keysets.count > 0 else { completion(false); return }
+            guard let cosigners = cosigners, cosigners.count > 0 else { completion(false); return }
             
             DispatchQueue.background(background: {
                 for (i, inputDictArray) in self.inputsArray.enumerated() {
@@ -163,11 +163,11 @@ class PsbtTableViewController: UIViewController, UITableViewDelegate, UITableVie
                             let fullPath = pubkeyDict["fullPath"] as! BIP32Path
                             
                             
-                            func loopKeysets() {
-                                for (k, keyset) in keysets.enumerated() {
-                                    let keysetStruct = KeysetStruct(dictionary: keyset)
+                            func loopCosigners() {
+                                for (k, keyset) in cosigners.enumerated() {
+                                    let cosignerStruct = CosignerStruct(dictionary: keyset)
                                     
-                                    if let descriptor = keysetStruct.bip48SegwitAccount {
+                                    if let descriptor = cosignerStruct.bip48SegwitAccount {
                                         let arr = descriptor.split(separator: "]")
                                         var xpub = ""
                                         
@@ -180,12 +180,12 @@ class PsbtTableViewController: UIViewController, UITableViewDelegate, UITableVie
                                             let childKey = try? hdkey.derive(using: path) {
                                             
                                             if originalPubkey == childKey.pubKey.data.hexString {
-                                                updatedDict["keysetLabel"] = keysetStruct.label
-                                                if let desc = keysetStruct.bip48SegwitAccount {
+                                                updatedDict["cosignerLabel"] = cosignerStruct.label
+                                                if let desc = cosignerStruct.bip48SegwitAccount {
                                                     let dp = DescriptorParser()
                                                     let ds = dp.descriptor("wsh(\(desc))")
                                                     let xfp = ds.fingerprint
-                                                    updatedDict["keysetOrigin"] = "[" + fullPath.description.replacingOccurrences(of: "m", with: xfp) + "]"
+                                                    updatedDict["cosignerOrigin"] = "[" + fullPath.description.replacingOccurrences(of: "m", with: xfp) + "]"
                                                 }
                                                 
                                                 pubkeyArray[p] = updatedDict
@@ -211,7 +211,7 @@ class PsbtTableViewController: UIViewController, UITableViewDelegate, UITableVie
                                                                     self.inputsArray[i]["pubKeyArray"] = pubkeyArray
                                                                 }
                                                                 
-                                                                if k + 1 == keysets.count && p + 1 == pubkeyArray.count && i + 1 == self.inputsArray.count && s + 1 == sigs.count && x + 1 == self.signedFor.count {
+                                                                if k + 1 == cosigners.count && p + 1 == pubkeyArray.count && i + 1 == self.inputsArray.count && s + 1 == sigs.count && x + 1 == self.signedFor.count {
                                                                     self.parseOutputs(completion: completion)
                                                                 }
                                                             }
@@ -219,7 +219,7 @@ class PsbtTableViewController: UIViewController, UITableViewDelegate, UITableVie
                                                         } else {
                                                             self.inputsArray[i]["pubKeyArray"] = pubkeyArray
                                                             
-                                                            if k + 1 == keysets.count && p + 1 == pubkeyArray.count && i + 1 == self.inputsArray.count && s + 1 == sigs.count {
+                                                            if k + 1 == cosigners.count && p + 1 == pubkeyArray.count && i + 1 == self.inputsArray.count && s + 1 == sigs.count {
                                                                 self.parseOutputs(completion: completion)
                                                             }
                                                         }
@@ -228,7 +228,7 @@ class PsbtTableViewController: UIViewController, UITableViewDelegate, UITableVie
                                                 } else {
                                                     self.inputsArray[i]["pubKeyArray"] = pubkeyArray
                                                     
-                                                    if k + 1 == keysets.count && p + 1 == pubkeyArray.count && i + 1 == self.inputsArray.count {
+                                                    if k + 1 == cosigners.count && p + 1 == pubkeyArray.count && i + 1 == self.inputsArray.count {
                                                         self.parseOutputs(completion: completion)
                                                     }
                                                 }
@@ -248,7 +248,7 @@ class PsbtTableViewController: UIViewController, UITableViewDelegate, UITableVie
                                                     self.inputsArray[i]["pubKeyArray"] = pubkeyArray
                                                 }
                                                 
-                                                if k + 1 == keysets.count && p + 1 == pubkeyArray.count && i + 1 == self.inputsArray.count {
+                                                if k + 1 == cosigners.count && p + 1 == pubkeyArray.count && i + 1 == self.inputsArray.count {
                                                     self.parseOutputs(completion: completion)
                                                 }
                                             }
@@ -256,7 +256,7 @@ class PsbtTableViewController: UIViewController, UITableViewDelegate, UITableVie
                                         } else {
                                             self.inputsArray[i]["pubKeyArray"] = pubkeyArray
                                             
-                                            if k + 1 == keysets.count && p + 1 == pubkeyArray.count && i + 1 == self.inputsArray.count {
+                                            if k + 1 == cosigners.count && p + 1 == pubkeyArray.count && i + 1 == self.inputsArray.count {
                                                 self.parseOutputs(completion: completion)
                                             }
                                         }
@@ -265,41 +265,32 @@ class PsbtTableViewController: UIViewController, UITableViewDelegate, UITableVie
                             }
                             
                             
-                            CoreDataService.retrieveEntity(entityName: .signer) { (signers, errorDescription) in
-                                if let signers = signers, signers.count > 0 {
-                                    
-                                    for (s, signer) in signers.enumerated() {
-                                        let signerStruct = SignerStruct(dictionary: signer)
-                                        if let entropy = signerStruct.entropy {
-                                            if let decryptedEntropy = Encryption.decrypt(entropy) {
-                                                let e = BIP39Mnemonic.Entropy(decryptedEntropy)
-                                                if let mnemonic = try? BIP39Mnemonic(entropy: e) {
-                                                    var passphrase = ""
-                                                    if let encryptedPassphrase = signerStruct.passphrase {
-                                                        if let decryptedPassphrase = Encryption.decrypt(encryptedPassphrase) {
-                                                            passphrase = decryptedPassphrase.utf8
-                                                        }
-                                                    }
-                                                    
-                                                    let seedHex = mnemonic.seedHex(passphrase: passphrase)
-                                                    
-                                                    if let hdMasterKey = try? HDKey(seed: seedHex, network: .mainnet) {
-                                                        if let childKey = try? hdMasterKey.derive(using: fullPath) {
+                            CoreDataService.retrieveEntity(entityName: .cosigner) { (cosigners, errorDescription) in
+                                if let cosigners = cosigners, cosigners.count > 0 {
+
+                                    for (s, cosigner) in cosigners.enumerated() {
+                                        let cosignerStruct = CosignerStruct(dictionary: cosigner)
+                                        
+                                        if let encryptedXprv = cosignerStruct.xprv {
+                                            if let decryptedXprv = Encryption.decrypt(encryptedXprv) {
+                                                if let hdkey = try? HDKey(base58: decryptedXprv.utf8) {
+                                                    if let accountPath = try? fullPath.chop(depth: 4) {
+                                                        if let childKey = try? hdkey.derive(using: accountPath) {
                                                             if childKey.pubKey.data.hexString == originalPubkey {
                                                                 self.canSign = true
-                                                                updatedDict["lifeHash"] = UIImage(data: signerStruct.lifeHash)
+                                                                updatedDict["lifeHash"] = UIImage(data: cosignerStruct.lifehash)
                                                             }
                                                         }
                                                     }
                                                 }
                                             }
                                         }
-                                        if s + 1 == signers.count {
-                                            loopKeysets()
+                                        if s + 1 == cosigners.count {
+                                            loopCosigners()
                                         }
                                     }
                                 } else {
-                                    loopKeysets()
+                                    loopCosigners()
                                 }
                             }
 
@@ -317,18 +308,18 @@ class PsbtTableViewController: UIViewController, UITableViewDelegate, UITableVie
         
         for (o, output) in outputs.enumerated() {
             self.outputsArray.append(["output": output])
-            
+            // THIS SEEMS TO BE HARDCODING MAINNET?
             if let address = output.txOutput.address {
                 self.outputsArray[o]["address"] = address
                 self.outputsArray[o]["isMine"] = false
                 self.outputsArray[o]["accountMap"] = "unknown"
                 self.outputsArray[o]["path"] = "path unknown"
                 
-                if accountMaps.count == 0 && o + 1 == outputs.count {
+                if accounts.count == 0 && o + 1 == outputs.count {
                     completion(true)
                 }
                 
-                for (a, accountMap) in accountMaps.enumerated() {
+                for (a, accountMap) in accounts.enumerated() {
                     let descriptor = accountMap.descriptor
                     if !descriptor.contains("keyset") {
                         let descriptorParser = DescriptorParser()
@@ -348,27 +339,27 @@ class PsbtTableViewController: UIViewController, UITableViewDelegate, UITableVie
                                         
                                         if k + 1 == keys.count {
                                             let scriptPubKey = ScriptPubKey(multisig: pubkeys, threshold: sigsRequired, isBIP67: true)
-                                            guard let multiSigAddress = try? Address(scriptPubKey: scriptPubKey, network: .mainnet) else { return }
+                                            guard let multiSigAddress = try? Address(scriptPubKey: scriptPubKey, network: Keys.chain) else { return }
                                                                             
                                             if multiSigAddress.description == address {
                                                 self.outputsArray[o]["isMine"] = true
-                                                self.outputsArray[o]["accountMap"] = accountMap.label
+                                                self.outputsArray[o]["map"] = accountMap.label
                                                 self.outputsArray[o]["lifeHash"] = LifeHash.image(descriptor)
                                             }
                                             
-                                            if a + 1 == accountMaps.count && o + 1 == outputs.count && x + 1 == origins.count {
+                                            if a + 1 == accounts.count && o + 1 == outputs.count && x + 1 == origins.count {
                                                 completion(true)
                                             }
                                         }
                                     } else {
-                                        if k + 1 == keys.count && a + 1 == accountMaps.count && o + 1 == outputs.count && x + 1 == origins.count {
+                                        if k + 1 == keys.count && a + 1 == accounts.count && o + 1 == outputs.count && x + 1 == origins.count {
                                             completion(true)
                                         }
                                     }
                                 }
                             }
                         } else {
-                            if a + 1 == accountMaps.count && o + 1 == outputs.count {
+                            if a + 1 == accounts.count && o + 1 == outputs.count {
                                 completion(true)
                             }
                         }
@@ -446,11 +437,12 @@ class PsbtTableViewController: UIViewController, UITableViewDelegate, UITableVie
         lifeHashView.alpha = 0
         lifeHashView.backgroundColor = cell.backgroundColor
         lifeHashView.background.backgroundColor = cell.backgroundColor
+        lifeHashView.iconImage.image = UIImage(systemName: "person.2")
         sigImage.tintColor = .systemPink
         
         if let participants = inputsArray[indexPath.section]["pubKeyArray"] as? [[String:Any]] {
             let participant = participants[indexPath.row]
-            let cosignerLabel = participant["keysetLabel"] as! String
+            let cosignerLabel = participant["cosignerLabel"] as! String
             let hasSigned = participant["hasSigned"] as! Bool
             
             if hasSigned {
@@ -776,7 +768,7 @@ class PsbtTableViewController: UIViewController, UITableViewDelegate, UITableVie
         dict["label"] = "Signed PSBT"
         dict["id"] = UUID()
         
-        CoreDataService.saveEntity(dict: dict, entityName: .psbt, completion: { (success, errorDescription) in
+        CoreDataService.saveEntity(dict: dict, entityName: .payment, completion: { (success, errorDescription) in
             guard success else {
                 showAlert(self, "Not saved!", "There was an issue encrypting and saving your psbt. Please reach out and let us know. Error: \(errorDescription ?? "unknown")")
                 

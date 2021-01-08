@@ -29,6 +29,10 @@ enum LifeHash {
         return LifeHashGenerator.generateSync(input).pngData()
     }
     
+    static func hash(_ input: String) -> Data? {
+        return LifeHashGenerator.generateSync(input).pngData()
+    }
+    
     static func image(_ input: Data) -> UIImage? {
        return LifeHashGenerator.generateSync(input)
     }

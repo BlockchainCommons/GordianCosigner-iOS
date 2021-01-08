@@ -8,7 +8,7 @@
 
 import Foundation
 
-public struct KeysetStruct: CustomStringConvertible {
+public struct CosignerStruct: CustomStringConvertible {
     
     let id:UUID
     let label:String
@@ -17,6 +17,9 @@ public struct KeysetStruct: CustomStringConvertible {
     let dateShared:Date?
     let sharedWith:UUID?
     let fingerprint:String
+    let xprv:Data?
+    let words:Data?
+    let lifehash:Data
     
     init(dictionary: [String: Any]) {
         id = dictionary["id"] as! UUID
@@ -26,6 +29,9 @@ public struct KeysetStruct: CustomStringConvertible {
         dateShared = dictionary["dateShared"] as? Date
         sharedWith = dictionary["sharedWith"] as? UUID
         fingerprint = dictionary["fingerprint"] as? String ?? "00000000"
+        words = dictionary["words"] as? Data
+        xprv = dictionary["xprv"] as? Data
+        lifehash = dictionary["lifehash"] as! Data
     }
     
     public var description: String {

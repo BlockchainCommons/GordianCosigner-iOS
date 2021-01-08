@@ -13,10 +13,10 @@ class AccountMapsViewController: UIViewController, UITableViewDelegate, UITableV
     
     var addButton = UIBarButtonItem()
     var editButton = UIBarButtonItem()
-    var accountMaps = [[String:Any]]()
+    var accounts = [[String:Any]]()
     let descriptorParser = DescriptorParser()
     var mapToExport = [String:Any]()
-    var addressesAm:AccountMapStruct!
+    var addressesAm:AccountStruct!
     
     @IBOutlet weak var accountMapTable: UITableView!
     
@@ -54,37 +54,37 @@ class AccountMapsViewController: UIViewController, UITableViewDelegate, UITableV
     }
     
     private func load() {
-        accountMaps.removeAll()
+        accounts.removeAll()
         
-        CoreDataService.retrieveEntity(entityName: .accountMap) { [weak self] (accountMaps, errorDescription) in
+        CoreDataService.retrieveEntity(entityName: .account) { [weak self] (accounts, errorDescription) in
             guard let self = self else { return }
             
-            guard let accountMaps = accountMaps, accountMaps.count > 0 else { return }
+            guard let accounts = accounts, accounts.count > 0 else { return }
             
-            for accountMap in accountMaps {
-                let str = AccountMapStruct(dictionary: accountMap)
-                self.accountMaps.append(["accountMap": str])
+            for account in accounts {
+                let str = AccountStruct(dictionary: account)
+                self.accounts.append(["account": str])
             }
             
-            self.loadKeysets()
+            self.loadCosigners()
         }
     }
     
-    private func loadKeysets() {
-        CoreDataService.retrieveEntity(entityName: .keyset) { [weak self] (keysets, errorDescription) in
+    private func loadCosigners() {
+        CoreDataService.retrieveEntity(entityName: .cosigner) { [weak self] (cosigners, errorDescription) in
             guard let self = self else { return }
             
-            guard let keysets = keysets, keysets.count > 0 else {
+            guard let cosigners = cosigners, cosigners.count > 0 else {
                 
-                for (i, accountMap) in self.accountMaps.enumerated() {
-                    let amStruct = accountMap["accountMap"] as! AccountMapStruct
-                    self.accountMaps[i]["canSign"] = false
+                for (i, account) in self.accounts.enumerated() {
+                    let accountStruct = account["account"] as! AccountStruct
+                    self.accounts[i]["canSign"] = false
                     
-                    if !amStruct.descriptor.contains("keyset") {
-                        self.accountMaps[i]["lifeHash"] = LifeHash.image(amStruct.descriptor)
+                    if !accountStruct.descriptor.contains("keyset") {
+                        self.accounts[i]["lifeHash"] = LifeHash.image(accountStruct.descriptor)
                     }
                                         
-                    if i + 1 == self.accountMaps.count {
+                    if i + 1 == self.accounts.count {
                         DispatchQueue.main.async {
                             self.accountMapTable.reloadData()
                         }
@@ -94,48 +94,48 @@ class AccountMapsViewController: UIViewController, UITableViewDelegate, UITableV
                 return
             }
             
-            for (i, accountMap) in self.accountMaps.enumerated() {
-                let amStruct = accountMap["accountMap"] as! AccountMapStruct
-                self.accountMaps[i]["canSign"] = false
+            for (i, account) in self.accounts.enumerated() {
+                let accountStruct = account["account"] as! AccountStruct
+                self.accounts[i]["canSign"] = false
                 
-                if !amStruct.descriptor.contains("keyset") {
-                    self.accountMaps[i]["lifeHash"] = LifeHash.image(amStruct.descriptor)
+                if !accountStruct.descriptor.contains("keyset") {
+                    self.accounts[i]["lifeHash"] = LifeHash.image(accountStruct.descriptor)
                 }
                 
                 var participants = ""
-                for (k, keyset) in keysets.enumerated() {
-                    let keysetStruct = KeysetStruct(dictionary: keyset)
+                for (k, cosigner) in cosigners.enumerated() {
+                    let cosignerStruct = CosignerStruct(dictionary: cosigner)
                     
-                    if let desc = keysetStruct.bip48SegwitAccount {
+                    if let desc = cosignerStruct.bip48SegwitAccount {
                         
-                        if amStruct.descriptor.contains(desc) {
+                        if accountStruct.descriptor.contains(desc) {
                             
-                            let participant = keysetStruct.label
+                            let participant = cosignerStruct.label
                             
                             participants += participant + "\n"
                             
-                            CoreDataService.retrieveEntity(entityName: .signer) { (signers, errorDescription) in
-                                if let signers = signers, signers.count > 0 {
-                                    for signer in signers {
-                                        let signerStruct = SignerStruct(dictionary: signer)
-                                        if signerStruct.entropy != nil {
-                                            if keysetStruct.fingerprint == signerStruct.fingerprint {
-                                                self.accountMaps[i]["canSign"] = true
-                                                self.accountMaps[i]["signerLifeHash"] = signerStruct.lifeHash
-                                            }
-                                        }
-                                    }
-                                }
-                            }
+//                            CoreDataService.retrieveEntity(entityName: .signer) { (signers, errorDescription) in
+//                                if let signers = signers, signers.count > 0 {
+//                                    for signer in signers {
+//                                        let signerStruct = SignerStruct(dictionary: signer)
+//                                        if signerStruct.entropy != nil {
+//                                            if cosignerStruct.fingerprint == signerStruct.fingerprint {
+//                                                self.accountMaps[i]["canSign"] = true
+//                                                self.accountMaps[i]["signerLifeHash"] = signerStruct.lifeHash
+//                                            }
+//                                        }
+//                                    }
+//                                }
+//                            }
                         }
                     }
                     
-                    if k + 1 == keysets.count {
-                        self.accountMaps[i]["participants"] = participants
+                    if k + 1 == cosigners.count {
+                        self.accounts[i]["participants"] = participants
                     }
                 }
                 
-                if i + 1 == self.accountMaps.count {
+                if i + 1 == self.accounts.count {
                     DispatchQueue.main.async {
                         self.accountMapTable.reloadData()
                     }
@@ -149,8 +149,8 @@ class AccountMapsViewController: UIViewController, UITableViewDelegate, UITableV
     }
     
     func numberOfSections(in tableView: UITableView) -> Int {
-        if accountMaps.count > 0 {
-            return accountMaps.count
+        if accounts.count > 0 {
+            return accounts.count
         } else {
             return 1
         }
@@ -158,20 +158,20 @@ class AccountMapsViewController: UIViewController, UITableViewDelegate, UITableV
     
     func tableView(_ tableView: UITableView, commit editingStyle: UITableViewCell.EditingStyle, forRowAt indexPath: IndexPath) {
         if editingStyle == .delete {
-            let accountMap = accountMaps[indexPath.section]["accountMap"] as! AccountMapStruct
-            delete(accountMap.id, indexPath.section)
+            let account = accounts[indexPath.section]["account"] as! AccountStruct
+            delete(account.id, indexPath.section)
         }
     }
     
-    private func accountMapCell(_ indexPath: IndexPath) -> UITableViewCell {
-        let cell = accountMapTable.dequeueReusableCell(withIdentifier: "accountMapCell", for: indexPath)
+    private func accountCell(_ indexPath: IndexPath) -> UITableViewCell {
+        let cell = accountMapTable.dequeueReusableCell(withIdentifier: "accountCell", for: indexPath)
         cell.selectionStyle = .none
         cell.layer.cornerRadius = 8
         cell.layer.borderColor = UIColor.darkGray.cgColor
         cell.layer.borderWidth = 0.5
         
-        let accountMap = accountMaps[indexPath.section]["accountMap"] as! AccountMapStruct
-        let descriptor = accountMap.descriptor
+        let account = accounts[indexPath.section]["account"] as! AccountStruct
+        let descriptor = account.descriptor
         let descriptorStruct = descriptorParser.descriptor(descriptor)
         
 //        let label = cell.viewWithTag(1) as! UILabel
@@ -184,7 +184,7 @@ class AccountMapsViewController: UIViewController, UITableViewDelegate, UITableV
         script.text = descriptorStruct.format
         
         let participantsLabel = cell.viewWithTag(4) as! UILabel
-        if let participants = accountMaps[indexPath.section]["participants"] as? String {
+        if let participants = accounts[indexPath.section]["participants"] as? String {
             participantsLabel.text = participants
         } else {
             participantsLabel.text = ""
@@ -211,7 +211,7 @@ class AccountMapsViewController: UIViewController, UITableViewDelegate, UITableV
         exportButton.restorationIdentifier = "\(indexPath.section)"
         exportButton.addTarget(self, action: #selector(exportQr(_:)), for: .touchUpInside)
         
-        if accountMap.descriptor.contains("keyset") {
+        if account.descriptor.contains("keyset") {
             isCompleteImage.alpha = 1
             isCompleteImage.image = UIImage(systemName: "circle.lefthalf.fill")
             isCompleteImage.tintColor = .systemYellow
@@ -230,28 +230,28 @@ class AccountMapsViewController: UIViewController, UITableViewDelegate, UITableV
             addressesButton.alpha = 1
         }
         
-        let signerLifeHash = cell.viewWithTag(6) as! LifehashSeedSecondary
-        signerLifeHash.backgroundColor = cell.backgroundColor
-        signerLifeHash.background.backgroundColor = cell.backgroundColor
-        
-        if let lifehash = accountMaps[indexPath.section]["signerLifeHash"] as? Data {
-            signerLifeHash.lifehashImage.image = UIImage(data: lifehash)
-            signerLifeHash.alpha = 1
-        } else {
-            signerLifeHash.alpha = 0
-        }
+//        let signerLifeHash = cell.viewWithTag(6) as! LifehashSeedSecondary
+//        signerLifeHash.backgroundColor = cell.backgroundColor
+//        signerLifeHash.background.backgroundColor = cell.backgroundColor
+//        
+//        if let lifehash = accounts[indexPath.section]["signerLifeHash"] as? Data {
+//            signerLifeHash.lifehashImage.image = UIImage(data: lifehash)
+//            signerLifeHash.alpha = 1
+//        } else {
+//            signerLifeHash.alpha = 0
+//        }
         
         let date = cell.viewWithTag(11) as! UILabel
-        date.text = accountMap.dateAdded.formatted()
+        date.text = account.dateAdded.formatted()
         
         let lifehash = cell.viewWithTag(13) as! LifehashSeedView
         lifehash.background.backgroundColor = cell.backgroundColor
         lifehash.backgroundColor = cell.backgroundColor
         
-        if let image = accountMaps[indexPath.section]["lifeHash"] as? UIImage {
+        if let image = accounts[indexPath.section]["lifeHash"] as? UIImage {
             lifehash.lifehashImage.image = image
             lifehash.iconImage.image = UIImage(systemName: "person.2.square.stack")
-            lifehash.iconLabel.text = accountMap.label
+            lifehash.iconLabel.text = account.label
             lifehash.iconImage.alpha = 1
             lifehash.iconLabel.alpha = 1
         } else {
@@ -265,62 +265,62 @@ class AccountMapsViewController: UIViewController, UITableViewDelegate, UITableV
     }
     
     private func defaultCell(_ indexPath: IndexPath) -> UITableViewCell {
-        let cell = accountMapTable.dequeueReusableCell(withIdentifier: "accountMapDefaultCell", for: indexPath)
+        let cell = accountMapTable.dequeueReusableCell(withIdentifier: "accountDefaultCell", for: indexPath)
         let button = cell.viewWithTag(1) as! UIButton
         button.addTarget(self, action: #selector(add), for: .touchUpInside)
         return cell
     }
     
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
-        if accountMaps.count > 0 {
-            return accountMapCell(indexPath)
+        if accounts.count > 0 {
+            return accountCell(indexPath)
         } else {
             return defaultCell(indexPath)
         }
     }
     
     func tableView(_ tableView: UITableView, heightForRowAt indexPath: IndexPath) -> CGFloat {
-        if accountMaps.count > 0 {
+        if accounts.count > 0 {
             
-            var height = 247
-            let accountMap = accountMaps[indexPath.section]["accountMap"] as! AccountMapStruct
+            var height = 211
+            let account = accounts[indexPath.section]["account"] as! AccountStruct
             let descParser = DescriptorParser()
-            let descStruct = descParser.descriptor(accountMap.descriptor)
+            let descStruct = descParser.descriptor(account.descriptor)
             let hack = descStruct.mOfNType.replacingOccurrences(of: " of ", with: "*")
             let arr = hack.split(separator: "*")
             if arr.count > 0 {
-                
                 if let numberOfCosigners = Int("\(arr[1])") {
-                    switch numberOfCosigners {
-                    case _ where numberOfCosigners == 3:
-                        height = 257
-                    case _ where numberOfCosigners == 4:
-                        height = 277
-                    case _ where numberOfCosigners == 5:
-                        height = 287
-                    case _ where numberOfCosigners == 6:
-                        height = 297
-                    case _ where numberOfCosigners == 7:
-                        height = 307
-                    case _ where numberOfCosigners == 8:
-                        height = 317
-                    case _ where numberOfCosigners == 9:
-                        height = 327
-                    case _ where numberOfCosigners == 10:
-                        height = 337
-                    case _ where numberOfCosigners == 11:
-                        height = 347
-                    case _ where numberOfCosigners == 12:
-                        height = 357
-                    case _ where numberOfCosigners == 13:
-                        height = 367
-                    case _ where numberOfCosigners == 14:
-                        height = 377
-                    case _ where numberOfCosigners == 15:
-                        height = 387
-                    default:
-                        break
-                    }
+                    height += (numberOfCosigners * 10)
+//                    switch numberOfCosigners {
+//                    case _ where numberOfCosigners == 3:
+//                        height = 257
+//                    case _ where numberOfCosigners == 4:
+//                        height = 277
+//                    case _ where numberOfCosigners == 5:
+//                        height = 287
+//                    case _ where numberOfCosigners == 6:
+//                        height = 297
+//                    case _ where numberOfCosigners == 7:
+//                        height = 307
+//                    case _ where numberOfCosigners == 8:
+//                        height = 317
+//                    case _ where numberOfCosigners == 9:
+//                        height = 327
+//                    case _ where numberOfCosigners == 10:
+//                        height = 337
+//                    case _ where numberOfCosigners == 11:
+//                        height = 347
+//                    case _ where numberOfCosigners == 12:
+//                        height = 357
+//                    case _ where numberOfCosigners == 13:
+//                        height = 367
+//                    case _ where numberOfCosigners == 14:
+//                        height = 377
+//                    case _ where numberOfCosigners == 15:
+//                        height = 387
+//                    default:
+//                        break
+//                    }
                 }
             }
             return CGFloat(height)
@@ -332,7 +332,7 @@ class AccountMapsViewController: UIViewController, UITableViewDelegate, UITableV
     @objc func seeAddresses(_ sender: UIButton) {
         guard let sectionString = sender.restorationIdentifier, let int = Int(sectionString) else { return }
         
-        let am = accountMaps[int]["accountMap"] as! AccountMapStruct
+        let am = accounts[int]["account"] as! AccountStruct
         
         DispatchQueue.main.async {
             self.addressesAm = am
@@ -343,22 +343,22 @@ class AccountMapsViewController: UIViewController, UITableViewDelegate, UITableV
     @objc func addCosigner(_ sender: UIButton) {
         guard let sectionString = sender.restorationIdentifier, let int = Int(sectionString) else { return }
         
-        let am = accountMaps[int]["accountMap"] as! AccountMapStruct
-        var vettedCosigners = [KeysetStruct]()
+        let am = accounts[int]["account"] as! AccountStruct
+        var vettedCosigners = [CosignerStruct]()
         
-        CoreDataService.retrieveEntity(entityName: .keyset) { (keysets, errorDescription) in
-            guard let keysets = keysets, keysets.count > 0 else {
-                showAlert(self, "", "No cosigners added yet, either create a seed or add a cosigner first.")
+        CoreDataService.retrieveEntity(entityName: .cosigner) { (cosigners, errorDescription) in
+            guard let cosigners = cosigners, cosigners.count > 0 else {
+                showAlert(self, "", "No cosigners added yet, add a cosigner first.")
                 return
             }
             
-            for (i, keyset) in keysets.enumerated() {
-                let keysetStruct = KeysetStruct(dictionary: keyset)
-                if !am.descriptor.contains(keysetStruct.bip48SegwitAccount!) {
-                    vettedCosigners.append(keysetStruct)
+            for (i, cosigner) in cosigners.enumerated() {
+                let cosignerStruct = CosignerStruct(dictionary: cosigner)
+                if !am.descriptor.contains(cosignerStruct.bip48SegwitAccount!) {
+                    vettedCosigners.append(cosignerStruct)
                 }
                 
-                if i + 1 == keysets.count {
+                if i + 1 == cosigners.count {
                     
                     if vettedCosigners.count > 0 {
                         DispatchQueue.main.async { [weak self] in
@@ -390,8 +390,8 @@ class AccountMapsViewController: UIViewController, UITableViewDelegate, UITableV
         }
     }
     
-    private func updateAccountMap(_ accountMap: AccountMapStruct, _ keyset: KeysetStruct, _ section: Int) {
-        var desc = accountMap.descriptor
+    private func updateAccountMap(_ account: AccountStruct, _ cosigner: CosignerStruct, _ section: Int) {
+        var desc = account.descriptor
         let descriptorParser = DescriptorParser()
         let descStruct = descriptorParser.descriptor(desc)
         var mofn = descStruct.mOfNType
@@ -401,35 +401,35 @@ class AccountMapsViewController: UIViewController, UITableViewDelegate, UITableV
         
         for i in 0...n - 1 {
             if desc.contains("<keyset #\(i + 1)>") {
-                desc = desc.replacingOccurrences(of: "<keyset #\(i + 1)>", with: keyset.bip48SegwitAccount!)
+                desc = desc.replacingOccurrences(of: "<keyset #\(i + 1)>", with: cosigner.bip48SegwitAccount!)
                 break
             }
         }
         
-        guard var dict = try? JSONSerialization.jsonObject(with: accountMap.accountMap, options: []) as? [String:Any] else { return }
+        guard var dict = try? JSONSerialization.jsonObject(with: account.map, options: []) as? [String:Any] else { return }
         dict["descriptor"] = desc
         
         let updatedMap = (dict.json() ?? "").utf8
         
-        CoreDataService.updateEntity(id: accountMap.id, keyToUpdate: "descriptor", newValue: desc, entityName: .accountMap) { (success, errorDesc) in
+        CoreDataService.updateEntity(id: account.id, keyToUpdate: "descriptor", newValue: desc, entityName: .account) { (success, errorDesc) in
             guard success else {
                 showAlert(self, "Descriptor updating failed...", "Please let us know about this bug.")
                 return
             }
             
-            CoreDataService.updateEntity(id: accountMap.id, keyToUpdate: "accountMap", newValue: updatedMap, entityName: .accountMap) { (success, errorDesc) in
+            CoreDataService.updateEntity(id: account.id, keyToUpdate: "map", newValue: updatedMap, entityName: .account) { (success, errorDesc) in
                 guard success else {
                     showAlert(self, "Account map updating failed...", "Please let us know about this bug.")
                     return
                 }
                 
-                CoreDataService.updateEntity(id: keyset.id, keyToUpdate: "sharedWith", newValue: accountMap.id, entityName: .keyset) { (success, errorDescription) in
+                CoreDataService.updateEntity(id: cosigner.id, keyToUpdate: "sharedWith", newValue: account.id, entityName: .cosigner) { (success, errorDescription) in
                     guard success else {
                         showAlert(self, "sharedWith updating failed...", "Please let us know about this bug.")
                         return
                     }
                     
-                    CoreDataService.updateEntity(id: keyset.id, keyToUpdate: "dateShared", newValue: Date(), entityName: .keyset) { (success, errorDescription) in
+                    CoreDataService.updateEntity(id: cosigner.id, keyToUpdate: "dateShared", newValue: Date(), entityName: .cosigner) { (success, errorDescription) in
                         guard success else {
                             showAlert(self, "dateShared updating failed...", "Please let us know about this bug.")
                             return
@@ -451,7 +451,7 @@ class AccountMapsViewController: UIViewController, UITableViewDelegate, UITableV
     @objc func editLabel(_ sender: UIButton) {
         guard let sectionString = sender.restorationIdentifier, let int = Int(sectionString) else { return }
         
-        let am = accountMaps[int]["accountMap"] as! AccountMapStruct
+        let am = accounts[int]["account"] as! AccountStruct
         
         DispatchQueue.main.async { [weak self] in
             guard let self = self else { return }
@@ -487,7 +487,7 @@ class AccountMapsViewController: UIViewController, UITableViewDelegate, UITableV
     }
     
     private func updateLabel(_ id: UUID, _ label: String) {
-        CoreDataService.updateEntity(id: id, keyToUpdate: "label", newValue: label, entityName: .accountMap) { (success, errorDescription) in
+        CoreDataService.updateEntity(id: id, keyToUpdate: "label", newValue: label, entityName: .account) { (success, errorDescription) in
             guard success else { showAlert(self, "Label not saved!", "There was an error updating your label, please let us know about it: \(errorDescription ?? "unknown")"); return }
             
             DispatchQueue.main.async {
@@ -501,7 +501,7 @@ class AccountMapsViewController: UIViewController, UITableViewDelegate, UITableV
     @objc func exportQr(_ sender: UIButton) {
         guard let sectionString = sender.restorationIdentifier, let int = Int(sectionString) else { return }
         
-        let accountMapData = (accountMaps[int]["accountMap"] as! AccountMapStruct).accountMap
+        let accountMapData = (accounts[int]["account"] as! AccountStruct).map
         
         guard let dict = try? JSONSerialization.jsonObject(with: accountMapData, options: []) as? [String:Any] else { return }
         
@@ -577,15 +577,15 @@ class AccountMapsViewController: UIViewController, UITableViewDelegate, UITableV
     }
     
     private func deleteAccountMapNow(_ id: UUID, _ section: Int) {
-        CoreDataService.deleteEntity(id: id, entityName: .accountMap) { (success, errorDescription) in
+        CoreDataService.deleteEntity(id: id, entityName: .account) { (success, errorDescription) in
             guard success else {
                 showAlert(self, "Error deleting Account", "")
                 return
             }
             
             DispatchQueue.main.async { [weak self] in
-                self?.accountMaps.remove(at: section)
-                if self?.accountMaps.count == 0 {
+                self?.accounts.remove(at: section)
+                if self?.accounts.count == 0 {
                     self?.editAccounts()
                     self?.accountMapTable.reloadData()
                 } else {
@@ -662,22 +662,22 @@ class AccountMapsViewController: UIViewController, UITableViewDelegate, UITableV
                 let ds = dp.descriptor(hack)
                 let account = fullKey.replacingOccurrences(of: "/0/*", with: "")
                 
-                var keyset = [String:Any]()
-                keyset["id"] = UUID()
-                keyset["label"] = "Cosigner #\(i + 1)"
-                keyset["bip48SegwitAccount"] = account
-                keyset["dateAdded"] = Date()
-                keyset["fingerprint"] = ds.fingerprint
-                keyset["sharedWith"] = accountMapId
-                keyset["dateShared"] = Date()
+                var cosigner = [String:Any]()
+                cosigner["id"] = UUID()
+                cosigner["label"] = "Cosigner #\(i + 1)"
+                cosigner["bip48SegwitAccount"] = account
+                cosigner["dateAdded"] = Date()
+                cosigner["fingerprint"] = ds.fingerprint
+                cosigner["sharedWith"] = accountMapId
+                cosigner["dateShared"] = Date()
                 
                 // First fetch all existing cosigners to ensure we do not save duplicates
-                CoreDataService.retrieveEntity(entityName: .keyset) { (cosigners, errorDescription) in
+                CoreDataService.retrieveEntity(entityName: .cosigner) { (cosigners, errorDescription) in
                     var alreadyExists = false
                     
                     if let cosigners = cosigners, cosigners.count > 0 {
                         for (i, cosigner) in cosigners.enumerated() {
-                            let cosignerStruct = KeysetStruct(dictionary: cosigner)
+                            let cosignerStruct = CosignerStruct(dictionary: cosigner)
                             
                             if cosignerStruct.bip48SegwitAccount != nil {
                                 if cosignerStruct.bip48SegwitAccount! == account {
@@ -687,12 +687,12 @@ class AccountMapsViewController: UIViewController, UITableViewDelegate, UITableV
                             
                             if i + 1 == cosigners.count {
                                 if !alreadyExists {
-                                    CoreDataService.saveEntity(dict: keyset, entityName: .keyset) { (_, _) in }
+                                    CoreDataService.saveEntity(dict: cosigner, entityName: .cosigner) { (_, _) in }
                                 }
                             }
                         }
                     } else {
-                        CoreDataService.saveEntity(dict: keyset, entityName: .keyset) { (_, _) in }
+                        CoreDataService.saveEntity(dict: cosigner, entityName: .cosigner) { (_, _) in }
                     }
                 }
                 
@@ -717,7 +717,7 @@ class AccountMapsViewController: UIViewController, UITableViewDelegate, UITableV
         map["lifehash"] = LifeHash.hash(descriptor.utf8)
         map["descriptor"] = descriptor.condenseWhitespace()
         
-        CoreDataService.saveEntity(dict: map, entityName: .accountMap) { [weak self] (success, errorDescription) in
+        CoreDataService.saveEntity(dict: map, entityName: .account) { [weak self] (success, errorDescription) in
             guard let self = self, success else { return }
             
             DispatchQueue.main.async {
@@ -763,7 +763,7 @@ class AccountMapsViewController: UIViewController, UITableViewDelegate, UITableV
         
         if segue.identifier == "segueToAddresses" {
             if let vc = segue.destination as? AddressesViewController {
-                vc.accountMap = self.addressesAm
+                vc.account = self.addressesAm
             }
         }
         
@@ -809,7 +809,7 @@ class AccountMapsViewController: UIViewController, UITableViewDelegate, UITableV
             let masterKey = Keys.masterXprv(words, ""),
             let fingerprint = Keys.fingerprint(masterKey),
             let lifeHash = LifeHash.hash(entropy),
-            let cosigner = Keys.bip48SegwitAccount(masterKey, "main") else {
+            let cosigner = Keys.bip48SegwitAccount(masterKey) else {
                 showAlert(self, "Error ⚠️", "Something went wrong, private keys not saved!")
                 return
         }
@@ -823,40 +823,40 @@ class AccountMapsViewController: UIViewController, UITableViewDelegate, UITableV
         dict["entropy"] = encryptedData
         dict["cosigner"] = cosigner
         
-        CoreDataService.saveEntity(dict: dict, entityName: .signer) { [weak self] (success, errorDescription) in
-            guard let self = self else { return }
-            
-            guard success else {
-                showAlert(self, "Error ⚠️", "Failed saving to Core Data!")
-                return
-            }
-            
-            self.saveKeysets(masterKey, UIDevice.current.name, fingerprint)
-        }
+//        CoreDataService.saveEntity(dict: dict, entityName: .signer) { [weak self] (success, errorDescription) in
+//            guard let self = self else { return }
+//
+//            guard success else {
+//                showAlert(self, "Error ⚠️", "Failed saving to Core Data!")
+//                return
+//            }
+//
+//            self.saveKeysets(masterKey, UIDevice.current.name, fingerprint)
+//        }
     }
     
-    private func saveKeysets(_ masterKey: String, _ label: String, _ xfp: String) {
+    private func saveCosigners(_ masterKey: String, _ label: String, _ xfp: String) {
         let idToShare = UUID()
-        var keyset = [String:Any]()
-        keyset["id"] = UUID()
-        keyset["label"] = label
-        keyset["fingerprint"] = xfp
+        var cosigner = [String:Any]()
+        cosigner["id"] = UUID()
+        cosigner["label"] = label
+        cosigner["fingerprint"] = xfp
         
-        guard let bip48SegwitAccount = Keys.bip48SegwitAccount(masterKey, "main") else {
+        guard let bip48SegwitAccount = Keys.bip48SegwitAccount(masterKey) else {
             showAlert(self, "Key derivation failed", "")
             return
         }
         
-        keyset["bip48SegwitAccount"] = bip48SegwitAccount
-        keyset["dateAdded"] = Date()
-        keyset["dateShared"] = Date()
-        keyset["sharedWith"] = idToShare
+        cosigner["bip48SegwitAccount"] = bip48SegwitAccount
+        cosigner["dateAdded"] = Date()
+        cosigner["dateShared"] = Date()
+        cosigner["sharedWith"] = idToShare
         
-        CoreDataService.saveEntity(dict: keyset, entityName: .keyset) { [weak self] (success, errorDescription) in
+        CoreDataService.saveEntity(dict: cosigner, entityName: .cosigner) { [weak self] (success, errorDescription) in
             guard let self = self else { return }
 
             guard success else {
-                showAlert(self, "Failed to save keyset", errorDescription ?? "unknown error")
+                showAlert(self, "Failed to save cosigner", errorDescription ?? "unknown error")
                 return
             }
             
@@ -868,8 +868,8 @@ class AccountMapsViewController: UIViewController, UITableViewDelegate, UITableV
         }
     }
     
-    private func createPolicyMap(_ keyset: String, _ id: UUID) {
-        let desc = "wsh(sortedmulti(2,\(keyset),<keyset #2>,<keyset #3>))"
+    private func createPolicyMap(_ cosigner: String, _ id: UUID) {
+        let desc = "wsh(sortedmulti(2,\(cosigner),<keyset #2>,<keyset #3>))"
         
         let accountMap = ["descriptor":desc, "blockheight":0, "label":"Incomplete Account"] as [String : Any]
         let json = accountMap.json() ?? ""
@@ -883,7 +883,7 @@ class AccountMapsViewController: UIViewController, UITableViewDelegate, UITableV
         map["complete"] = false
         map["descriptor"] = desc
         
-        CoreDataService.saveEntity(dict: map, entityName: .accountMap) { [weak self] (success, errorDescription) in
+        CoreDataService.saveEntity(dict: map, entityName: .account) { [weak self] (success, errorDescription) in
             guard let self = self, success else { return }
             
             UserDefaults.standard.set(true, forKey: "createDefaults")

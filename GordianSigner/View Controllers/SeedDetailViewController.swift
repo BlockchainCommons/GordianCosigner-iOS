@@ -61,9 +61,7 @@ class SeedDetailViewController: UIViewController {
                 self.passphraseLabel.text = "No passphrase"
             }
         }
-        
-        print("signer.cosigner: \(signer.cosigner)")
-        
+                
         guard let cosigner = signer.cosigner else {
             DispatchQueue.main.async { [weak self] in
                 guard let self = self else { return }

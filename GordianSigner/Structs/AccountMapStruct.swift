@@ -8,11 +8,11 @@
 
 import Foundation
 
-public struct AccountMapStruct: CustomStringConvertible {
+public struct AccountStruct: CustomStringConvertible {
     
     let id:UUID
     let label:String
-    let accountMap:Data
+    let map:Data
     let dateAdded:Date
     let descriptor:String
     let birthblock:Int64?
@@ -21,7 +21,7 @@ public struct AccountMapStruct: CustomStringConvertible {
     init(dictionary: [String: Any]) {
         id = dictionary["id"] as! UUID
         label = dictionary["label"] as! String
-        accountMap = dictionary["accountMap"] as! Data
+        map = dictionary["map"] as! Data
         dateAdded = dictionary["dateAdded"] as! Date
         birthblock = dictionary["birthblock"] as? Int64
         descriptor = dictionary["descriptor"] as! String

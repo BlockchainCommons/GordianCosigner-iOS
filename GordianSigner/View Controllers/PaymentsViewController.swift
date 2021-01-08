@@ -67,7 +67,7 @@ class PsbtViewController: UIViewController, UITableViewDelegate, UITableViewData
         amounts.removeAll()
         weSigned.removeAll()
         
-        CoreDataService.retrieveEntity(entityName: .psbt) { [weak self] (psbts, errorDescription) in
+        CoreDataService.retrieveEntity(entityName: .payment) { [weak self] (psbts, errorDescription) in
             guard let self = self else { return }
             
             guard let psbts = psbts, psbts.count > 0 else { self.spinner.remove(); return }
@@ -78,7 +78,7 @@ class PsbtViewController: UIViewController, UITableViewDelegate, UITableViewData
                     let psbtStruct = PsbtStruct(dictionary: psbt)
                     self.psbts.append(psbtStruct)
                                         
-                    if let psbtWally = Keys.psbt(psbtStruct.psbt, .mainnet) {
+                    if let psbtWally = Keys.psbt(psbtStruct.psbt) {
                         guard let image = LifeHash.image(PaymentId.id(psbtWally).utf8) else { self.spinner.remove(); return }
                         
                         var amount = 0.0
@@ -90,27 +90,19 @@ class PsbtViewController: UIViewController, UITableViewDelegate, UITableViewData
                             }
                             
                             if let origins = input.origins {
-                                CoreDataService.retrieveEntity(entityName: .signer) { (signers, errorDescription) in
-                                    if let signers = signers, signers.count > 0 {
-                                        for origin in origins {
-                                            let originalPubkey = origin.key.data.hexString
-                                            for signer in signers {
-                                                let signerStruct = SignerStruct(dictionary: signer)
-                                                if let entropy = signerStruct.entropy {
-                                                    if let decryptedEntropy = Encryption.decrypt(entropy) {
-                                                        let e = BIP39Mnemonic.Entropy(decryptedEntropy)
-                                                        if let mnemonic = try? BIP39Mnemonic(entropy: e) {
-                                                            var passphrase = ""
-                                                            if let encryptedPassphrase = signerStruct.passphrase {
-                                                                if let decryptedPassphrase = Encryption.decrypt(encryptedPassphrase) {
-                                                                    passphrase = decryptedPassphrase.utf8
-                                                                }
-                                                            }
-                                                            let seedHex = mnemonic.seedHex(passphrase: passphrase)
-                                                            if let hdMasterKey = try? HDKey(seed: seedHex, network: .mainnet) {
-                                                                if let childKey = try? hdMasterKey.derive(using: origin.value.path) {
+                                for origin in origins {
+                                    let originalPubkey = origin.key.data.hexString
+                                    CoreDataService.retrieveEntity(entityName: .cosigner) { (cosigners, errorDescription) in
+                                        if let cosigners = cosigners, cosigners.count > 0 {
+
+                                            for cosigner in cosigners {
+                                                let cosignerStruct = CosignerStruct(dictionary: cosigner)
+                                                if let encryptedXprv = cosignerStruct.xprv {
+                                                    if let decryptedXprv = Encryption.decrypt(encryptedXprv) {
+                                                        if let hdkey = try? HDKey(base58: decryptedXprv.utf8) {
+                                                            if let accountPath = try? origin.value.path.chop(depth: 4) {
+                                                                if let childKey = try? hdkey.derive(using: accountPath) {
                                                                     if childKey.pubKey.data.hexString == originalPubkey {
-                                                                        // CAN SIGN
                                                                         if let sigs = input.signatures {
                                                                             for sig in sigs {
                                                                                 if sig.key.data.hexString == originalPubkey {
@@ -173,24 +165,9 @@ class PsbtViewController: UIViewController, UITableViewDelegate, UITableViewData
             configureCell(cell)
             let psbt = psbts[indexPath.section]
             
-//            let copyTextButton = cell.viewWithTag(1) as! UIButton
-//            copyTextButton.restorationIdentifier = "\(indexPath.section)"
-//            copyTextButton.addTarget(self, action: #selector(copyText(_:)), for: .touchUpInside)
-//
-//            let exportFileButton = cell.viewWithTag(2) as! UIButton
-//            exportFileButton.restorationIdentifier = "\(indexPath.section)"
-//            exportFileButton.addTarget(self, action: #selector(exportAsFile(_:)), for: .touchUpInside)
-            
             let detailButton = cell.viewWithTag(3) as! UIButton
             detailButton.addTarget(self, action: #selector(seeDetail(_:)), for: .touchUpInside)
             detailButton.restorationIdentifier = "\(indexPath.section)"
-            
-//            let exportQrButton = cell.viewWithTag(4) as! UIButton
-//            exportQrButton.restorationIdentifier = "\(indexPath.section)"
-//            exportQrButton.addTarget(self, action: #selector(exportQr(_:)), for: .touchUpInside)
-            
-//            let label = cell.viewWithTag(5) as! UILabel
-//            label.text = psbt.label
             
             let dateAdded = cell.viewWithTag(6) as! UILabel
             dateAdded.text = psbt.dateAdded.formatted()
@@ -226,11 +203,13 @@ class PsbtViewController: UIViewController, UITableViewDelegate, UITableViewData
             let signedByUsImageView = cell.viewWithTag(12) as! UIImageView
             let signedByUsLabel = cell.viewWithTag(13) as! UILabel
             if weSigned[indexPath.section] {
-                signedByUsImageView.alpha = 1
-                signedByUsLabel.alpha = 1
+                signedByUsImageView.tintColor = .systemGreen
+                signedByUsLabel.text = "Signed by us ✓"
+                signedByUsLabel.textColor = .systemGreen
             } else {
-                signedByUsLabel.alpha = 0
-                signedByUsImageView.alpha = 0
+                signedByUsImageView.tintColor = .systemRed
+                signedByUsLabel.text = "We have not signed ｘ"
+                signedByUsLabel.textColor = .systemRed
             }
             
             return cell
@@ -284,7 +263,7 @@ class PsbtViewController: UIViewController, UITableViewDelegate, UITableViewData
     
     func tableView(_ tableView: UITableView, heightForRowAt indexPath: IndexPath) -> CGFloat {
         if psbts.count > 0 {
-            return 249
+            return 196
         } else {
             return 44
         }
@@ -352,7 +331,7 @@ class PsbtViewController: UIViewController, UITableViewDelegate, UITableViewData
     }
     
     private func updateLabel(_ id: UUID, _ label: String) {
-        CoreDataService.updateEntity(id: id, keyToUpdate: "label", newValue: label, entityName: .psbt) { (success, errorDescription) in
+        CoreDataService.updateEntity(id: id, keyToUpdate: "label", newValue: label, entityName: .payment) { (success, errorDescription) in
             guard success else {
                 showAlert(self, "Label not saved!", "There was an error updating your label, please let us know about it: \(errorDescription ?? "unknown")")
                 return
@@ -419,7 +398,7 @@ class PsbtViewController: UIViewController, UITableViewDelegate, UITableViewData
     }
     
     private func deletePsbtNow(_ id: UUID, _ section: Int) {
-        CoreDataService.deleteEntity(id: id, entityName: .psbt) { (success, errorDescription) in
+        CoreDataService.deleteEntity(id: id, entityName: .payment) { (success, errorDescription) in
             guard success else {
                 showAlert(self, "Error deleting psbt", "")
                 return

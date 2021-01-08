@@ -14,6 +14,22 @@ enum Keys {
     static let chain:Network = .testnet
     static let coinType = "1"
     
+    static func accountXprv(_ masterKey: String) -> String? {
+        guard let hdkey = try? HDKey(base58: masterKey), let path = try? BIP32Path(string: "m/48h/\(coinType)h/0h/2h"), let accountXprv = try? hdkey.derive(using: path) else {
+            return nil
+        }
+        
+        return accountXprv.xpriv
+    }
+    
+    static func accountXpub(_ masterKey: String) -> String? {
+        guard let hdkey = try? HDKey(base58: masterKey), let path = try? BIP32Path(string: "m/48h/\(coinType)h/0h/2h"), let accountXpub = try? hdkey.derive(using: path) else {
+            return nil
+        }
+        
+        return accountXpub.xpub
+    }
+    
     static func masterKey(_ words: [String], _ passphrase: String) -> String? {
         guard let mnemonic = try? BIP39Mnemonic(words: words) else { return nil }
         
@@ -110,17 +126,17 @@ enum Keys {
         return try? BIP39Mnemonic(entropy: bip39entropy).description
     }
     
-    static func psbt(_ psbt: String, _ network: Network) -> PSBT? {
+    static func psbt(_ psbt: String) -> PSBT? {
         
-        return try? PSBT(psbt: psbt, network: network)
+        return try? PSBT(psbt: psbt, network: chain)
     }
     
-    static func psbt(_ psbt: Data, _ network: Network) -> PSBT? {
+    static func psbt(_ psbt: Data) -> PSBT? {
         
-        return try? PSBT(psbt: psbt, network: network)
+        return try? PSBT(psbt: psbt, network: chain)
     }
     
-    static func bip48SegwitAccount(_ masterKey: String, _ network: String) -> String? {
+    static func bip48SegwitAccount(_ masterKey: String) -> String? {
         guard let hdKey = try? HDKey(base58: masterKey), let bip48SegwitDeriv = try? BIP32Path(string: "m/48'/\(coinType)'/0'/2'"),
             let account = try? hdKey.derive(using: bip48SegwitDeriv) else {
                 return nil

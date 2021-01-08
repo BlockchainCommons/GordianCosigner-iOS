@@ -7,18 +7,13 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
-		D00F4981258B239500941DBA /* Intro1ViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = D00F4980258B239500941DBA /* Intro1ViewController.swift */; };
-		D00F4983258B243D00941DBA /* Intro2ViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = D00F4982258B243D00941DBA /* Intro2ViewController.swift */; };
-		D00F4985258B24D200941DBA /* Intro3ViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = D00F4984258B24D200941DBA /* Intro3ViewController.swift */; };
-		D00F4987258B253A00941DBA /* Intro4ViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = D00F4986258B253A00941DBA /* Intro4ViewController.swift */; };
-		D00F4989258B259C00941DBA /* Intro5ViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = D00F4988258B259C00941DBA /* Intro5ViewController.swift */; };
 		D00F498D258B2ACD00941DBA /* accounts.png in Resources */ = {isa = PBXBuildFile; fileRef = D00F498C258B2ACD00941DBA /* accounts.png */; };
 		D00F498F258B2AFE00941DBA /* seeds.png in Resources */ = {isa = PBXBuildFile; fileRef = D00F498E258B2AFD00941DBA /* seeds.png */; };
 		D00F4991258B2B6D00941DBA /* cosigners.png in Resources */ = {isa = PBXBuildFile; fileRef = D00F4990258B2B6D00941DBA /* cosigners.png */; };
 		D00F4993258B2B9300941DBA /* payments.png in Resources */ = {isa = PBXBuildFile; fileRef = D00F4992258B2B9300941DBA /* payments.png */; };
-		D01ACBA42563EA8100B5B4E5 /* PsbtViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = D01ACBA32563EA8100B5B4E5 /* PsbtViewController.swift */; };
+		D01ACBA42563EA8100B5B4E5 /* PaymentsViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = D01ACBA32563EA8100B5B4E5 /* PaymentsViewController.swift */; };
 		D01ACBA62563ED3200B5B4E5 /* Psbt.swift in Sources */ = {isa = PBXBuildFile; fileRef = D01ACBA52563ED3200B5B4E5 /* Psbt.swift */; };
-		D01C2955255CE33F00C5ED55 /* PsbtTableViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = D01C2954255CE33F00C5ED55 /* PsbtTableViewController.swift */; };
+		D01C2955255CE33F00C5ED55 /* PaymentDetailViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = D01C2954255CE33F00C5ED55 /* PaymentDetailViewController.swift */; };
 		D0246DD7256B660100F812A5 /* Base58.swift in Sources */ = {isa = PBXBuildFile; fileRef = D0246DD6256B660100F812A5 /* Base58.swift */; };
 		D0246DDB256B667800F812A5 /* base58.c in Sources */ = {isa = PBXBuildFile; fileRef = D0246DDA256B667800F812A5 /* base58.c */; };
 		D02E51F0258860C200A479A0 /* SeedDetailViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = D02E51EF258860C200A479A0 /* SeedDetailViewController.swift */; };
@@ -30,9 +25,8 @@
 		D04423F72586F2F700A25179 /* LifehashSeedView.xib in Resources */ = {isa = PBXBuildFile; fileRef = D04423F62586F2F700A25179 /* LifehashSeedView.xib */; };
 		D04423FB258705B900A25179 /* LifehashSeedSecondary.swift in Sources */ = {isa = PBXBuildFile; fileRef = D04423FA258705B900A25179 /* LifehashSeedSecondary.swift */; };
 		D04423FD258705D900A25179 /* LifehashSeedSecondary.xib in Resources */ = {isa = PBXBuildFile; fileRef = D04423FC258705D900A25179 /* LifehashSeedSecondary.xib */; };
-		D04B029825249EEB00C249B8 /* SignerViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = D04B029725249EEB00C249B8 /* SignerViewController.swift */; };
-		D04B029A2524A18100C249B8 /* SignersViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = D04B02992524A18100C249B8 /* SignersViewController.swift */; };
-		D04B029C2524A9F800C249B8 /* AddSignerViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = D04B029B2524A9F800C249B8 /* AddSignerViewController.swift */; };
+		D04B029825249EEB00C249B8 /* AddPaymentViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = D04B029725249EEB00C249B8 /* AddPaymentViewController.swift */; };
+		D04B029C2524A9F800C249B8 /* AddSeedWordsViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = D04B029B2524A9F800C249B8 /* AddSeedWordsViewController.swift */; };
 		D04D4980252C19E000D7383E /* QRScannerViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = D04D497F252C19E000D7383E /* QRScannerViewController.swift */; };
 		D04D4982252C1A9300D7383E /* Spinner.swift in Sources */ = {isa = PBXBuildFile; fileRef = D04D4981252C1A9300D7383E /* Spinner.swift */; };
 		D04D4984252C4FEF00D7383E /* QRDisplayerViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = D04D4983252C4FEF00D7383E /* QRDisplayerViewController.swift */; };
@@ -41,8 +35,8 @@
 		D064BCC8252D62FD00D42D66 /* URHelper.swift in Sources */ = {isa = PBXBuildFile; fileRef = D064BCC7252D62FD00D42D66 /* URHelper.swift */; };
 		D06F44572581B86200B42DEB /* AddressesViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = D06F44562581B86200B42DEB /* AddressesViewController.swift */; };
 		D090963B2560FE540098013A /* KeysetStruct.swift in Sources */ = {isa = PBXBuildFile; fileRef = D090963A2560FE540098013A /* KeysetStruct.swift */; };
-		D090963D25610D440098013A /* KeysetsViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = D090963C25610D440098013A /* KeysetsViewController.swift */; };
-		D090963F256256500098013A /* AccountMapsViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = D090963E2562564F0098013A /* AccountMapsViewController.swift */; };
+		D090963D25610D440098013A /* CosignersViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = D090963C25610D440098013A /* CosignersViewController.swift */; };
+		D090963F256256500098013A /* AccountViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = D090963E2562564F0098013A /* AccountViewController.swift */; };
 		D090964125625CC30098013A /* DescriptorParser.swift in Sources */ = {isa = PBXBuildFile; fileRef = D090964025625CC30098013A /* DescriptorParser.swift */; };
 		D090964325625CED0098013A /* Descriptor.swift in Sources */ = {isa = PBXBuildFile; fileRef = D090964225625CED0098013A /* Descriptor.swift */; };
 		D093E2A925A6E4C50038B59A /* InfoViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = D093E2A825A6E4C40038B59A /* InfoViewController.swift */; };
@@ -70,7 +64,7 @@
 		D0CF1E77252303370059C541 /* Utlities.swift in Sources */ = {isa = PBXBuildFile; fileRef = D0CF1E76252303370059C541 /* Utlities.swift */; };
 		D0CF1E79252360EC0059C541 /* Signer.swift in Sources */ = {isa = PBXBuildFile; fileRef = D0CF1E78252360EC0059C541 /* Signer.swift */; };
 		D0CF1E7B252368DC0059C541 /* Keys.swift in Sources */ = {isa = PBXBuildFile; fileRef = D0CF1E7A252368DC0059C541 /* Keys.swift */; };
-		D0E0EA022567A10900F2403C /* CreateAccountMapViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = D0E0EA012567A10900F2403C /* CreateAccountMapViewController.swift */; };
+		D0E0EA022567A10900F2403C /* CreateAccountViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = D0E0EA012567A10900F2403C /* CreateAccountViewController.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -105,18 +99,13 @@
 /* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
-		D00F4980258B239500941DBA /* Intro1ViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Intro1ViewController.swift; sourceTree = "<group>"; };
-		D00F4982258B243D00941DBA /* Intro2ViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Intro2ViewController.swift; sourceTree = "<group>"; };
-		D00F4984258B24D200941DBA /* Intro3ViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Intro3ViewController.swift; sourceTree = "<group>"; };
-		D00F4986258B253A00941DBA /* Intro4ViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Intro4ViewController.swift; sourceTree = "<group>"; };
-		D00F4988258B259C00941DBA /* Intro5ViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Intro5ViewController.swift; sourceTree = "<group>"; };
 		D00F498C258B2ACD00941DBA /* accounts.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = accounts.png; sourceTree = "<group>"; };
 		D00F498E258B2AFD00941DBA /* seeds.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = seeds.png; sourceTree = "<group>"; };
 		D00F4990258B2B6D00941DBA /* cosigners.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = cosigners.png; sourceTree = "<group>"; };
 		D00F4992258B2B9300941DBA /* payments.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = payments.png; sourceTree = "<group>"; };
-		D01ACBA32563EA8100B5B4E5 /* PsbtViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PsbtViewController.swift; sourceTree = "<group>"; };
+		D01ACBA32563EA8100B5B4E5 /* PaymentsViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PaymentsViewController.swift; sourceTree = "<group>"; };
 		D01ACBA52563ED3200B5B4E5 /* Psbt.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Psbt.swift; sourceTree = "<group>"; };
-		D01C2954255CE33F00C5ED55 /* PsbtTableViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PsbtTableViewController.swift; sourceTree = "<group>"; };
+		D01C2954255CE33F00C5ED55 /* PaymentDetailViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PaymentDetailViewController.swift; sourceTree = "<group>"; };
 		D0246DD6256B660100F812A5 /* Base58.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Base58.swift; sourceTree = "<group>"; };
 		D0246DD8256B663800F812A5 /* base58.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = base58.h; sourceTree = "<group>"; };
 		D0246DD9256B667700F812A5 /* GordianSigner-Bridging-Header.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "GordianSigner-Bridging-Header.h"; sourceTree = "<group>"; };
@@ -129,9 +118,8 @@
 		D04423F62586F2F700A25179 /* LifehashSeedView.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = LifehashSeedView.xib; sourceTree = "<group>"; };
 		D04423FA258705B900A25179 /* LifehashSeedSecondary.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LifehashSeedSecondary.swift; sourceTree = "<group>"; };
 		D04423FC258705D900A25179 /* LifehashSeedSecondary.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = LifehashSeedSecondary.xib; sourceTree = "<group>"; };
-		D04B029725249EEB00C249B8 /* SignerViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SignerViewController.swift; sourceTree = "<group>"; };
-		D04B02992524A18100C249B8 /* SignersViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SignersViewController.swift; sourceTree = "<group>"; };
-		D04B029B2524A9F800C249B8 /* AddSignerViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AddSignerViewController.swift; sourceTree = "<group>"; };
+		D04B029725249EEB00C249B8 /* AddPaymentViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AddPaymentViewController.swift; sourceTree = "<group>"; };
+		D04B029B2524A9F800C249B8 /* AddSeedWordsViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AddSeedWordsViewController.swift; sourceTree = "<group>"; };
 		D04D497F252C19E000D7383E /* QRScannerViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = QRScannerViewController.swift; sourceTree = "<group>"; };
 		D04D4981252C1A9300D7383E /* Spinner.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Spinner.swift; sourceTree = "<group>"; };
 		D04D4983252C4FEF00D7383E /* QRDisplayerViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = QRDisplayerViewController.swift; sourceTree = "<group>"; };
@@ -139,8 +127,8 @@
 		D064BCC7252D62FD00D42D66 /* URHelper.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = URHelper.swift; sourceTree = "<group>"; };
 		D06F44562581B86200B42DEB /* AddressesViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AddressesViewController.swift; sourceTree = "<group>"; };
 		D090963A2560FE540098013A /* KeysetStruct.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = KeysetStruct.swift; sourceTree = "<group>"; };
-		D090963C25610D440098013A /* KeysetsViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = KeysetsViewController.swift; sourceTree = "<group>"; };
-		D090963E2562564F0098013A /* AccountMapsViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AccountMapsViewController.swift; sourceTree = "<group>"; };
+		D090963C25610D440098013A /* CosignersViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CosignersViewController.swift; sourceTree = "<group>"; };
+		D090963E2562564F0098013A /* AccountViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AccountViewController.swift; sourceTree = "<group>"; };
 		D090964025625CC30098013A /* DescriptorParser.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DescriptorParser.swift; sourceTree = "<group>"; };
 		D090964225625CED0098013A /* Descriptor.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Descriptor.swift; sourceTree = "<group>"; };
 		D093E2A825A6E4C40038B59A /* InfoViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = InfoViewController.swift; sourceTree = "<group>"; };
@@ -174,7 +162,7 @@
 		D0CF1E76252303370059C541 /* Utlities.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Utlities.swift; sourceTree = "<group>"; };
 		D0CF1E78252360EC0059C541 /* Signer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Signer.swift; sourceTree = "<group>"; };
 		D0CF1E7A252368DC0059C541 /* Keys.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Keys.swift; sourceTree = "<group>"; };
-		D0E0EA012567A10900F2403C /* CreateAccountMapViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CreateAccountMapViewController.swift; sourceTree = "<group>"; };
+		D0E0EA012567A10900F2403C /* CreateAccountViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CreateAccountViewController.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -249,23 +237,17 @@
 			isa = PBXGroup;
 			children = (
 				D0AD2FFF2591825F00B9CBFC /* LicenseDisclaimerViewController.swift */,
-				D04B029725249EEB00C249B8 /* SignerViewController.swift */,
-				D04B02992524A18100C249B8 /* SignersViewController.swift */,
-				D04B029B2524A9F800C249B8 /* AddSignerViewController.swift */,
+				D04B029725249EEB00C249B8 /* AddPaymentViewController.swift */,
+				D04B029B2524A9F800C249B8 /* AddSeedWordsViewController.swift */,
 				D04D497F252C19E000D7383E /* QRScannerViewController.swift */,
 				D04D4983252C4FEF00D7383E /* QRDisplayerViewController.swift */,
-				D01C2954255CE33F00C5ED55 /* PsbtTableViewController.swift */,
-				D090963C25610D440098013A /* KeysetsViewController.swift */,
-				D090963E2562564F0098013A /* AccountMapsViewController.swift */,
-				D01ACBA32563EA8100B5B4E5 /* PsbtViewController.swift */,
-				D0E0EA012567A10900F2403C /* CreateAccountMapViewController.swift */,
+				D01C2954255CE33F00C5ED55 /* PaymentDetailViewController.swift */,
+				D090963C25610D440098013A /* CosignersViewController.swift */,
+				D090963E2562564F0098013A /* AccountViewController.swift */,
+				D01ACBA32563EA8100B5B4E5 /* PaymentsViewController.swift */,
+				D0E0EA012567A10900F2403C /* CreateAccountViewController.swift */,
 				D06F44562581B86200B42DEB /* AddressesViewController.swift */,
 				D02E51EF258860C200A479A0 /* SeedDetailViewController.swift */,
-				D00F4980258B239500941DBA /* Intro1ViewController.swift */,
-				D00F4982258B243D00941DBA /* Intro2ViewController.swift */,
-				D00F4984258B24D200941DBA /* Intro3ViewController.swift */,
-				D00F4986258B253A00941DBA /* Intro4ViewController.swift */,
-				D00F4988258B259C00941DBA /* Intro5ViewController.swift */,
 				D093E2A825A6E4C40038B59A /* InfoViewController.swift */,
 			);
 			path = "View Controllers";
@@ -528,40 +510,34 @@
 			buildActionMask = 2147483647;
 			files = (
 				D064BCC8252D62FD00D42D66 /* URHelper.swift in Sources */,
-				D00F4981258B239500941DBA /* Intro1ViewController.swift in Sources */,
 				D0CF1E732523012A0059C541 /* FirstTime.swift in Sources */,
 				D090964325625CED0098013A /* Descriptor.swift in Sources */,
-				D090963D25610D440098013A /* KeysetsViewController.swift in Sources */,
-				D00F4989258B259C00941DBA /* Intro5ViewController.swift in Sources */,
+				D090963D25610D440098013A /* CosignersViewController.swift in Sources */,
 				D0974A58255B8E8D0013DC60 /* SignerStruct.swift in Sources */,
 				D0CF1E342522E20C0059C541 /* AppDelegate.swift in Sources */,
 				D0CF1E3E2522E20C0059C541 /* GordianSigner.xcdatamodeld in Sources */,
 				D04D4980252C19E000D7383E /* QRScannerViewController.swift in Sources */,
 				D0CF1E77252303370059C541 /* Utlities.swift in Sources */,
 				D090964125625CC30098013A /* DescriptorParser.swift in Sources */,
-				D0E0EA022567A10900F2403C /* CreateAccountMapViewController.swift in Sources */,
+				D0E0EA022567A10900F2403C /* CreateAccountViewController.swift in Sources */,
 				D04423FB258705B900A25179 /* LifehashSeedSecondary.swift in Sources */,
-				D00F4985258B24D200941DBA /* Intro3ViewController.swift in Sources */,
 				D0974A5C255B93130013DC60 /* CoreDataService.swift in Sources */,
 				D0CF1E362522E20C0059C541 /* SceneDelegate.swift in Sources */,
 				D090963B2560FE540098013A /* KeysetStruct.swift in Sources */,
-				D090963F256256500098013A /* AccountMapsViewController.swift in Sources */,
-				D01ACBA42563EA8100B5B4E5 /* PsbtViewController.swift in Sources */,
-				D00F4983258B243D00941DBA /* Intro2ViewController.swift in Sources */,
+				D090963F256256500098013A /* AccountViewController.swift in Sources */,
+				D01ACBA42563EA8100B5B4E5 /* PaymentsViewController.swift in Sources */,
 				D04D4984252C4FEF00D7383E /* QRDisplayerViewController.swift in Sources */,
 				D093E2A925A6E4C50038B59A /* InfoViewController.swift in Sources */,
 				D06F44572581B86200B42DEB /* AddressesViewController.swift in Sources */,
 				D0974A5E255B93500013DC60 /* Entities.swift in Sources */,
 				D04423F52586F2CC00A25179 /* LifehashSeedView.swift in Sources */,
-				D04B029C2524A9F800C249B8 /* AddSignerViewController.swift in Sources */,
+				D04B029C2524A9F800C249B8 /* AddSeedWordsViewController.swift in Sources */,
 				D0B4DDD725258B25009C8624 /* Bip39Words.swift in Sources */,
 				D0AD30002591825F00B9CBFC /* LicenseDisclaimerViewController.swift in Sources */,
 				D0CF1E79252360EC0059C541 /* Signer.swift in Sources */,
 				D0CF1E70252300B80059C541 /* Keychain.swift in Sources */,
-				D04B029A2524A18100C249B8 /* SignersViewController.swift in Sources */,
 				D0CF1E75252302A00059C541 /* Encryption.swift in Sources */,
-				D00F4987258B253A00941DBA /* Intro4ViewController.swift in Sources */,
-				D01C2955255CE33F00C5ED55 /* PsbtTableViewController.swift in Sources */,
+				D01C2955255CE33F00C5ED55 /* PaymentDetailViewController.swift in Sources */,
 				D04423F325837A8700A25179 /* PaymentHash.swift in Sources */,
 				D04D4986252C509400D7383E /* QRGenerator.swift in Sources */,
 				D0246DD7256B660100F812A5 /* Base58.swift in Sources */,
@@ -570,7 +546,7 @@
 				D0CF1E7B252368DC0059C541 /* Keys.swift in Sources */,
 				D0974A5A255B90A10013DC60 /* AccountMapStruct.swift in Sources */,
 				D0246DDB256B667800F812A5 /* base58.c in Sources */,
-				D04B029825249EEB00C249B8 /* SignerViewController.swift in Sources */,
+				D04B029825249EEB00C249B8 /* AddPaymentViewController.swift in Sources */,
 				D01ACBA62563ED3200B5B4E5 /* Psbt.swift in Sources */,
 				D04D4982252C1A9300D7383E /* Spinner.swift in Sources */,
 			);
@@ -748,7 +724,7 @@
 				CLANG_ENABLE_MODULES = YES;
 				CODE_SIGN_ENTITLEMENTS = GordianSigner/GordianSigner.entitlements;
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 0.1.6;
+				CURRENT_PROJECT_VERSION = 0.1.7;
 				DEVELOPMENT_TEAM = YZHG975W3A;
 				ENABLE_BITCODE = NO;
 				INFOPLIST_FILE = GordianSigner/Info.plist;
@@ -757,7 +733,7 @@
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				MARKETING_VERSION = 0.1.6;
+				MARKETING_VERSION = 0.1.7;
 				PRODUCT_BUNDLE_IDENTIFIER = com.blockchaincommons.GordianSigner;
 				PRODUCT_NAME = "Gordian Cosigner";
 				SUPPORTS_MACCATALYST = YES;
@@ -775,7 +751,7 @@
 				CLANG_ENABLE_MODULES = YES;
 				CODE_SIGN_ENTITLEMENTS = GordianSigner/GordianSigner.entitlements;
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 0.1.6;
+				CURRENT_PROJECT_VERSION = 0.1.7;
 				DEVELOPMENT_TEAM = YZHG975W3A;
 				ENABLE_BITCODE = NO;
 				INFOPLIST_FILE = GordianSigner/Info.plist;
@@ -784,7 +760,7 @@
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				MARKETING_VERSION = 0.1.6;
+				MARKETING_VERSION = 0.1.7;
 				PRODUCT_BUNDLE_IDENTIFIER = com.blockchaincommons.GordianSigner;
 				PRODUCT_NAME = "Gordian Cosigner";
 				SUPPORTS_MACCATALYST = YES;

@@ -88,7 +88,7 @@ class SignerViewController: UIViewController {
     }
     
     private func psbtValid(_ string: String) {
-        guard let validPsbt = Keys.psbt(string, .mainnet) else {
+        guard let validPsbt = Keys.psbt(string) else {
             showAlert(self, "⚠️ Invalid psbt", "")
             return
         }
@@ -112,7 +112,7 @@ class SignerViewController: UIViewController {
         dict["label"] = "PSBT"
         dict["id"] = UUID()
         
-        CoreDataService.saveEntity(dict: dict, entityName: .psbt, completion: { (success, errorDescription) in
+        CoreDataService.saveEntity(dict: dict, entityName: .payment, completion: { (success, errorDescription) in
             guard success else {
                 showAlert(self, "Not saved!", "There was an issue encrypting and saving your psbt. Please reach out and let us know. Error: \(errorDescription ?? "unknown")")
                 
@@ -124,9 +124,7 @@ class SignerViewController: UIViewController {
             }
         })
     }
-    
-    
-    
+        
     // MARK: - Navigation
 
     // In a storyboard-based application, you will often want to do a little preparation before navigation

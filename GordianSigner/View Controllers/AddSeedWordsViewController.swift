@@ -57,105 +57,138 @@ class AddSignerViewController: UIViewController {
                 alias = aliasField.text!
             }
             
-            guard let entropy = Keys.entropy(justWords), let encryptedData = Encryption.encrypt(entropy), let masterKey = Keys.masterKey(justWords, passphrase), let fingerprint = Keys.fingerprint(masterKey), let lifeHash = LifeHash.hash(entropy), let cosigner = Keys.bip48SegwitAccount(masterKey, "main") else {
-                showAlert(self, "Error ⚠️", "Something went wrong, private keys not saved!")
+            let wordData = self.justWords.joined().utf8
+            
+            guard let encryptedWords = Encryption.encrypt(wordData),
+                let masterKey = Keys.masterKey(justWords, passphrase),
+                let fingerprint = Keys.fingerprint(masterKey),
+                let bip48SegwitAccount = Keys.bip48SegwitAccount(masterKey),
+                let xprv = Keys.accountXprv(masterKey),
+                let encryptedXprv = Encryption.encrypt(xprv.utf8),
+                let xpub = Keys.accountXpub(masterKey),
+                let lifeHash = LifeHash.hash(xpub) else {
+                showAlert(self, "Error ⚠️", "Something went wrong, Cosigner not saved!")
                 return
             }
             
-            var dict = [String:Any]()
-            dict["id"] = UUID()
-            dict["label"] = alias
-            dict["dateAdded"] = Date()
-            dict["lifeHash"] = lifeHash
-            dict["fingerprint"] = fingerprint
-            dict["entropy"] = encryptedData
-            dict["cosigner"] = cosigner
+            var cosigner = [String:Any]()
+            cosigner["id"] = UUID()
+            cosigner["label"] = alias
+            cosigner["dateAdded"] = Date()
+            cosigner["lifehash"] = lifeHash
+            cosigner["fingerprint"] = fingerprint
+            cosigner["xprv"] = encryptedXprv
+            cosigner["bip48SegwitAccount"] = bip48SegwitAccount
+            cosigner["words"] = encryptedWords
             
-            if passphrase != "" {
-                guard let encryptedPassphrase = Encryption.encrypt(passphrase.utf8) else { return }
-                
-                dict["passphrase"] = encryptedPassphrase
+            func finish() {
+                CoreDataService.saveEntity(dict: cosigner, entityName: .cosigner) { [weak self] (success, errorDescription) in
+                    guard let self = self else { return }
+
+                    guard success else {
+                        showAlert(self, "Error ⚠️", "Failed saving cosigner to Core Data!")
+                        return
+                    }
+                    
+                    DispatchQueue.main.async {
+                        showAlert(self, "Cosigner saved", "Account xprv and seed words encrypted and saved 🔐")
+                        
+                        self.textField.text = ""
+                        self.addedWords.removeAll()
+                        self.justWords.removeAll()
+                        self.bip39Words.removeAll()
+                        self.textView.text = ""
+                        
+                        self.doneBlock!()
+                        self.navigationController?.popViewController(animated: true)
+                    }
+                }
             }
             
-            
-            
-            CoreDataService.saveEntity(dict: dict, entityName: .signer) { [weak self] (success, errorDescription) in
-                guard let self = self else { return }
-                
-                guard success else {
-                    showAlert(self, "Error ⚠️", "Failed saving to Core Data!")
-                    return
+            CoreDataService.retrieveEntity(entityName: .account) { (accounts, errorDescription) in
+                if let accounts = accounts, accounts.count > 0 {
+                    for (i, account) in accounts.enumerated() {
+                        let accountStruct = AccountStruct(dictionary: account)
+                        if accountStruct.descriptor.contains(bip48SegwitAccount) {
+                            cosigner["dateShared"] = Date()
+                            cosigner["sharedWith"] = accountStruct.id
+                        }
+                        
+                        if i + 1 == accounts.count {
+                            finish()
+                        }
+                    }
+                } else {
+                    finish()
                 }
-                
-                self.saveKeysets(masterKey, alias, fingerprint)
             }
         } else {
             showAlert(self, "Invalid bip39 mnemonic", "Take a deep breath and make sure you input your words and optional passphrase correctly. If you add the words one by one autocorrect will assist you to ensure no errors are made.")
         }
     }
     
-    private func saveKeysets(_ masterKey: String, _ label: String, _ xfp: String) {
-        var keyset = [String:Any]()
-        keyset["id"] = UUID()
-        keyset["label"] = label
-        keyset["fingerprint"] = xfp
-        
-        guard let bip48SegwitAccount = Keys.bip48SegwitAccount(masterKey, "main") else {
-                showAlert(self, "Key derivation failed", "")
-                return
-        }
-        
-        keyset["bip48SegwitAccount"] = bip48SegwitAccount
-        keyset["dateAdded"] = Date()
-        
-        func finish() {
-            CoreDataService.saveEntity(dict: keyset, entityName: .keyset) { [weak self] (success, errorDescription) in
-                guard let self = self else { return }
-
-                guard success else {
-                    showAlert(self, "Failed to save keyset", errorDescription ?? "unknown error")
-                    return
-                }
-                
-                DispatchQueue.main.async {
-                    NotificationCenter.default.post(name: .cosignerAdded, object: nil, userInfo: nil)
-                }
-                
-                if self.tempWords {
-                    self.doneBlock!()
-                    self.navigationController?.popViewController(animated: true)
-                } else {
-                    showAlert(self, "Private keys encrypted and saved 🔐", "")
-
-                    self.textField.text = ""
-                    self.addedWords.removeAll()
-                    self.justWords.removeAll()
-                    self.bip39Words.removeAll()
-                    self.textView.text = ""
-
-                    self.navigationController?.popViewController(animated: true)
-                }
-            }
-        }
-        
-        CoreDataService.retrieveEntity(entityName: .accountMap) { (accountMaps, errorDescription) in
-            if let accountMaps = accountMaps, accountMaps.count > 0 {
-                for (i, accountMap) in accountMaps.enumerated() {
-                    let accountMapStruct = AccountMapStruct(dictionary: accountMap)
-                    if accountMapStruct.descriptor.contains(bip48SegwitAccount) {
-                        keyset["dateShared"] = Date()
-                        keyset["sharedWith"] = accountMapStruct.id
-                    }
-                    
-                    if i + 1 == accountMaps.count {
-                        finish()
-                    }
-                }
-            } else {
-                finish()
-            }
-        }
-    }
+//    private func saveCosigners(_ masterKey: String, _ label: String, _ xfp: String) {
+//        var cosigner = [String:Any]()
+//        cosigner["id"] = UUID()
+//        cosigner["label"] = label
+//        cosigner["fingerprint"] = xfp
+//
+//        guard let bip48SegwitAccount = Keys.bip48SegwitAccount(masterKey, "main") else {
+//                showAlert(self, "Key derivation failed", "")
+//                return
+//        }
+//
+//        cosigner["bip48SegwitAccount"] = bip48SegwitAccount
+//        cosigner["dateAdded"] = Date()
+//
+//        func finish() {
+//            CoreDataService.saveEntity(dict: cosigner, entityName: .cosigner) { [weak self] (success, errorDescription) in
+//                guard let self = self else { return }
+//
+//                guard success else {
+//                    showAlert(self, "Failed to save cosigner", errorDescription ?? "unknown error")
+//                    return
+//                }
+//
+//                DispatchQueue.main.async {
+//                    NotificationCenter.default.post(name: .cosignerAdded, object: nil, userInfo: nil)
+//                }
+//
+//                if self.tempWords {
+//                    self.doneBlock!()
+//                    self.navigationController?.popViewController(animated: true)
+//                } else {
+//                    showAlert(self, "Private keys encrypted and saved 🔐", "")
+//
+//                    self.textField.text = ""
+//                    self.addedWords.removeAll()
+//                    self.justWords.removeAll()
+//                    self.bip39Words.removeAll()
+//                    self.textView.text = ""
+//
+//                    self.navigationController?.popViewController(animated: true)
+//                }
+//            }
+//        }
+//
+//        CoreDataService.retrieveEntity(entityName: .account) { (accounts, errorDescription) in
+//            if let accounts = accounts, accounts.count > 0 {
+//                for (i, account) in accounts.enumerated() {
+//                    let accountStruct = AccountStruct(dictionary: account)
+//                    if accountStruct.descriptor.contains(bip48SegwitAccount) {
+//                        cosigner["dateShared"] = Date()
+//                        cosigner["sharedWith"] = accountStruct.id
+//                    }
+//
+//                    if i + 1 == accounts.count {
+//                        finish()
+//                    }
+//                }
+//            } else {
+//                finish()
+//            }
+//        }
+//    }
     
     @IBAction func removeWordAction(_ sender: Any) {
         guard self.justWords.count > 0 else { return }

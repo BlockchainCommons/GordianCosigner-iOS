@@ -13,7 +13,7 @@ class AddressesViewController: UIViewController, UITableViewDelegate, UITableVie
 
     @IBOutlet weak var addressesTable: UITableView!
     var addresses = [String]()
-    var accountMap:AccountMapStruct!
+    var account:AccountStruct!
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -26,7 +26,7 @@ class AddressesViewController: UIViewController, UITableViewDelegate, UITableVie
     }
     
     private func load() {
-        let descriptor = accountMap.descriptor
+        let descriptor = account.descriptor
         let descriptorParser = DescriptorParser()
         let descriptorStruct = descriptorParser.descriptor(descriptor)
         let keys = descriptorStruct.multiSigKeys

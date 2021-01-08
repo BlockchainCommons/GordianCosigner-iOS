@@ -13,10 +13,9 @@ class KeysetsViewController: UIViewController, UITableViewDelegate, UITableViewD
     
     var addButton = UIBarButtonItem()
     var editButton = UIBarButtonItem()
-    private var keysets = [KeysetStruct]()
-    private var signers = [SignerStruct]()
-    private var accountMaps = [AccountMapStruct]()
-    private var keysetToExport = ""
+    private var cosigners = [CosignerStruct]()
+    private var accounts = [AccountStruct]()
+    private var cosignerToExport = ""
     private var headerText = ""
     private var subheaderText = ""
     private var lifehashes = [UIImage]()
@@ -32,7 +31,7 @@ class KeysetsViewController: UIViewController, UITableViewDelegate, UITableViewD
         keysetsTable.dataSource = self
         
         addButton = UIBarButtonItem.init(barButtonSystemItem: .add, target: self, action: #selector(add))
-        editButton = UIBarButtonItem.init(barButtonSystemItem: .edit, target: self, action: #selector(editKeysets))
+        editButton = UIBarButtonItem.init(barButtonSystemItem: .edit, target: self, action: #selector(editCosigners))
         self.navigationItem.setRightBarButtonItems([addButton, editButton], animated: true)
         NotificationCenter.default.addObserver(self, selector: #selector(refreshTable), name: .cosignerAdded, object: nil)
         load()
@@ -47,6 +46,22 @@ class KeysetsViewController: UIViewController, UITableViewDelegate, UITableViewD
     
     @IBAction func infoAction(_ sender: Any) {
         showInfo()
+    }
+    
+    private func addSeedWords() {
+        DispatchQueue.main.async { [weak self] in
+            guard let self = self else { return }
+            
+            self.performSegue(withIdentifier: "segueToAddSeedWords", sender: self)
+        }
+    }
+    
+    private func seeSeedWords() {
+        DispatchQueue.main.async { [weak self] in
+            guard let self = self else { return }
+            
+            self.performSegue(withIdentifier: "segueToSeeSeedDetail", sender: self)
+        }
     }
     
     private func getPasteboard() {
@@ -89,6 +104,31 @@ class KeysetsViewController: UIViewController, UITableViewDelegate, UITableViewD
                 alertStyle = UIAlertController.Style.alert
             }
             
+            let alert = UIAlertController(title: "Add Cosigner", message: "You may either create or import a cosigner.", preferredStyle: alertStyle)
+            
+            alert.addAction(UIAlertAction(title: "Create", style: .default, handler: { action in
+                self.addSeedWords()
+            }))
+            
+            alert.addAction(UIAlertAction(title: "Import", style: .default, handler: { action in
+                self.importCosigner()
+            }))
+            
+            alert.addAction(UIAlertAction(title: "Cancel", style: .cancel, handler: { action in }))
+            alert.popoverPresentationController?.sourceView = self.view
+            self.present(alert, animated: true, completion: nil)
+        }
+    }
+    
+    private func importCosigner() {
+        DispatchQueue.main.async { [weak self] in
+            guard let self = self else { return }
+            
+            var alertStyle = UIAlertController.Style.actionSheet
+            if (UIDevice.current.userInterfaceIdiom == .pad) {
+                alertStyle = UIAlertController.Style.alert
+            }
+            
             let alert = UIAlertController(title: "Import Cosigner", message: "You may either paste one as text or scan a QR code.", preferredStyle: alertStyle)
             
             alert.addAction(UIAlertAction(title: "Paste", style: .default, handler: { action in
@@ -115,66 +155,57 @@ class KeysetsViewController: UIViewController, UITableViewDelegate, UITableViewD
     
     private func load() {
         spinner.add(vc: self, description: "loading...")
-        keysets.removeAll()
+        cosigners.removeAll()
         lifehashes.removeAll()
-        signers.removeAll()
-        accountMaps.removeAll()
+        accounts.removeAll()
         
-        CoreDataService.retrieveEntity(entityName: .accountMap) { (accountMaps, err) in
-            if let accountMaps = accountMaps {
-                for accountMap in accountMaps {
-                    self.accountMaps.append(AccountMapStruct(dictionary: accountMap))
+        CoreDataService.retrieveEntity(entityName: .account) { (accounts, err) in
+            if let accounts = accounts {
+                for account in accounts {
+                    self.accounts.append(AccountStruct(dictionary: account))
                 }
             }
         }
         
-        CoreDataService.retrieveEntity(entityName: .signer) { (signers, errorDescription) in
-            guard let signers = signers else { return }
+        CoreDataService.retrieveEntity(entityName: .cosigner) { [weak self] (cosigners, errorDescription) in
+            guard let self = self else { return }
             
-            for signer in signers {
-                self.signers.append(SignerStruct(dictionary: signer))
-            }
+            guard let cosigners = cosigners, cosigners.count > 0 else { self.spinner.remove(); return }
             
-            CoreDataService.retrieveEntity(entityName: .keyset) { [weak self] (keysets, errorDescription) in
+            DispatchQueue.background(background: { [weak self] in
                 guard let self = self else { return }
-                
-                guard let keysets = keysets, keysets.count > 0 else { self.spinner.remove(); return }
-                
-                DispatchQueue.background(background: { [weak self] in
-                    guard let self = self else { return }
-                    for (i, keyset) in keysets.enumerated() {
-                        let keysetStruct = KeysetStruct(dictionary: keyset)
-                        self.keysets.append(keysetStruct)
-                        self.lifehashes.append(LifeHash.image(keysetStruct.bip48SegwitAccount ?? ""))
-                        
-                        if i + 1 == keysets.count {
-                            DispatchQueue.main.async { [weak self] in
-                                guard let self = self else { return }
-                                
-                                self.keysetsTable.reloadData()
-                                self.spinner.remove()
-                            }
+                for (i, cosigner) in cosigners.enumerated() {
+                    let cosignerStruct = CosignerStruct(dictionary: cosigner)
+                    self.cosigners.append(cosignerStruct)
+                    self.lifehashes.append(LifeHash.image(cosignerStruct.lifehash) ?? UIImage())
+                    
+                    if i + 1 == cosigners.count {
+                        DispatchQueue.main.async { [weak self] in
+                            guard let self = self else { return }
+                            
+                            self.keysetsTable.reloadData()
+                            self.spinner.remove()
                         }
                     }
-                }, completion: {})
-            }
+                }
+            }, completion: {})
         }
     }
     
     private func refresh(_ section: Int) {
         spinner.add(vc: self, description: "")
-        keysets.removeAll()
+        cosigners.removeAll()
         
-        CoreDataService.retrieveEntity(entityName: .keyset) { [weak self] (keysets, errorDescription) in
+        CoreDataService.retrieveEntity(entityName: .cosigner) { [weak self] (cosigners, errorDescription) in
             guard let self = self else { return }
             
-            guard let keysets = keysets, keysets.count > 0 else { self.spinner.remove(); return }
+            guard let cosigners = cosigners, cosigners.count > 0 else { self.spinner.remove(); return }
             
-            for (i, keyset) in keysets.enumerated() {
-                let keysetStruct = KeysetStruct(dictionary: keyset)
-                self.keysets.append(keysetStruct)
+            for (i, cosigner) in cosigners.enumerated() {
+                let cosignerStruct = CosignerStruct(dictionary: cosigner)
+                self.cosigners.append(cosignerStruct)
                 
-                if i + 1 == keysets.count {
+                if i + 1 == cosigners.count {
                     DispatchQueue.main.async { [weak self] in
                         guard let self = self else { return }
                         
@@ -187,8 +218,8 @@ class KeysetsViewController: UIViewController, UITableViewDelegate, UITableViewD
     }
     
     func numberOfSections(in tableView: UITableView) -> Int {
-        if keysets.count > 0 {
-            return keysets.count
+        if cosigners.count > 0 {
+            return cosigners.count
         } else {
             return 1
         }
@@ -199,55 +230,37 @@ class KeysetsViewController: UIViewController, UITableViewDelegate, UITableViewD
     }
     
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
-        if keysets.count > 0 {
+        if cosigners.count > 0 {
         let cell = tableView.dequeueReusableCell(withIdentifier: "keysetCell", for: indexPath)
         configureCell(cell)
         
-        if keysets.count > 0 && indexPath.section < keysets.count && lifehashes.count > 0 && indexPath.section < lifehashes.count {
-            let keyset = keysets[indexPath.section]
+        if cosigners.count > 0 && indexPath.section < cosigners.count && lifehashes.count > 0 && indexPath.section < lifehashes.count {
+            let cosigner = cosigners[indexPath.section]
             
             let fingerprintLabel = cell.viewWithTag(2) as! UILabel
-            if let key = keyset.bip48SegwitAccount {
+            if let key = cosigner.bip48SegwitAccount {
                 let arr = key.split(separator: "]")
                 fingerprintLabel.text = "\(String(describing: arr[0]))]"
             } else {
-                fingerprintLabel.text = keyset.fingerprint
-            }
-            
-            let (_, _, lifeHash) = canSign(keyset)
-            
-            let lifeHashView = cell.viewWithTag(6) as! LifehashSeedSecondary
-            lifeHashView.backgroundColor = cell.backgroundColor
-            lifeHashView.background.backgroundColor = cell.backgroundColor
-            if lifeHash != nil {
-                lifeHashView.lifehashImage.image = lifeHash
-                lifeHashView.alpha = 1
-            } else {
-                lifeHashView.alpha = 0
+                fingerprintLabel.text = cosigner.fingerprint
             }
             
             let dateAddedLabel = cell.viewWithTag(7) as! UILabel
-            dateAddedLabel.text = keyset.dateAdded.formatted()
+            dateAddedLabel.text = cosigner.dateAdded.formatted()
 
-            let addToMapButton = cell.viewWithTag(11) as! UIButton
-            addToMapButton.restorationIdentifier = "\(indexPath.section)"
-            configureView(addToMapButton)
-            addToMapButton.addTarget(self, action: #selector(addToMap(_:)), for: .touchUpInside)
-            
             let exportKeysetButton = cell.viewWithTag(9) as! UIButton
             exportKeysetButton.restorationIdentifier = "\(indexPath.section)"
             configureView(exportKeysetButton)
-            exportKeysetButton.addTarget(self, action: #selector(exportMultisigKeyset(_:)), for: .touchUpInside)
+            exportKeysetButton.addTarget(self, action: #selector(exportCosigner(_:)), for: .touchUpInside)
             
             let isSharedImage = cell.viewWithTag(5) as! UIImageView
             let sharedText = cell.viewWithTag(14) as! UILabel
-            if keyset.sharedWith != nil {
+            if cosigner.sharedWith != nil {
                 isSharedImage.image = UIImage(systemName: "person.2.square.stack")
                 isSharedImage.tintColor = .systemPink
-                //sharedText.text = "used"
                 sharedText.textColor = .systemPink
-                for account in accountMaps {
-                    if account.id == keyset.sharedWith {
+                for account in accounts {
+                    if account.id == cosigner.sharedWith {
                         sharedText.text = account.label
                     }
                 }
@@ -269,9 +282,9 @@ class KeysetsViewController: UIViewController, UITableViewDelegate, UITableViewD
             let keysetLifehash = cell.viewWithTag(16) as! LifehashSeedView
             keysetLifehash.backgroundColor = cell.backgroundColor
             keysetLifehash.background.backgroundColor = cell.backgroundColor
-            keysetLifehash.lifehashImage.image = lifehashes[indexPath.section]
+            keysetLifehash.lifehashImage.image = UIImage(data: cosigner.lifehash)
             keysetLifehash.iconImage.image = UIImage(systemName: "person.2")
-            keysetLifehash.iconLabel.text = keyset.label
+            keysetLifehash.iconLabel.text = cosigner.label
             
             return cell
         } else {
@@ -279,7 +292,7 @@ class KeysetsViewController: UIViewController, UITableViewDelegate, UITableViewD
         }
             
         } else {
-            let cell = tableView.dequeueReusableCell(withIdentifier: "cosognerDefaultCell", for: indexPath)
+            let cell = tableView.dequeueReusableCell(withIdentifier: "cosignerDefaultCell", for: indexPath)
             let button = cell.viewWithTag(1) as! UIButton
             button.addTarget(self, action: #selector(add), for: .touchUpInside)
             return cell
@@ -287,8 +300,8 @@ class KeysetsViewController: UIViewController, UITableViewDelegate, UITableViewD
     }
     
     func tableView(_ tableView: UITableView, heightForRowAt indexPath: IndexPath) -> CGFloat {
-        if keysets.count > 0 {
-            return 266
+        if cosigners.count > 0 {
+            return 170
         } else {
             return 44
         }
@@ -296,7 +309,7 @@ class KeysetsViewController: UIViewController, UITableViewDelegate, UITableViewD
     
     func tableView(_ tableView: UITableView, commit editingStyle: UITableViewCell.EditingStyle, forRowAt indexPath: IndexPath) {
         if editingStyle == .delete {
-            let keyset = keysets[indexPath.section]
+            let keyset = cosigners[indexPath.section]
             deleteKeyset(keyset.id, indexPath.section)
         }
     }
@@ -314,29 +327,10 @@ class KeysetsViewController: UIViewController, UITableViewDelegate, UITableViewD
         view.layer.cornerRadius = 8
     }
     
-    private func canSign(_ keyset: KeysetStruct) -> (isHot: Bool, isMine: Bool, lifeHash: UIImage?) {
-        var isHot = false
-        var isMine = false
-        var lifeHash:UIImage?
-        
-        for signer in signers {
-            if keyset.fingerprint == signer.fingerprint {
-                isMine = true
-                lifeHash = UIImage(data: signer.lifeHash)
-                
-                if signer.entropy != nil {
-                    isHot = true
-                }
-            }
-        }
-        
-        return (isHot, isMine, lifeHash)
-    }
-    
     @objc func copyText(_ sender: UIButton) {
         guard let sectionString = sender.restorationIdentifier, let int = Int(sectionString) else { return }
         
-        let keyset = keysets[int]
+        let keyset = cosigners[int]
         
         UIPasteboard.general.string = keyset.bip48SegwitAccount
         showAlert(self, "", "Cosigner text copied ✓")
@@ -345,12 +339,12 @@ class KeysetsViewController: UIViewController, UITableViewDelegate, UITableViewD
     @objc func editLabel(_ sender: UIButton) {
         guard let sectionString = sender.restorationIdentifier, let int = Int(sectionString) else { return }
         
-        let keyset = keysets[int]
+        let keyset = cosigners[int]
         
         promptToEditLabel(keyset)
     }
     
-    private func promptToEditLabel(_ keyset: KeysetStruct) {
+    private func promptToEditLabel(_ keyset: CosignerStruct) {
         DispatchQueue.main.async { [weak self] in
             guard let self = self else { return }
             
@@ -386,151 +380,20 @@ class KeysetsViewController: UIViewController, UITableViewDelegate, UITableViewD
     
     
     private func updateLabel(_ id: UUID, _ label: String) {
-        CoreDataService.updateEntity(id: id, keyToUpdate: "label", newValue: label, entityName: .keyset) { (success, errorDescription) in
+        CoreDataService.updateEntity(id: id, keyToUpdate: "label", newValue: label, entityName: .cosigner) { (success, errorDescription) in
             guard success else { showAlert(self, "Label not saved!", "There was an error updating your label, please let us know about it: \(errorDescription ?? "unknown")"); return }
             
             self.load()
         }
     }
     
-    @objc func addToMap(_ sender: UIButton) {
+    @objc func exportCosigner(_ sender: UIButton) {
         guard let sectionString = sender.restorationIdentifier, let int = Int(sectionString) else { return }
         
-        let keyset = keysets[int]
-        
-        if keyset.sharedWith != nil {
-            DispatchQueue.main.async { [weak self] in
-                guard let self = self else { return }
-                
-                var alertStyle = UIAlertController.Style.actionSheet
-                if (UIDevice.current.userInterfaceIdiom == .pad) {
-                  alertStyle = UIAlertController.Style.alert
-                }
-                
-                let alert = UIAlertController(title: "Cosigner already shared!", message: "This cosigner was previously added to an Account, reusing keys is never a good idea. Are you sure you want to share this cosigner again?", preferredStyle: alertStyle)
-                
-                alert.addAction(UIAlertAction(title: "Yes", style: .default, handler: { action in
-                    self.promptToSelectMap(keyset, int)
-                }))
-                                
-                alert.addAction(UIAlertAction(title: "Cancel", style: .cancel, handler: { action in }))
-                alert.popoverPresentationController?.sourceView = self.view
-                self.present(alert, animated: true, completion: nil)
-            }
-        } else {
-            promptToSelectMap(keyset, int)
-        }
-    }
-    
-    private func promptToSelectMap(_ keyset: KeysetStruct, _ section: Int) {
-        CoreDataService.retrieveEntity(entityName: .accountMap) { [weak self] (accountMaps, errorDescription) in
-            guard let self = self else { return }
-            
-            guard let accountMaps = accountMaps, accountMaps.count > 0 else {
-                showAlert(self, "No Accounts exist yet", "Create one first.")
-                return
-            }
-            
-            var policyMaps = [AccountMapStruct]()
-            
-            for (a, accountMap) in accountMaps.enumerated() {
-                let mapStruct = AccountMapStruct(dictionary: accountMap)
-                
-                if mapStruct.descriptor.contains("keyset") {
-                    policyMaps.append(mapStruct)
-                }
-                
-                if a + 1 == accountMaps.count {
-                    guard policyMaps.count > 0 else {
-                        showAlert(self, "No incomplete Accounts", "All of your Accounts are complete, create a new one to add cosigners")
-                        return
-                    }
-                    DispatchQueue.main.async { [weak self] in
-                        guard let self = self else { return }
-                        
-                        var alertStyle = UIAlertController.Style.actionSheet
-                        if (UIDevice.current.userInterfaceIdiom == .pad) {
-                          alertStyle = UIAlertController.Style.alert
-                        }
-                        
-                        let alert = UIAlertController(title: "Which Account?", message: "Select the Account you want this cosigner to join.", preferredStyle: alertStyle)
-                        
-                        for policyMap in policyMaps {
-                            alert.addAction(UIAlertAction(title: policyMap.label, style: .default, handler: { action in
-                                self.updateAccountMap(policyMap, keyset, section)
-                            }))
-                        }
-                                        
-                        alert.addAction(UIAlertAction(title: "Cancel", style: .cancel, handler: { action in }))
-                        alert.popoverPresentationController?.sourceView = self.view
-                        self.present(alert, animated: true, completion: nil)
-                    }
-                }
-            }
-        }
-    }
-    
-    private func updateAccountMap(_ accountMap: AccountMapStruct, _ keyset: KeysetStruct, _ section: Int) {
-        var desc = accountMap.descriptor
-        let descriptorParser = DescriptorParser()
-        let descStruct = descriptorParser.descriptor(desc)
-        var mofn = descStruct.mOfNType
-        mofn = mofn.replacingOccurrences(of: " of ", with: "*")
-        let arr = mofn.split(separator: "*")
-        guard let n = Int(arr[1]) else { return }
-        
-        for i in 0...n - 1 {
-            if desc.contains("<keyset #\(i + 1)>") {
-                desc = desc.replacingOccurrences(of: "<keyset #\(i + 1)>", with: keyset.bip48SegwitAccount!)
-                break
-            }
-        }
-        
-        guard var dict = try? JSONSerialization.jsonObject(with: accountMap.accountMap, options: []) as? [String:Any] else { return }
-        dict["descriptor"] = desc
-        
-        let updatedMap = (dict.json() ?? "").utf8
-        
-        CoreDataService.updateEntity(id: accountMap.id, keyToUpdate: "descriptor", newValue: desc, entityName: .accountMap) { (success, errorDesc) in
-            guard success else {
-                showAlert(self, "Account Map updating failed...", "Please let us know about this bug.")
-                return
-            }
-            
-            CoreDataService.updateEntity(id: accountMap.id, keyToUpdate: "accountMap", newValue: updatedMap, entityName: .accountMap) { (success, errorDesc) in
-                guard success else {
-                    showAlert(self, "Account Map updating failed...", "Please let us know about this bug.")
-                    return
-                }
-                
-                CoreDataService.updateEntity(id: keyset.id, keyToUpdate: "sharedWith", newValue: accountMap.id, entityName: .keyset) { (success, errorDescription) in
-                    guard success else {
-                        showAlert(self, "Account Map updating failed...", "Please let us know about this bug.")
-                        return
-                    }
-                    
-                    CoreDataService.updateEntity(id: keyset.id, keyToUpdate: "dateShared", newValue: Date(), entityName: .keyset) { (success, errorDescription) in
-                        guard success else {
-                            showAlert(self, "Account Map updating failed...", "Please let us know about this bug.")
-                            return
-                        }
-                        
-                        showAlert(self, "Account Map updated ✓", "")
-                        
-                        self.refresh(section)
-                    }
-                }
-            }
-        }
-    }
-    
-    @objc func exportMultisigKeyset(_ sender: UIButton) {
-        guard let sectionString = sender.restorationIdentifier, let int = Int(sectionString) else { return }
-        
-        let keyset = keysets[int]
+        let keyset = cosigners[int]
         guard let account = keyset.bip48SegwitAccount else { return }
         
-        keysetToExport = account
+        cosignerToExport = account
         headerText = "Cosigner"
         subheaderText = account
         export()
@@ -556,7 +419,7 @@ class KeysetsViewController: UIViewController, UITableViewDelegate, UITableViewD
             let alert = UIAlertController(title: "Delete cosigner?", message: "", preferredStyle: alertStyle)
             
             alert.addAction(UIAlertAction(title: "Delete", style: .destructive, handler: { action in
-                self.deleteKeysetNow(id, section)
+                self.deleteCosignerNow(id, section)
             }))
             
             alert.addAction(UIAlertAction(title: "Cancel", style: .cancel, handler: { action in }))
@@ -565,8 +428,8 @@ class KeysetsViewController: UIViewController, UITableViewDelegate, UITableViewD
         }
     }
     
-    private func deleteKeysetNow(_ id: UUID, _ section: Int) {
-        CoreDataService.deleteEntity(id: id, entityName: .keyset) { (success, errorDescription) in
+    private func deleteCosignerNow(_ id: UUID, _ section: Int) {
+        CoreDataService.deleteEntity(id: id, entityName: .cosigner) { (success, errorDescription) in
             guard success else {
                 showAlert(self, "Error deleting cosigner", "We were unable to delete that cosigner!")
                 return
@@ -574,11 +437,11 @@ class KeysetsViewController: UIViewController, UITableViewDelegate, UITableViewD
             
             DispatchQueue.main.async { [weak self] in
                 self?.lifehashes.remove(at: section)
-                self?.keysets.remove(at: section)
-                if self?.keysets.count ?? 0 > 0 {
+                self?.cosigners.remove(at: section)
+                if self?.cosigners.count ?? 0 > 0 {
                     self?.keysetsTable.deleteSections(IndexSet.init(arrayLiteral: section), with: .fade)
                 } else {
-                    self?.editKeysets()
+                    self?.editCosigners()
                     self?.keysetsTable.reloadData()
                 }
                 
@@ -586,13 +449,13 @@ class KeysetsViewController: UIViewController, UITableViewDelegate, UITableViewD
         }
     }
     
-    @objc func editKeysets() {
+    @objc func editCosigners() {
         keysetsTable.setEditing(!keysetsTable.isEditing, animated: true)
         
         if keysetsTable.isEditing {
-            editButton = UIBarButtonItem(title: "Done", style: .plain, target: self, action: #selector(editKeysets))
+            editButton = UIBarButtonItem(title: "Done", style: .plain, target: self, action: #selector(editCosigners))
         } else {
-            editButton = UIBarButtonItem(title: "Edit", style: .plain, target: self, action: #selector(editKeysets))
+            editButton = UIBarButtonItem(title: "Edit", style: .plain, target: self, action: #selector(editCosigners))
         }
         
         self.navigationItem.setRightBarButtonItems([addButton, editButton], animated: true)
@@ -620,7 +483,7 @@ class KeysetsViewController: UIViewController, UITableViewDelegate, UITableViewD
         keyset["dateAdded"] = Date()
         keyset["fingerprint"] = ds.fingerprint
         
-        CoreDataService.saveEntity(dict: keyset, entityName: .keyset) { [weak self] (success, errorDesc) in
+        CoreDataService.saveEntity(dict: keyset, entityName: .cosigner) { [weak self] (success, errorDesc) in
             guard let self = self else { return }
             
             guard success else {
@@ -639,7 +502,7 @@ class KeysetsViewController: UIViewController, UITableViewDelegate, UITableViewD
                 let alert = UIAlertController(title: "Cosigner imported ✓", message: "Would you like to give it a label now? You can edit the label at any time.", preferredStyle: alertStyle)
                 
                 alert.addAction(UIAlertAction(title: "Add label", style: .default, handler: { action in
-                    self.promptToEditLabel(KeysetStruct(dictionary: keyset))
+                    self.promptToEditLabel(CosignerStruct(dictionary: keyset))
                 }))
                                 
                 alert.addAction(UIAlertAction(title: "Cancel", style: .cancel, handler: { action in
@@ -668,7 +531,7 @@ class KeysetsViewController: UIViewController, UITableViewDelegate, UITableViewD
         // Pass the selected object to the new view controller.
         if segue.identifier == "exportKeyset" {
             if let vc = segue.destination as? QRDisplayerViewController {
-                vc.text = keysetToExport
+                vc.text = cosignerToExport
                 vc.isPsbt = false
                 vc.descriptionText = subheaderText
                 vc.header = headerText
@@ -694,6 +557,14 @@ class KeysetsViewController: UIViewController, UITableViewDelegate, UITableViewD
         if segue.identifier == "segueToCosignersInfo" {
             if let vc = segue.destination as? InfoViewController {
                 vc.isCosigner = true
+            }
+        }
+        
+        if segue.identifier == "segueToAddSeedWords" {
+            if let vc = segue.destination as? AddSignerViewController {
+                vc.doneBlock = {
+                    self.load()
+                }
             }
         }
     }

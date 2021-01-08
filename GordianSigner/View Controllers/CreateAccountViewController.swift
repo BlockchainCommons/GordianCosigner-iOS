@@ -74,19 +74,19 @@ class CreateAccountMapViewController: UIViewController, UIPickerViewDelegate, UI
         
         desc += keystores + "))"
         
-        let accountMap = ["descriptor":desc, "blockheight":0, "label":label] as [String : Any]
-        let json = accountMap.json() ?? ""
+        let map = ["descriptor":desc, "blockheight":0, "label":label] as [String : Any]
+        let json = map.json() ?? ""
         
-        var map = [String:Any]()
-        map["blockheight"] = Int64(0)
-        map["accountMap"] = json.utf8
-        map["label"] = label
-        map["id"] = UUID()
-        map["dateAdded"] = Date()
-        map["complete"] = false
-        map["descriptor"] = desc
+        var account = [String:Any]()
+        account["blockheight"] = Int64(0)
+        account["map"] = json.utf8
+        account["label"] = label
+        account["id"] = UUID()
+        account["dateAdded"] = Date()
+        account["complete"] = false
+        account["descriptor"] = desc
         
-        CoreDataService.saveEntity(dict: map, entityName: .accountMap) { [weak self] (success, errorDescription) in
+        CoreDataService.saveEntity(dict: account, entityName: .account) { [weak self] (success, errorDescription) in
             guard let self = self else { return }
             
             guard success else {
