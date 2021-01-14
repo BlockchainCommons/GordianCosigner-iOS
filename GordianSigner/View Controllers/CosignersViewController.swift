@@ -470,7 +470,7 @@ class KeysetsViewController: UIViewController, UITableViewDelegate, UITableViewD
         let dp = DescriptorParser()
         let ds = dp.descriptor(hack)
                 
-        guard let _ = try? HDKey(base58: ds.accountXpub) else {
+        guard let _ = try? HDKey(base58: ds.accountXpub), let lifeHash = LifeHash.hash(ds.accountXpub) else {
             showAlert(self, "Invalid key", "Gordian Cosigner is not yet compatible with slip132, please ensure you are adding a valid xpub and try again.")
             return
         }
@@ -480,14 +480,16 @@ class KeysetsViewController: UIViewController, UITableViewDelegate, UITableViewD
             return
         }
         
-        var keyset = [String:Any]()
-        keyset["id"] = UUID()
-        keyset["label"] = "Cosigner"
-        keyset["bip48SegwitAccount"] = account
-        keyset["dateAdded"] = Date()
-        keyset["fingerprint"] = ds.fingerprint
+        var cosigner = [String:Any]()
+        cosigner["id"] = UUID()
+        cosigner["label"] = "Cosigner"
+        cosigner["bip48SegwitAccount"] = account
+        cosigner["dateAdded"] = Date()
+        cosigner["fingerprint"] = ds.fingerprint
+        cosigner["lifehash"] = lifeHash
         
-        CoreDataService.saveEntity(dict: keyset, entityName: .cosigner) { [weak self] (success, errorDesc) in
+        
+        CoreDataService.saveEntity(dict: cosigner, entityName: .cosigner) { [weak self] (success, errorDesc) in
             guard let self = self else { return }
             
             guard success else {
@@ -506,7 +508,7 @@ class KeysetsViewController: UIViewController, UITableViewDelegate, UITableViewD
                 let alert = UIAlertController(title: "Cosigner imported ✓", message: "Would you like to give it a label now? You can edit the label at any time.", preferredStyle: alertStyle)
                 
                 alert.addAction(UIAlertAction(title: "Add label", style: .default, handler: { action in
-                    self.promptToEditLabel(CosignerStruct(dictionary: keyset))
+                    self.promptToEditLabel(CosignerStruct(dictionary: cosigner))
                 }))
                                 
                 alert.addAction(UIAlertAction(title: "Cancel", style: .cancel, handler: { action in
