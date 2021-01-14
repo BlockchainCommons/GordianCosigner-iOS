@@ -365,7 +365,7 @@ class AccountMapsViewController: UIViewController, UITableViewDelegate, UITableV
     private func updateAccountMap(_ account: AccountStruct, _ cosigner: CosignerStruct, _ section: Int) {
         var desc = account.descriptor
         let descriptorParser = DescriptorParser()
-        let descStruct = descriptorParser.descriptor(desc)
+        var descStruct = descriptorParser.descriptor(desc)
         var mofn = descStruct.mOfNType
         mofn = mofn.replacingOccurrences(of: " of ", with: "*")
         let arr = mofn.split(separator: "*")
@@ -379,7 +379,58 @@ class AccountMapsViewController: UIViewController, UITableViewDelegate, UITableV
         }
         
         guard var dict = try? JSONSerialization.jsonObject(with: account.map, options: []) as? [String:Any] else { return }
-        dict["descriptor"] = desc
+        
+        descStruct = descriptorParser.descriptor(desc)
+        
+        if !desc.contains("keyset") {
+            var dictArray = [[String:String]]()
+            
+            for keyWithPath in descStruct.keysWithPath {
+                print("keyWithPath: \(keyWithPath)")
+                
+                guard keyWithPath.contains("/48h/\(Keys.coinType)h/0h/2h") || keyWithPath.contains("/48'/\(Keys.coinType)'/0'/2'") else {
+                    showAlert(self, "Unsupported key origin", "Gordian Cosigner currently only supports the m/48'/\(Keys.coinType)'/0'/2' origin.")
+                    return
+                }
+                
+                let arr = keyWithPath.split(separator: "]")
+                
+                if arr.count > 1 {
+                    var xpubString = "\(arr[1].replacingOccurrences(of: "))", with: ""))"
+                    xpubString = xpubString.replacingOccurrences(of: "/0/*", with: "")
+                    
+                    guard let xpub = try? HDKey(base58: xpubString) else {
+                        showAlert(self, "Key invalid", "Gordian Cosigner does not yet support slip0132 keys. Please ensure your xpub is valid then try again.")
+                        return
+                    }
+                    
+                    let dict = ["path":"\(arr[0])]", "key": xpub.description]
+                    dictArray.append(dict)
+                }
+            }
+            
+            dictArray.sort(by: {($0["key"]!) < $1["key"]!})
+            
+            var sortedKeys = ""
+            
+            for (i, sortedItem) in dictArray.enumerated() {
+                let path = sortedItem["path"]!
+                let key = sortedItem["key"]!
+                let fullKey = path + key
+                sortedKeys += fullKey
+                
+                if i + 1 < dictArray.count {
+                    sortedKeys += ","
+                }
+            }
+            
+            let arr2 = desc.split(separator: ",")
+            let descriptor = "\(arr2[0])," + sortedKeys + "))"
+            dict["descriptor"] = descriptor
+            
+        } else {
+            dict["descriptor"] = desc
+        }
         
         let updatedMap = (dict.json() ?? "").utf8
         
@@ -576,10 +627,12 @@ class AccountMapsViewController: UIViewController, UITableViewDelegate, UITableV
     }
     
     private func parseAccountMap(_ accountMap: String) {
-        guard let dict = try? JSONSerialization.jsonObject(with: accountMap.utf8, options: []) as? [String:Any] else { return }
-        
-        guard var descriptor = dict["descriptor"] as? String, !descriptor.contains("keyset") else { return }
-        
+        guard let dict = try? JSONSerialization.jsonObject(with: accountMap.utf8, options: []) as? [String:Any],
+              var descriptor = dict["descriptor"] as? String,
+              !descriptor.contains("keyset") else {
+            return
+        }
+                
         let accountMapId = UUID()
         
         let descriptorParser = DescriptorParser()
@@ -610,10 +663,13 @@ class AccountMapsViewController: UIViewController, UITableViewDelegate, UITableV
                     showAlert(self, "Unsupported key origin", "Gordian Cosigner currently only supports the m/48'/\(Keys.coinType)'/0'/2' origin.")
                     return
                 }
+                
                 let arr = keyWithPath.split(separator: "]")
+                
                 if arr.count > 1 {
                     var xpubString = "\(arr[1].replacingOccurrences(of: "))", with: ""))"
                     xpubString = xpubString.replacingOccurrences(of: "/0/*", with: "")
+                    
                     guard let xpub = try? HDKey(base58: xpubString) else {
                         showAlert(self, "Key invalid", "Gordian Cosigner does not yet support slip0132 keys. Please ensure your xpub is valid then try again.")
                         return
@@ -638,14 +694,20 @@ class AccountMapsViewController: UIViewController, UITableViewDelegate, UITableV
                 let ds = dp.descriptor(hack)
                 let account = fullKey.replacingOccurrences(of: "/0/*", with: "")
                 
-                var cosigner = [String:Any]()
-                cosigner["id"] = UUID()
-                cosigner["label"] = "Cosigner #\(i + 1)"
-                cosigner["bip48SegwitAccount"] = account
-                cosigner["dateAdded"] = Date()
-                cosigner["fingerprint"] = ds.fingerprint
-                cosigner["sharedWith"] = accountMapId
-                cosigner["dateShared"] = Date()
+                guard let lifeHash = LifeHash.hash(ds.accountXpub) else {
+                    showAlert(self, "", "Error deriving Cosigner lifehash.")
+                    return
+                }
+                
+                var cosignerToSave = [String:Any]()
+                cosignerToSave["id"] = UUID()
+                cosignerToSave["label"] = "Cosigner #\(i + 1)"
+                cosignerToSave["bip48SegwitAccount"] = account
+                cosignerToSave["dateAdded"] = Date()
+                cosignerToSave["fingerprint"] = ds.fingerprint
+                cosignerToSave["sharedWith"] = accountMapId
+                cosignerToSave["dateShared"] = Date()
+                cosignerToSave["lifehash"] = lifeHash
                 
                 // First fetch all existing cosigners to ensure we do not save duplicates
                 CoreDataService.retrieveEntity(entityName: .cosigner) { (cosigners, errorDescription) in
@@ -663,12 +725,12 @@ class AccountMapsViewController: UIViewController, UITableViewDelegate, UITableV
                             
                             if i + 1 == cosigners.count {
                                 if !alreadyExists {
-                                    CoreDataService.saveEntity(dict: cosigner, entityName: .cosigner) { (_, _) in }
+                                    CoreDataService.saveEntity(dict: cosignerToSave, entityName: .cosigner) { (_, _) in }
                                 }
                             }
                         }
                     } else {
-                        CoreDataService.saveEntity(dict: cosigner, entityName: .cosigner) { (_, _) in }
+                        CoreDataService.saveEntity(dict: cosignerToSave, entityName: .cosigner) { (_, _) in }
                     }
                 }
                 
@@ -685,7 +747,7 @@ class AccountMapsViewController: UIViewController, UITableViewDelegate, UITableV
         
         var map = [String:Any]()
         map["blockheight"] = Int64(dict["blockheight"] as? Int ?? 0)
-        map["accountMap"] = accountMap.utf8
+        map["map"] = accountMap.utf8
         map["label"] = dict["label"] as? String ?? "Account map"
         map["id"] = accountMapId
         map["dateAdded"] = Date()

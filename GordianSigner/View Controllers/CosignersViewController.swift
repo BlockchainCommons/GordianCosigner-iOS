@@ -18,7 +18,6 @@ class KeysetsViewController: UIViewController, UITableViewDelegate, UITableViewD
     private var cosignerToExport = ""
     private var headerText = ""
     private var subheaderText = ""
-    private var lifehashes = [UIImage]()
     let spinner = Spinner()
 
     @IBOutlet weak private var keysetsTable: UITableView!
@@ -78,7 +77,7 @@ class KeysetsViewController: UIViewController, UITableViewDelegate, UITableViewD
                     let alert = UIAlertController(title: "Import cosigner?", message: "You have a valid cosigner on your clipboard, would you like to import it?", preferredStyle: alertStyle)
                     
                     alert.addAction(UIAlertAction(title: "Yes", style: .default, handler: { action in
-                        self.addKeyset(account)
+                        self.addCosigner(account)
                     }))
                     
                     alert.addAction(UIAlertAction(title: "Cancel", style: .cancel, handler: { action in }))
@@ -86,7 +85,7 @@ class KeysetsViewController: UIViewController, UITableViewDelegate, UITableViewD
                     self.present(alert, animated: true, completion: nil)
                 }
             } else if pasteBoard.contains("48h/\(Keys.coinType)h/0h/2h") || pasteBoard.contains("48'/\(Keys.coinType)'/0'/2'") {
-                self.addKeyset(pasteBoard)
+                self.addCosigner(pasteBoard)
             } else {
                 showAlert(self, "", "Invalid cosigner text, we accept UR crypto-account or [<fingerprint>/48h/\(Keys.coinType)h/0h/2h]xpub.....")
             }
@@ -156,7 +155,6 @@ class KeysetsViewController: UIViewController, UITableViewDelegate, UITableViewD
     private func load() {
         spinner.add(vc: self, description: "loading...")
         cosigners.removeAll()
-        lifehashes.removeAll()
         accounts.removeAll()
         
         CoreDataService.retrieveEntity(entityName: .account) { (accounts, err) in
@@ -170,25 +168,24 @@ class KeysetsViewController: UIViewController, UITableViewDelegate, UITableViewD
         CoreDataService.retrieveEntity(entityName: .cosigner) { [weak self] (cosigners, errorDescription) in
             guard let self = self else { return }
             
-            guard let cosigners = cosigners, cosigners.count > 0 else { self.spinner.remove(); return }
+            guard let cosigners = cosigners, cosigners.count > 0 else {
+                self.spinner.remove()
+                return
+            }
             
-            DispatchQueue.background(background: { [weak self] in
-                guard let self = self else { return }
-                for (i, cosigner) in cosigners.enumerated() {
-                    let cosignerStruct = CosignerStruct(dictionary: cosigner)
-                    self.cosigners.append(cosignerStruct)
-                    self.lifehashes.append(LifeHash.image(cosignerStruct.lifehash) ?? UIImage())
-                    
-                    if i + 1 == cosigners.count {
-                        DispatchQueue.main.async { [weak self] in
-                            guard let self = self else { return }
-                            
-                            self.keysetsTable.reloadData()
-                            self.spinner.remove()
-                        }
+            for (i, cosigner) in cosigners.enumerated() {
+                let cosignerStruct = CosignerStruct(dictionary: cosigner)
+                self.cosigners.append(cosignerStruct)
+                
+                if i + 1 == cosigners.count {
+                    DispatchQueue.main.async { [weak self] in
+                        guard let self = self else { return }
+                        
+                        self.keysetsTable.reloadData()
+                        self.spinner.remove()
                     }
                 }
-            }, completion: {})
+            }
         }
     }
     
@@ -234,7 +231,7 @@ class KeysetsViewController: UIViewController, UITableViewDelegate, UITableViewD
         let cell = tableView.dequeueReusableCell(withIdentifier: "keysetCell", for: indexPath)
         configureCell(cell)
         
-        if cosigners.count > 0 && indexPath.section < cosigners.count && lifehashes.count > 0 && indexPath.section < lifehashes.count {
+        if cosigners.count > 0 && indexPath.section < cosigners.count {
             let cosigner = cosigners[indexPath.section]
             
             let fingerprintLabel = cell.viewWithTag(2) as! UILabel
@@ -436,7 +433,6 @@ class KeysetsViewController: UIViewController, UITableViewDelegate, UITableViewD
             }
             
             DispatchQueue.main.async { [weak self] in
-                self?.lifehashes.remove(at: section)
                 self?.cosigners.remove(at: section)
                 if self?.cosigners.count ?? 0 > 0 {
                     self?.keysetsTable.deleteSections(IndexSet.init(arrayLiteral: section), with: .fade)
@@ -465,7 +461,7 @@ class KeysetsViewController: UIViewController, UITableViewDelegate, UITableViewD
         self.navigationItem.setRightBarButtonItems([addButton, editButton], animated: true)
     }
     
-    private func addKeyset(_ account: String) {
+    private func addCosigner(_ account: String) {
         let hack = "wsh(\(account)/0/*)"
         let dp = DescriptorParser()
         let ds = dp.descriptor(hack)
@@ -550,9 +546,9 @@ class KeysetsViewController: UIViewController, UITableViewDelegate, UITableViewD
                     guard let self = self, let result = result else { return }
                     
                     if let account = URHelper.accountUr(result) {
-                        self.addKeyset(account)
+                        self.addCosigner(account)
                     } else if result.contains("48h/\(Keys.coinType)h/0h/2h") || result.contains("48'/\(Keys.coinType)'/0'/2'") {
-                        self.addKeyset(result)
+                        self.addCosigner(result)
                     } else {
                         showAlert(self, "Cosigner not recognized!", "Gordian Cosigner currently only supports the m/48h/\(Keys.coinType)h/0h/2h key origin.")
                     }
