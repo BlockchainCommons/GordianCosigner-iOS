@@ -1,9 +1,11 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<document type="com.apple.InterfaceBuilder3.CocoaTouch.Storyboard.XIB" version="3.0" toolsVersion="16096" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" useSafeAreas="YES" colorMatched="YES" initialViewController="shV-H0-8JM">
+<document type="com.apple.InterfaceBuilder3.CocoaTouch.Storyboard.XIB" version="3.0" toolsVersion="17701" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" useSafeAreas="YES" colorMatched="YES" initialViewController="shV-H0-8JM">
     <device id="retina6_1" orientation="portrait" appearance="light"/>
     <dependencies>
-        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="16087"/>
+        <deployment identifier="iOS"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="17703"/>
         <capability name="Safe area layout guides" minToolsVersion="9.0"/>
+        <capability name="System colors in document resources" minToolsVersion="11.0"/>
         <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
     </dependencies>
     <scenes>
@@ -46,7 +48,7 @@
             <objects>
                 <navigationController extendedLayoutIncludesOpaqueBars="YES" id="lSK-eS-ZYx" sceneMemberID="viewController">
                     <tabBarItem key="tabBarItem" title="payments" image="bitcoinsign.circle" catalog="system" id="EcB-B8-pkc">
-                        <color key="badgeColor" systemColor="systemTealColor" red="0.35294117650000001" green="0.7843137255" blue="0.98039215690000003" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+                        <color key="badgeColor" systemColor="systemTealColor"/>
                     </tabBarItem>
                     <navigationItem key="navigationItem" id="bjy-Im-JaK"/>
                     <simulatedNavigationBarMetrics key="simulatedTopBarMetrics" barStyle="black" translucent="NO" prompted="NO"/>
@@ -88,9 +90,9 @@
                                                         <constraint firstAttribute="width" constant="60" id="ghB-Sc-I9h"/>
                                                     </constraints>
                                                     <fontDescription key="fontDescription" type="system" pointSize="18"/>
-                                                    <color key="tintColor" systemColor="systemTealColor" red="0.35294117650000001" green="0.7843137255" blue="0.98039215690000003" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+                                                    <color key="tintColor" systemColor="systemTealColor"/>
                                                     <state key="normal" title=" add a payment" image="plus" catalog="system">
-                                                        <color key="titleColor" systemColor="systemTealColor" red="0.35294117650000001" green="0.7843137255" blue="0.98039215690000003" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+                                                        <color key="titleColor" systemColor="systemTealColor"/>
                                                         <preferredSymbolConfiguration key="preferredSymbolConfiguration" scale="default" weight="semibold"/>
                                                     </state>
                                                 </button>
@@ -118,8 +120,8 @@
                                                     <nil key="highlightedColor"/>
                                                 </label>
                                                 <imageView clipsSubviews="YES" userInteractionEnabled="NO" tag="12" contentMode="scaleAspectFit" horizontalHuggingPriority="251" verticalHuggingPriority="251" image="signature" catalog="system" translatesAutoresizingMaskIntoConstraints="NO" id="SOW-vf-wsk">
-                                                    <rect key="frame" x="20" y="158" width="20.5" height="21"/>
-                                                    <color key="tintColor" systemColor="systemGreenColor" red="0.20392156859999999" green="0.78039215689999997" blue="0.34901960780000002" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+                                                    <rect key="frame" x="20" y="157" width="20.5" height="21"/>
+                                                    <color key="tintColor" systemColor="systemGreenColor"/>
                                                     <constraints>
                                                         <constraint firstAttribute="height" constant="20.5" id="7Ep-yr-Q5e"/>
                                                         <constraint firstAttribute="width" constant="20.5" id="fLK-OL-VbK"/>
@@ -131,21 +133,21 @@
                                                         <constraint firstAttribute="height" constant="20" id="8hC-Co-gwk"/>
                                                     </constraints>
                                                     <fontDescription key="fontDescription" type="system" pointSize="12"/>
-                                                    <color key="textColor" systemColor="systemGreenColor" red="0.20392156859999999" green="0.78039215689999997" blue="0.34901960780000002" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+                                                    <color key="textColor" systemColor="systemGreenColor"/>
                                                     <nil key="highlightedColor"/>
                                                 </label>
                                                 <imageView clipsSubviews="YES" userInteractionEnabled="NO" tag="10" contentMode="scaleAspectFit" horizontalHuggingPriority="251" verticalHuggingPriority="251" image="exclamationmark.triangle" catalog="system" translatesAutoresizingMaskIntoConstraints="NO" id="c7c-90-1PI">
                                                     <rect key="frame" x="20" y="132" width="20.5" height="18"/>
-                                                    <color key="tintColor" systemColor="systemOrangeColor" red="1" green="0.58431372550000005" blue="0.0" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+                                                    <color key="tintColor" systemColor="systemOrangeColor"/>
                                                 </imageView>
                                                 <label opaque="NO" userInteractionEnabled="NO" tag="9" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="requires signature" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="Inx-xk-Hb4">
                                                     <rect key="frame" x="45" y="134" width="102.5" height="14.5"/>
                                                     <fontDescription key="fontDescription" type="system" pointSize="12"/>
-                                                    <color key="textColor" systemColor="systemOrangeColor" red="1" green="0.58431372550000005" blue="0.0" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+                                                    <color key="textColor" systemColor="systemOrangeColor"/>
                                                     <nil key="highlightedColor"/>
                                                 </label>
                                                 <label opaque="NO" userInteractionEnabled="NO" tag="11" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="- 2.75648373" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="0MA-Mj-hvO">
-                                                    <rect key="frame" x="48.5" y="102.5" width="107" height="20.5"/>
+                                                    <rect key="frame" x="48.5" y="102.5" width="105.5" height="20.5"/>
                                                     <fontDescription key="fontDescription" type="system" pointSize="17"/>
                                                     <color key="textColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                                                     <nil key="highlightedColor"/>
@@ -165,14 +167,14 @@
                                                         <constraint firstAttribute="width" constant="48" id="CJ4-Zb-SOr"/>
                                                     </constraints>
                                                     <fontDescription key="fontDescription" type="system" pointSize="10"/>
-                                                    <color key="tintColor" systemColor="systemTealColor" red="0.35294117650000001" green="0.7843137255" blue="0.98039215690000003" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+                                                    <color key="tintColor" systemColor="systemTealColor"/>
                                                     <state key="normal" image="chevron.right" catalog="system">
                                                         <color key="titleColor" red="0.25174289789999998" green="0.82675522769999998" blue="1" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
                                                     </state>
                                                 </button>
                                                 <view tag="7" contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="JwH-w9-fra" customClass="LifehashSeedView" customModule="Gordian_Cosigner" customModuleProvider="target">
                                                     <rect key="frame" x="20" y="11" width="228" height="80"/>
-                                                    <color key="backgroundColor" systemColor="systemBackgroundColor" cocoaTouchSystemColor="whiteColor"/>
+                                                    <color key="backgroundColor" systemColor="systemBackgroundColor"/>
                                                     <constraints>
                                                         <constraint firstAttribute="height" constant="80" id="cxp-35-Iq5"/>
                                                     </constraints>
@@ -184,9 +186,9 @@
                                                         <constraint firstAttribute="height" constant="40" id="Eoe-Py-big"/>
                                                     </constraints>
                                                     <fontDescription key="fontDescription" type="system" pointSize="10"/>
-                                                    <color key="tintColor" systemColor="systemTealColor" red="0.35294117650000001" green="0.7843137255" blue="0.98039215690000003" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+                                                    <color key="tintColor" systemColor="systemTealColor"/>
                                                     <state key="normal" title="  edit " image="pencil" catalog="system">
-                                                        <color key="titleColor" systemColor="systemTealColor" red="0.35294117650000001" green="0.7843137255" blue="0.98039215690000003" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+                                                        <color key="titleColor" systemColor="systemTealColor"/>
                                                     </state>
                                                 </button>
                                             </subviews>
@@ -236,6 +238,7 @@
                                 <nil key="highlightedColor"/>
                             </label>
                         </subviews>
+                        <viewLayoutGuide key="safeArea" id="QxW-X5-ygV"/>
                         <color key="backgroundColor" white="0.0" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                         <constraints>
                             <constraint firstItem="7d6-vW-Ixa" firstAttribute="top" secondItem="QxW-X5-ygV" secondAttribute="top" constant="20" id="1XT-cy-Kkl"/>
@@ -247,7 +250,6 @@
                             <constraint firstItem="7YZ-5P-IrG" firstAttribute="leading" secondItem="7d6-vW-Ixa" secondAttribute="trailing" constant="8" id="ceE-ot-Rae"/>
                             <constraint firstItem="7YZ-5P-IrG" firstAttribute="centerY" secondItem="7d6-vW-Ixa" secondAttribute="centerY" id="owE-b6-opH"/>
                         </constraints>
-                        <viewLayoutGuide key="safeArea" id="QxW-X5-ygV"/>
                     </view>
                     <navigationItem key="navigationItem" id="NxX-NZ-h8V">
                         <barButtonItem key="leftBarButtonItem" image="info.circle" catalog="system" id="Il9-0H-Vk7">
@@ -291,7 +293,7 @@
                                     <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                                     <subviews>
                                         <progressView opaque="NO" contentMode="scaleToFill" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="Rtx-HY-9mw">
-                                            <rect key="frame" x="8" y="64" width="358" height="2"/>
+                                            <rect key="frame" x="8" y="62" width="358" height="4"/>
                                         </progressView>
                                         <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Label" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="98x-sO-hO8">
                                             <rect key="frame" x="166" y="20" width="42" height="21"/>
@@ -328,7 +330,8 @@
                                 </connections>
                             </button>
                         </subviews>
-                        <color key="backgroundColor" systemColor="systemBackgroundColor" cocoaTouchSystemColor="whiteColor"/>
+                        <viewLayoutGuide key="safeArea" id="in4-ZL-XAA"/>
+                        <color key="backgroundColor" systemColor="systemBackgroundColor"/>
                         <constraints>
                             <constraint firstItem="11N-cd-oai" firstAttribute="trailing" secondItem="in4-ZL-XAA" secondAttribute="trailing" id="5pU-pY-v5t"/>
                             <constraint firstItem="11N-cd-oai" firstAttribute="top" secondItem="in4-ZL-XAA" secondAttribute="top" id="94M-7z-8kk"/>
@@ -340,7 +343,6 @@
                             <constraint firstItem="11N-cd-oai" firstAttribute="leading" secondItem="in4-ZL-XAA" secondAttribute="leading" id="dA7-Rr-xJS"/>
                             <constraint firstAttribute="bottom" secondItem="11N-cd-oai" secondAttribute="bottom" id="zHV-aJ-rbg"/>
                         </constraints>
-                        <viewLayoutGuide key="safeArea" id="in4-ZL-XAA"/>
                     </view>
                     <connections>
                         <outlet property="backgroundView" destination="3vK-q4-XRq" id="0dy-OO-PJa"/>
@@ -368,7 +370,7 @@
                                     <constraint firstAttribute="width" constant="374" id="b5U-DN-2N7"/>
                                 </constraints>
                             </imageView>
-                            <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="QDZ-sc-dJG">
+                            <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="system" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="QDZ-sc-dJG">
                                 <rect key="frame" x="179.5" y="486" width="55" height="30"/>
                                 <state key="normal" title="animate">
                                     <color key="titleColor" red="0.25174289789999998" green="0.82675522769999998" blue="1" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
@@ -378,13 +380,13 @@
                                 </connections>
                             </button>
                             <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Header" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="8Fb-WX-yzn">
-                                <rect key="frame" x="20" y="20" width="96.5" height="35"/>
+                                <rect key="frame" x="20" y="20" width="97" height="35"/>
                                 <fontDescription key="fontDescription" type="system" weight="semibold" pointSize="29"/>
                                 <color key="textColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                                 <nil key="highlightedColor"/>
                             </label>
                             <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" showsTouchWhenHighlighted="YES" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="hpJ-y0-mBa">
-                                <rect key="frame" x="332.5" y="63" width="61.5" height="24"/>
+                                <rect key="frame" x="333" y="64" width="61" height="23"/>
                                 <fontDescription key="fontDescription" type="system" pointSize="10"/>
                                 <color key="tintColor" red="0.25174289789999998" green="0.82675522769999998" blue="1" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
                                 <state key="normal" title=" copy qr" image="doc.on.doc" catalog="system">
@@ -395,7 +397,7 @@
                                 </connections>
                             </button>
                             <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" showsTouchWhenHighlighted="YES" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="hEA-SP-XCB">
-                                <rect key="frame" x="252.5" y="64.5" width="62" height="21"/>
+                                <rect key="frame" x="253" y="65" width="62" height="21"/>
                                 <fontDescription key="fontDescription" type="system" pointSize="10"/>
                                 <color key="tintColor" red="0.25174289789999998" green="0.82675522769999998" blue="1" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
                                 <state key="normal" title=" share qr" image="square.and.arrow.up" catalog="system">
@@ -406,14 +408,14 @@
                                 </connections>
                             </button>
                             <textView clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="scaleToFill" editable="NO" translatesAutoresizingMaskIntoConstraints="NO" id="0t4-W0-Izf">
-                                <rect key="frame" x="20" y="518" width="374" height="256"/>
+                                <rect key="frame" x="20" y="517" width="374" height="257"/>
                                 <color key="backgroundColor" white="0.0" alpha="0.0" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                                 <color key="textColor" white="0.66666666669999997" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                                 <fontDescription key="fontDescription" type="system" weight="semibold" pointSize="17"/>
                                 <textInputTraits key="textInputTraits" autocapitalizationType="sentences"/>
                             </textView>
                             <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" showsTouchWhenHighlighted="YES" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="LAq-QM-9fZ">
-                                <rect key="frame" x="324" y="486" width="70" height="24"/>
+                                <rect key="frame" x="325" y="486" width="69" height="23"/>
                                 <fontDescription key="fontDescription" type="system" pointSize="10"/>
                                 <color key="tintColor" red="0.25174289789999998" green="0.82675522769999998" blue="1" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
                                 <state key="normal" title=" copy text" image="doc.on.doc" catalog="system">
@@ -424,7 +426,7 @@
                                 </connections>
                             </button>
                             <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" showsTouchWhenHighlighted="YES" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="gnh-pp-jsJ">
-                                <rect key="frame" x="244" y="487.5" width="70" height="21"/>
+                                <rect key="frame" x="245" y="487" width="70" height="21"/>
                                 <fontDescription key="fontDescription" type="system" pointSize="10"/>
                                 <color key="tintColor" red="0.25174289789999998" green="0.82675522769999998" blue="1" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
                                 <state key="normal" title=" share text" image="square.and.arrow.up" catalog="system">
@@ -435,6 +437,7 @@
                                 </connections>
                             </button>
                         </subviews>
+                        <viewLayoutGuide key="safeArea" id="GK0-od-YHe"/>
                         <color key="backgroundColor" white="0.0" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                         <constraints>
                             <constraint firstItem="lJf-Uh-ILV" firstAttribute="centerX" secondItem="i3r-81-WoL" secondAttribute="centerX" id="FY6-aA-ZeU"/>
@@ -456,7 +459,6 @@
                             <constraint firstItem="hpJ-y0-mBa" firstAttribute="centerY" secondItem="hEA-SP-XCB" secondAttribute="centerY" id="w9x-fr-RZy"/>
                             <constraint firstItem="LAq-QM-9fZ" firstAttribute="top" secondItem="lJf-Uh-ILV" secondAttribute="bottom" constant="17" id="zht-Q2-AjK"/>
                         </constraints>
-                        <viewLayoutGuide key="safeArea" id="GK0-od-YHe"/>
                     </view>
                     <navigationItem key="navigationItem" id="Moc-PD-hEV"/>
                     <connections>
@@ -495,33 +497,33 @@
                                 <nil key="highlightedColor"/>
                             </label>
                             <stackView opaque="NO" contentMode="scaleToFill" axis="vertical" alignment="top" spacing="28" translatesAutoresizingMaskIntoConstraints="NO" id="TTn-Sr-sef">
-                                <rect key="frame" x="20" y="177" width="378" height="123.5"/>
+                                <rect key="frame" x="20" y="177" width="378" height="123"/>
                                 <subviews>
                                     <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="leading" contentVerticalAlignment="center" showsTouchWhenHighlighted="YES" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="9Nf-xa-kAv">
                                         <rect key="frame" x="0.0" y="0.0" width="378" height="22"/>
                                         <color key="tintColor" red="0.25174289789999998" green="0.82675522769999998" blue="1" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
                                         <state key="normal" title="  as .psbt file" image="folder" catalog="system">
-                                            <color key="titleColor" systemColor="systemTealColor" red="0.35294117650000001" green="0.7843137255" blue="0.98039215690000003" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+                                            <color key="titleColor" systemColor="systemTealColor"/>
                                         </state>
                                         <connections>
                                             <action selector="importFileAction:" destination="EM0-dh-3fz" eventType="touchUpInside" id="4ID-P9-vGT"/>
                                         </connections>
                                     </button>
                                     <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="left" contentVerticalAlignment="center" showsTouchWhenHighlighted="YES" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="h7v-HZ-MWy">
-                                        <rect key="frame" x="0.0" y="50" width="378" height="23.5"/>
+                                        <rect key="frame" x="0.0" y="50" width="378" height="23"/>
                                         <color key="tintColor" red="0.25174289789999998" green="0.82675522769999998" blue="1" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
                                         <state key="normal" title="  paste base64 psbt text" image="doc.on.clipboard" catalog="system">
-                                            <color key="titleColor" systemColor="systemTealColor" red="0.35294117650000001" green="0.7843137255" blue="0.98039215690000003" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+                                            <color key="titleColor" systemColor="systemTealColor"/>
                                         </state>
                                         <connections>
                                             <action selector="pasteAction:" destination="EM0-dh-3fz" eventType="touchUpInside" id="BoF-fh-zSy"/>
                                         </connections>
                                     </button>
                                     <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="left" contentVerticalAlignment="center" showsTouchWhenHighlighted="YES" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="uHl-cG-gez">
-                                        <rect key="frame" x="0.0" y="101.5" width="378" height="22"/>
+                                        <rect key="frame" x="0.0" y="101" width="378" height="22"/>
                                         <color key="tintColor" red="0.25174289789999998" green="0.82675522769999998" blue="1" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
                                         <state key="normal" title="  airgapped qr from Gordian Wallet" image="qrcode.viewfinder" catalog="system">
-                                            <color key="titleColor" systemColor="systemTealColor" red="0.35294117650000001" green="0.7843137255" blue="0.98039215690000003" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+                                            <color key="titleColor" systemColor="systemTealColor"/>
                                         </state>
                                         <connections>
                                             <action selector="qrAction:" destination="EM0-dh-3fz" eventType="touchUpInside" id="W3t-4k-e9S"/>
@@ -538,6 +540,7 @@
                                 </constraints>
                             </stackView>
                         </subviews>
+                        <viewLayoutGuide key="safeArea" id="E9r-0y-qrb"/>
                         <color key="backgroundColor" white="0.0" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                         <constraints>
                             <constraint firstItem="E9r-0y-qrb" firstAttribute="trailing" secondItem="5wM-In-ro1" secondAttribute="trailing" constant="16" id="HQm-Fa-Oih"/>
@@ -548,7 +551,6 @@
                             <constraint firstItem="5wM-In-ro1" firstAttribute="top" secondItem="niS-Hx-hLU" secondAttribute="topMargin" constant="30" id="ewQ-Sj-TLD"/>
                             <constraint firstItem="wLI-vs-8hP" firstAttribute="leading" secondItem="E9r-0y-qrb" secondAttribute="leading" constant="16" id="kvI-Ig-rVN"/>
                         </constraints>
-                        <viewLayoutGuide key="safeArea" id="E9r-0y-qrb"/>
                     </view>
                     <navigationItem key="navigationItem" id="Xvd-VO-Ybi"/>
                     <connections>
@@ -581,7 +583,7 @@
                                             <autoresizingMask key="autoresizingMask"/>
                                             <subviews>
                                                 <label opaque="NO" userInteractionEnabled="NO" tag="7" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Input #1" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="mqO-S8-3QD">
-                                                    <rect key="frame" x="16" y="8" width="65" height="21"/>
+                                                    <rect key="frame" x="16" y="8" width="64" height="21"/>
                                                     <fontDescription key="fontDescription" type="system" weight="semibold" pointSize="17"/>
                                                     <color key="textColor" white="0.66666666666666663" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                                                     <nil key="highlightedColor"/>
@@ -612,7 +614,7 @@
                                                                 <subviews>
                                                                     <view tag="2" contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="86m-uI-ODv" customClass="LifehashSeedSecondary" customModule="Gordian_Cosigner" customModuleProvider="target">
                                                                         <rect key="frame" x="222" y="11" width="68" height="41"/>
-                                                                        <color key="backgroundColor" systemColor="systemBackgroundColor" cocoaTouchSystemColor="whiteColor"/>
+                                                                        <color key="backgroundColor" systemColor="systemBackgroundColor"/>
                                                                         <constraints>
                                                                             <constraint firstAttribute="height" constant="41" id="4Wv-M2-4v7"/>
                                                                             <constraint firstAttribute="width" constant="68" id="jJ4-26-Sxs"/>
@@ -625,8 +627,8 @@
                                                                         <nil key="highlightedColor"/>
                                                                     </label>
                                                                     <imageView clipsSubviews="YES" userInteractionEnabled="NO" tag="3" contentMode="scaleAspectFit" horizontalHuggingPriority="251" verticalHuggingPriority="251" image="signature" catalog="system" translatesAutoresizingMaskIntoConstraints="NO" id="eaO-Wv-wgK">
-                                                                        <rect key="frame" x="16" y="18.5" width="30" height="31"/>
-                                                                        <color key="tintColor" systemColor="systemPinkColor" red="1" green="0.1764705882" blue="0.33333333329999998" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+                                                                        <rect key="frame" x="16" y="17.5" width="30" height="31"/>
+                                                                        <color key="tintColor" systemColor="systemPinkColor"/>
                                                                         <constraints>
                                                                             <constraint firstAttribute="height" constant="30.5" id="G6B-LX-Vu2"/>
                                                                             <constraint firstAttribute="width" constant="30" id="cT8-bG-Hgj"/>
@@ -652,7 +654,7 @@
                                                     </connections>
                                                 </tableView>
                                                 <label opaque="NO" userInteractionEnabled="NO" tag="8" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="path" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="2P4-ar-0sH">
-                                                    <rect key="frame" x="284.5" y="33" width="29.5" height="17"/>
+                                                    <rect key="frame" x="285" y="33" width="29" height="17"/>
                                                     <fontDescription key="fontDescription" type="system" pointSize="14"/>
                                                     <color key="textColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                                                     <nil key="highlightedColor"/>
@@ -708,7 +710,7 @@
                                                     <nil key="highlightedColor"/>
                                                 </label>
                                                 <label opaque="NO" userInteractionEnabled="NO" tag="3" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="0.23456 btc" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="lfK-IA-YLB">
-                                                    <rect key="frame" x="20" y="40" width="95" height="21"/>
+                                                    <rect key="frame" x="20" y="40" width="94" height="21"/>
                                                     <fontDescription key="fontDescription" type="system" pointSize="17"/>
                                                     <color key="textColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                                                     <nil key="highlightedColor"/>
@@ -738,7 +740,7 @@
                                                     <nil key="highlightedColor"/>
                                                 </label>
                                                 <label opaque="NO" userInteractionEnabled="NO" tag="6" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="m/48h/0h/0h/2h/0/217" textAlignment="right" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="pWI-g2-a35">
-                                                    <rect key="frame" x="167.5" y="11" width="146" height="21"/>
+                                                    <rect key="frame" x="170" y="11" width="143.5" height="21"/>
                                                     <constraints>
                                                         <constraint firstAttribute="height" constant="21" id="A6c-kz-k6I"/>
                                                     </constraints>
@@ -748,7 +750,7 @@
                                                 </label>
                                                 <view tag="2" contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="YgK-K0-nvv" customClass="LifehashSeedSecondary" customModule="Gordian_Cosigner" customModuleProvider="target">
                                                     <rect key="frame" x="244" y="40" width="70" height="41"/>
-                                                    <color key="backgroundColor" systemColor="systemBackgroundColor" cocoaTouchSystemColor="whiteColor"/>
+                                                    <color key="backgroundColor" systemColor="systemBackgroundColor"/>
                                                     <constraints>
                                                         <constraint firstAttribute="width" constant="70" id="OhR-Qh-1PL"/>
                                                         <constraint firstAttribute="height" constant="41" id="VXa-oG-Zh6"/>
@@ -794,7 +796,7 @@
                                             <autoresizingMask key="autoresizingMask"/>
                                             <subviews>
                                                 <label opaque="NO" userInteractionEnabled="NO" tag="1" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Mining fee:" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="hnM-2N-ugd">
-                                                    <rect key="frame" x="20" y="11.5" width="85" height="21"/>
+                                                    <rect key="frame" x="20" y="11.5" width="84" height="21"/>
                                                     <fontDescription key="fontDescription" type="system" pointSize="17"/>
                                                     <color key="textColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                                                     <nil key="highlightedColor"/>
@@ -856,7 +858,7 @@
                                 <constraints>
                                     <constraint firstAttribute="height" constant="50" id="Qpq-y6-pn7"/>
                                 </constraints>
-                                <color key="tintColor" systemColor="systemTealColor" red="0.35294117650000001" green="0.7843137255" blue="0.98039215690000003" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+                                <color key="tintColor" systemColor="systemTealColor"/>
                                 <state key="normal" title="sign">
                                     <color key="titleColor" red="0.25174289789999998" green="0.82675522769999998" blue="1" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
                                 </state>
@@ -865,6 +867,7 @@
                                 </connections>
                             </button>
                         </subviews>
+                        <viewLayoutGuide key="safeArea" id="4Jg-zn-8gW"/>
                         <color key="backgroundColor" white="0.0" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                         <constraints>
                             <constraint firstItem="f9C-dt-19s" firstAttribute="top" secondItem="4Jg-zn-8gW" secondAttribute="top" constant="20" id="4bK-AK-p5u"/>
@@ -877,7 +880,6 @@
                             <constraint firstItem="f9C-dt-19s" firstAttribute="leading" secondItem="4Jg-zn-8gW" secondAttribute="leading" constant="20" id="l7z-m9-6xa"/>
                             <constraint firstItem="zaS-M0-VOe" firstAttribute="top" secondItem="t98-et-dYS" secondAttribute="bottom" constant="8" id="x7x-ib-AFM"/>
                         </constraints>
-                        <viewLayoutGuide key="safeArea" id="4Jg-zn-8gW"/>
                     </view>
                     <navigationItem key="navigationItem" id="EJw-I7-pO3">
                         <barButtonItem key="rightBarButtonItem" image="square.and.arrow.up" catalog="system" id="Qfc-Bd-hVM">
@@ -906,7 +908,7 @@
                         <autoresizingMask key="autoresizingMask"/>
                         <color key="backgroundColor" white="0.0" alpha="0.0" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                         <color key="barTintColor" white="0.0" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
-                        <color key="selectedImageTintColor" systemColor="systemTealColor" red="0.35294117650000001" green="0.7843137255" blue="0.98039215690000003" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+                        <color key="selectedImageTintColor" systemColor="systemTealColor"/>
                     </tabBar>
                     <connections>
                         <segue destination="m8o-ee-tpB" kind="relationship" relationship="viewControllers" id="vCv-7M-n0D"/>
@@ -954,7 +956,7 @@
                                                                 <constraint firstAttribute="width" constant="55.399999999999999" id="mn7-BV-d3b"/>
                                                             </constraints>
                                                             <fontDescription key="fontDescription" type="system" pointSize="10"/>
-                                                            <color key="tintColor" systemColor="systemTealColor" red="0.35294117650000001" green="0.7843137255" blue="0.98039215690000003" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+                                                            <color key="tintColor" systemColor="systemTealColor"/>
                                                             <state key="normal" title=" edit" image="pencil.circle" catalog="system">
                                                                 <color key="titleColor" red="0.25174289789999998" green="0.82675522769999998" blue="1" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
                                                             </state>
@@ -967,9 +969,9 @@
                                                                 <constraint firstAttribute="width" constant="55.399999999999999" id="CRj-kW-raV"/>
                                                             </constraints>
                                                             <fontDescription key="fontDescription" type="system" pointSize="10"/>
-                                                            <color key="tintColor" systemColor="systemTealColor" red="0.35294117650000001" green="0.7843137255" blue="0.98039215690000003" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+                                                            <color key="tintColor" systemColor="systemTealColor"/>
                                                             <state key="normal" title=" copy" image="doc.on.doc" catalog="system">
-                                                                <color key="titleColor" systemColor="systemTealColor" red="0.35294117650000001" green="0.7843137255" blue="0.98039215690000003" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+                                                                <color key="titleColor" systemColor="systemTealColor"/>
                                                             </state>
                                                         </button>
                                                         <button opaque="NO" clipsSubviews="YES" tag="9" contentMode="scaleToFill" contentHorizontalAlignment="leading" contentVerticalAlignment="center" showsTouchWhenHighlighted="YES" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="KyH-HU-AEc">
@@ -980,9 +982,9 @@
                                                                 <constraint firstAttribute="width" constant="54.5" id="r9o-x9-pDU"/>
                                                             </constraints>
                                                             <fontDescription key="fontDescription" type="system" pointSize="10"/>
-                                                            <color key="tintColor" systemColor="systemTealColor" red="0.35294117650000001" green="0.7843137255" blue="0.98039215690000003" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+                                                            <color key="tintColor" systemColor="systemTealColor"/>
                                                             <state key="normal" title=" export" image="qrcode" catalog="system">
-                                                                <color key="titleColor" systemColor="systemTealColor" red="0.35294117650000001" green="0.7843137255" blue="0.98039215690000003" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+                                                                <color key="titleColor" systemColor="systemTealColor"/>
                                                             </state>
                                                         </button>
                                                     </subviews>
@@ -1003,12 +1005,12 @@
                                                         <constraint firstAttribute="width" constant="185" id="Gmp-vq-VA9"/>
                                                     </constraints>
                                                     <fontDescription key="fontDescription" type="system" pointSize="10"/>
-                                                    <color key="textColor" systemColor="systemPinkColor" red="1" green="0.1764705882" blue="0.33333333329999998" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+                                                    <color key="textColor" systemColor="systemPinkColor"/>
                                                     <nil key="highlightedColor"/>
                                                 </label>
                                                 <view tag="16" contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="t3l-ou-ANk" customClass="LifehashSeedView" customModule="Gordian_Cosigner" customModuleProvider="target">
                                                     <rect key="frame" x="20" y="11" width="220" height="80"/>
-                                                    <color key="backgroundColor" systemColor="systemBackgroundColor" cocoaTouchSystemColor="whiteColor"/>
+                                                    <color key="backgroundColor" systemColor="systemBackgroundColor"/>
                                                     <constraints>
                                                         <constraint firstAttribute="height" constant="80" id="hBx-DT-ozn"/>
                                                     </constraints>
@@ -1051,7 +1053,7 @@
                                                         <constraint firstAttribute="height" constant="44" id="txp-VA-Mk4"/>
                                                     </constraints>
                                                     <fontDescription key="fontDescription" type="system" pointSize="17"/>
-                                                    <color key="tintColor" systemColor="systemTealColor" red="0.35294117650000001" green="0.7843137255" blue="0.98039215690000003" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+                                                    <color key="tintColor" systemColor="systemTealColor"/>
                                                     <state key="normal" title=" add cosigner" image="plus" catalog="system">
                                                         <color key="titleColor" red="0.25174289789999998" green="0.82675522769999998" blue="1" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
                                                     </state>
@@ -1079,12 +1081,13 @@
                                 </constraints>
                             </imageView>
                             <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Cosigners" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="0Jw-zJ-UV2">
-                                <rect key="frame" x="64" y="19" width="138" height="35"/>
+                                <rect key="frame" x="64" y="19" width="138.5" height="35"/>
                                 <fontDescription key="fontDescription" type="boldSystem" pointSize="29"/>
                                 <color key="textColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                                 <nil key="highlightedColor"/>
                             </label>
                         </subviews>
+                        <viewLayoutGuide key="safeArea" id="ZXS-sm-UBJ"/>
                         <color key="backgroundColor" white="0.0" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                         <constraints>
                             <constraint firstItem="iS9-Hq-6ma" firstAttribute="top" secondItem="6iA-4d-gNe" secondAttribute="top" constant="16" id="0T9-aU-MfE"/>
@@ -1096,7 +1099,6 @@
                             <constraint firstItem="MwK-VP-A9M" firstAttribute="bottom" secondItem="ZXS-sm-UBJ" secondAttribute="bottom" id="wLd-6B-Z9p"/>
                             <constraint firstItem="MwK-VP-A9M" firstAttribute="leading" secondItem="ZXS-sm-UBJ" secondAttribute="leading" constant="20" id="wah-lj-Cpr"/>
                         </constraints>
-                        <viewLayoutGuide key="safeArea" id="ZXS-sm-UBJ"/>
                     </view>
                     <navigationItem key="navigationItem" id="EWg-zu-rzB">
                         <barButtonItem key="leftBarButtonItem" image="info.circle" catalog="system" id="IlK-rd-fB9">
@@ -1185,9 +1187,9 @@
                                                         <constraint firstAttribute="width" constant="74" id="aiZ-ME-gIF"/>
                                                     </constraints>
                                                     <fontDescription key="fontDescription" type="system" pointSize="10"/>
-                                                    <color key="tintColor" systemColor="systemTealColor" red="0.35294117650000001" green="0.7843137255" blue="0.98039215690000003" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+                                                    <color key="tintColor" systemColor="systemTealColor"/>
                                                     <state key="normal" title=" export" image="qrcode" catalog="system">
-                                                        <color key="titleColor" systemColor="systemTealColor" red="0.35294117650000001" green="0.7843137255" blue="0.98039215690000003" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+                                                        <color key="titleColor" systemColor="systemTealColor"/>
                                                     </state>
                                                 </button>
                                                 <button opaque="NO" tag="9" contentMode="scaleToFill" contentHorizontalAlignment="leading" contentVerticalAlignment="center" showsTouchWhenHighlighted="YES" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="X3K-bu-27l">
@@ -1197,7 +1199,7 @@
                                                         <constraint firstAttribute="width" constant="74" id="jHx-Pf-2Za"/>
                                                     </constraints>
                                                     <fontDescription key="fontDescription" type="system" pointSize="10"/>
-                                                    <color key="tintColor" systemColor="systemTealColor" red="0.35294117650000001" green="0.7843137255" blue="0.98039215690000003" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+                                                    <color key="tintColor" systemColor="systemTealColor"/>
                                                     <state key="normal" title=" edit" image="pencil.circle" catalog="system">
                                                         <color key="titleColor" red="0.25174289789999998" green="0.82675522769999998" blue="1" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
                                                     </state>
@@ -1215,7 +1217,7 @@
                                                     <nil key="highlightedColor"/>
                                                 </label>
                                                 <label opaque="NO" userInteractionEnabled="NO" tag="4" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Label" textAlignment="natural" lineBreakMode="middleTruncation" numberOfLines="0" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="tiF-xF-OsX">
-                                                    <rect key="frame" x="20" y="146" width="42" height="20.5"/>
+                                                    <rect key="frame" x="20" y="146" width="41.5" height="20.5"/>
                                                     <fontDescription key="fontDescription" type="system" pointSize="17"/>
                                                     <color key="textColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                                                     <nil key="highlightedColor"/>
@@ -1231,34 +1233,34 @@
                                                         <color key="titleColor" red="0.25174289789999998" green="0.82675522769999998" blue="1" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
                                                     </state>
                                                 </button>
-                                                <imageView clipsSubviews="YES" userInteractionEnabled="NO" tag="5" contentMode="scaleAspectFit" horizontalHuggingPriority="251" verticalHuggingPriority="251" ambiguous="YES" translatesAutoresizingMaskIntoConstraints="NO" id="m8G-DG-8gz">
+                                                <imageView clipsSubviews="YES" userInteractionEnabled="NO" tag="5" contentMode="scaleAspectFit" horizontalHuggingPriority="251" verticalHuggingPriority="251" translatesAutoresizingMaskIntoConstraints="NO" id="m8G-DG-8gz">
                                                     <rect key="frame" x="167" y="136" width="26" height="26"/>
                                                     <constraints>
                                                         <constraint firstAttribute="width" constant="26" id="PKV-0b-pCR"/>
                                                         <constraint firstAttribute="height" constant="26" id="Ujg-zT-EPF"/>
                                                     </constraints>
                                                 </imageView>
-                                                <label opaque="NO" userInteractionEnabled="NO" tag="12" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" ambiguous="YES" text="account incomplete!" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="WD6-g2-z8N">
+                                                <label opaque="NO" userInteractionEnabled="NO" tag="12" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="account incomplete!" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="WD6-g2-z8N">
                                                     <rect key="frame" x="201" y="141" width="123.5" height="16"/>
                                                     <fontDescription key="fontDescription" type="system" pointSize="13"/>
-                                                    <color key="textColor" systemColor="systemYellowColor" red="1" green="0.80000000000000004" blue="0.0" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+                                                    <color key="textColor" systemColor="systemYellowColor"/>
                                                     <nil key="highlightedColor"/>
                                                 </label>
-                                                <button opaque="NO" tag="14" contentMode="scaleToFill" ambiguous="YES" contentHorizontalAlignment="leading" contentVerticalAlignment="center" showsTouchWhenHighlighted="YES" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="LHT-O3-jjh">
+                                                <button opaque="NO" tag="14" contentMode="scaleToFill" contentHorizontalAlignment="leading" contentVerticalAlignment="center" showsTouchWhenHighlighted="YES" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="LHT-O3-jjh">
                                                     <rect key="frame" x="171" y="165" width="108" height="18"/>
                                                     <constraints>
                                                         <constraint firstAttribute="width" constant="108" id="Uhy-DJ-WaK"/>
                                                         <constraint firstAttribute="height" constant="18" id="tmD-Z0-EM5"/>
                                                     </constraints>
                                                     <fontDescription key="fontDescription" type="system" pointSize="13"/>
-                                                    <color key="tintColor" systemColor="systemGreenColor" red="0.20392156859999999" green="0.78039215689999997" blue="0.34901960780000002" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+                                                    <color key="tintColor" systemColor="systemGreenColor"/>
                                                     <state key="normal" title="   add cosigner" image="plus" catalog="system">
-                                                        <color key="titleColor" systemColor="systemGreenColor" red="0.20392156859999999" green="0.78039215689999997" blue="0.34901960780000002" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+                                                        <color key="titleColor" systemColor="systemGreenColor"/>
                                                     </state>
                                                 </button>
                                                 <view tag="13" contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="EN2-bJ-Xzp" customClass="LifehashSeedView" customModule="Gordian_Cosigner" customModuleProvider="target">
                                                     <rect key="frame" x="20" y="11" width="212" height="80"/>
-                                                    <color key="backgroundColor" systemColor="systemBackgroundColor" cocoaTouchSystemColor="whiteColor"/>
+                                                    <color key="backgroundColor" systemColor="systemBackgroundColor"/>
                                                     <constraints>
                                                         <constraint firstAttribute="height" constant="80" id="1iq-Xy-lHK"/>
                                                     </constraints>
@@ -1273,6 +1275,7 @@
                                                 <constraint firstItem="HQt-Pe-dRb" firstAttribute="bottom" secondItem="4uh-R9-2St" secondAttribute="bottomMargin" constant="1" id="JLA-L2-K80"/>
                                                 <constraint firstItem="I3g-vQ-6Vk" firstAttribute="trailing" secondItem="4uh-R9-2St" secondAttribute="trailingMargin" id="JMs-PD-0Da"/>
                                                 <constraint firstItem="X3K-bu-27l" firstAttribute="top" secondItem="lpj-Sn-rL7" secondAttribute="bottom" constant="4" id="Jhv-IO-jK8"/>
+                                                <constraint firstAttribute="bottomMargin" secondItem="LHT-O3-jjh" secondAttribute="bottom" constant="17" id="K7a-fS-fyp"/>
                                                 <constraint firstItem="7rN-A7-HuX" firstAttribute="top" secondItem="154-U5-HWh" secondAttribute="bottom" constant="2" id="ND9-Bp-quo"/>
                                                 <constraint firstItem="EN2-bJ-Xzp" firstAttribute="top" secondItem="4uh-R9-2St" secondAttribute="topMargin" id="Of5-TO-SfU"/>
                                                 <constraint firstItem="JcD-5C-7yD" firstAttribute="leading" secondItem="4uh-R9-2St" secondAttribute="leadingMargin" id="RPY-VR-Dmu"/>
@@ -1311,9 +1314,9 @@
                                                         <constraint firstAttribute="height" constant="40" id="Olb-BH-u9j"/>
                                                     </constraints>
                                                     <fontDescription key="fontDescription" type="system" pointSize="17"/>
-                                                    <color key="tintColor" systemColor="systemTealColor" red="0.35294117650000001" green="0.7843137255" blue="0.98039215690000003" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+                                                    <color key="tintColor" systemColor="systemTealColor"/>
                                                     <state key="normal" title=" create account" image="plus" catalog="system">
-                                                        <color key="titleColor" systemColor="systemTealColor" red="0.35294117650000001" green="0.7843137255" blue="0.98039215690000003" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+                                                        <color key="titleColor" systemColor="systemTealColor"/>
                                                     </state>
                                                 </button>
                                             </subviews>
@@ -1333,6 +1336,7 @@
                                 </connections>
                             </tableView>
                         </subviews>
+                        <viewLayoutGuide key="safeArea" id="oc1-7g-yRC"/>
                         <color key="backgroundColor" white="0.0" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                         <constraints>
                             <constraint firstItem="QUk-qt-fbj" firstAttribute="trailing" secondItem="oc1-7g-yRC" secondAttribute="trailing" constant="-20" id="A33-Gg-xWa"/>
@@ -1344,7 +1348,6 @@
                             <constraint firstItem="QUk-qt-fbj" firstAttribute="leading" secondItem="oc1-7g-yRC" secondAttribute="leading" constant="20" id="ae3-le-6IY"/>
                             <constraint firstItem="SPg-6E-hGO" firstAttribute="top" secondItem="oc1-7g-yRC" secondAttribute="top" constant="20" id="utG-tY-5KH"/>
                         </constraints>
-                        <viewLayoutGuide key="safeArea" id="oc1-7g-yRC"/>
                     </view>
                     <navigationItem key="navigationItem" id="IBD-Nb-A9w">
                         <barButtonItem key="leftBarButtonItem" image="info.circle" catalog="system" id="wwV-Vy-azx">
@@ -1416,20 +1419,21 @@
                                     </pickerView>
                                 </subviews>
                             </stackView>
-                            <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" showsTouchWhenHighlighted="YES" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="XEe-8F-g3c">
+                            <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="system" showsTouchWhenHighlighted="YES" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="XEe-8F-g3c">
                                 <rect key="frame" x="16" y="800" width="382" height="44"/>
-                                <color key="backgroundColor" cocoaTouchSystemColor="viewFlipsideBackgroundColor"/>
+                                <color key="backgroundColor" systemColor="viewFlipsideBackgroundColor"/>
                                 <constraints>
                                     <constraint firstAttribute="height" constant="44" id="aSm-5s-ghA"/>
                                 </constraints>
                                 <state key="normal" title="create">
-                                    <color key="titleColor" systemColor="systemTealColor" red="0.35294117650000001" green="0.7843137255" blue="0.98039215690000003" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+                                    <color key="titleColor" systemColor="systemTealColor"/>
                                 </state>
                                 <connections>
                                     <action selector="createAction:" destination="Iuy-9M-v3m" eventType="touchUpInside" id="00Z-qi-UPv"/>
                                 </connections>
                             </button>
                         </subviews>
+                        <viewLayoutGuide key="safeArea" id="m1M-Gn-itD"/>
                         <color key="backgroundColor" white="0.0" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                         <constraints>
                             <constraint firstItem="m1M-Gn-itD" firstAttribute="trailing" secondItem="e5i-uP-Exq" secondAttribute="trailing" constant="16" id="7x2-fd-Lft"/>
@@ -1439,7 +1443,6 @@
                             <constraint firstItem="m1M-Gn-itD" firstAttribute="bottom" secondItem="XEe-8F-g3c" secondAttribute="bottom" constant="18" id="abO-ly-MRs"/>
                             <constraint firstItem="m1M-Gn-itD" firstAttribute="trailing" secondItem="XEe-8F-g3c" secondAttribute="trailing" constant="16" id="wc8-EZ-9EE"/>
                         </constraints>
-                        <viewLayoutGuide key="safeArea" id="m1M-Gn-itD"/>
                     </view>
                     <navigationItem key="navigationItem" id="FNK-tI-r0a"/>
                     <connections>
@@ -1479,7 +1482,7 @@
                                             <autoresizingMask key="autoresizingMask"/>
                                             <subviews>
                                                 <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="3pd-bL-SAd">
-                                                    <rect key="frame" x="332" y="23" width="22" height="24"/>
+                                                    <rect key="frame" x="332" y="23" width="22" height="23"/>
                                                     <constraints>
                                                         <constraint firstAttribute="width" constant="22" id="sVK-tb-5GJ"/>
                                                     </constraints>
@@ -1510,6 +1513,7 @@
                                 </connections>
                             </tableView>
                         </subviews>
+                        <viewLayoutGuide key="safeArea" id="xPv-sy-l61"/>
                         <color key="backgroundColor" white="0.0" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                         <constraints>
                             <constraint firstItem="3bK-dG-SMk" firstAttribute="leading" secondItem="xPv-sy-l61" secondAttribute="leading" constant="20" id="D1l-0X-J4l"/>
@@ -1519,7 +1523,6 @@
                             <constraint firstItem="3bK-dG-SMk" firstAttribute="bottom" secondItem="xPv-sy-l61" secondAttribute="bottom" id="vlj-6v-Alj"/>
                             <constraint firstItem="Jbd-Mk-4Hz" firstAttribute="leading" secondItem="xPv-sy-l61" secondAttribute="leading" constant="20" id="xhd-Iq-hbr"/>
                         </constraints>
-                        <viewLayoutGuide key="safeArea" id="xPv-sy-l61"/>
                     </view>
                     <navigationItem key="navigationItem" id="E0z-Gu-Fjv"/>
                     <connections>
@@ -1538,14 +1541,14 @@
                         <rect key="frame" x="0.0" y="0.0" width="414" height="896"/>
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                         <subviews>
-                            <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="tXJ-Ca-pfZ">
+                            <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="system" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="tXJ-Ca-pfZ">
                                 <rect key="frame" x="16" y="800" width="382" height="42"/>
-                                <color key="backgroundColor" cocoaTouchSystemColor="viewFlipsideBackgroundColor"/>
+                                <color key="backgroundColor" systemColor="viewFlipsideBackgroundColor"/>
                                 <constraints>
                                     <constraint firstAttribute="height" constant="42" id="yjN-A4-xYP"/>
                                 </constraints>
                                 <state key="normal" title="encrypt &amp; save">
-                                    <color key="titleColor" systemColor="systemTealColor" red="0.35294117650000001" green="0.7843137255" blue="0.98039215690000003" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+                                    <color key="titleColor" systemColor="systemTealColor"/>
                                 </state>
                                 <connections>
                                     <action selector="addSignerAction:" destination="vZg-oW-Ek8" eventType="touchUpInside" id="xTp-dn-BLd"/>
@@ -1581,7 +1584,7 @@
                                                     <constraint firstAttribute="width" constant="24" id="B5c-Gj-x2F"/>
                                                     <constraint firstAttribute="height" constant="34" id="fEK-sn-bxu"/>
                                                 </constraints>
-                                                <color key="tintColor" systemColor="systemPinkColor" red="1" green="0.1764705882" blue="0.33333333329999998" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+                                                <color key="tintColor" systemColor="systemPinkColor"/>
                                                 <state key="normal" image="minus.rectangle" catalog="system"/>
                                                 <connections>
                                                     <action selector="removeWordAction:" destination="vZg-oW-Ek8" eventType="touchUpInside" id="U7W-Ws-oMp"/>
@@ -1601,7 +1604,7 @@
                                                     <constraint firstAttribute="height" constant="34" id="ZdL-gf-K6E"/>
                                                     <constraint firstAttribute="width" constant="24" id="oni-Ks-REh"/>
                                                 </constraints>
-                                                <color key="tintColor" systemColor="systemGreenColor" red="0.20392156859999999" green="0.78039215689999997" blue="0.34901960780000002" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+                                                <color key="tintColor" systemColor="systemGreenColor"/>
                                                 <state key="normal" image="plus.rectangle" catalog="system"/>
                                                 <connections>
                                                     <action selector="addWordAction:" destination="vZg-oW-Ek8" eventType="touchUpInside" id="1PF-yX-xeu"/>
@@ -1627,7 +1630,7 @@
                                 </subviews>
                             </stackView>
                             <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Give your cosigner a label:" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="2SY-hX-Krs">
-                                <rect key="frame" x="20" y="149" width="201.5" height="20.5"/>
+                                <rect key="frame" x="20" y="149" width="200" height="20.5"/>
                                 <fontDescription key="fontDescription" type="system" pointSize="17"/>
                                 <color key="textColor" white="0.66666666666666663" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                                 <nil key="highlightedColor"/>
@@ -1653,6 +1656,7 @@ If you do not want to add seed words to create a cosigner go back and choose the
                                 </connections>
                             </button>
                         </subviews>
+                        <viewLayoutGuide key="safeArea" id="ygb-tm-OJF"/>
                         <color key="backgroundColor" white="0.0" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                         <constraints>
                             <constraint firstItem="2SY-hX-Krs" firstAttribute="top" secondItem="bnh-FZ-tjQ" secondAttribute="bottom" constant="8" id="0Dm-OU-eq7"/>
@@ -1675,7 +1679,6 @@ If you do not want to add seed words to create a cosigner go back and choose the
                             <constraint firstItem="EzJ-7h-OG7" firstAttribute="centerY" secondItem="bnh-FZ-tjQ" secondAttribute="centerY" id="sKg-XL-fXv"/>
                             <constraint firstItem="ygb-tm-OJF" firstAttribute="trailing" secondItem="aPD-n5-10f" secondAttribute="trailing" constant="16" id="vW5-es-cMO"/>
                         </constraints>
-                        <viewLayoutGuide key="safeArea" id="ygb-tm-OJF"/>
                     </view>
                     <navigationItem key="navigationItem" id="vP2-NT-WcZ"/>
                     <connections>
@@ -1711,13 +1714,13 @@ If you do not want to add seed words to create a cosigner go back and choose the
                                 <nil key="highlightedColor"/>
                             </label>
                             <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Passphrase:" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="gmd-jY-AQy">
-                                <rect key="frame" x="20" y="255" width="94" height="21"/>
+                                <rect key="frame" x="20" y="255" width="93" height="21"/>
                                 <fontDescription key="fontDescription" type="system" pointSize="17"/>
                                 <color key="textColor" white="0.66666666669999997" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                                 <nil key="highlightedColor"/>
                             </label>
                             <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Cosigner:" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="kfk-gj-Xgg">
-                                <rect key="frame" x="20" y="339.5" width="74" height="21"/>
+                                <rect key="frame" x="20" y="339.5" width="73" height="21"/>
                                 <fontDescription key="fontDescription" type="system" pointSize="17"/>
                                 <color key="textColor" white="0.66666666669999997" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                                 <nil key="highlightedColor"/>
@@ -1741,7 +1744,7 @@ If you do not want to add seed words to create a cosigner go back and choose the
                                 <nil key="highlightedColor"/>
                             </label>
                             <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" showsTouchWhenHighlighted="YES" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="kae-J2-xZs">
-                                <rect key="frame" x="354" y="164" width="40" height="24"/>
+                                <rect key="frame" x="354" y="165" width="40" height="23"/>
                                 <constraints>
                                     <constraint firstAttribute="width" constant="40" id="lID-qJ-vwk"/>
                                 </constraints>
@@ -1752,7 +1755,7 @@ If you do not want to add seed words to create a cosigner go back and choose the
                                 </connections>
                             </button>
                             <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" showsTouchWhenHighlighted="YES" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="NgF-9q-iEN">
-                                <rect key="frame" x="354" y="336.5" width="40" height="24"/>
+                                <rect key="frame" x="354" y="337.5" width="40" height="23"/>
                                 <constraints>
                                     <constraint firstAttribute="width" constant="40" id="sMl-11-O6g"/>
                                 </constraints>
@@ -1763,6 +1766,7 @@ If you do not want to add seed words to create a cosigner go back and choose the
                                 </connections>
                             </button>
                         </subviews>
+                        <viewLayoutGuide key="safeArea" id="xbm-eg-gSI"/>
                         <color key="backgroundColor" white="0.0" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                         <constraints>
                             <constraint firstItem="kae-J2-xZs" firstAttribute="bottom" secondItem="h5j-1m-awu" secondAttribute="bottom" id="1Lf-CY-mQl"/>
@@ -1787,7 +1791,6 @@ If you do not want to add seed words to create a cosigner go back and choose the
                             <constraint firstItem="b5m-P6-H7W" firstAttribute="top" secondItem="gmd-jY-AQy" secondAttribute="bottom" constant="8" id="vMW-eW-INn"/>
                             <constraint firstItem="xbm-eg-gSI" firstAttribute="trailing" secondItem="x2U-GM-38H" secondAttribute="trailing" constant="20" id="zg0-VT-ywD"/>
                         </constraints>
-                        <viewLayoutGuide key="safeArea" id="xbm-eg-gSI"/>
                     </view>
                     <navigationItem key="navigationItem" id="yPb-qq-byF"/>
                     <connections>
@@ -1829,7 +1832,7 @@ If you do not want to add seed words to create a cosigner go back and choose the
                                 <fontDescription key="fontDescription" type="system" pointSize="14"/>
                                 <textInputTraits key="textInputTraits" autocapitalizationType="sentences"/>
                             </textView>
-                            <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="xtG-2W-fag">
+                            <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="system" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="xtG-2W-fag">
                                 <rect key="frame" x="165.5" y="769" width="83" height="39"/>
                                 <constraints>
                                     <constraint firstAttribute="width" constant="83" id="Jgo-Be-Vuh"/>
@@ -1854,6 +1857,7 @@ If you do not want to add seed words to create a cosigner go back and choose the
                                 </connections>
                             </button>
                         </subviews>
+                        <viewLayoutGuide key="safeArea" id="61I-rY-shf"/>
                         <color key="backgroundColor" white="0.0" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                         <constraints>
                             <constraint firstItem="na8-AO-gaK" firstAttribute="top" secondItem="S4t-z2-KRf" secondAttribute="bottom" constant="8" id="HOo-EX-kiI"/>
@@ -1869,7 +1873,6 @@ If you do not want to add seed words to create a cosigner go back and choose the
                             <constraint firstItem="S4t-z2-KRf" firstAttribute="top" secondItem="61I-rY-shf" secondAttribute="top" constant="20" id="uji-zi-cg1"/>
                             <constraint firstItem="61I-rY-shf" firstAttribute="trailing" secondItem="qsI-a2-d5U" secondAttribute="trailing" constant="20" id="vz9-Fl-fy3"/>
                         </constraints>
-                        <viewLayoutGuide key="safeArea" id="61I-rY-shf"/>
                     </view>
                     <connections>
                         <outlet property="blurb" destination="na8-AO-gaK" id="h6p-kS-lcZ"/>
@@ -1892,25 +1895,25 @@ If you do not want to add seed words to create a cosigner go back and choose the
                             <stackView opaque="NO" contentMode="scaleToFill" spacing="10" translatesAutoresizingMaskIntoConstraints="NO" id="Pbn-mh-qpI">
                                 <rect key="frame" x="132" y="812" width="150" height="30"/>
                                 <subviews>
-                                    <button opaque="NO" clipsSubviews="YES" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="H0R-xX-k9m">
+                                    <button opaque="NO" clipsSubviews="YES" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="system" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="H0R-xX-k9m">
                                         <rect key="frame" x="0.0" y="0.0" width="70" height="30"/>
                                         <color key="backgroundColor" white="0.33333333329999998" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                                         <constraints>
                                             <constraint firstAttribute="width" constant="70" id="3JM-rW-Qy1"/>
                                         </constraints>
-                                        <color key="tintColor" systemColor="systemRedColor" red="1" green="0.23137254900000001" blue="0.18823529410000001" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+                                        <color key="tintColor" systemColor="systemRedColor"/>
                                         <state key="normal" title="Decline"/>
                                         <connections>
                                             <action selector="declineAction:" destination="SMV-jN-46G" eventType="touchUpInside" id="hfe-Kq-tIO"/>
                                         </connections>
                                     </button>
-                                    <button opaque="NO" clipsSubviews="YES" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="4oZ-lb-UDr">
+                                    <button opaque="NO" clipsSubviews="YES" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="system" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="4oZ-lb-UDr">
                                         <rect key="frame" x="80" y="0.0" width="70" height="30"/>
                                         <color key="backgroundColor" white="0.33333333329999998" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                                         <constraints>
                                             <constraint firstAttribute="width" constant="70" id="dcM-vx-drR"/>
                                         </constraints>
-                                        <color key="tintColor" systemColor="systemGreenColor" red="0.20392156859999999" green="0.78039215689999997" blue="0.34901960780000002" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+                                        <color key="tintColor" systemColor="systemGreenColor"/>
                                         <state key="normal" title="Accept"/>
                                         <connections>
                                             <action selector="acceptAction:" destination="SMV-jN-46G" eventType="touchUpInside" id="gMe-6l-1SM"/>
@@ -1924,7 +1927,7 @@ If you do not want to add seed words to create a cosigner go back and choose the
                             </stackView>
                             <imageView clipsSubviews="YES" userInteractionEnabled="NO" contentMode="scaleAspectFit" horizontalHuggingPriority="251" verticalHuggingPriority="251" image="exclamationmark.bubble" catalog="system" translatesAutoresizingMaskIntoConstraints="NO" id="3Ms-zy-4zH">
                                 <rect key="frame" x="16" y="79.5" width="25" height="25"/>
-                                <color key="tintColor" systemColor="systemOrangeColor" red="1" green="0.58431372550000005" blue="0.0" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+                                <color key="tintColor" systemColor="systemOrangeColor"/>
                                 <constraints>
                                     <constraint firstAttribute="width" constant="25" id="503-RD-79K"/>
                                     <constraint firstAttribute="height" constant="25.5" id="sLu-Hk-a1f"/>
@@ -1942,7 +1945,7 @@ If you do not want to add seed words to create a cosigner go back and choose the
                             <textView clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="scaleToFill" editable="NO" textAlignment="natural" translatesAutoresizingMaskIntoConstraints="NO" id="Nhp-d8-eCA">
                                 <rect key="frame" x="16" y="127" width="382" height="677"/>
                                 <color key="backgroundColor" white="0.0" alpha="0.0" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
-                                <mutableString key="text">WARNING!
+                                <string key="text">WARNING!
 
 Gordian cosigner is an alpha release! It operates on Testnet. It is designed to only work with segwit m/48' account based derivations, other derivations will not work!
 
@@ -1950,12 +1953,13 @@ We are very grateful for your usage, and for any bugs, comments, or fixes, which
 
 Please read and accept the terms of our disclaimer:
 
-The use of Gordian Cosigner is under the "BSD 2-Clause Plus Patent License" (https://spdx.org/licenses/BSD-2-Clause-Patent.html). Copyright © 2019 BlockchainCommons. All rights reserved. With the disclaimer: THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDERS OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.</mutableString>
+The use of Gordian Cosigner is under the "BSD 2-Clause Plus Patent License" (https://spdx.org/licenses/BSD-2-Clause-Patent.html). Copyright © 2019 BlockchainCommons. All rights reserved. With the disclaimer: THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDERS OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.</string>
                                 <color key="textColor" white="0.66666666669999997" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                                 <fontDescription key="fontDescription" type="system" pointSize="14"/>
                                 <textInputTraits key="textInputTraits" autocapitalizationType="sentences"/>
                             </textView>
                         </subviews>
+                        <viewLayoutGuide key="safeArea" id="nn1-Xw-ioh"/>
                         <color key="backgroundColor" red="0.0" green="0.0" blue="0.0" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
                         <constraints>
                             <constraint firstItem="Pbn-mh-qpI" firstAttribute="top" secondItem="Nhp-d8-eCA" secondAttribute="bottom" constant="8" id="18Z-15-zLn"/>
@@ -1970,7 +1974,6 @@ The use of Gordian Cosigner is under the "BSD 2-Clause Plus Patent License" (htt
                             <constraint firstItem="nn1-Xw-ioh" firstAttribute="trailing" secondItem="k1N-w2-AD8" secondAttribute="trailing" constant="16" id="tkM-yb-xIt"/>
                             <constraint firstItem="k1N-w2-AD8" firstAttribute="top" secondItem="nn1-Xw-ioh" secondAttribute="top" constant="20" id="wdT-yf-f0Q"/>
                         </constraints>
-                        <viewLayoutGuide key="safeArea" id="nn1-Xw-ioh"/>
                     </view>
                     <navigationItem key="navigationItem" id="MsR-bl-1SL"/>
                     <connections>
@@ -1986,10 +1989,10 @@ The use of Gordian Cosigner is under the "BSD 2-Clause Plus Patent License" (htt
         </scene>
     </scenes>
     <inferredMetricsTieBreakers>
-        <segue reference="sdO-iP-xRE"/>
+        <segue reference="Shp-nC-lxd"/>
         <segue reference="GpL-x0-vs7"/>
         <segue reference="KzM-QC-ivF"/>
-        <segue reference="no9-tq-P7U"/>
+        <segue reference="WEQ-0q-dcz"/>
         <segue reference="hPq-I8-kVg"/>
     </inferredMetricsTieBreakers>
     <resources>
@@ -1997,11 +2000,11 @@ The use of Gordian Cosigner is under the "BSD 2-Clause Plus Patent License" (htt
         <image name="bitcoinsign.circle" catalog="system" width="128" height="121"/>
         <image name="chevron.down" catalog="system" width="128" height="72"/>
         <image name="chevron.right" catalog="system" width="96" height="128"/>
-        <image name="doc.on.clipboard" catalog="system" width="117" height="128"/>
-        <image name="doc.on.doc" catalog="system" width="117" height="128"/>
+        <image name="doc.on.clipboard" catalog="system" width="116" height="128"/>
+        <image name="doc.on.doc" catalog="system" width="116" height="128"/>
         <image name="exclamationmark.bubble" catalog="system" width="128" height="110"/>
         <image name="exclamationmark.triangle" catalog="system" width="128" height="112"/>
-        <image name="folder" catalog="system" width="128" height="95"/>
+        <image name="folder" catalog="system" width="128" height="97"/>
         <image name="info.circle" catalog="system" width="128" height="121"/>
         <image name="list.number" catalog="system" width="128" height="97"/>
         <image name="minus.rectangle" catalog="system" width="128" height="93"/>
@@ -2012,9 +2015,33 @@ The use of Gordian Cosigner is under the "BSD 2-Clause Plus Patent License" (htt
         <image name="plus" catalog="system" width="128" height="113"/>
         <image name="plus.rectangle" catalog="system" width="128" height="93"/>
         <image name="qrcode" catalog="system" width="128" height="114"/>
-        <image name="qrcode.viewfinder" catalog="system" width="128" height="114"/>
+        <image name="qrcode.viewfinder" catalog="system" width="128" height="115"/>
         <image name="signature" catalog="system" width="128" height="90"/>
         <image name="square.and.arrow.up" catalog="system" width="115" height="128"/>
         <image name="xmark.circle" catalog="system" width="128" height="121"/>
+        <systemColor name="systemBackgroundColor">
+            <color white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+        </systemColor>
+        <systemColor name="systemGreenColor">
+            <color red="0.20392156862745098" green="0.7803921568627451" blue="0.34901960784313724" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+        </systemColor>
+        <systemColor name="systemOrangeColor">
+            <color red="1" green="0.58431372549019611" blue="0.0" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+        </systemColor>
+        <systemColor name="systemPinkColor">
+            <color red="1" green="0.17647058823529413" blue="0.33333333333333331" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+        </systemColor>
+        <systemColor name="systemRedColor">
+            <color red="1" green="0.23137254901960785" blue="0.18823529411764706" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+        </systemColor>
+        <systemColor name="systemTealColor">
+            <color red="0.35294117647058826" green="0.78431372549019607" blue="0.98039215686274506" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+        </systemColor>
+        <systemColor name="systemYellowColor">
+            <color red="1" green="0.80000000000000004" blue="0.0" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+        </systemColor>
+        <systemColor name="viewFlipsideBackgroundColor">
+            <color red="0.1215686274509804" green="0.12941176470588239" blue="0.14117647058823529" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+        </systemColor>
     </resources>
 </document>

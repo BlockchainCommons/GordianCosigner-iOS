@@ -70,7 +70,10 @@ class PsbtViewController: UIViewController, UITableViewDelegate, UITableViewData
         CoreDataService.retrieveEntity(entityName: .payment) { [weak self] (psbts, errorDescription) in
             guard let self = self else { return }
             
-            guard let psbts = psbts, psbts.count > 0 else { self.spinner.remove(); return }
+            guard let psbts = psbts, psbts.count > 0 else {
+                self.spinner.remove()
+                return
+            }
             
             DispatchQueue.background(background: {
                 
@@ -365,7 +368,11 @@ class PsbtViewController: UIViewController, UITableViewDelegate, UITableViewData
     }
     
     @objc func editPsbts() {
-        psbtTable.setEditing(!psbtTable.isEditing, animated: true)
+        if psbts.count > 0 {
+            psbtTable.setEditing(!psbtTable.isEditing, animated: true)
+        } else {
+            psbtTable.setEditing(false, animated: true)
+        }
         
         if psbtTable.isEditing {
             editButton = UIBarButtonItem(title: "Done", style: .plain, target: self, action: #selector(editPsbts))

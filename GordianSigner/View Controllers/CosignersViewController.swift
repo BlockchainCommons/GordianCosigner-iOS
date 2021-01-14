@@ -450,7 +450,11 @@ class KeysetsViewController: UIViewController, UITableViewDelegate, UITableViewD
     }
     
     @objc func editCosigners() {
-        keysetsTable.setEditing(!keysetsTable.isEditing, animated: true)
+        if cosigners.count > 0 {
+            keysetsTable.setEditing(!keysetsTable.isEditing, animated: true)
+        } else {
+            keysetsTable.setEditing(false, animated: true)
+        }
         
         if keysetsTable.isEditing {
             editButton = UIBarButtonItem(title: "Done", style: .plain, target: self, action: #selector(editCosigners))

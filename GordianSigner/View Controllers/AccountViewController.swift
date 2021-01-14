@@ -113,20 +113,6 @@ class AccountMapsViewController: UIViewController, UITableViewDelegate, UITableV
                             let participant = cosignerStruct.label
                             
                             participants += participant + "\n"
-                            
-//                            CoreDataService.retrieveEntity(entityName: .signer) { (signers, errorDescription) in
-//                                if let signers = signers, signers.count > 0 {
-//                                    for signer in signers {
-//                                        let signerStruct = SignerStruct(dictionary: signer)
-//                                        if signerStruct.entropy != nil {
-//                                            if cosignerStruct.fingerprint == signerStruct.fingerprint {
-//                                                self.accountMaps[i]["canSign"] = true
-//                                                self.accountMaps[i]["signerLifeHash"] = signerStruct.lifeHash
-//                                            }
-//                                        }
-//                                    }
-//                                }
-//                            }
                         }
                     }
                     
@@ -173,9 +159,6 @@ class AccountMapsViewController: UIViewController, UITableViewDelegate, UITableV
         let account = accounts[indexPath.section]["account"] as! AccountStruct
         let descriptor = account.descriptor
         let descriptorStruct = descriptorParser.descriptor(descriptor)
-        
-//        let label = cell.viewWithTag(1) as! UILabel
-//        label.text = accountMap.label
         
         let policy = cell.viewWithTag(2) as! UILabel
         policy.text = descriptorStruct.mOfNType
@@ -229,17 +212,6 @@ class AccountMapsViewController: UIViewController, UITableViewDelegate, UITableV
             addButton.alpha = 0
             addressesButton.alpha = 1
         }
-        
-//        let signerLifeHash = cell.viewWithTag(6) as! LifehashSeedSecondary
-//        signerLifeHash.backgroundColor = cell.backgroundColor
-//        signerLifeHash.background.backgroundColor = cell.backgroundColor
-//        
-//        if let lifehash = accounts[indexPath.section]["signerLifeHash"] as? Data {
-//            signerLifeHash.lifehashImage.image = UIImage(data: lifehash)
-//            signerLifeHash.alpha = 1
-//        } else {
-//            signerLifeHash.alpha = 0
-//        }
         
         let date = cell.viewWithTag(11) as! UILabel
         date.text = account.dateAdded.formatted()
@@ -544,7 +516,11 @@ class AccountMapsViewController: UIViewController, UITableViewDelegate, UITableV
     }
     
     @objc func editAccounts() {
-        accountMapTable.setEditing(!accountMapTable.isEditing, animated: true)
+        if accounts.count > 0 {
+            accountMapTable.setEditing(!accountMapTable.isEditing, animated: true)
+        } else {
+            accountMapTable.setEditing(false, animated: true)
+        }
         
         if accountMapTable.isEditing {
             editButton = UIBarButtonItem(title: "Done", style: .plain, target: self, action: #selector(editAccounts))
