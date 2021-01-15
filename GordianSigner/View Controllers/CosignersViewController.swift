@@ -18,6 +18,7 @@ class KeysetsViewController: UIViewController, UITableViewDelegate, UITableViewD
     private var cosignerToExport = ""
     private var headerText = ""
     private var subheaderText = ""
+    private var cosigner:CosignerStruct!
     let spinner = Spinner()
 
     @IBOutlet weak private var keysetsTable: UITableView!
@@ -29,6 +30,10 @@ class KeysetsViewController: UIViewController, UITableViewDelegate, UITableViewD
         keysetsTable.delegate = self
         keysetsTable.dataSource = self
         
+        if !FirstTime.firstTimeHere() {
+            showAlert(self, "Fatal error", "We were unable to set and save an encryption key to your secure enclave, the app will not function without this key.")
+        }
+        
         addButton = UIBarButtonItem.init(barButtonSystemItem: .add, target: self, action: #selector(add))
         editButton = UIBarButtonItem.init(barButtonSystemItem: .edit, target: self, action: #selector(editCosigners))
         self.navigationItem.setRightBarButtonItems([addButton, editButton], animated: true)
@@ -37,9 +42,17 @@ class KeysetsViewController: UIViewController, UITableViewDelegate, UITableViewD
     }
     
     override func viewDidAppear(_ animated: Bool) {
-        if UserDefaults.standard.object(forKey: "seenCosignerInfo") == nil {
-            showInfo()
-            UserDefaults.standard.set(true, forKey: "seenCosignerInfo")
+        if UserDefaults.standard.object(forKey: "acceptDisclaimer") == nil {
+            DispatchQueue.main.async {
+                self.performSegue(withIdentifier: "segueToDisclaimer", sender: self)
+            }
+        } else {
+            load()
+            
+            if UserDefaults.standard.object(forKey: "seenCosignerInfo") == nil {
+                showInfo()
+                UserDefaults.standard.set(true, forKey: "seenCosignerInfo")
+            }
         }
     }
     
@@ -55,14 +68,6 @@ class KeysetsViewController: UIViewController, UITableViewDelegate, UITableViewD
         }
     }
     
-    private func seeSeedWords() {
-        DispatchQueue.main.async { [weak self] in
-            guard let self = self else { return }
-            
-            self.performSegue(withIdentifier: "segueToSeeSeedDetail", sender: self)
-        }
-    }
-    
     private func getPasteboard() {
         if let pasteBoard = UIPasteboard.general.string {
             if let account = URHelper.accountUr(pasteBoard) {
@@ -74,7 +79,7 @@ class KeysetsViewController: UIViewController, UITableViewDelegate, UITableViewD
                         alertStyle = UIAlertController.Style.alert
                     }
                     
-                    let alert = UIAlertController(title: "Import cosigner?", message: "You have a valid cosigner on your clipboard, would you like to import it?", preferredStyle: alertStyle)
+                    let alert = UIAlertController(title: "Import Cosigner?", message: "You have a valid cosigner on your clipboard, would you like to import it?", preferredStyle: alertStyle)
                     
                     alert.addAction(UIAlertAction(title: "Yes", style: .default, handler: { action in
                         self.addCosigner(account)
@@ -228,30 +233,38 @@ class KeysetsViewController: UIViewController, UITableViewDelegate, UITableViewD
     
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         if cosigners.count > 0 {
-        let cell = tableView.dequeueReusableCell(withIdentifier: "keysetCell", for: indexPath)
-        configureCell(cell)
-        
-        if cosigners.count > 0 && indexPath.section < cosigners.count {
+            let cell = tableView.dequeueReusableCell(withIdentifier: "keysetCell", for: indexPath)
+            configureCell(cell)
+            
             let cosigner = cosigners[indexPath.section]
             
-            let fingerprintLabel = cell.viewWithTag(2) as! UILabel
+            let fingerprintLabel = cell.viewWithTag(1) as! UILabel
+            let dateAddedLabel = cell.viewWithTag(2) as! UILabel
+            let isSharedImage = cell.viewWithTag(3) as! UIImageView
+            let sharedText = cell.viewWithTag(4) as! UILabel
+            let keysetLifehash = cell.viewWithTag(5) as! LifehashSeedView
+            let detailButton = cell.viewWithTag(6) as! UIButton
+            let isHotImageView = cell.viewWithTag(7) as! UIImageView
+            
             if let key = cosigner.bip48SegwitAccount {
                 let arr = key.split(separator: "]")
-                fingerprintLabel.text = "\(String(describing: arr[0]))]"
+                let processed = "\(arr[0])".replacingOccurrences(of: "[", with: "")
+                fingerprintLabel.text = processed
             } else {
-                fingerprintLabel.text = cosigner.fingerprint
+                fingerprintLabel.text = "?"
             }
             
-            let dateAddedLabel = cell.viewWithTag(7) as! UILabel
-            dateAddedLabel.text = cosigner.dateAdded.formatted()
-
-            let exportKeysetButton = cell.viewWithTag(9) as! UIButton
-            exportKeysetButton.restorationIdentifier = "\(indexPath.section)"
-            configureView(exportKeysetButton)
-            exportKeysetButton.addTarget(self, action: #selector(exportCosigner(_:)), for: .touchUpInside)
+            isHotImageView.image = UIImage(systemName: "flame")
+            isHotImageView.tintColor = .systemOrange
             
-            let isSharedImage = cell.viewWithTag(5) as! UIImageView
-            let sharedText = cell.viewWithTag(14) as! UILabel
+            if cosigner.words != nil || cosigner.xprv != nil {
+                isHotImageView.alpha = 1
+            } else {
+                isHotImageView.alpha = 0
+            }
+            
+            dateAddedLabel.text = cosigner.dateAdded.formatted()
+            
             if cosigner.sharedWith != nil {
                 isSharedImage.image = UIImage(systemName: "person.2.square.stack")
                 isSharedImage.tintColor = .systemPink
@@ -268,15 +281,10 @@ class KeysetsViewController: UIViewController, UITableViewDelegate, UITableViewD
                 sharedText.textColor = .systemBlue
             }
             
-            let editButton = cell.viewWithTag(12) as! UIButton
-            editButton.addTarget(self, action: #selector(editLabel(_:)), for: .touchUpInside)
-            editButton.restorationIdentifier = "\(indexPath.section)"
             
-            let copyTextButton = cell.viewWithTag(15) as! UIButton
-            copyTextButton.addTarget(self, action: #selector(copyText(_:)), for: .touchUpInside)
-            copyTextButton.restorationIdentifier = "\(indexPath.section)"
+            detailButton.addTarget(self, action: #selector(seeDetail(_:)), for: .touchUpInside)
+            detailButton.restorationIdentifier = "\(indexPath.section)"
             
-            let keysetLifehash = cell.viewWithTag(16) as! LifehashSeedView
             keysetLifehash.backgroundColor = cell.backgroundColor
             keysetLifehash.background.backgroundColor = cell.backgroundColor
             keysetLifehash.lifehashImage.image = UIImage(data: cosigner.lifehash)
@@ -284,9 +292,6 @@ class KeysetsViewController: UIViewController, UITableViewDelegate, UITableViewD
             keysetLifehash.iconLabel.text = cosigner.label
             
             return cell
-        } else {
-            return UITableViewCell()
-        }
             
         } else {
             let cell = tableView.dequeueReusableCell(withIdentifier: "cosignerDefaultCell", for: indexPath)
@@ -324,28 +329,23 @@ class KeysetsViewController: UIViewController, UITableViewDelegate, UITableViewD
         view.layer.cornerRadius = 8
     }
     
-    @objc func copyText(_ sender: UIButton) {
+    @objc func seeDetail(_ sender: UIButton) {
         guard let sectionString = sender.restorationIdentifier, let int = Int(sectionString) else { return }
         
-        let keyset = cosigners[int]
+        cosigner = cosigners[int]
         
-        UIPasteboard.general.string = keyset.bip48SegwitAccount
-        showAlert(self, "", "Cosigner text copied ✓")
-    }
-    
-    @objc func editLabel(_ sender: UIButton) {
-        guard let sectionString = sender.restorationIdentifier, let int = Int(sectionString) else { return }
-        
-        let keyset = cosigners[int]
-        
-        promptToEditLabel(keyset)
+        DispatchQueue.main.async { [weak self] in
+            guard let self = self else { return }
+            
+            self.performSegue(withIdentifier: "segueToSeeCosignerDetail", sender: self)
+        }
     }
     
     private func promptToEditLabel(_ keyset: CosignerStruct) {
         DispatchQueue.main.async { [weak self] in
             guard let self = self else { return }
             
-            let title = "Edit cosigner label"
+            let title = "Add Cosigner label"
             let message = ""
             let style = UIAlertController.Style.alert
             let alert = UIAlertController(title: title, message: message, preferredStyle: style)
@@ -381,26 +381,6 @@ class KeysetsViewController: UIViewController, UITableViewDelegate, UITableViewD
             guard success else { showAlert(self, "Label not saved!", "There was an error updating your label, please let us know about it: \(errorDescription ?? "unknown")"); return }
             
             self.load()
-        }
-    }
-    
-    @objc func exportCosigner(_ sender: UIButton) {
-        guard let sectionString = sender.restorationIdentifier, let int = Int(sectionString) else { return }
-        
-        let keyset = cosigners[int]
-        guard let account = keyset.bip48SegwitAccount else { return }
-        
-        cosignerToExport = account
-        headerText = "Cosigner"
-        subheaderText = account
-        export()
-    }
-    
-    private func export() {
-        DispatchQueue.main.async { [weak self] in
-            guard let self = self else { return }
-            
-            self.performSegue(withIdentifier: "exportKeyset", sender: self)
         }
     }
     
@@ -531,43 +511,41 @@ class KeysetsViewController: UIViewController, UITableViewDelegate, UITableViewD
     override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
         // Get the new view controller using segue.destination.
         // Pass the selected object to the new view controller.
-        if segue.identifier == "exportKeyset" {
-            if let vc = segue.destination as? QRDisplayerViewController {
-                vc.text = cosignerToExport
-                vc.isPsbt = false
-                vc.descriptionText = subheaderText
-                vc.header = headerText
-            }
-        }
-        
-        if segue.identifier == "segueToScanKeyset" {
-            if let vc = segue.destination as? QRScannerViewController {
-                vc.doneBlock = { [weak self] result in
-                    guard let self = self, let result = result else { return }
-                    
-                    if let account = URHelper.accountUr(result) {
-                        self.addCosigner(account)
-                    } else if result.contains("48h/\(Keys.coinType)h/0h/2h") || result.contains("48'/\(Keys.coinType)'/0'/2'") {
-                        self.addCosigner(result)
-                    } else {
-                        showAlert(self, "Cosigner not recognized!", "Gordian Cosigner currently only supports the m/48h/\(Keys.coinType)h/0h/2h key origin.")
-                    }
+        switch segue.identifier {
+        case "segueToSeeCosignerDetail":
+            guard let vc = segue.destination as? SeedDetailViewController else { fallthrough }
+            
+            vc.cosigner = self.cosigner
+            
+        case "segueToScanKeyset":
+            guard let vc = segue.destination as? QRScannerViewController else { fallthrough }
+            
+            vc.doneBlock = { [weak self] result in
+                guard let self = self, let result = result else { return }
+                
+                if let account = URHelper.accountUr(result) {
+                    self.addCosigner(account)
+                } else if result.contains("48h/\(Keys.coinType)h/0h/2h") || result.contains("48'/\(Keys.coinType)'/0'/2'") {
+                    self.addCosigner(result)
+                } else {
+                    showAlert(self, "Cosigner not recognized!", "Gordian Cosigner currently only supports the m/48h/\(Keys.coinType)h/0h/2h key origin.")
                 }
             }
-        }
-        
-        if segue.identifier == "segueToCosignersInfo" {
-            if let vc = segue.destination as? InfoViewController {
-                vc.isCosigner = true
+            
+        case "segueToCosignersInfo":
+            guard let vc = segue.destination as? InfoViewController else { fallthrough }
+            
+            vc.isCosigner = true
+            
+        case "segueToAddSeedWords":
+            guard let vc = segue.destination as? AddSignerViewController else { fallthrough }
+            
+            vc.doneBlock = {
+                self.load()
             }
-        }
-        
-        if segue.identifier == "segueToAddSeedWords" {
-            if let vc = segue.destination as? AddSignerViewController {
-                vc.doneBlock = {
-                    self.load()
-                }
-            }
+            
+        default:
+            break
         }
     }
 }

@@ -120,6 +120,25 @@ class PsbtViewController: UIViewController, UITableViewDelegate, UITableViewData
                                                         }
                                                     }
                                                 }
+                                                
+                                                if let encryptedXprv = cosignerStruct.masterKey {
+                                                    if let decryptedXprv = Encryption.decrypt(encryptedXprv) {
+                                                        if let hdkey = try? HDKey(base58: decryptedXprv.utf8) {
+                                                            if let childKey = try? hdkey.derive(using: origin.value.path) {
+                                                                if childKey.pubKey.data.hexString == originalPubkey {
+                                                                    if let sigs = input.signatures {
+                                                                        for sig in sigs {
+                                                                            if sig.key.data.hexString == originalPubkey {
+                                                                                // DID SIGN
+                                                                                self.weSigned[p] = true
+                                                                            }
+                                                                        }
+                                                                    }
+                                                                }
+                                                            }
+                                                        }
+                                                    }
+                                                }
                                             }
                                         }
                                     }

@@ -13,30 +13,51 @@ class PSBTSigner {
     
     class func sign(_ psbt: String, completion: @escaping ((psbt: PSBT?, signedFor: [String]?, errorMessage: String?)) -> Void) {
         var xprvsToSignWith = [HDKey]()
+        var masterKeysToSignWith = [HDKey]()
         var psbtToSign:PSBT!
         var signedFor = [String]()
+        var signableKeys = [String]()
         
         func reset() {
+            signableKeys.removeAll()
+            masterKeysToSignWith.removeAll()
             xprvsToSignWith.removeAll()
-            psbtToSign = nil
         }
         
-        func attemptToSignLocally() {
-            guard xprvsToSignWith.count > 0  else {
+        func sign() {
+            let uniqueSigners = Array(Set(signableKeys))
+            
+            guard uniqueSigners.count > 0 else {
+                reset()
                 completion((nil, nil, "Looks like none of your Cosigners can sign this psbt."))
                 return
             }
-            var signableKeys = [String]()
             
-            for (i, key) in xprvsToSignWith.enumerated() {
-                let inputs = psbtToSign.inputs
-                
-                for (x, input) in inputs.enumerated() {
-                    /// Create an array of child keys that we know can sign our inputs.
-                    if let origins = input.origins {
-                        for origin in origins {
-                            if let path = try? origin.value.path.chop(depth: 4) {
-                                if let childKey = try? key.derive(using: path) {
+            for (s, signer) in uniqueSigners.enumerated() {
+                guard let signingKey = try? Key(wif: signer, network: Keys.chain) else {
+                    reset()
+                    completion((nil, nil, "There was an error deriving your private key for signing."))
+                    return
+                }
+                signedFor.append(signingKey.pubKey.data.hexString)
+                psbtToSign = try? psbtToSign.signed(with: signingKey)
+                if s + 1 == uniqueSigners.count {
+                    reset()
+                    completion((psbtToSign, signedFor, nil))
+                }
+            }
+        }
+        
+        func attemptToSignWithMasterKeys() {
+            if masterKeysToSignWith.count > 0 {
+                for (i, key) in masterKeysToSignWith.enumerated() {
+                    let inputs = psbtToSign.inputs
+                    
+                    for (x, input) in inputs.enumerated() {
+                        /// Create an array of child keys that we know can sign our inputs.
+                        if let origins = input.origins {
+                            for origin in origins {
+                                if let childKey = try? key.derive(using: origin.value.path) {
                                     if let privKey = childKey.privKey {
                                         if childKey.pubKey == origin.key {
                                             signableKeys.append(privKey.wif)
@@ -45,30 +66,47 @@ class PSBTSigner {
                                 }
                             }
                         }
-                    }
-                    
-                    /// Once the above loops complete we remove any duplicate signing keys from the array then sign the psbt with each unique key.
-                    if i + 1 == xprvsToSignWith.count && x + 1 == inputs.count {
-                        let uniqueSigners = Array(Set(signableKeys))
                         
-                        guard uniqueSigners.count > 0 else {
-                            completion((nil, nil, "Looks like none of your Cosigners can sign this psbt."))
-                            return
-                        }
-                        
-                        for (s, signer) in uniqueSigners.enumerated() {
-                            guard let signingKey = try? Key(wif: signer, network: Keys.chain) else {
-                                completion((nil, nil, "There was an error deriving your private key for signing."))
-                                return
-                            }
-                            signedFor.append(signingKey.pubKey.data.hexString)
-                            psbtToSign = try? psbtToSign.signed(with: signingKey)
-                            if s + 1 == uniqueSigners.count {
-                                completion((psbtToSign, signedFor, nil))
-                            }
+                        /// Once the above loops complete we remove any duplicate signing keys from the array then sign the psbt with each unique key.
+                        if i + 1 == masterKeysToSignWith.count && x + 1 == inputs.count {
+                            sign()
                         }
                     }
                 }
+            } else {
+                sign()
+            }
+        }
+        
+        func attemptToSignWithAccountXprvs() {
+            if xprvsToSignWith.count > 0 {
+                for (i, key) in xprvsToSignWith.enumerated() {
+                    let inputs = psbtToSign.inputs
+                    
+                    for (x, input) in inputs.enumerated() {
+                        /// Create an array of child keys that we know can sign our inputs.
+                        if let origins = input.origins {
+                            for origin in origins {
+                                if let path = try? origin.value.path.chop(depth: 4) {
+                                    if let childKey = try? key.derive(using: path) {
+                                        if let privKey = childKey.privKey {
+                                            if childKey.pubKey == origin.key {
+                                                signableKeys.append(privKey.wif)
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                        
+                        /// Once the above loops complete we remove any duplicate signing keys from the array then sign the psbt with each unique key.
+                        if i + 1 == xprvsToSignWith.count && x + 1 == inputs.count {
+                            attemptToSignWithMasterKeys()
+                        }
+                    }
+                }
+            } else {
+                attemptToSignWithMasterKeys()
             }
         }
         
@@ -85,20 +123,38 @@ class PSBTSigner {
                     
                     if let encryptedXprv = cosignerStruct.xprv {
                         guard let decryptedXprv = Encryption.decrypt(encryptedXprv) else {
-                            completion((nil, nil, "There was an error decrypting your xprv."))
+                            reset()
+                            completion((nil, nil, "There was an error decrypting your account xprv."))
                             return
                         }
                         
                         guard let hdkey = try? HDKey(base58: decryptedXprv.utf8) else {
-                            completion((nil, nil, "There was an error decrypting your xprv."))
+                            reset()
+                            completion((nil, nil, "There was an error deriving your account xprv."))
                             return
                         }
                         
                         xprvsToSignWith.append(hdkey)
                     }
                     
+                    if let encryptedMasterKey = cosignerStruct.masterKey {
+                        guard let decryptedMasterKey = Encryption.decrypt(encryptedMasterKey) else {
+                            reset()
+                            completion((nil, nil, "There was an error decrypting your master key."))
+                            return
+                        }
+                        
+                        guard let hdkey = try? HDKey(base58: decryptedMasterKey.utf8) else {
+                            reset()
+                            completion((nil, nil, "There was an error deriving your master key."))
+                            return
+                        }
+                        
+                        masterKeysToSignWith.append(hdkey)
+                    }
+                    
                     if i + 1 == cosigners.count {
-                        attemptToSignLocally()
+                        attemptToSignWithAccountXprvs()
                     }
                 }
             }

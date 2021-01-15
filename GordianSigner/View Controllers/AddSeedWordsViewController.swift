@@ -57,10 +57,11 @@ class AddSignerViewController: UIViewController {
                 alias = aliasField.text!
             }
             
-            let wordData = self.justWords.joined().utf8
+            let wordData = self.justWords.joined(separator: " ").utf8
             
             guard let encryptedWords = Encryption.encrypt(wordData),
                 let masterKey = Keys.masterKey(justWords, passphrase),
+                let encryptedMasterKey = Encryption.encrypt(masterKey.utf8),
                 let fingerprint = Keys.fingerprint(masterKey),
                 let bip48SegwitAccount = Keys.bip48SegwitAccount(masterKey),
                 let xprv = Keys.accountXprv(masterKey),
@@ -80,6 +81,7 @@ class AddSignerViewController: UIViewController {
             cosigner["xprv"] = encryptedXprv
             cosigner["bip48SegwitAccount"] = bip48SegwitAccount
             cosigner["words"] = encryptedWords
+            cosigner["masterKey"] = encryptedMasterKey
             
             func finish() {
                 CoreDataService.saveEntity(dict: cosigner, entityName: .cosigner) { [weak self] (success, errorDescription) in

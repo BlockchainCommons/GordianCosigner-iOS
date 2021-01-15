@@ -285,6 +285,20 @@ class PsbtTableViewController: UIViewController, UITableViewDelegate, UITableVie
                                                 }
                                             }
                                         }
+                                        
+                                        if let encryptedXprv = cosignerStruct.masterKey {
+                                            if let decryptedXprv = Encryption.decrypt(encryptedXprv) {
+                                                if let hdkey = try? HDKey(base58: decryptedXprv.utf8) {
+                                                    if let childKey = try? hdkey.derive(using: fullPath) {
+                                                        if childKey.pubKey.data.hexString == originalPubkey {
+                                                            self.canSign = true
+                                                            updatedDict["lifeHash"] = UIImage(data: cosignerStruct.lifehash)
+                                                        }
+                                                    }
+                                                }
+                                            }
+                                        }
+                                        
                                         if s + 1 == cosigners.count {
                                             loopCosigners()
                                         }
@@ -724,8 +738,9 @@ class PsbtTableViewController: UIViewController, UITableViewDelegate, UITableVie
         PSBTSigner.sign(psbt.description) { [weak self] (signedPsbt, signedFor, errorMessage) in
             guard let self = self else { return }
             
+            self.spinner.remove()
+            
             guard let signedPsbt = signedPsbt, let signedFor = signedFor else {
-                self.spinner.remove()
                 showAlert(self, "Something is not right...", errorMessage ?? "unable to sign that psbt: unknown error")
                 return
             }
@@ -754,9 +769,7 @@ class PsbtTableViewController: UIViewController, UITableViewDelegate, UITableVie
                     }
                 }
             }
-            
-            self.spinner.remove()
-            
+                        
             showAlert(self, "Payment signed ✓", "The signed copy of the payment has been saved. You may export it at anytime by tapping the \"export\" button.")
         }
     }

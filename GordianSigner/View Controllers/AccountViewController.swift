@@ -29,23 +29,13 @@ class AccountMapsViewController: UIViewController, UITableViewDelegate, UITableV
         addButton = UIBarButtonItem.init(barButtonSystemItem: .add, target: self, action: #selector(add))
         editButton = UIBarButtonItem.init(barButtonSystemItem: .edit, target: self, action: #selector(editAccounts))
         self.navigationItem.setRightBarButtonItems([addButton, editButton], animated: true)
-        
-        if !FirstTime.firstTimeHere() {
-            showAlert(self, "Fatal error", "We were unable to set and save an encryption key to your secure enclave, the app will not function without this key.")
-        }
     }
     
     override func viewDidAppear(_ animated: Bool) {
-        if UserDefaults.standard.object(forKey: "acceptDisclaimer") == nil {
-            DispatchQueue.main.async {
-                self.performSegue(withIdentifier: "segueToDisclaimer", sender: self)
-            }
-        } else {
-            load()
-            if UserDefaults.standard.object(forKey: "seenAccountInfo") == nil {
-                showInfo()
-                UserDefaults.standard.set(true, forKey: "seenAccountInfo")
-            }
+        load()
+        if UserDefaults.standard.object(forKey: "seenAccountInfo") == nil {
+            showInfo()
+            UserDefaults.standard.set(true, forKey: "seenAccountInfo")
         }
     }
     
@@ -155,7 +145,6 @@ class AccountMapsViewController: UIViewController, UITableViewDelegate, UITableV
             participantsLabel.text = ""
         }
         
-        let isCompleteImage = cell.viewWithTag(5) as! UIImageView
         let completeLabel = cell.viewWithTag(12) as! UILabel
         let addButton = cell.viewWithTag(14) as! UIButton
         addButton.addTarget(self, action: #selector(addCosigner(_:)), for: .touchUpInside)
@@ -176,10 +165,7 @@ class AccountMapsViewController: UIViewController, UITableViewDelegate, UITableV
         exportButton.addTarget(self, action: #selector(exportQr(_:)), for: .touchUpInside)
         
         if account.descriptor.contains("keyset") {
-            isCompleteImage.alpha = 1
-            isCompleteImage.image = UIImage(systemName: "circle.lefthalf.fill")
-            isCompleteImage.tintColor = .systemYellow
-            completeLabel.text = "Account incomplete!"
+            completeLabel.text = "⚠️ Account incomplete!"
             addButton.alpha = 1
             addressesButton.alpha = 0
             editButton.alpha = 0
@@ -187,8 +173,6 @@ class AccountMapsViewController: UIViewController, UITableViewDelegate, UITableV
         } else {
             editButton.alpha = 1
             exportButton.alpha = 1
-            isCompleteImage.alpha = 0
-            isCompleteImage.tintColor = .systemGreen
             completeLabel.text = ""
             addButton.alpha = 0
             addressesButton.alpha = 1
@@ -562,7 +546,7 @@ class AccountMapsViewController: UIViewController, UITableViewDelegate, UITableV
             let alert = UIAlertController(title: "Delete Account?", message: "", preferredStyle: alertStyle)
             
             alert.addAction(UIAlertAction(title: "Delete", style: .destructive, handler: { action in
-                self.deleteAccountMapNow(id, section)
+                self.deleteAccountNow(id, section)
             }))
             
             alert.addAction(UIAlertAction(title: "Cancel", style: .cancel, handler: { action in }))
@@ -571,7 +555,7 @@ class AccountMapsViewController: UIViewController, UITableViewDelegate, UITableV
         }
     }
     
-    private func deleteAccountMapNow(_ id: UUID, _ section: Int) {
+    private func deleteAccountNow(_ id: UUID, _ section: Int) {
         CoreDataService.deleteEntity(id: id, entityName: .account) { (success, errorDescription) in
             guard success else {
                 showAlert(self, "Error deleting Account", "")
