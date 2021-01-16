@@ -15,6 +15,8 @@
 	<key>com.apple.security.network.client</key>
 	<true/>
 	<key>keychain-access-groups</key>
-	<array/>
+	<array>
+		<string>$(AppIdentifierPrefix)com.blockchaincommons.GordianSigner</string>
+	</array>
 </dict>
 </plist>

@@ -1,4 +1,38 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
-<model type="com.apple.IDECoreDataModeler.DataModel" documentVersion="1.0" lastSavedToolsVersion="1" systemVersion="11A491" minimumToolsVersion="Automatic" sourceLanguage="Swift" usedWithCloudKit="false" userDefinedModelVersionIdentifier="">
-    <elements/>
+<model type="com.apple.IDECoreDataModeler.DataModel" documentVersion="1.0" lastSavedToolsVersion="17709" systemVersion="19E242d" minimumToolsVersion="Automatic" sourceLanguage="Swift" userDefinedModelVersionIdentifier="">
+    <entity name="Account" representedClassName="Account" syncable="YES" codeGenerationType="class">
+        <attribute name="blockheight" optional="YES" attributeType="Integer 64" defaultValueString="0" usesScalarValueType="YES"/>
+        <attribute name="complete" optional="YES" attributeType="Boolean" usesScalarValueType="YES"/>
+        <attribute name="dateAdded" optional="YES" attributeType="Date" usesScalarValueType="NO"/>
+        <attribute name="descriptor" optional="YES" attributeType="String"/>
+        <attribute name="id" optional="YES" attributeType="UUID" usesScalarValueType="NO"/>
+        <attribute name="label" optional="YES" attributeType="String"/>
+        <attribute name="lifehash" optional="YES" attributeType="Binary"/>
+        <attribute name="map" optional="YES" attributeType="Binary"/>
+    </entity>
+    <entity name="Cosigner" representedClassName="Cosigner" syncable="YES" codeGenerationType="class">
+        <attribute name="bip48SegwitAccount" optional="YES" attributeType="String"/>
+        <attribute name="dateAdded" optional="YES" attributeType="Date" usesScalarValueType="NO"/>
+        <attribute name="dateShared" optional="YES" attributeType="Date" usesScalarValueType="NO"/>
+        <attribute name="fingerprint" optional="YES" attributeType="String"/>
+        <attribute name="id" optional="YES" attributeType="UUID" usesScalarValueType="NO"/>
+        <attribute name="label" optional="YES" attributeType="String"/>
+        <attribute name="lifehash" optional="YES" attributeType="Binary"/>
+        <attribute name="masterKey" optional="YES" attributeType="Binary"/>
+        <attribute name="sharedWith" optional="YES" attributeType="UUID" usesScalarValueType="NO"/>
+        <attribute name="words" optional="YES" attributeType="Binary"/>
+        <attribute name="xprv" optional="YES" attributeType="Binary"/>
+    </entity>
+    <entity name="Payment" representedClassName="Payment" syncable="YES" codeGenerationType="class">
+        <attribute name="dateAdded" optional="YES" attributeType="Date" usesScalarValueType="NO"/>
+        <attribute name="dateSigned" optional="YES" attributeType="Date" usesScalarValueType="NO"/>
+        <attribute name="id" optional="YES" attributeType="UUID" usesScalarValueType="NO"/>
+        <attribute name="label" optional="YES" attributeType="String"/>
+        <attribute name="psbt" optional="YES" attributeType="Binary"/>
+    </entity>
+    <elements>
+        <element name="Account" positionX="-54" positionY="18" width="128" height="163"/>
+        <element name="Cosigner" positionX="-54" positionY="54" width="128" height="208"/>
+        <element name="Payment" positionX="-54" positionY="117" width="128" height="118"/>
+    </elements>
 </model>

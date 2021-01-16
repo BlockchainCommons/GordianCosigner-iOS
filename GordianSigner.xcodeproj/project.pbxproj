@@ -7,18 +7,46 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
-		D00C4C772534296E00B8A61F /* CLibWally.xcframework in Frameworks */ = {isa = PBXBuildFile; fileRef = D00C4C752534296E00B8A61F /* CLibWally.xcframework */; };
-		D00C4C792534297400B8A61F /* LibWally.xcframework in Frameworks */ = {isa = PBXBuildFile; fileRef = D00C4C762534296E00B8A61F /* LibWally.xcframework */; };
-		D00C4C7A2534297400B8A61F /* LibWally.xcframework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = D00C4C762534296E00B8A61F /* LibWally.xcframework */; settings = {ATTRIBUTES = (CodeSignOnCopy, ); }; };
-		D04B029825249EEB00C249B8 /* SignerViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = D04B029725249EEB00C249B8 /* SignerViewController.swift */; };
-		D04B029A2524A18100C249B8 /* SignersViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = D04B02992524A18100C249B8 /* SignersViewController.swift */; };
-		D04B029C2524A9F800C249B8 /* AddSignerViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = D04B029B2524A9F800C249B8 /* AddSignerViewController.swift */; };
+		D00F498D258B2ACD00941DBA /* accounts.png in Resources */ = {isa = PBXBuildFile; fileRef = D00F498C258B2ACD00941DBA /* accounts.png */; };
+		D00F498F258B2AFE00941DBA /* seeds.png in Resources */ = {isa = PBXBuildFile; fileRef = D00F498E258B2AFD00941DBA /* seeds.png */; };
+		D00F4991258B2B6D00941DBA /* cosigners.png in Resources */ = {isa = PBXBuildFile; fileRef = D00F4990258B2B6D00941DBA /* cosigners.png */; };
+		D00F4993258B2B9300941DBA /* payments.png in Resources */ = {isa = PBXBuildFile; fileRef = D00F4992258B2B9300941DBA /* payments.png */; };
+		D016AE5D25B0031600A59E93 /* LibWally.xcframework in Frameworks */ = {isa = PBXBuildFile; fileRef = D016AE5825B0031300A59E93 /* LibWally.xcframework */; };
+		D016AE5E25B0031600A59E93 /* LibWally.xcframework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = D016AE5825B0031300A59E93 /* LibWally.xcframework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
+		D01ACBA42563EA8100B5B4E5 /* PaymentsViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = D01ACBA32563EA8100B5B4E5 /* PaymentsViewController.swift */; };
+		D01ACBA62563ED3200B5B4E5 /* Psbt.swift in Sources */ = {isa = PBXBuildFile; fileRef = D01ACBA52563ED3200B5B4E5 /* Psbt.swift */; };
+		D01C2955255CE33F00C5ED55 /* PaymentDetailViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = D01C2954255CE33F00C5ED55 /* PaymentDetailViewController.swift */; };
+		D0246DD7256B660100F812A5 /* Base58.swift in Sources */ = {isa = PBXBuildFile; fileRef = D0246DD6256B660100F812A5 /* Base58.swift */; };
+		D0246DDB256B667800F812A5 /* base58.c in Sources */ = {isa = PBXBuildFile; fileRef = D0246DDA256B667800F812A5 /* base58.c */; };
+		D02E51F0258860C200A479A0 /* SeedDetailViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = D02E51EF258860C200A479A0 /* SeedDetailViewController.swift */; };
+		D04423F325837A8700A25179 /* PaymentHash.swift in Sources */ = {isa = PBXBuildFile; fileRef = D04423F225837A8700A25179 /* PaymentHash.swift */; };
+		D04423F52586F2CC00A25179 /* LifehashSeedView.swift in Sources */ = {isa = PBXBuildFile; fileRef = D04423F42586F2CC00A25179 /* LifehashSeedView.swift */; };
+		D04423F72586F2F700A25179 /* LifehashSeedView.xib in Resources */ = {isa = PBXBuildFile; fileRef = D04423F62586F2F700A25179 /* LifehashSeedView.xib */; };
+		D04423FB258705B900A25179 /* LifehashSeedSecondary.swift in Sources */ = {isa = PBXBuildFile; fileRef = D04423FA258705B900A25179 /* LifehashSeedSecondary.swift */; };
+		D04423FD258705D900A25179 /* LifehashSeedSecondary.xib in Resources */ = {isa = PBXBuildFile; fileRef = D04423FC258705D900A25179 /* LifehashSeedSecondary.xib */; };
+		D04B029825249EEB00C249B8 /* AddPaymentViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = D04B029725249EEB00C249B8 /* AddPaymentViewController.swift */; };
+		D04B029C2524A9F800C249B8 /* AddSeedWordsViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = D04B029B2524A9F800C249B8 /* AddSeedWordsViewController.swift */; };
 		D04D4980252C19E000D7383E /* QRScannerViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = D04D497F252C19E000D7383E /* QRScannerViewController.swift */; };
 		D04D4982252C1A9300D7383E /* Spinner.swift in Sources */ = {isa = PBXBuildFile; fileRef = D04D4981252C1A9300D7383E /* Spinner.swift */; };
 		D04D4984252C4FEF00D7383E /* QRDisplayerViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = D04D4983252C4FEF00D7383E /* QRDisplayerViewController.swift */; };
 		D04D4986252C509400D7383E /* QRGenerator.swift in Sources */ = {isa = PBXBuildFile; fileRef = D04D4985252C509400D7383E /* QRGenerator.swift */; };
 		D064BCC6252D5BD700D42D66 /* URKit in Frameworks */ = {isa = PBXBuildFile; productRef = D064BCC5252D5BD700D42D66 /* URKit */; };
 		D064BCC8252D62FD00D42D66 /* URHelper.swift in Sources */ = {isa = PBXBuildFile; fileRef = D064BCC7252D62FD00D42D66 /* URHelper.swift */; };
+		D06F44572581B86200B42DEB /* AddressesViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = D06F44562581B86200B42DEB /* AddressesViewController.swift */; };
+		D090963B2560FE540098013A /* KeysetStruct.swift in Sources */ = {isa = PBXBuildFile; fileRef = D090963A2560FE540098013A /* KeysetStruct.swift */; };
+		D090963D25610D440098013A /* CosignersViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = D090963C25610D440098013A /* CosignersViewController.swift */; };
+		D090963F256256500098013A /* AccountViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = D090963E2562564F0098013A /* AccountViewController.swift */; };
+		D090964125625CC30098013A /* DescriptorParser.swift in Sources */ = {isa = PBXBuildFile; fileRef = D090964025625CC30098013A /* DescriptorParser.swift */; };
+		D090964325625CED0098013A /* Descriptor.swift in Sources */ = {isa = PBXBuildFile; fileRef = D090964225625CED0098013A /* Descriptor.swift */; };
+		D093E2A925A6E4C50038B59A /* InfoViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = D093E2A825A6E4C40038B59A /* InfoViewController.swift */; };
+		D0974A56255B8E300013DC60 /* LifeHash in Frameworks */ = {isa = PBXBuildFile; productRef = D0974A55255B8E300013DC60 /* LifeHash */; };
+		D0974A58255B8E8D0013DC60 /* SignerStruct.swift in Sources */ = {isa = PBXBuildFile; fileRef = D0974A57255B8E8D0013DC60 /* SignerStruct.swift */; };
+		D0974A5A255B90A10013DC60 /* AccountMapStruct.swift in Sources */ = {isa = PBXBuildFile; fileRef = D0974A59255B90A10013DC60 /* AccountMapStruct.swift */; };
+		D0974A5C255B93130013DC60 /* CoreDataService.swift in Sources */ = {isa = PBXBuildFile; fileRef = D0974A5B255B93130013DC60 /* CoreDataService.swift */; };
+		D0974A5E255B93500013DC60 /* Entities.swift in Sources */ = {isa = PBXBuildFile; fileRef = D0974A5D255B93500013DC60 /* Entities.swift */; };
+		D0974A62255BA1B90013DC60 /* LifeHash.swift in Sources */ = {isa = PBXBuildFile; fileRef = D0974A61255BA1B90013DC60 /* LifeHash.swift */; };
+		D0974A64255BB3C00013DC60 /* icons8-key-24.png in Resources */ = {isa = PBXBuildFile; fileRef = D0974A63255BB3C00013DC60 /* icons8-key-24.png */; };
+		D0AD30002591825F00B9CBFC /* LicenseDisclaimerViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = D0AD2FFF2591825F00B9CBFC /* LicenseDisclaimerViewController.swift */; };
 		D0B4DDD725258B25009C8624 /* Bip39Words.swift in Sources */ = {isa = PBXBuildFile; fileRef = D0B4DDD625258B25009C8624 /* Bip39Words.swift */; };
 		D0B4DDD92525AC18009C8624 /* whiteFingerPrint.png in Resources */ = {isa = PBXBuildFile; fileRef = D0B4DDD82525AC18009C8624 /* whiteFingerPrint.png */; };
 		D0CF1E342522E20C0059C541 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = D0CF1E332522E20C0059C541 /* AppDelegate.swift */; };
@@ -35,6 +63,7 @@
 		D0CF1E77252303370059C541 /* Utlities.swift in Sources */ = {isa = PBXBuildFile; fileRef = D0CF1E76252303370059C541 /* Utlities.swift */; };
 		D0CF1E79252360EC0059C541 /* Signer.swift in Sources */ = {isa = PBXBuildFile; fileRef = D0CF1E78252360EC0059C541 /* Signer.swift */; };
 		D0CF1E7B252368DC0059C541 /* Keys.swift in Sources */ = {isa = PBXBuildFile; fileRef = D0CF1E7A252368DC0059C541 /* Keys.swift */; };
+		D0E0EA022567A10900F2403C /* CreateAccountViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = D0E0EA012567A10900F2403C /* CreateAccountViewController.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -55,13 +84,13 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXCopyFilesBuildPhase section */
-		D00C4C7B2534297400B8A61F /* Embed Frameworks */ = {
+		D016AE5F25B0031600A59E93 /* Embed Frameworks */ = {
 			isa = PBXCopyFilesBuildPhase;
 			buildActionMask = 2147483647;
 			dstPath = "";
 			dstSubfolderSpec = 10;
 			files = (
-				D00C4C7A2534297400B8A61F /* LibWally.xcframework in Embed Frameworks */,
+				D016AE5E25B0031600A59E93 /* LibWally.xcframework in Embed Frameworks */,
 			);
 			name = "Embed Frameworks";
 			runOnlyForDeploymentPostprocessing = 0;
@@ -69,19 +98,48 @@
 /* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
-		D00C4C752534296E00B8A61F /* CLibWally.xcframework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcframework; path = CLibWally.xcframework; sourceTree = "<group>"; };
-		D00C4C762534296E00B8A61F /* LibWally.xcframework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcframework; path = LibWally.xcframework; sourceTree = "<group>"; };
-		D04B029725249EEB00C249B8 /* SignerViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SignerViewController.swift; sourceTree = "<group>"; };
-		D04B02992524A18100C249B8 /* SignersViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SignersViewController.swift; sourceTree = "<group>"; };
-		D04B029B2524A9F800C249B8 /* AddSignerViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AddSignerViewController.swift; sourceTree = "<group>"; };
+		D00F498C258B2ACD00941DBA /* accounts.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = accounts.png; sourceTree = "<group>"; };
+		D00F498E258B2AFD00941DBA /* seeds.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = seeds.png; sourceTree = "<group>"; };
+		D00F4990258B2B6D00941DBA /* cosigners.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = cosigners.png; sourceTree = "<group>"; };
+		D00F4992258B2B9300941DBA /* payments.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = payments.png; sourceTree = "<group>"; };
+		D016AE5825B0031300A59E93 /* LibWally.xcframework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcframework; path = LibWally.xcframework; sourceTree = "<group>"; };
+		D01ACBA32563EA8100B5B4E5 /* PaymentsViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PaymentsViewController.swift; sourceTree = "<group>"; };
+		D01ACBA52563ED3200B5B4E5 /* Psbt.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Psbt.swift; sourceTree = "<group>"; };
+		D01C2954255CE33F00C5ED55 /* PaymentDetailViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PaymentDetailViewController.swift; sourceTree = "<group>"; };
+		D0246DD6256B660100F812A5 /* Base58.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Base58.swift; sourceTree = "<group>"; };
+		D0246DD8256B663800F812A5 /* base58.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = base58.h; sourceTree = "<group>"; };
+		D0246DD9256B667700F812A5 /* GordianSigner-Bridging-Header.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "GordianSigner-Bridging-Header.h"; sourceTree = "<group>"; };
+		D0246DDA256B667800F812A5 /* base58.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; path = base58.c; sourceTree = "<group>"; };
+		D02E51EF258860C200A479A0 /* SeedDetailViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SeedDetailViewController.swift; sourceTree = "<group>"; };
+		D04423F225837A8700A25179 /* PaymentHash.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PaymentHash.swift; sourceTree = "<group>"; };
+		D04423F42586F2CC00A25179 /* LifehashSeedView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LifehashSeedView.swift; sourceTree = "<group>"; };
+		D04423F62586F2F700A25179 /* LifehashSeedView.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = LifehashSeedView.xib; sourceTree = "<group>"; };
+		D04423FA258705B900A25179 /* LifehashSeedSecondary.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LifehashSeedSecondary.swift; sourceTree = "<group>"; };
+		D04423FC258705D900A25179 /* LifehashSeedSecondary.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = LifehashSeedSecondary.xib; sourceTree = "<group>"; };
+		D04B029725249EEB00C249B8 /* AddPaymentViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AddPaymentViewController.swift; sourceTree = "<group>"; };
+		D04B029B2524A9F800C249B8 /* AddSeedWordsViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AddSeedWordsViewController.swift; sourceTree = "<group>"; };
 		D04D497F252C19E000D7383E /* QRScannerViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = QRScannerViewController.swift; sourceTree = "<group>"; };
 		D04D4981252C1A9300D7383E /* Spinner.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Spinner.swift; sourceTree = "<group>"; };
 		D04D4983252C4FEF00D7383E /* QRDisplayerViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = QRDisplayerViewController.swift; sourceTree = "<group>"; };
 		D04D4985252C509400D7383E /* QRGenerator.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = QRGenerator.swift; sourceTree = "<group>"; };
 		D064BCC7252D62FD00D42D66 /* URHelper.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = URHelper.swift; sourceTree = "<group>"; };
+		D06F44562581B86200B42DEB /* AddressesViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AddressesViewController.swift; sourceTree = "<group>"; };
+		D090963A2560FE540098013A /* KeysetStruct.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = KeysetStruct.swift; sourceTree = "<group>"; };
+		D090963C25610D440098013A /* CosignersViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CosignersViewController.swift; sourceTree = "<group>"; };
+		D090963E2562564F0098013A /* AccountViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AccountViewController.swift; sourceTree = "<group>"; };
+		D090964025625CC30098013A /* DescriptorParser.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DescriptorParser.swift; sourceTree = "<group>"; };
+		D090964225625CED0098013A /* Descriptor.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Descriptor.swift; sourceTree = "<group>"; };
+		D093E2A825A6E4C40038B59A /* InfoViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = InfoViewController.swift; sourceTree = "<group>"; };
+		D0974A57255B8E8D0013DC60 /* SignerStruct.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SignerStruct.swift; sourceTree = "<group>"; };
+		D0974A59255B90A10013DC60 /* AccountMapStruct.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AccountMapStruct.swift; sourceTree = "<group>"; };
+		D0974A5B255B93130013DC60 /* CoreDataService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CoreDataService.swift; sourceTree = "<group>"; };
+		D0974A5D255B93500013DC60 /* Entities.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Entities.swift; sourceTree = "<group>"; };
+		D0974A61255BA1B90013DC60 /* LifeHash.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LifeHash.swift; sourceTree = "<group>"; };
+		D0974A63255BB3C00013DC60 /* icons8-key-24.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "icons8-key-24.png"; sourceTree = "<group>"; };
+		D0AD2FFF2591825F00B9CBFC /* LicenseDisclaimerViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = LicenseDisclaimerViewController.swift; sourceTree = "<group>"; };
 		D0B4DDD625258B25009C8624 /* Bip39Words.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Bip39Words.swift; sourceTree = "<group>"; };
 		D0B4DDD82525AC18009C8624 /* whiteFingerPrint.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = whiteFingerPrint.png; sourceTree = "<group>"; };
-		D0CF1E302522E20C0059C541 /* GordianSigner.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = GordianSigner.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		D0CF1E302522E20C0059C541 /* Gordian Cosigner.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "Gordian Cosigner.app"; sourceTree = BUILT_PRODUCTS_DIR; };
 		D0CF1E332522E20C0059C541 /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
 		D0CF1E352522E20C0059C541 /* SceneDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SceneDelegate.swift; sourceTree = "<group>"; };
 		D0CF1E3A2522E20C0059C541 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/Main.storyboard; sourceTree = "<group>"; };
@@ -102,6 +160,7 @@
 		D0CF1E76252303370059C541 /* Utlities.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Utlities.swift; sourceTree = "<group>"; };
 		D0CF1E78252360EC0059C541 /* Signer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Signer.swift; sourceTree = "<group>"; };
 		D0CF1E7A252368DC0059C541 /* Keys.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Keys.swift; sourceTree = "<group>"; };
+		D0E0EA012567A10900F2403C /* CreateAccountViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CreateAccountViewController.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -109,9 +168,9 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				D0974A56255B8E300013DC60 /* LifeHash in Frameworks */,
 				D064BCC6252D5BD700D42D66 /* URKit in Frameworks */,
-				D00C4C772534296E00B8A61F /* CLibWally.xcframework in Frameworks */,
-				D00C4C792534297400B8A61F /* LibWally.xcframework in Frameworks */,
+				D016AE5D25B0031600A59E93 /* LibWally.xcframework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -132,6 +191,78 @@
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
+		D04423F82587058600A25179 /* Sub Views */ = {
+			isa = PBXGroup;
+			children = (
+				D04423F92587059900A25179 /* Lifehash Primary */,
+				D04423FE258705E200A25179 /* Lifehash Secondary */,
+			);
+			path = "Sub Views";
+			sourceTree = "<group>";
+		};
+		D04423F92587059900A25179 /* Lifehash Primary */ = {
+			isa = PBXGroup;
+			children = (
+				D04423F42586F2CC00A25179 /* LifehashSeedView.swift */,
+				D04423F62586F2F700A25179 /* LifehashSeedView.xib */,
+			);
+			path = "Lifehash Primary";
+			sourceTree = "<group>";
+		};
+		D04423FE258705E200A25179 /* Lifehash Secondary */ = {
+			isa = PBXGroup;
+			children = (
+				D04423FA258705B900A25179 /* LifehashSeedSecondary.swift */,
+				D04423FC258705D900A25179 /* LifehashSeedSecondary.xib */,
+			);
+			path = "Lifehash Secondary";
+			sourceTree = "<group>";
+		};
+		D0974A5F255B99CF0013DC60 /* Structs */ = {
+			isa = PBXGroup;
+			children = (
+				D0974A57255B8E8D0013DC60 /* SignerStruct.swift */,
+				D0974A59255B90A10013DC60 /* AccountMapStruct.swift */,
+				D090963A2560FE540098013A /* KeysetStruct.swift */,
+				D090964225625CED0098013A /* Descriptor.swift */,
+				D01ACBA52563ED3200B5B4E5 /* Psbt.swift */,
+			);
+			path = Structs;
+			sourceTree = "<group>";
+		};
+		D0974A60255B9C870013DC60 /* View Controllers */ = {
+			isa = PBXGroup;
+			children = (
+				D0AD2FFF2591825F00B9CBFC /* LicenseDisclaimerViewController.swift */,
+				D04B029725249EEB00C249B8 /* AddPaymentViewController.swift */,
+				D04B029B2524A9F800C249B8 /* AddSeedWordsViewController.swift */,
+				D04D497F252C19E000D7383E /* QRScannerViewController.swift */,
+				D04D4983252C4FEF00D7383E /* QRDisplayerViewController.swift */,
+				D01C2954255CE33F00C5ED55 /* PaymentDetailViewController.swift */,
+				D090963C25610D440098013A /* CosignersViewController.swift */,
+				D090963E2562564F0098013A /* AccountViewController.swift */,
+				D01ACBA32563EA8100B5B4E5 /* PaymentsViewController.swift */,
+				D0E0EA012567A10900F2403C /* CreateAccountViewController.swift */,
+				D06F44562581B86200B42DEB /* AddressesViewController.swift */,
+				D02E51EF258860C200A479A0 /* SeedDetailViewController.swift */,
+				D093E2A825A6E4C40038B59A /* InfoViewController.swift */,
+			);
+			path = "View Controllers";
+			sourceTree = "<group>";
+		};
+		D0974A65255BD2500013DC60 /* Images */ = {
+			isa = PBXGroup;
+			children = (
+				D00F4992258B2B9300941DBA /* payments.png */,
+				D00F4990258B2B6D00941DBA /* cosigners.png */,
+				D00F498E258B2AFD00941DBA /* seeds.png */,
+				D00F498C258B2ACD00941DBA /* accounts.png */,
+				D0974A63255BB3C00013DC60 /* icons8-key-24.png */,
+				D0B4DDD82525AC18009C8624 /* whiteFingerPrint.png */,
+			);
+			path = Images;
+			sourceTree = "<group>";
+		};
 		D0CF1E272522E20C0059C541 = {
 			isa = PBXGroup;
 			children = (
@@ -146,7 +277,7 @@
 		D0CF1E312522E20C0059C541 /* Products */ = {
 			isa = PBXGroup;
 			children = (
-				D0CF1E302522E20C0059C541 /* GordianSigner.app */,
+				D0CF1E302522E20C0059C541 /* Gordian Cosigner.app */,
 				D0CF1E492522E2140059C541 /* GordianSignerTests.xctest */,
 				D0CF1E542522E2140059C541 /* GordianSignerUITests.xctest */,
 			);
@@ -156,7 +287,7 @@
 		D0CF1E322522E20C0059C541 /* GordianSigner */ = {
 			isa = PBXGroup;
 			children = (
-				D0B4DDD82525AC18009C8624 /* whiteFingerPrint.png */,
+				D0974A65255BD2500013DC60 /* Images */,
 				D0CF1E662522E22A0059C541 /* GordianSigner.entitlements */,
 				D0CF1E332522E20C0059C541 /* AppDelegate.swift */,
 				D0CF1E352522E20C0059C541 /* SceneDelegate.swift */,
@@ -166,15 +297,9 @@
 				D0CF1E442522E2140059C541 /* Info.plist */,
 				D0CF1E3C2522E20C0059C541 /* GordianSigner.xcdatamodeld */,
 				D0CF1E71252301030059C541 /* Helpers */,
-				D0CF1E76252303370059C541 /* Utlities.swift */,
-				D0CF1E78252360EC0059C541 /* Signer.swift */,
-				D04B029725249EEB00C249B8 /* SignerViewController.swift */,
-				D04B02992524A18100C249B8 /* SignersViewController.swift */,
-				D04B029B2524A9F800C249B8 /* AddSignerViewController.swift */,
-				D04D497F252C19E000D7383E /* QRScannerViewController.swift */,
-				D04D4981252C1A9300D7383E /* Spinner.swift */,
-				D04D4983252C4FEF00D7383E /* QRDisplayerViewController.swift */,
-				D04D4985252C509400D7383E /* QRGenerator.swift */,
+				D0974A60255B9C870013DC60 /* View Controllers */,
+				D0974A5F255B99CF0013DC60 /* Structs */,
+				D04423F82587058600A25179 /* Sub Views */,
 			);
 			path = GordianSigner;
 			sourceTree = "<group>";
@@ -200,8 +325,7 @@
 		D0CF1E672522E5DB0059C541 /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
-				D00C4C752534296E00B8A61F /* CLibWally.xcframework */,
-				D00C4C762534296E00B8A61F /* LibWally.xcframework */,
+				D016AE5825B0031300A59E93 /* LibWally.xcframework */,
 			);
 			name = Frameworks;
 			sourceTree = "<group>";
@@ -209,12 +333,25 @@
 		D0CF1E71252301030059C541 /* Helpers */ = {
 			isa = PBXGroup;
 			children = (
+				D0974A5D255B93500013DC60 /* Entities.swift */,
+				D0CF1E78252360EC0059C541 /* Signer.swift */,
+				D0CF1E76252303370059C541 /* Utlities.swift */,
+				D04D4981252C1A9300D7383E /* Spinner.swift */,
+				D04D4985252C509400D7383E /* QRGenerator.swift */,
+				D0974A5B255B93130013DC60 /* CoreDataService.swift */,
 				D0CF1E6F252300B80059C541 /* Keychain.swift */,
 				D0CF1E722523012A0059C541 /* FirstTime.swift */,
 				D0CF1E74252302A00059C541 /* Encryption.swift */,
 				D0CF1E7A252368DC0059C541 /* Keys.swift */,
 				D0B4DDD625258B25009C8624 /* Bip39Words.swift */,
 				D064BCC7252D62FD00D42D66 /* URHelper.swift */,
+				D0974A61255BA1B90013DC60 /* LifeHash.swift */,
+				D090964025625CC30098013A /* DescriptorParser.swift */,
+				D0246DD9256B667700F812A5 /* GordianSigner-Bridging-Header.h */,
+				D0246DD6256B660100F812A5 /* Base58.swift */,
+				D0246DD8256B663800F812A5 /* base58.h */,
+				D0246DDA256B667800F812A5 /* base58.c */,
+				D04423F225837A8700A25179 /* PaymentHash.swift */,
 			);
 			path = Helpers;
 			sourceTree = "<group>";
@@ -229,7 +366,7 @@
 				D0CF1E2C2522E20C0059C541 /* Sources */,
 				D0CF1E2D2522E20C0059C541 /* Frameworks */,
 				D0CF1E2E2522E20C0059C541 /* Resources */,
-				D00C4C7B2534297400B8A61F /* Embed Frameworks */,
+				D016AE5F25B0031600A59E93 /* Embed Frameworks */,
 			);
 			buildRules = (
 			);
@@ -238,9 +375,10 @@
 			name = GordianSigner;
 			packageProductDependencies = (
 				D064BCC5252D5BD700D42D66 /* URKit */,
+				D0974A55255B8E300013DC60 /* LifeHash */,
 			);
 			productName = GordianSigner;
-			productReference = D0CF1E302522E20C0059C541 /* GordianSigner.app */;
+			productReference = D0CF1E302522E20C0059C541 /* Gordian Cosigner.app */;
 			productType = "com.apple.product-type.application";
 		};
 		D0CF1E482522E2140059C541 /* GordianSignerTests */ = {
@@ -291,6 +429,7 @@
 				TargetAttributes = {
 					D0CF1E2F2522E20C0059C541 = {
 						CreatedOnToolsVersion = 11.4.1;
+						LastSwiftMigration = 1140;
 					};
 					D0CF1E482522E2140059C541 = {
 						CreatedOnToolsVersion = 11.4.1;
@@ -313,6 +452,7 @@
 			mainGroup = D0CF1E272522E20C0059C541;
 			packageReferences = (
 				D064BCC4252D5BD700D42D66 /* XCRemoteSwiftPackageReference "URKit" */,
+				D0974A54255B8E300013DC60 /* XCRemoteSwiftPackageReference "LifeHash" */,
 			);
 			productRefGroup = D0CF1E312522E20C0059C541 /* Products */;
 			projectDirPath = "";
@@ -330,10 +470,17 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				D0974A64255BB3C00013DC60 /* icons8-key-24.png in Resources */,
+				D00F4993258B2B9300941DBA /* payments.png in Resources */,
+				D00F4991258B2B6D00941DBA /* cosigners.png in Resources */,
+				D00F498F258B2AFE00941DBA /* seeds.png in Resources */,
 				D0B4DDD92525AC18009C8624 /* whiteFingerPrint.png in Resources */,
+				D04423FD258705D900A25179 /* LifehashSeedSecondary.xib in Resources */,
 				D0CF1E432522E2140059C541 /* LaunchScreen.storyboard in Resources */,
 				D0CF1E402522E2140059C541 /* Assets.xcassets in Resources */,
 				D0CF1E3B2522E20C0059C541 /* Main.storyboard in Resources */,
+				D04423F72586F2F700A25179 /* LifehashSeedView.xib in Resources */,
+				D00F498D258B2ACD00941DBA /* accounts.png in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -360,21 +507,43 @@
 			files = (
 				D064BCC8252D62FD00D42D66 /* URHelper.swift in Sources */,
 				D0CF1E732523012A0059C541 /* FirstTime.swift in Sources */,
+				D090964325625CED0098013A /* Descriptor.swift in Sources */,
+				D090963D25610D440098013A /* CosignersViewController.swift in Sources */,
+				D0974A58255B8E8D0013DC60 /* SignerStruct.swift in Sources */,
 				D0CF1E342522E20C0059C541 /* AppDelegate.swift in Sources */,
 				D0CF1E3E2522E20C0059C541 /* GordianSigner.xcdatamodeld in Sources */,
 				D04D4980252C19E000D7383E /* QRScannerViewController.swift in Sources */,
 				D0CF1E77252303370059C541 /* Utlities.swift in Sources */,
+				D090964125625CC30098013A /* DescriptorParser.swift in Sources */,
+				D0E0EA022567A10900F2403C /* CreateAccountViewController.swift in Sources */,
+				D04423FB258705B900A25179 /* LifehashSeedSecondary.swift in Sources */,
+				D0974A5C255B93130013DC60 /* CoreDataService.swift in Sources */,
 				D0CF1E362522E20C0059C541 /* SceneDelegate.swift in Sources */,
+				D090963B2560FE540098013A /* KeysetStruct.swift in Sources */,
+				D090963F256256500098013A /* AccountViewController.swift in Sources */,
+				D01ACBA42563EA8100B5B4E5 /* PaymentsViewController.swift in Sources */,
 				D04D4984252C4FEF00D7383E /* QRDisplayerViewController.swift in Sources */,
-				D04B029C2524A9F800C249B8 /* AddSignerViewController.swift in Sources */,
+				D093E2A925A6E4C50038B59A /* InfoViewController.swift in Sources */,
+				D06F44572581B86200B42DEB /* AddressesViewController.swift in Sources */,
+				D0974A5E255B93500013DC60 /* Entities.swift in Sources */,
+				D04423F52586F2CC00A25179 /* LifehashSeedView.swift in Sources */,
+				D04B029C2524A9F800C249B8 /* AddSeedWordsViewController.swift in Sources */,
 				D0B4DDD725258B25009C8624 /* Bip39Words.swift in Sources */,
+				D0AD30002591825F00B9CBFC /* LicenseDisclaimerViewController.swift in Sources */,
 				D0CF1E79252360EC0059C541 /* Signer.swift in Sources */,
 				D0CF1E70252300B80059C541 /* Keychain.swift in Sources */,
-				D04B029A2524A18100C249B8 /* SignersViewController.swift in Sources */,
 				D0CF1E75252302A00059C541 /* Encryption.swift in Sources */,
+				D01C2955255CE33F00C5ED55 /* PaymentDetailViewController.swift in Sources */,
+				D04423F325837A8700A25179 /* PaymentHash.swift in Sources */,
 				D04D4986252C509400D7383E /* QRGenerator.swift in Sources */,
+				D0246DD7256B660100F812A5 /* Base58.swift in Sources */,
+				D0974A62255BA1B90013DC60 /* LifeHash.swift in Sources */,
+				D02E51F0258860C200A479A0 /* SeedDetailViewController.swift in Sources */,
 				D0CF1E7B252368DC0059C541 /* Keys.swift in Sources */,
-				D04B029825249EEB00C249B8 /* SignerViewController.swift in Sources */,
+				D0974A5A255B90A10013DC60 /* AccountMapStruct.swift in Sources */,
+				D0246DDB256B667800F812A5 /* base58.c in Sources */,
+				D04B029825249EEB00C249B8 /* AddPaymentViewController.swift in Sources */,
+				D01ACBA62563ED3200B5B4E5 /* Psbt.swift in Sources */,
 				D04D4982252C1A9300D7383E /* Spinner.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -548,20 +717,24 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				CLANG_ENABLE_MODULES = YES;
 				CODE_SIGN_ENTITLEMENTS = GordianSigner/GordianSigner.entitlements;
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 0.0.2;
+				CURRENT_PROJECT_VERSION = 0.1.8;
 				DEVELOPMENT_TEAM = YZHG975W3A;
+				ENABLE_BITCODE = NO;
 				INFOPLIST_FILE = GordianSigner/Info.plist;
 				IPHONEOS_DEPLOYMENT_TARGET = 13.0;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				MARKETING_VERSION = 0.0.2;
+				MARKETING_VERSION = 0.1.8;
 				PRODUCT_BUNDLE_IDENTIFIER = com.blockchaincommons.GordianSigner;
-				PRODUCT_NAME = "$(TARGET_NAME)";
+				PRODUCT_NAME = "Gordian Cosigner";
 				SUPPORTS_MACCATALYST = YES;
+				SWIFT_OBJC_BRIDGING_HEADER = "GordianSigner/Helpers/GordianSigner-Bridging-Header.h";
+				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
 				SWIFT_VERSION = 5.0;
 				TARGETED_DEVICE_FAMILY = "1,2";
 			};
@@ -571,20 +744,23 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				CLANG_ENABLE_MODULES = YES;
 				CODE_SIGN_ENTITLEMENTS = GordianSigner/GordianSigner.entitlements;
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 0.0.2;
+				CURRENT_PROJECT_VERSION = 0.1.8;
 				DEVELOPMENT_TEAM = YZHG975W3A;
+				ENABLE_BITCODE = NO;
 				INFOPLIST_FILE = GordianSigner/Info.plist;
 				IPHONEOS_DEPLOYMENT_TARGET = 13.0;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				MARKETING_VERSION = 0.0.2;
+				MARKETING_VERSION = 0.1.8;
 				PRODUCT_BUNDLE_IDENTIFIER = com.blockchaincommons.GordianSigner;
-				PRODUCT_NAME = "$(TARGET_NAME)";
+				PRODUCT_NAME = "Gordian Cosigner";
 				SUPPORTS_MACCATALYST = YES;
+				SWIFT_OBJC_BRIDGING_HEADER = "GordianSigner/Helpers/GordianSigner-Bridging-Header.h";
 				SWIFT_VERSION = 5.0;
 				TARGETED_DEVICE_FAMILY = "1,2";
 			};
@@ -724,6 +900,14 @@
 				minimumVersion = 2.0.0;
 			};
 		};
+		D0974A54255B8E300013DC60 /* XCRemoteSwiftPackageReference "LifeHash" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/BlockchainCommons/LifeHash";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 4.2.0;
+			};
+		};
 /* End XCRemoteSwiftPackageReference section */
 
 /* Begin XCSwiftPackageProductDependency section */
@@ -731,6 +915,11 @@
 			isa = XCSwiftPackageProductDependency;
 			package = D064BCC4252D5BD700D42D66 /* XCRemoteSwiftPackageReference "URKit" */;
 			productName = URKit;
+		};
+		D0974A55255B8E300013DC60 /* LifeHash */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = D0974A54255B8E300013DC60 /* XCRemoteSwiftPackageReference "LifeHash" */;
+			productName = LifeHash;
 		};
 /* End XCSwiftPackageProductDependency section */
 

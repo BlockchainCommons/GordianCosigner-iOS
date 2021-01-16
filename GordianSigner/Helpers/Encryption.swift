@@ -11,19 +11,16 @@ import CryptoKit
 
 enum Encryption {
     
-    static func decryptedSeeds() -> [String]? {
-        guard let encryptedSeeds = KeyChain.seeds(), encryptedSeeds.count > 0 else { return nil }
+    static func sha256hash(_ text: String) -> String {
+        let digest = SHA256.hash(data: text.utf8)
         
-        var decryptedSeeds:[String] = []
-        
-        for seed in encryptedSeeds {
-            guard let decryptedSeed = Encryption.decrypt(seed),
-                let words = String(data: decryptedSeed, encoding: .utf8) else { return nil }
-            
-            decryptedSeeds.append(words)
-        }
-        
-        return decryptedSeeds
+        return digest.map { String(format: "%02hhx", $0) }.joined()
+    }
+    
+    static func checksum(_ data: Data) -> String {
+        let hash = SHA256.hash(data: Data(SHA256.hash(data: data)))
+        let checksum = Data(hash).subdata(in: Range(0...3))
+        return checksum.hexString
     }
     
     static func privateKey() -> Data {
