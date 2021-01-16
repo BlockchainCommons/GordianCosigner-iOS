@@ -614,31 +614,36 @@ class PsbtTableViewController: UIViewController, UITableViewDelegate, UITableVie
         
         let outputLabel = cell.viewWithTag(1) as! UILabel
         
-        let lifehashView = cell.viewWithTag(2) as! LifehashSeedSecondary
+        let lifehashView = cell.viewWithTag(2) as! LifehashSeedView
         lifehashView.backgroundColor = cell.backgroundColor
         lifehashView.background.backgroundColor = cell.backgroundColor
         
         let amountLabel = cell.viewWithTag(3) as! UILabel
         let addressLabel = cell.viewWithTag(4) as! UILabel
-        let accountMapLabel = cell.viewWithTag(5) as! UILabel
+        //let accountMapLabel = cell.viewWithTag(5) as! UILabel
         let pathLabel = cell.viewWithTag(6) as! UILabel
+        let addressTypeImage = cell.viewWithTag(7) as! UIImageView
+        let addressTypeLabel = cell.viewWithTag(8) as! UILabel
         let outputDict = outputsArray[indexPath.row]
         let output = outputDict["output"] as! PSBTOutput
         
         outputLabel.text = "Output #\(indexPath.row + 1)"
         
         let isMine = outputDict["isMine"] as! Bool
+        lifehashView.iconImage.image = UIImage(systemName: "person.2.square.stack")
+        
+        let accountMap = outputDict["map"] as! String
+        //accountMapLabel.text = accountMap
+        
         if isMine {
-            lifehashView.lifehashImage.image = UIImage(systemName: "person.crop.circle.fill.badge.checkmark")
-            lifehashView.iconImage.image = UIImage(systemName: "person.2.square.stack")
             if let lifehash = outputDict["lifeHash"] as? UIImage {
                 lifehashView.lifehashImage.image = lifehash
-            } else {
-                lifehashView.lifehashImage.tintColor = .systemGreen
             }
-            lifehashView.alpha = 1
+            lifehashView.iconLabel.text = accountMap
         } else {
-            lifehashView.alpha = 0
+            lifehashView.lifehashImage.image = UIImage(systemName: "person.crop.circle.badge.exclam")
+            lifehashView.lifehashImage.tintColor = .systemRed
+            lifehashView.iconLabel.text = "UNKNOWN RECIPIENT!"
         }
         
         amountLabel.text = (Double(output.txOutput.amount) / 100000000.0).avoidNotation + " btc"
@@ -650,11 +655,20 @@ class PsbtTableViewController: UIViewController, UITableViewDelegate, UITableVie
         }
         addressLabel.adjustsFontSizeToFitWidth = true
         
-        let accountMap = outputDict["map"] as! String
-        accountMapLabel.text = accountMap
+        
         
         let path = outputDict["path"] as! String
         pathLabel.text = path
+        
+        if path.contains("/1/") {
+            addressTypeImage.image = UIImage(systemName: "arrow.2.circlepath")
+            addressTypeLabel.text = "Change Address:"
+            addressTypeImage.tintColor = .darkGray
+        } else {
+            addressTypeImage.image = UIImage(systemName: "arrow.down.right")
+            addressTypeLabel.text = "Receive Address:"
+            addressTypeImage.tintColor = .systemGreen
+        }
         
         return cell
     }
@@ -683,7 +697,7 @@ class PsbtTableViewController: UIViewController, UITableViewDelegate, UITableVie
             case 1:
                 return 300
             case 2:
-                return 156
+                return 251
             case 3:
                 return 44
             default:
