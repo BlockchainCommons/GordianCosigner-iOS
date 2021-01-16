@@ -322,7 +322,7 @@ class PsbtTableViewController: UIViewController, UITableViewDelegate, UITableVie
         
         for (o, output) in outputs.enumerated() {
             self.outputsArray.append(["output": output])
-            // THIS SEEMS TO BE HARDCODING MAINNET?
+            
             if let address = output.txOutput.address {
                 self.outputsArray[o]["address"] = address
                 self.outputsArray[o]["isMine"] = false
@@ -650,7 +650,7 @@ class PsbtTableViewController: UIViewController, UITableViewDelegate, UITableVie
         }
         addressLabel.adjustsFontSizeToFitWidth = true
         
-        let accountMap = outputDict["accountMap"] as! String
+        let accountMap = outputDict["map"] as! String
         accountMapLabel.text = accountMap
         
         let path = outputDict["path"] as! String

@@ -426,12 +426,12 @@ class AccountMapsViewController: UIViewController, UITableViewDelegate, UITableV
     @objc func editLabel(_ sender: UIButton) {
         guard let sectionString = sender.restorationIdentifier, let int = Int(sectionString) else { return }
         
-        let am = accounts[int]["account"] as! AccountStruct
+        let account = accounts[int]["account"] as! AccountStruct
         
         DispatchQueue.main.async { [weak self] in
             guard let self = self else { return }
             
-            let title = "Edit Account Map label"
+            let title = "Edit Account Label"
             let message = ""
             let style = UIAlertController.Style.alert
             let alert = UIAlertController(title: title, message: message, preferredStyle: style)
@@ -443,11 +443,11 @@ class AccountMapsViewController: UIViewController, UITableViewDelegate, UITableV
                 
                 guard let updatedLabel = textField1, updatedLabel != "" else { return }
                 
-                self.updateLabel(am.id, updatedLabel)
+                self.updateLabel(account.id, updatedLabel, account.map)
             }
             
             alert.addTextField { (textField) in
-                textField.text = am.label
+                textField.text = account.label
                 textField.isSecureTextEntry = false
                 textField.keyboardAppearance = .dark
             }
@@ -461,15 +461,25 @@ class AccountMapsViewController: UIViewController, UITableViewDelegate, UITableV
         }
     }
     
-    private func updateLabel(_ id: UUID, _ label: String) {
-        CoreDataService.updateEntity(id: id, keyToUpdate: "label", newValue: label, entityName: .account) { (success, errorDescription) in
+    private func updateLabel(_ id: UUID, _ newlabel: String, _ map: Data) {
+        CoreDataService.updateEntity(id: id, keyToUpdate: "label", newValue: newlabel, entityName: .account) { (success, errorDescription) in
             guard success else { showAlert(self, "Label not saved!", "There was an error updating your label, please let us know about it: \(errorDescription ?? "unknown")"); return }
             
-            DispatchQueue.main.async {
-                NotificationCenter.default.post(name: .cosignerAdded, object: nil, userInfo: nil)
-            }
+            guard var accountMap = try? JSONSerialization.jsonObject(with: map, options: []) as? [String:Any] else { return }
             
-            self.load()
+            accountMap["label"] = newlabel
+            
+            guard let json = accountMap.json() else { return }
+            
+            CoreDataService.updateEntity(id: id, keyToUpdate: "map", newValue: json.utf8, entityName: .account) { (success, errorDescription) in
+                guard success else { showAlert(self, "Account map not saved!", "There was an error updating the Account Map, please let us know about it: \(errorDescription ?? "unknown")"); return }
+                
+                DispatchQueue.main.async {
+                    NotificationCenter.default.post(name: .cosignerAdded, object: nil, userInfo: nil)
+                }
+                
+                self.load()
+            }
         }
     }
     
