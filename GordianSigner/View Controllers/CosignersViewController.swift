@@ -252,15 +252,14 @@ class KeysetsViewController: UIViewController, UITableViewDelegate, UITableViewD
                 fingerprintLabel.text = processed
             } else {
                 fingerprintLabel.text = "?"
-            }
-            
-            isHotImageView.image = UIImage(systemName: "flame")
-            isHotImageView.tintColor = .systemOrange
+            }            
             
             if cosigner.words != nil || cosigner.xprv != nil {
-                isHotImageView.alpha = 1
+                isHotImageView.image = UIImage(systemName: "flame")
+                isHotImageView.tintColor = .systemOrange
             } else {
-                isHotImageView.alpha = 0
+                isHotImageView.image = UIImage(systemName: "snow")
+                isHotImageView.tintColor = .white
             }
             
             dateAddedLabel.text = cosigner.dateAdded.formatted()

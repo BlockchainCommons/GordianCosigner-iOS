@@ -34,6 +34,7 @@ class PsbtTableViewController: UIViewController, UITableViewDelegate, UITableVie
         tableView.dataSource = self
         
         signButtonOutlet.layer.cornerRadius = 8
+        signButtonOutlet.alpha = 0
         
         if (UIDevice.current.userInterfaceIdiom == .pad) {
           alertStyle = UIAlertController.Style.alert
@@ -161,7 +162,8 @@ class PsbtTableViewController: UIViewController, UITableViewDelegate, UITableVie
                             
                             let originalPubkey = pubkeyDict["pubkey"] as! String
                             let fullPath = pubkeyDict["fullPath"] as! BIP32Path
-                            
+                            updatedDict["hasSigned"] = false
+                            updatedDict["canSign"] = false
                             
                             func loopCosigners() {
                                 for (k, keyset) in cosigners.enumerated() {
@@ -181,6 +183,7 @@ class PsbtTableViewController: UIViewController, UITableViewDelegate, UITableVie
                                             
                                             if originalPubkey == childKey.pubKey.data.hexString {
                                                 updatedDict["cosignerLabel"] = cosignerStruct.label
+                                                updatedDict["lifeHash"] = UIImage(data: cosignerStruct.lifehash)
                                                 if let desc = cosignerStruct.bip48SegwitAccount {
                                                     let dp = DescriptorParser()
                                                     let ds = dp.descriptor("wsh(\(desc))")
@@ -278,7 +281,7 @@ class PsbtTableViewController: UIViewController, UITableViewDelegate, UITableVie
                                                         if let childKey = try? hdkey.derive(using: accountPath) {
                                                             if childKey.pubKey.data.hexString == originalPubkey {
                                                                 self.canSign = true
-                                                                updatedDict["lifeHash"] = UIImage(data: cosignerStruct.lifehash)
+                                                                updatedDict["canSign"] = true
                                                             }
                                                         }
                                                     }
@@ -292,7 +295,7 @@ class PsbtTableViewController: UIViewController, UITableViewDelegate, UITableVie
                                                     if let childKey = try? hdkey.derive(using: fullPath) {
                                                         if childKey.pubKey.data.hexString == originalPubkey {
                                                             self.canSign = true
-                                                            updatedDict["lifeHash"] = UIImage(data: cosignerStruct.lifehash)
+                                                            updatedDict["canSign"] = true
                                                         }
                                                     }
                                                 }
@@ -317,7 +320,30 @@ class PsbtTableViewController: UIViewController, UITableViewDelegate, UITableVie
         }
     }
     
+    private func updateButton() {
+        for input in inputsArray {
+            let pubkeyArray = input["pubKeyArray"] as! [[String:Any]]
+            
+            for pubkey in pubkeyArray {
+                let canSign = pubkey["canSign"] as! Bool
+                let hasSigned = pubkey["hasSigned"] as! Bool
+                
+                if canSign {
+                    if !hasSigned {
+                        DispatchQueue.main.async { [weak self] in
+                            guard let self = self else { return }
+                            
+                            self.signButtonOutlet.alpha = 1
+                        }
+                    }
+                }
+            }
+        }
+    }
+    
     private func parseOutputs(completion: @escaping ((Bool) -> Void)) {
+        updateButton()
+        
         let outputs = psbt.outputs
         
         for (o, output) in outputs.enumerated() {
@@ -388,31 +414,27 @@ class PsbtTableViewController: UIViewController, UITableViewDelegate, UITableVie
     }
     
     @IBAction func signAction(_ sender: Any) {
-        if !export {
-            if canSign {
-                sign()
-            } else {
-                
-                DispatchQueue.main.async { [weak self] in
-                    guard let self = self else { return }
-                    
-                    let alert = UIAlertController(title: "No private keys to sign with", message: "", preferredStyle: self.alertStyle)
-                    
-                    alert.addAction(UIAlertAction(title: "add private keys", style: .default, handler: { action in
-                        DispatchQueue.main.async { [weak self] in
-                            guard let self = self else { return }
-                            
-                            self.performSegue(withIdentifier: "segueToSign", sender: self)
-                        }
-                    }))
-                    
-                    alert.addAction(UIAlertAction(title: "Cancel", style: .cancel, handler: { action in }))
-                    alert.popoverPresentationController?.sourceView = self.view
-                    self.present(alert, animated: true) {}
-                }
-            }
+        if canSign {
+            sign()
         } else {
-            exportAction()
+            
+            DispatchQueue.main.async { [weak self] in
+                guard let self = self else { return }
+                
+                let alert = UIAlertController(title: "No private keys to sign with", message: "", preferredStyle: self.alertStyle)
+                
+                alert.addAction(UIAlertAction(title: "add private keys", style: .default, handler: { action in
+                    DispatchQueue.main.async { [weak self] in
+                        guard let self = self else { return }
+                        
+                        self.performSegue(withIdentifier: "segueToSign", sender: self)
+                    }
+                }))
+                
+                alert.addAction(UIAlertAction(title: "Cancel", style: .cancel, handler: { action in }))
+                alert.popoverPresentationController?.sourceView = self.view
+                self.present(alert, animated: true) {}
+            }
         }
     }
     
@@ -445,19 +467,31 @@ class PsbtTableViewController: UIViewController, UITableViewDelegate, UITableVie
     
     private func cosignersCell(_ table: UITableView, _ indexPath: IndexPath) -> UITableViewCell {
         let cell = table.dequeueReusableCell(withIdentifier: "participantsCell", for: indexPath)
-        let label = cell.viewWithTag(1) as! UILabel
-        let lifeHashView = cell.viewWithTag(2) as! LifehashSeedSecondary
+        cell.selectionStyle = .none
+        
+        let lifeHashView = cell.viewWithTag(2) as! LifehashSeedView
         let sigImage = cell.viewWithTag(3) as! UIImageView
-        lifeHashView.alpha = 0
+        let isHotImage = cell.viewWithTag(4) as! UIImageView
+        
         lifeHashView.backgroundColor = cell.backgroundColor
         lifeHashView.background.backgroundColor = cell.backgroundColor
         lifeHashView.iconImage.image = UIImage(systemName: "person.2")
+        
         sigImage.tintColor = .systemPink
         
         if let participants = inputsArray[indexPath.section]["pubKeyArray"] as? [[String:Any]] {
             let participant = participants[indexPath.row]
             let cosignerLabel = participant["cosignerLabel"] as! String
             let hasSigned = participant["hasSigned"] as! Bool
+            let canSign = participant["canSign"] as! Bool
+            
+            if canSign {
+                isHotImage.image = UIImage(systemName: "flame")
+                isHotImage.tintColor = .systemOrange
+            } else {
+                isHotImage.image = UIImage(systemName: "snow")
+                isHotImage.tintColor = .white
+            }
             
             if hasSigned {
                 sigImage.image = UIImage(systemName: "signature")
@@ -469,10 +503,13 @@ class PsbtTableViewController: UIViewController, UITableViewDelegate, UITableVie
             if cosignerLabel != "unknown" {
                 if let lifehash = participant["lifeHash"] as? UIImage {
                     lifeHashView.lifehashImage.image = lifehash
-                    lifeHashView.alpha = 1
                 }
+                lifeHashView.iconLabel.text = cosignerLabel
+            } else {
+                lifeHashView.iconLabel.text = "UNKNOWN COSIGNER!"
+                lifeHashView.lifehashImage.image = UIImage(systemName: "person.crop.circle.badge.exclam")
+                lifeHashView.lifehashImage.tintColor = .systemRed
             }
-            label.text = cosignerLabel
         }
         
         return cell
@@ -631,15 +668,12 @@ class PsbtTableViewController: UIViewController, UITableViewDelegate, UITableVie
         
         let isMine = outputDict["isMine"] as! Bool
         lifehashView.iconImage.image = UIImage(systemName: "person.2.square.stack")
-        
-        let accountMap = outputDict["map"] as! String
-        //accountMapLabel.text = accountMap
-        
+                
         if isMine {
             if let lifehash = outputDict["lifeHash"] as? UIImage {
                 lifehashView.lifehashImage.image = lifehash
             }
-            lifehashView.iconLabel.text = accountMap
+            lifehashView.iconLabel.text = outputDict["map"] as? String ?? ""
         } else {
             lifehashView.lifehashImage.image = UIImage(systemName: "person.crop.circle.badge.exclam")
             lifehashView.lifehashImage.tintColor = .systemRed
@@ -662,12 +696,16 @@ class PsbtTableViewController: UIViewController, UITableViewDelegate, UITableVie
         
         if path.contains("/1/") {
             addressTypeImage.image = UIImage(systemName: "arrow.2.circlepath")
-            addressTypeLabel.text = "Change Address:"
+            addressTypeLabel.text = "Change address:"
             addressTypeImage.tintColor = .darkGray
-        } else {
+        } else if path.contains("/0/") {
             addressTypeImage.image = UIImage(systemName: "arrow.down.right")
-            addressTypeLabel.text = "Receive Address:"
+            addressTypeLabel.text = "Receive address:"
             addressTypeImage.tintColor = .systemGreen
+        } else {
+            addressTypeImage.image = UIImage(systemName: "questionmark.circle")
+            addressTypeLabel.text = "Unknown address:"
+            addressTypeImage.tintColor = .systemRed
         }
         
         return cell
@@ -689,7 +727,7 @@ class PsbtTableViewController: UIViewController, UITableViewDelegate, UITableVie
     
     func tableView(_ tableView: UITableView, heightForRowAt indexPath: IndexPath) -> CGFloat {
          if tableView.tag == 3 {
-            return 60
+            return 90
          } else {
             switch indexPath.section {
             case 0:
@@ -697,7 +735,7 @@ class PsbtTableViewController: UIViewController, UITableViewDelegate, UITableVie
             case 1:
                 return 300
             case 2:
-                return 251
+                return 271
             case 3:
                 return 44
             default:
