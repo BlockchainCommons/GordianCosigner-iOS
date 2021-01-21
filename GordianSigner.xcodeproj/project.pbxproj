@@ -32,6 +32,7 @@
 		D04D4986252C509400D7383E /* QRGenerator.swift in Sources */ = {isa = PBXBuildFile; fileRef = D04D4985252C509400D7383E /* QRGenerator.swift */; };
 		D064BCC6252D5BD700D42D66 /* URKit in Frameworks */ = {isa = PBXBuildFile; productRef = D064BCC5252D5BD700D42D66 /* URKit */; };
 		D064BCC8252D62FD00D42D66 /* URHelper.swift in Sources */ = {isa = PBXBuildFile; fileRef = D064BCC7252D62FD00D42D66 /* URHelper.swift */; };
+		D06D789225B946E000769157 /* AccountDetailViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = D06D789125B946E000769157 /* AccountDetailViewController.swift */; };
 		D06F44572581B86200B42DEB /* AddressesViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = D06F44562581B86200B42DEB /* AddressesViewController.swift */; };
 		D090963B2560FE540098013A /* KeysetStruct.swift in Sources */ = {isa = PBXBuildFile; fileRef = D090963A2560FE540098013A /* KeysetStruct.swift */; };
 		D090963D25610D440098013A /* CosignersViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = D090963C25610D440098013A /* CosignersViewController.swift */; };
@@ -123,6 +124,7 @@
 		D04D4983252C4FEF00D7383E /* QRDisplayerViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = QRDisplayerViewController.swift; sourceTree = "<group>"; };
 		D04D4985252C509400D7383E /* QRGenerator.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = QRGenerator.swift; sourceTree = "<group>"; };
 		D064BCC7252D62FD00D42D66 /* URHelper.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = URHelper.swift; sourceTree = "<group>"; };
+		D06D789125B946E000769157 /* AccountDetailViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AccountDetailViewController.swift; sourceTree = "<group>"; };
 		D06F44562581B86200B42DEB /* AddressesViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AddressesViewController.swift; sourceTree = "<group>"; };
 		D090963A2560FE540098013A /* KeysetStruct.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = KeysetStruct.swift; sourceTree = "<group>"; };
 		D090963C25610D440098013A /* CosignersViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CosignersViewController.swift; sourceTree = "<group>"; };
@@ -218,6 +220,55 @@
 			path = "Lifehash Secondary";
 			sourceTree = "<group>";
 		};
+		D06D789525B946EF00769157 /* Accounts */ = {
+			isa = PBXGroup;
+			children = (
+				D090963E2562564F0098013A /* AccountViewController.swift */,
+				D0E0EA012567A10900F2403C /* CreateAccountViewController.swift */,
+				D06F44562581B86200B42DEB /* AddressesViewController.swift */,
+				D06D789125B946E000769157 /* AccountDetailViewController.swift */,
+			);
+			path = Accounts;
+			sourceTree = "<group>";
+		};
+		D06D789825B9470200769157 /* Payments */ = {
+			isa = PBXGroup;
+			children = (
+				D04B029725249EEB00C249B8 /* AddPaymentViewController.swift */,
+				D01C2954255CE33F00C5ED55 /* PaymentDetailViewController.swift */,
+				D01ACBA32563EA8100B5B4E5 /* PaymentsViewController.swift */,
+			);
+			path = Payments;
+			sourceTree = "<group>";
+		};
+		D06D789B25B9471700769157 /* Cosigners */ = {
+			isa = PBXGroup;
+			children = (
+				D04B029B2524A9F800C249B8 /* AddSeedWordsViewController.swift */,
+				D090963C25610D440098013A /* CosignersViewController.swift */,
+				D02E51EF258860C200A479A0 /* SeedDetailViewController.swift */,
+			);
+			path = Cosigners;
+			sourceTree = "<group>";
+		};
+		D06D789E25B9472900769157 /* QRs */ = {
+			isa = PBXGroup;
+			children = (
+				D04D497F252C19E000D7383E /* QRScannerViewController.swift */,
+				D04D4983252C4FEF00D7383E /* QRDisplayerViewController.swift */,
+			);
+			path = QRs;
+			sourceTree = "<group>";
+		};
+		D06D78A125B9473900769157 /* Misc */ = {
+			isa = PBXGroup;
+			children = (
+				D0AD2FFF2591825F00B9CBFC /* LicenseDisclaimerViewController.swift */,
+				D093E2A825A6E4C40038B59A /* InfoViewController.swift */,
+			);
+			path = Misc;
+			sourceTree = "<group>";
+		};
 		D0974A5F255B99CF0013DC60 /* Structs */ = {
 			isa = PBXGroup;
 			children = (
@@ -233,19 +284,11 @@
 		D0974A60255B9C870013DC60 /* View Controllers */ = {
 			isa = PBXGroup;
 			children = (
-				D0AD2FFF2591825F00B9CBFC /* LicenseDisclaimerViewController.swift */,
-				D04B029725249EEB00C249B8 /* AddPaymentViewController.swift */,
-				D04B029B2524A9F800C249B8 /* AddSeedWordsViewController.swift */,
-				D04D497F252C19E000D7383E /* QRScannerViewController.swift */,
-				D04D4983252C4FEF00D7383E /* QRDisplayerViewController.swift */,
-				D01C2954255CE33F00C5ED55 /* PaymentDetailViewController.swift */,
-				D090963C25610D440098013A /* CosignersViewController.swift */,
-				D090963E2562564F0098013A /* AccountViewController.swift */,
-				D01ACBA32563EA8100B5B4E5 /* PaymentsViewController.swift */,
-				D0E0EA012567A10900F2403C /* CreateAccountViewController.swift */,
-				D06F44562581B86200B42DEB /* AddressesViewController.swift */,
-				D02E51EF258860C200A479A0 /* SeedDetailViewController.swift */,
-				D093E2A825A6E4C40038B59A /* InfoViewController.swift */,
+				D06D78A125B9473900769157 /* Misc */,
+				D06D789825B9470200769157 /* Payments */,
+				D06D789B25B9471700769157 /* Cosigners */,
+				D06D789E25B9472900769157 /* QRs */,
+				D06D789525B946EF00769157 /* Accounts */,
 			);
 			path = "View Controllers";
 			sourceTree = "<group>";
@@ -532,6 +575,7 @@
 				D0AD30002591825F00B9CBFC /* LicenseDisclaimerViewController.swift in Sources */,
 				D0CF1E79252360EC0059C541 /* Signer.swift in Sources */,
 				D0CF1E70252300B80059C541 /* Keychain.swift in Sources */,
+				D06D789225B946E000769157 /* AccountDetailViewController.swift in Sources */,
 				D0CF1E75252302A00059C541 /* Encryption.swift in Sources */,
 				D01C2955255CE33F00C5ED55 /* PaymentDetailViewController.swift in Sources */,
 				D04423F325837A8700A25179 /* PaymentHash.swift in Sources */,
