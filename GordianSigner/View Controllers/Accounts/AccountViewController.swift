@@ -703,11 +703,6 @@ class AccountMapsViewController: UIViewController, UITableViewDelegate, UITableV
             
             vc.account = self.accountToView
             
-//        case "segueToAddresses":
-//            guard let vc = segue.destination as? AddressesViewController else { fallthrough }
-//
-//            vc.account = self.addressesAm
-            
         case "createAccountMap":
             guard let vc = segue.destination as? CreateAccountMapViewController else { fallthrough }
             

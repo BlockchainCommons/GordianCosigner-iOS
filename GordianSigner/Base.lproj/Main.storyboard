@@ -1283,7 +1283,6 @@
                         <outlet property="accountMapTable" destination="QUk-qt-fbj" id="zUN-YT-zzC"/>
                         <segue destination="4dz-cW-ULS" kind="presentation" identifier="segueToAddAccountMap" id="hPq-I8-kVg"/>
                         <segue destination="Iuy-9M-v3m" kind="show" identifier="createAccountMap" id="0RT-ZT-Efi"/>
-                        <segue destination="6NQ-R2-fha" kind="show" identifier="segueToAddresses" id="Co5-jp-gAi"/>
                         <segue destination="swD-W5-MAD" kind="presentation" identifier="segueToAccountsInfo" id="Shp-nC-lxd"/>
                         <segue destination="4wd-vt-dMc" kind="show" identifier="segueToAccountDetail" id="qaV-iR-XEL"/>
                     </connections>
@@ -1463,6 +1462,16 @@
                                     </tableViewCell>
                                 </prototypes>
                             </tableView>
+                            <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" showsTouchWhenHighlighted="YES" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="Msq-1e-6yw">
+                                <rect key="frame" x="284" y="110.5" width="110" height="29"/>
+                                <fontDescription key="fontDescription" type="system" pointSize="14"/>
+                                <state key="normal" title="Address Explorer">
+                                    <color key="titleColor" red="0.25174289789999998" green="0.82675522769999998" blue="1" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+                                </state>
+                                <connections>
+                                    <action selector="seeAddressesAction:" destination="4wd-vt-dMc" eventType="touchUpInside" id="XRU-93-6G6"/>
+                                </connections>
+                            </button>
                             <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Label:" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="roL-Pk-pVv">
                                 <rect key="frame" x="20" y="148" width="46" height="21"/>
                                 <fontDescription key="fontDescription" type="system" pointSize="17"/>
@@ -1475,8 +1484,10 @@
                         <constraints>
                             <constraint firstItem="i8L-v6-Szc" firstAttribute="trailing" secondItem="RaO-fz-MWZ" secondAttribute="trailing" constant="20" id="12q-of-ICe"/>
                             <constraint firstItem="ttY-5p-rFa" firstAttribute="leading" secondItem="i8L-v6-Szc" secondAttribute="leading" constant="20" id="30V-bW-75a"/>
+                            <constraint firstItem="Msq-1e-6yw" firstAttribute="centerY" secondItem="FUo-KJ-le8" secondAttribute="centerY" id="3ZH-jp-TEt"/>
                             <constraint firstItem="32h-G6-H6N" firstAttribute="leading" secondItem="i8L-v6-Szc" secondAttribute="leading" constant="20" id="8r8-Ac-y7h"/>
                             <constraint firstItem="FUo-KJ-le8" firstAttribute="top" secondItem="i8L-v6-Szc" secondAttribute="top" constant="20" id="Fig-7P-wyf"/>
+                            <constraint firstItem="i8L-v6-Szc" firstAttribute="trailing" secondItem="Msq-1e-6yw" secondAttribute="trailing" constant="20" id="P2p-gd-4gB"/>
                             <constraint firstItem="RaO-fz-MWZ" firstAttribute="leading" secondItem="i8L-v6-Szc" secondAttribute="leading" constant="20" id="Poy-QU-4yw"/>
                             <constraint firstAttribute="bottom" secondItem="Hkf-Kx-g2t" secondAttribute="bottom" constant="16" id="Tn7-dP-49u"/>
                             <constraint firstItem="ttY-5p-rFa" firstAttribute="top" secondItem="RaO-fz-MWZ" secondAttribute="bottom" constant="8" id="VgO-eE-Se3"/>
@@ -1506,6 +1517,7 @@
                         <outlet property="thresholdLabel" destination="ttY-5p-rFa" id="fD7-uc-bYY"/>
                         <segue destination="iug-s9-0PF" kind="show" identifier="segueToCosignerFromAccountDetail" id="RRe-xD-Awd"/>
                         <segue destination="9Vu-3O-YNg" kind="show" identifier="segueToExportAccountMap" id="cew-VD-Qtb"/>
+                        <segue destination="6NQ-R2-fha" kind="show" identifier="segueToAddresses" id="bWu-t4-v64"/>
                     </connections>
                 </viewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="npg-ZV-dua" userLabel="First Responder" customClass="UIResponder" sceneMemberID="firstResponder"/>

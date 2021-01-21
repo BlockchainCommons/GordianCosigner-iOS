@@ -41,6 +41,15 @@ class AccountDetailViewController: UIViewController, UITextFieldDelegate, UITabl
         textField.returnKeyType = .done
     }
     
+    @IBAction func seeAddressesAction(_ sender: Any) {
+        DispatchQueue.main.async { [weak self] in
+            guard let self = self else { return }
+            
+            self.performSegue(withIdentifier: "segueToAddresses", sender: self)
+        }
+    }
+    
+    
     @IBAction func exportAccountAction(_ sender: Any) {
         DispatchQueue.main.async { [weak self] in
             guard let self = self else { return }
@@ -195,6 +204,11 @@ class AccountDetailViewController: UIViewController, UITextFieldDelegate, UITabl
             vc.descriptionText = map.json() ?? ""
             vc.isPsbt = false
             vc.text = map.json() ?? ""
+            
+        case "segueToAddresses":
+            guard let vc = segue.destination as? AddressesViewController else { fallthrough }
+            
+            vc.account = self.account
             
         default:
             break
