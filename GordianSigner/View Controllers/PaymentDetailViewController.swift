@@ -19,7 +19,6 @@ class PsbtTableViewController: UIViewController, UITableViewDelegate, UITableVie
     var rawTx = ""
     var psbt:PSBT!
     private var canSign = false
-    private var export = false
     private var alertStyle = UIAlertController.Style.actionSheet
     var inputsArray = [[String:Any]]()
     var outputsArray = [[String:Any]]()
@@ -47,10 +46,6 @@ class PsbtTableViewController: UIViewController, UITableViewDelegate, UITableVie
             
             if let psbtToFinalize = try? psbt.finalized() {
                 if psbtToFinalize.isComplete {
-                    self.export = true
-                    DispatchQueue.main.async {
-                        self.signButtonOutlet.setTitle("export", for: .normal)
-                    }
                     if let final = psbtToFinalize.transactionFinal {
                         if let hex = final.description {
                             self.rawTx = hex
@@ -417,7 +412,6 @@ class PsbtTableViewController: UIViewController, UITableViewDelegate, UITableVie
         if canSign {
             sign()
         } else {
-            
             DispatchQueue.main.async { [weak self] in
                 guard let self = self else { return }
                 
@@ -566,7 +560,6 @@ class PsbtTableViewController: UIViewController, UITableViewDelegate, UITableVie
                 label.text = "Signatures complete"
                 icon.image = UIImage(systemName: "checkmark.square")
                 icon.tintColor = .systemGreen
-                export = true
             } else {
                 label.text = "Signatures required"
                 icon.image = UIImage(systemName: "exclamationmark.square")
@@ -577,7 +570,6 @@ class PsbtTableViewController: UIViewController, UITableViewDelegate, UITableVie
                 label.text = "Signatures complete"
                 icon.image = UIImage(systemName: "checkmark.square")
                 icon.tintColor = .systemGreen
-                export = true
             } else {
                 label.text = "Signatures required"
                 icon.image = UIImage(systemName: "exclamationmark.square")
@@ -657,7 +649,6 @@ class PsbtTableViewController: UIViewController, UITableViewDelegate, UITableVie
         
         let amountLabel = cell.viewWithTag(3) as! UILabel
         let addressLabel = cell.viewWithTag(4) as! UILabel
-        //let accountMapLabel = cell.viewWithTag(5) as! UILabel
         let pathLabel = cell.viewWithTag(6) as! UILabel
         let addressTypeImage = cell.viewWithTag(7) as! UIImageView
         let addressTypeLabel = cell.viewWithTag(8) as! UILabel
@@ -789,9 +780,7 @@ class PsbtTableViewController: UIViewController, UITableViewDelegate, UITableVie
         
         PSBTSigner.sign(psbt.description) { [weak self] (signedPsbt, signedFor, errorMessage) in
             guard let self = self else { return }
-            
-            self.spinner.remove()
-            
+                        
             guard let signedPsbt = signedPsbt, let signedFor = signedFor else {
                 showAlert(self, "Something is not right...", errorMessage ?? "unable to sign that psbt: unknown error")
                 return
@@ -811,18 +800,20 @@ class PsbtTableViewController: UIViewController, UITableViewDelegate, UITableVie
                 }
             }
             
-            DispatchQueue.main.async {
-                self.export = true
+            DispatchQueue.main.async { [weak self] in
+                guard let self = self else { return }
+                
                 self.psbt = signedPsbt
-                self.signButtonOutlet.setTitle("export", for: .normal)
+                self.signButtonOutlet.alpha = 0
                 self.load { success in
-                    DispatchQueue.main.async {
+                    DispatchQueue.main.async { [weak self] in
+                        guard let self = self else { return }
                         self.tableView.reloadData()
+                        self.spinner.remove()
+                        showAlert(self, "Payment Signed ✓", "The signed payment has been saved. Export it by tapping the share button in top right.")
                     }
                 }
             }
-                        
-            showAlert(self, "Payment signed ✓", "The signed copy of the payment has been saved. You may export it at anytime by tapping the \"export\" button.")
         }
     }
     
