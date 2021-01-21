@@ -1604,7 +1604,7 @@
                                 <nil key="highlightedColor"/>
                             </label>
                             <textView clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="scaleToFill" editable="NO" textAlignment="natural" selectable="NO" translatesAutoresizingMaskIntoConstraints="NO" id="ioS-z5-N7c">
-                                <rect key="frame" x="16" y="375" width="382" height="417"/>
+                                <rect key="frame" x="16" y="413" width="382" height="379"/>
                                 <color key="backgroundColor" white="0.0" alpha="0.0" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                                 <string key="text">As you add valid bip39 words they will appear here so you may confirm them.
 
@@ -1623,6 +1623,21 @@ If you do not want to add seed words to create a cosigner go back and choose the
                                     <action selector="generateAction:" destination="vZg-oW-Ek8" eventType="touchUpInside" id="tDM-uC-mci"/>
                                 </connections>
                             </button>
+                            <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" showsTouchWhenHighlighted="YES" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="ACg-Sc-SuY">
+                                <rect key="frame" x="354" y="372" width="40" height="40"/>
+                                <constraints>
+                                    <constraint firstAttribute="width" constant="40" id="bPH-dj-sEq"/>
+                                    <constraint firstAttribute="height" constant="40" id="zWr-kV-TPY"/>
+                                </constraints>
+                                <fontDescription key="fontDescription" type="system" pointSize="12"/>
+                                <color key="tintColor" red="0.25174289789999998" green="0.82675522769999998" blue="1" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+                                <state key="normal" image="square.and.arrow.up" catalog="system">
+                                    <color key="titleColor" red="0.25174289789999998" green="0.82675522769999998" blue="1" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+                                </state>
+                                <connections>
+                                    <action selector="shareMnemonicAction:" destination="vZg-oW-Ek8" eventType="touchUpInside" id="KmF-Cx-APM"/>
+                                </connections>
+                            </button>
                         </subviews>
                         <viewLayoutGuide key="safeArea" id="ygb-tm-OJF"/>
                         <color key="backgroundColor" white="0.0" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
@@ -1635,7 +1650,7 @@ If you do not want to add seed words to create a cosigner go back and choose the
                             <constraint firstItem="ygb-tm-OJF" firstAttribute="bottom" secondItem="tXJ-Ca-pfZ" secondAttribute="bottom" constant="20" id="8od-Mq-KVK"/>
                             <constraint firstItem="bnh-FZ-tjQ" firstAttribute="leading" secondItem="ygb-tm-OJF" secondAttribute="leading" constant="16" id="Ady-P8-Kec"/>
                             <constraint firstItem="bnh-FZ-tjQ" firstAttribute="top" secondItem="ygb-tm-OJF" secondAttribute="top" constant="18" id="FAp-8u-xgd"/>
-                            <constraint firstItem="ioS-z5-N7c" firstAttribute="top" secondItem="aPD-n5-10f" secondAttribute="bottom" constant="8" id="JX2-AT-4FJ"/>
+                            <constraint firstItem="ioS-z5-N7c" firstAttribute="top" secondItem="aPD-n5-10f" secondAttribute="bottom" constant="46" id="JX2-AT-4FJ"/>
                             <constraint firstItem="ygb-tm-OJF" firstAttribute="trailing" secondItem="tXJ-Ca-pfZ" secondAttribute="trailing" constant="16" id="KVb-LX-07R"/>
                             <constraint firstItem="aPD-n5-10f" firstAttribute="top" secondItem="Fgt-26-vN0" secondAttribute="bottom" constant="16" id="M1b-PJ-SSv"/>
                             <constraint firstItem="ygb-tm-OJF" firstAttribute="trailing" secondItem="ioS-z5-N7c" secondAttribute="trailing" constant="16" id="VQ0-g1-k23"/>
@@ -1644,7 +1659,9 @@ If you do not want to add seed words to create a cosigner go back and choose the
                             <constraint firstItem="ioS-z5-N7c" firstAttribute="leading" secondItem="ygb-tm-OJF" secondAttribute="leading" constant="16" id="coc-WL-dDZ"/>
                             <constraint firstItem="ygb-tm-OJF" firstAttribute="trailing" secondItem="EzJ-7h-OG7" secondAttribute="trailing" constant="16" id="iQk-tf-X3g"/>
                             <constraint firstItem="ygb-tm-OJF" firstAttribute="trailing" secondItem="Fgt-26-vN0" secondAttribute="trailing" constant="16" id="jFf-oi-t9Z"/>
+                            <constraint firstItem="ygb-tm-OJF" firstAttribute="trailing" secondItem="ACg-Sc-SuY" secondAttribute="trailing" constant="20" id="pXM-J6-B66"/>
                             <constraint firstItem="EzJ-7h-OG7" firstAttribute="centerY" secondItem="bnh-FZ-tjQ" secondAttribute="centerY" id="sKg-XL-fXv"/>
+                            <constraint firstItem="ioS-z5-N7c" firstAttribute="top" secondItem="ACg-Sc-SuY" secondAttribute="bottom" constant="1" id="sa5-eS-gDY"/>
                             <constraint firstItem="ygb-tm-OJF" firstAttribute="trailing" secondItem="aPD-n5-10f" secondAttribute="trailing" constant="16" id="vW5-es-cMO"/>
                         </constraints>
                     </view>
@@ -1659,7 +1676,7 @@ If you do not want to add seed words to create a cosigner go back and choose the
                 </viewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="urU-Fs-nq4" userLabel="First Responder" customClass="UIResponder" sceneMemberID="firstResponder"/>
             </objects>
-            <point key="canvasLocation" x="2101" y="875"/>
+            <point key="canvasLocation" x="2100" y="874.55357142857144"/>
         </scene>
         <!--Seed Detail View Controller-->
         <scene sceneID="Rcx-dw-Rd1">

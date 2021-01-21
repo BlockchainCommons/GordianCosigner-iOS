@@ -35,6 +35,29 @@ class AddSignerViewController: UIViewController {
         bip39Words = Bip39Words.valid
     }
     
+    @IBAction func shareMnemonicAction(_ sender: Any) {
+        if Keys.validMnemonicArray(self.justWords) {
+            share(self.justWords.joined(separator: " "))
+        } else {
+            showAlert(self, "", "Add or generate a valid mnemonic first.")
+        }
+    }
+    
+    private func share(_ item: Any) {
+        DispatchQueue.main.async {
+            let itemToShare = [item]
+            let activityViewController = UIActivityViewController(activityItems: itemToShare, applicationActivities: nil)
+            
+            if UIDevice.current.userInterfaceIdiom == .pad {
+                activityViewController.popoverPresentationController?.sourceView = self.view
+                activityViewController.popoverPresentationController?.sourceRect = CGRect(x: 0, y: 0, width: 100, height: 100)
+            }
+            
+            self.present(activityViewController, animated: true) {}
+        }
+    }
+    
+    
     @IBAction func generateAction(_ sender: Any) {
         guard let words = Keys.seed() else { return }
         
