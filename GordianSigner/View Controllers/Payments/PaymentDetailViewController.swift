@@ -595,6 +595,9 @@ class PsbtTableViewController: UIViewController, UITableViewDelegate, UITableVie
         
         let inputNumberLabel = cell.viewWithTag(7) as! UILabel
         inputNumberLabel.text = "Input #\(indexPath.row + 1)"
+        
+        let inputTypeImageView = cell.viewWithTag(4) as! UIImageView
+        let inputTypeLabel = cell.viewWithTag(5) as! UILabel
                 
         let inputDict = inputsArray[indexPath.row]
         let input = inputDict["input"] as! PSBTInput
@@ -614,6 +617,20 @@ class PsbtTableViewController: UIViewController, UITableViewDelegate, UITableVie
                     }
                     
                     pathLabel.text = fullPath.description
+                    
+                    if fullPath.description.contains("/0/") {
+                        inputTypeImageView.image = UIImage(systemName: "arrow.down.right")
+                        inputTypeLabel.text = "Receive Input"
+                        inputTypeImageView.tintColor = .systemGreen
+                    } else if fullPath.description.contains("/1/") {
+                        inputTypeImageView.image = UIImage(systemName: "arrow.2.circlepath")
+                        inputTypeLabel.text = "Change Input"
+                        inputTypeImageView.tintColor = .gray
+                    } else {
+                        inputTypeImageView.image = UIImage(systemName: "questionmark.circle")
+                        inputTypeLabel.text = "Unknown type"
+                        inputTypeImageView.tintColor = .systemRed
+                    }
                 }
                 
                 numberOfSigsLabel.text = "\(numberOfSigs) signatures"
