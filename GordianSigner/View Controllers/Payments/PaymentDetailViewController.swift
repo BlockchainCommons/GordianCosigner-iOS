@@ -320,8 +320,8 @@ class PsbtTableViewController: UIViewController, UITableViewDelegate, UITableVie
             let pubkeyArray = input["pubKeyArray"] as! [[String:Any]]
             
             for pubkey in pubkeyArray {
-                let canSign = pubkey["canSign"] as! Bool
-                let hasSigned = pubkey["hasSigned"] as! Bool
+                let canSign = pubkey["canSign"] as? Bool ?? false
+                let hasSigned = pubkey["hasSigned"] as? Bool ?? false
                 
                 if canSign {
                     if !hasSigned {
@@ -475,9 +475,9 @@ class PsbtTableViewController: UIViewController, UITableViewDelegate, UITableVie
         
         if let participants = inputsArray[indexPath.section]["pubKeyArray"] as? [[String:Any]] {
             let participant = participants[indexPath.row]
-            let cosignerLabel = participant["cosignerLabel"] as! String
-            let hasSigned = participant["hasSigned"] as! Bool
-            let canSign = participant["canSign"] as! Bool
+            let cosignerLabel = participant["cosignerLabel"] as? String ?? "unknown"
+            let hasSigned = participant["hasSigned"] as? Bool ?? false
+            let canSign = participant["canSign"] as? Bool ?? false
             
             if canSign {
                 isHotImage.image = UIImage(systemName: "flame")
