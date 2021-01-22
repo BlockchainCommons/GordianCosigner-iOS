@@ -1469,9 +1469,19 @@
                                                         <constraint firstAttribute="width" constant="19" id="gI3-M4-aZR"/>
                                                     </constraints>
                                                 </imageView>
+                                                <imageView clipsSubviews="YES" userInteractionEnabled="NO" contentMode="scaleAspectFit" horizontalHuggingPriority="251" verticalHuggingPriority="251" image="chevron.right" catalog="system" translatesAutoresizingMaskIntoConstraints="NO" id="OjL-df-cxs">
+                                                    <rect key="frame" x="347" y="37.5" width="19" height="15.5"/>
+                                                    <color key="tintColor" white="0.66666666666666663" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+                                                    <constraints>
+                                                        <constraint firstAttribute="height" constant="19" id="0Xf-GD-0Q9"/>
+                                                        <constraint firstAttribute="width" constant="19" id="eyT-it-1QT"/>
+                                                    </constraints>
+                                                </imageView>
                                             </subviews>
                                             <constraints>
+                                                <constraint firstAttribute="trailing" secondItem="OjL-df-cxs" secondAttribute="trailing" constant="8" id="4oE-Sy-98C"/>
                                                 <constraint firstAttribute="trailing" secondItem="yNZ-Ga-qFT" secondAttribute="trailing" constant="8" id="6bP-zJ-ptC"/>
+                                                <constraint firstItem="OjL-df-cxs" firstAttribute="centerY" secondItem="q5E-2s-a9F" secondAttribute="centerY" id="GGz-0T-d8E"/>
                                                 <constraint firstItem="36f-U3-ZsH" firstAttribute="leading" secondItem="q5E-2s-a9F" secondAttribute="leading" id="NOa-ew-XDw"/>
                                                 <constraint firstItem="36f-U3-ZsH" firstAttribute="centerY" secondItem="q5E-2s-a9F" secondAttribute="centerY" id="XqA-bo-LK5"/>
                                                 <constraint firstItem="yNZ-Ga-qFT" firstAttribute="leading" secondItem="36f-U3-ZsH" secondAttribute="trailing" constant="8" symbolic="YES" id="u6r-TE-5I4"/>
@@ -2252,7 +2262,7 @@ The use of Gordian Cosigner is under the "BSD 2-Clause Plus Patent License" (htt
         <segue reference="RRe-xD-Awd"/>
         <segue reference="UaS-I9-AEd"/>
         <segue reference="KzM-QC-ivF"/>
-        <segue reference="JgM-9d-RH3"/>
+        <segue reference="cew-VD-Qtb"/>
         <segue reference="hPq-I8-kVg"/>
     </inferredMetricsTieBreakers>
     <resources>
