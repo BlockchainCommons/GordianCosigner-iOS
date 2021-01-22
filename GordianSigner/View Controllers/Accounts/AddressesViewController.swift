@@ -32,41 +32,46 @@ class AddressesViewController: UIViewController, UITableViewDelegate, UITableVie
         let keys = descriptorStruct.multiSigKeys
         let sigsRequired = descriptorStruct.sigsRequired
         
-        for i in 0 ... 999 {
-            var pubkeys = [PubKey]()
+        //DispatchQueue.background(background: {
+        DispatchQueue.background(background: { [weak self] in
+            guard let self = self else { return }
             
-            for (k, key) in keys.enumerated() {
-                guard let hdKey = try? HDKey(base58: key.condenseWhitespace()) else {
-                    showAlert(self, "Invalid key", "Gordian Cosigner does not yet support slip132, please ensure your xpub is valid and try again.")
-                    return
-                }
+            for i in 0 ... 999 {
+                var pubkeys = [PubKey]()
                 
-                let path = "0" + "/" + "\(i)"
-                
-                guard let bip32path = try? BIP32Path(string: path), let key = try? hdKey.derive(using: bip32path) else {
-                    showAlert(self, "", "There was an error deriving your addresses")
-                    return
-                }
-                
-                pubkeys.append(key.pubKey)
-                
-                if k + 1 == keys.count {
-                    let scriptPubKey = ScriptPubKey(multisig: pubkeys, threshold: sigsRequired, isBIP67: true)
-                    
-                    if let multiSigAddress = try? Address(scriptPubKey: scriptPubKey, network: Keys.chain) {
-                        addresses.append(multiSigAddress.description)
+                for (k, key) in keys.enumerated() {
+                    guard let hdKey = try? HDKey(base58: key.condenseWhitespace()) else {
+                        showAlert(self, "Invalid key", "Gordian Cosigner does not yet support slip132, please ensure your xpub is valid and try again.")
+                        return
                     }
                     
-                    pubkeys.removeAll()
+                    let path = "0" + "/" + "\(i)"
+                    
+                    guard let bip32path = try? BIP32Path(string: path), let key = try? hdKey.derive(using: bip32path) else {
+                        showAlert(self, "", "There was an error deriving your addresses")
+                        return
+                    }
+                    
+                    pubkeys.append(key.pubKey)
+                    
+                    if k + 1 == keys.count {
+                        let scriptPubKey = ScriptPubKey(multisig: pubkeys, threshold: sigsRequired, isBIP67: true)
+                        
+                        if let multiSigAddress = try? Address(scriptPubKey: scriptPubKey, network: Keys.chain) {
+                            self.addresses.append(multiSigAddress.description)
+                        }
+                        
+                        pubkeys.removeAll()
+                    }
+                }
+                
+                if i == 999 {
+                    DispatchQueue.main.async { [weak self] in
+                        self?.addressesTable.reloadData()
+                    }
                 }
             }
-            
-            if i == 999 {
-                DispatchQueue.main.async { [weak self] in
-                    self?.addressesTable.reloadData()
-                }
-            }
-        }
+        }, completion: {})
     }
     
     func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
