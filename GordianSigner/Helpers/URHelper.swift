@@ -31,16 +31,21 @@ enum URHelper {
         var xpub = ""
         var path = ""
         
-        guard let ur = try? URDecoder.decode(urString) else { return nil }
-        guard let decodedCbor = try? CBOR.decode(ur.cbor.bytes) else { return nil }
-        guard case let CBOR.map(dict) = decodedCbor else { return nil }
+        guard let ur = try? URDecoder.decode(urString.condenseWhitespace()),
+              let decodedCbor = try? CBOR.decode(ur.cbor.bytes),
+              case let CBOR.map(dict) = decodedCbor else {
+            
+            return nil
+        }
         
         for (key, value) in dict {
             switch key {
             case 1:
                 guard case let CBOR.unsignedInt(fingerprint) = value else { fallthrough }
+                
                 let hex = String(Int(fingerprint), radix: 16)
                 xfp = "[\(hex)/"
+                
             case 2:
                 guard case let CBOR.array(accounts) = value else { fallthrough }
                 
@@ -49,18 +54,26 @@ enum URHelper {
                         if tag.rawValue == 401 {
                             if case let CBOR.tagged(_, hdkeyCbor) = rawCbor {
                                 let (keydata, chaincode, origins) = urToHdkey(cbor: hdkeyCbor)
-                                guard let keyData = keydata, let chainCode = chaincode, let origin = origins else { return nil }
-                                path = origin
-                                let prefix = "0488b21e"//mainnet "043587cf"//testnet
-                                var base58String = "\(prefix)000000000000000000\(chainCode)\(keyData)"
                                 
-                                if let data = Data(base64Encoded: base58String) {
-                                    let checksum = Encryption.checksum(Data(data))
-                                    base58String += checksum
-                                    if let rawData = Data(base64Encoded: base58String) {
-                                        xpub = Base58.encode([UInt8](rawData))
-                                    }
+                                guard let keyData = keydata, let chainCode = chaincode, let origin = origins else { return nil }
+                                
+                                path = origin
+                                
+                                var prefix = "0488b21e"//mainnet
+                                
+                                if Keys.coinType == "1" {
+                                    prefix = "043587cf"//testnet
                                 }
+                                
+                                var hexString = "\(prefix)000000000000000000\(chainCode)\(keyData)"
+                                
+                                guard let data = Data(hexString: hexString) else { return nil }
+                                
+                                hexString += Encryption.checksum(data)
+                                
+                                guard let hexData = Data(hexString: hexString) else { return nil }
+                                
+                                xpub = Base58.encode([UInt8](hexData))
                             }
                         }
                     }

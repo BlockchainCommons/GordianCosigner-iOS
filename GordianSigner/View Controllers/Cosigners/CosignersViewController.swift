@@ -92,7 +92,7 @@ class KeysetsViewController: UIViewController, UITableViewDelegate, UITableViewD
             } else if pasteBoard.contains("48h/\(Keys.coinType)h/0h/2h") || pasteBoard.contains("48'/\(Keys.coinType)'/0'/2'") {
                 self.addCosigner(pasteBoard)
             } else {
-                showAlert(self, "", "Invalid cosigner text, we accept UR crypto-account or [<fingerprint>/48h/\(Keys.coinType)h/0h/2h]xpub.....")
+                showAlert(self, "", "Invalid cosigner text, we accept UR crypto-account or [<fingerprint>/48h/\(Keys.coinType)h/0h/2h]tpub.....")
             }
         } else {
             showAlert(self, "Invalid cosigner text", "We accept UR crypto-account or [<fingerprint>/48h/\(Keys.coinType)h/0h/2h]xpub.....")
