@@ -12,9 +12,9 @@ import LibWally
 class SignerViewController: UIViewController {
     
     private var spinner = Spinner()
-    private var psbt = ""
     private var alertStyle = UIAlertController.Style.actionSheet
     private var psbtToParse:PSBT!
+    var psbtStruct:PsbtStruct!
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -30,7 +30,6 @@ class SignerViewController: UIViewController {
             self.dismiss(animated: true, completion: nil)
         }
     }
-    
     
     @IBAction func importFileAction(_ sender: Any) {
         DispatchQueue.main.async { [weak self] in
@@ -95,7 +94,6 @@ class SignerViewController: UIViewController {
         
         save(validPsbt)
         psbtToParse = validPsbt
-        psbt = string
         
         DispatchQueue.main.async { [weak self] in
             guard let self = self else { return }
@@ -105,12 +103,13 @@ class SignerViewController: UIViewController {
     }
     
     private func save(_ psbt: PSBT) {
-        print("save")
         var dict = [String:Any]()
         dict["dateAdded"] = Date()
         dict["psbt"] = psbt.data
         dict["label"] = "PSBT"
         dict["id"] = UUID()
+        
+        self.psbtStruct = PsbtStruct(dictionary: dict)
         
         CoreDataService.saveEntity(dict: dict, entityName: .payment, completion: { (success, errorDescription) in
             guard success else {
@@ -148,13 +147,13 @@ class SignerViewController: UIViewController {
         
         if segue.identifier == "segueToQRDisplayer" {
             if let vc = segue.destination as? QRDisplayerViewController {
-                vc.text = psbt
+                vc.text = self.psbtStruct.psbt.base64EncodedString()
             }
         }
         
         if segue.identifier == "segueToPsbtDetail" {
             if let vc = segue.destination as? PsbtTableViewController {
-                vc.psbt = psbtToParse
+                vc.psbtStruct = self.psbtStruct
             }
         }
     }
@@ -166,11 +165,11 @@ extension SignerViewController: UIDocumentPickerDelegate {
         if controller.documentPickerMode == .import {
             do {
                 let data = try Data(contentsOf: urls[0].absoluteURL)
-                psbt = data.base64EncodedString()
+                let psbt = data.base64EncodedString()
                 self.psbtValid(psbt)
             } catch {
                 spinner.remove()
-                showAlert(self, "Ooops", "That is not a recognized format, generally it will be a .psbt file, Gordian Signer is compatible with BIP174.")
+                showAlert(self, "", "That is not a recognized format, generally it will be a .psbt file, Gordian Cosigner is compatible with BIP174.")
             }
         }
     }

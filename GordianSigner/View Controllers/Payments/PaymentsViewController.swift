@@ -14,12 +14,11 @@ class PsbtViewController: UIViewController, UITableViewDelegate, UITableViewData
     
     private let spinner = Spinner()
     private var psbts = [PsbtStruct]()
-    private var psbtText = ""
     private var lifeHashes = [UIImage]()
     private var completes = [Bool]()
     private var amounts = [Double]()
     private var weSigned = [Bool]()
-    private var psbtToExport = ""
+    var psbtStruct:PsbtStruct!
     var addButton = UIBarButtonItem()
     var editButton = UIBarButtonItem()
     @IBOutlet weak private var psbtTable: UITableView!
@@ -246,7 +245,7 @@ class PsbtViewController: UIViewController, UITableViewDelegate, UITableViewData
     @objc func exportQr(_ sender: UIButton) {
         guard let sectionString = sender.restorationIdentifier, let int = Int(sectionString) else { return }
         
-        psbtToExport = psbts[int].psbt.base64EncodedString()
+        psbtStruct = psbts[int]
         
         DispatchQueue.main.async { [weak self] in
             guard let self = self else { return }
@@ -374,7 +373,7 @@ class PsbtViewController: UIViewController, UITableViewDelegate, UITableViewData
     @objc func seeDetail(_ sender: UIButton) {
         guard let sectionString = sender.restorationIdentifier, let int = Int(sectionString) else { return }
         
-        psbtText = psbts[int].psbt.base64EncodedString()
+        psbtStruct = psbts[int]
         segueToDetail()
     }
     
@@ -467,14 +466,14 @@ class PsbtViewController: UIViewController, UITableViewDelegate, UITableViewData
         // Pass the selected object to the new view controller.
         if segue.identifier == "segueToPsbtDetail" {
             if let vc = segue.destination as? PsbtTableViewController {
-                vc.psbtText = psbtText
+                vc.psbtStruct = self.psbtStruct
             }
         }
         
         if segue.identifier == "segueToShowPsbtQR" {
             if let vc = segue.destination as? QRDisplayerViewController {
                 vc.isPsbt = true
-                vc.text = psbtToExport
+                vc.text = psbtStruct.psbt.base64EncodedString()
             }
         }
         
@@ -484,6 +483,4 @@ class PsbtViewController: UIViewController, UITableViewDelegate, UITableViewData
             }
         }
     }
-    
-
 }

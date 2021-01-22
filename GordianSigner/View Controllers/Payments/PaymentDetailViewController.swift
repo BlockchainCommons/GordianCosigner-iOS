@@ -15,8 +15,8 @@ class PsbtTableViewController: UIViewController, UITableViewDelegate, UITableVie
     @IBOutlet weak private var signButtonOutlet: UIButton!
     
     private var spinner = Spinner()
-    var psbtText = ""
     var rawTx = ""
+    var psbtStruct:PsbtStruct!
     var psbt:PSBT!
     private var canSign = false
     private var alertStyle = UIAlertController.Style.actionSheet
@@ -41,15 +41,13 @@ class PsbtTableViewController: UIViewController, UITableViewDelegate, UITableVie
         
         spinner.add(vc: self, description: "loading...")
         
-        if psbtText != "" {
-            psbt = try? PSBT(psbt: psbtText, network: Keys.chain)
-            
-            if let psbtToFinalize = try? psbt.finalized() {
-                if psbtToFinalize.isComplete {
-                    if let final = psbtToFinalize.transactionFinal {
-                        if let hex = final.description {
-                            self.rawTx = hex
-                        }
+        psbt = try? PSBT(psbt: psbtStruct.psbt, network: Keys.chain)
+        
+        if let psbtToFinalize = try? psbt.finalized() {
+            if psbtToFinalize.isComplete {
+                if let final = psbtToFinalize.transactionFinal {
+                    if let hex = final.description {
+                        self.rawTx = hex
                     }
                 }
             }
@@ -697,8 +695,6 @@ class PsbtTableViewController: UIViewController, UITableViewDelegate, UITableVie
         }
         addressLabel.adjustsFontSizeToFitWidth = true
         
-        
-        
         let path = outputDict["path"] as! String
         pathLabel.text = path
         
@@ -835,15 +831,9 @@ class PsbtTableViewController: UIViewController, UITableViewDelegate, UITableVie
     }
     
     private func save(_ psbtToSave: PSBT) {
-        var dict = [String:Any]()
-        dict["dateAdded"] = Date()
-        dict["psbt"] = psbtToSave.data
-        dict["label"] = "Signed PSBT"
-        dict["id"] = UUID()
-        
-        CoreDataService.saveEntity(dict: dict, entityName: .payment, completion: { (success, errorDescription) in
+        CoreDataService.updateEntity(id: self.psbtStruct.id, keyToUpdate: "psbt", newValue: psbtToSave.data, entityName: .payment) { (success, errorDescription) in
             guard success else {
-                showAlert(self, "Not saved!", "There was an issue encrypting and saving your psbt. Please reach out and let us know. Error: \(errorDescription ?? "unknown")")
+                showAlert(self, "Not saved!", "There was an issue saving the updated psbt. Please reach out and let us know. Error: \(errorDescription ?? "unknown")")
                 
                 return
             }
@@ -851,7 +841,7 @@ class PsbtTableViewController: UIViewController, UITableViewDelegate, UITableVie
             DispatchQueue.main.async {
                 NotificationCenter.default.post(name: .psbtSaved, object: nil, userInfo: nil)
             }
-        })
+        }
     }
     
     private func exportAsFile(_ psbt: Data) {
@@ -964,5 +954,4 @@ class PsbtTableViewController: UIViewController, UITableViewDelegate, UITableVie
             }
         }
     }
-
 }
