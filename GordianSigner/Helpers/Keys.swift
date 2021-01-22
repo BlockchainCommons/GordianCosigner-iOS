@@ -144,4 +144,13 @@ enum Keys {
                 
         return "[\(hdKey.fingerprint.hexString)/48h/\(coinType)h/0h/2h]\(account.xpub)"
     }
+    
+    static func bip48SegwitAccountXprv(_ masterKey: String) -> String? {
+        guard let hdKey = try? HDKey(base58: masterKey), let bip48SegwitDeriv = try? BIP32Path(string: "m/48'/\(coinType)'/0'/2'"),
+              let account = try? hdKey.derive(using: bip48SegwitDeriv), let xprv = account.xpriv else {
+                return nil
+        }
+                
+        return "[\(hdKey.fingerprint.hexString)/48h/\(coinType)h/0h/2h]\(xprv)"
+    }
 }

@@ -26,7 +26,7 @@ enum URHelper {
         return Data(bytes).base64EncodedString()
     }
     
-    static func accountUr(_ urString: String) -> String? {
+    static func accountUrToCosigner(_ urString: String) -> String? {
         var xfp = ""
         var xpub = ""
         var path = ""
@@ -53,32 +53,19 @@ enum URHelper {
                     if case let CBOR.tagged(tag, rawCbor) = elem {
                         if tag.rawValue == 401 {
                             if case let CBOR.tagged(_, hdkeyCbor) = rawCbor {
-                                let (keydata, chaincode, origins) = urToHdkey(cbor: hdkeyCbor)
+                                let (keydata, chaincode, origins) = cborToCosigner(cbor: hdkeyCbor)
                                 
                                 guard let keyData = keydata, let chainCode = chaincode, let origin = origins else { return nil }
                                 
                                 path = origin
                                 
-                                var prefix = "0488b21e"//mainnet
+                                guard let xpubCheck = URHelper.xpub(keyData, chainCode) else { return nil }
                                 
-                                if Keys.coinType == "1" {
-                                    prefix = "043587cf"//testnet
-                                }
-                                
-                                var hexString = "\(prefix)000000000000000000\(chainCode)\(keyData)"
-                                
-                                guard let data = Data(hexString: hexString) else { return nil }
-                                
-                                hexString += Encryption.checksum(data)
-                                
-                                guard let hexData = Data(hexString: hexString) else { return nil }
-                                
-                                xpub = Base58.encode([UInt8](hexData))
+                                xpub = xpubCheck
                             }
                         }
                     }
                 }
-
             default:
                 break
             }
@@ -89,7 +76,114 @@ enum URHelper {
         return xfp + path + "]" + xpub
     }
     
-    static func urToHdkey(cbor: CBOR) -> (keyData: String?, chainCode: String?, origins: String?) {
+    static func urHdkeyToCosigner(_ urString: String) -> String? {
+        guard let ur = try? URDecoder.decode(urString),
+              let decodedCbor = try? CBOR.decode(ur.cbor.bytes),
+              case let CBOR.map(dict) = decodedCbor else {
+            return nil
+        }
+        
+        var isMaster = false
+        var keyData:String?
+        var chainCode:String?
+        var isPrivate = false
+        var origins:String?
+        var fingerprint:String?
+        
+        for (key, value) in dict {
+            switch key {
+            case 1:
+                guard case let CBOR.boolean(b) = value else { fallthrough }
+                
+                isMaster = b
+            case 2:
+                guard case let CBOR.boolean(b) = value else { fallthrough }
+                
+                isPrivate = b
+            case 3:
+                guard case let CBOR.byteString(bs) = value else { fallthrough }
+                
+                keyData = Data(bs).hexString
+            case 4:
+                guard case let CBOR.byteString(bs) = value else { fallthrough }
+                
+                chainCode = Data(bs).hexString
+            case 6:
+                guard case let CBOR.tagged(_, originCbor) = value else { fallthrough }
+                guard case let CBOR.map(map) = originCbor else { fallthrough }
+                
+                origins = URHelper.origins(map)
+                
+            case 8:
+                guard case let CBOR.unsignedInt(xfp) = value else { fallthrough }
+                
+                fingerprint = String(Int(xfp), radix: 16)
+            default:
+                break
+            }
+        }
+        
+        var extendedKey:String?
+        var cosigner:String?
+        
+        guard let keydata = keyData, let chaincode = chainCode else { return nil }
+        
+        if !isPrivate && !isMaster {
+            extendedKey = URHelper.xpub(keydata, chaincode)
+        } else {
+            extendedKey = URHelper.xprv(keydata, chaincode)
+        }
+        
+        guard let key = extendedKey else { return nil }
+        
+        if isMaster {
+            cosigner = Keys.bip48SegwitAccountXprv(key)
+        } else {
+            guard let origin = origins, let xfp = fingerprint else { return nil }
+            
+            cosigner = "[\(xfp + "/" + origin)]\(key)"
+        }
+                
+        return cosigner
+    }
+    
+    static func xprv(_ keyData: String, _ chainCode: String) -> String? {
+        var prefix = "0488ade4"//mainnet
+        
+        if Keys.coinType == "1" {
+            prefix = "04358394"//testnet
+        }
+        
+        var hexString = "\(prefix)000000000000000000\(chainCode)\(keyData)"
+        
+        guard let data = Data(hexString: hexString) else { return nil }
+        
+        hexString += Encryption.checksum(data)
+        
+        guard let hexData = Data(hexString: hexString) else { return nil }
+        
+        return Base58.encode([UInt8](hexData))
+    }
+    
+    static func xpub(_ keyData: String, _ chainCode: String) -> String? {
+        var prefix = "0488b21e"//mainnet
+        
+        if Keys.coinType == "1" {
+            prefix = "043587cf"//testnet
+        }
+        
+        var hexString = "\(prefix)000000000000000000\(chainCode)\(keyData)"
+        
+        guard let data = Data(hexString: hexString) else { return nil }
+        
+        hexString += Encryption.checksum(data)
+        
+        guard let hexData = Data(hexString: hexString) else { return nil }
+        
+        return Base58.encode([UInt8](hexData))
+    }
+    
+    static func cborToCosigner(cbor: CBOR) -> (keyData: String?, chainCode: String?, origins: String?) {
         guard case let CBOR.map(dict) = cbor else { return (nil, nil, nil) }
         
         var keyData:String?
@@ -107,53 +201,47 @@ enum URHelper {
             case 6:
                 guard case let CBOR.tagged(_, originCbor) = value else { fallthrough }
                 guard case let CBOR.map(map) = originCbor else { fallthrough }
-                
-                for (k, v) in map {
-                    switch k {
-                    case 1:
-                        if case let CBOR.array(originsArray) = v {
-                            var path = ""
-                            
-                            for (i, elem) in originsArray.enumerated() {
-                                
-                                if case let CBOR.unsignedInt(comp) = elem {
-                                    path += "\(comp)"
-                                }
-                                
-                                if case let CBOR.boolean(isHardened) = elem {
-                                    
-                                    if isHardened {
-                                        
-                                        if i < originsArray.count - 1 {
-                                            path += "h/"
-                                        } else {
-                                            path += "h"
-                                        }
-                                        
-                                    } else {
-                                        
-                                        if i < originsArray.count - 1 {
-                                            path += "/"
-                                        }
-                                    }
-                                }
-                                
-                                if i + 1 == originsArray.count {
-                                    origins = path
-                                }
-                            }
-                        }
-                        
-                    default:
-                        print("nothing")
-                    }
-                }
+                guard let originsCheck = URHelper.origins(map) else { fallthrough }
+                origins = originsCheck
                 
             default:
                 break
             }
         }
         return (keyData, chainCode, origins)
+    }
+    
+    private static func origins(_ map: [CBOR : CBOR]) -> String? {
+        var path = ""
+        for (k, v) in map {
+            switch k {
+            case 1:
+                if case let CBOR.array(originsArray) = v {
+                    for (i, elem) in originsArray.enumerated() {
+                        if case let CBOR.unsignedInt(comp) = elem {
+                            path += "\(comp)"
+                        }
+                        if case let CBOR.boolean(isHardened) = elem {
+                            if isHardened {
+                                if i < originsArray.count - 1 {
+                                    path += "h/"
+                                } else {
+                                    path += "h"
+                                }
+                            } else {
+                                if i < originsArray.count - 1 {
+                                    path += "/"
+                                }
+                            }
+                        }
+                    }
+                }
+            default:
+                break
+            }
+        }
+        
+        return path
     }
     
 //    static func account(_ account: String) -> UR? {

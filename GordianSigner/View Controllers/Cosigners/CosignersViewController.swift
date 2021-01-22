@@ -69,33 +69,40 @@ class KeysetsViewController: UIViewController, UITableViewDelegate, UITableViewD
     }
     
     private func getPasteboard() {
-        if let pasteBoard = UIPasteboard.general.string {
-            if let account = URHelper.accountUr(pasteBoard) {
-                DispatchQueue.main.async { [weak self] in
-                    guard let self = self else { return }
-                    
-                    var alertStyle = UIAlertController.Style.actionSheet
-                    if (UIDevice.current.userInterfaceIdiom == .pad) {
-                        alertStyle = UIAlertController.Style.alert
-                    }
-                    
-                    let alert = UIAlertController(title: "Import Cosigner?", message: "You have a valid cosigner on your clipboard, would you like to import it?", preferredStyle: alertStyle)
-                    
-                    alert.addAction(UIAlertAction(title: "Yes", style: .default, handler: { action in
-                        self.addCosigner(account)
-                    }))
-                    
-                    alert.addAction(UIAlertAction(title: "Cancel", style: .cancel, handler: { action in }))
-                    alert.popoverPresentationController?.sourceView = self.view
-                    self.present(alert, animated: true, completion: nil)
-                }
-            } else if pasteBoard.contains("48h/\(Keys.coinType)h/0h/2h") || pasteBoard.contains("48'/\(Keys.coinType)'/0'/2'") {
-                self.addCosigner(pasteBoard)
-            } else {
-                showAlert(self, "", "Invalid cosigner text, we accept UR crypto-account or [<fingerprint>/48h/\(Keys.coinType)h/0h/2h]tpub.....")
-            }
+        guard let text = UIPasteboard.general.string else { return }
+        if text.hasPrefix("ur:crypto-account") {
+            guard let cosigner = URHelper.accountUrToCosigner(text.lowercased().condenseWhitespace()) else { return }
+            
+            promptToAddCosigner(cosigner)
+        } else if text.hasPrefix("ur:crypto-hdkey") {
+            guard let cosigner = URHelper.urHdkeyToCosigner(text.lowercased().condenseWhitespace()) else { return }
+            
+            promptToAddCosigner(cosigner)
+        } else if text.contains("48h/\(Keys.coinType)h/0h/2h") || text.contains("48'/\(Keys.coinType)'/0'/2'") {
+            self.addCosigner(text.condenseWhitespace())
         } else {
-            showAlert(self, "Invalid cosigner text", "We accept UR crypto-account or [<fingerprint>/48h/\(Keys.coinType)h/0h/2h]xpub.....")
+            showAlert(self, "", "Invalid cosigner text, we accept UR crypto-account or [<fingerprint>/48h/\(Keys.coinType)h/0h/2h]tpub.....")
+        }
+    }
+    
+    private func promptToAddCosigner(_ cosigner: String) {
+        DispatchQueue.main.async { [weak self] in
+            guard let self = self else { return }
+            
+            var alertStyle = UIAlertController.Style.actionSheet
+            if (UIDevice.current.userInterfaceIdiom == .pad) {
+                alertStyle = UIAlertController.Style.alert
+            }
+            
+            let alert = UIAlertController(title: "Import Cosigner?", message: "You have a valid cosigner on your clipboard, would you like to import it?", preferredStyle: alertStyle)
+            
+            alert.addAction(UIAlertAction(title: "Yes", style: .default, handler: { action in
+                self.addCosigner(cosigner)
+            }))
+            
+            alert.addAction(UIAlertAction(title: "Cancel", style: .cancel, handler: { action in }))
+            alert.popoverPresentationController?.sourceView = self.view
+            self.present(alert, animated: true, completion: nil)
         }
     }
     
@@ -441,9 +448,19 @@ class KeysetsViewController: UIViewController, UITableViewDelegate, UITableViewD
     }
     
     private func addCosigner(_ account: String) {
-        let hack = "wsh(\(account)/0/*)"
+        var segwitBip84Account = account
+        var hack = "wsh(\(account)/0/*)"
         let dp = DescriptorParser()
-        let ds = dp.descriptor(hack)
+        var ds = dp.descriptor(hack)
+        var cosigner = [String:Any]()
+        
+        if let hdkey = try? HDKey(base58: ds.accountXprv) {
+            guard let encryptedXprv = Encryption.encrypt(ds.accountXprv.utf8) else { return }
+            cosigner["xprv"] = encryptedXprv
+            hack = hack.replacingOccurrences(of: ds.accountXprv, with: hdkey.xpub)
+            segwitBip84Account = segwitBip84Account.replacingOccurrences(of: ds.accountXprv, with: hdkey.xpub)
+            ds = dp.descriptor(hack)
+        }
                 
         guard let _ = try? HDKey(base58: ds.accountXpub), let lifeHash = LifeHash.hash(ds.accountXpub) else {
             showAlert(self, "Invalid key", "Gordian Cosigner is not yet compatible with slip132, please ensure you are adding a valid xpub and try again.")
@@ -451,18 +468,16 @@ class KeysetsViewController: UIViewController, UITableViewDelegate, UITableViewD
         }
         
         guard account.contains("/48h/\(Keys.coinType)h/0h/2h") || account.contains("/48'/\(Keys.coinType)'/0'/2'") else {
-            showAlert(self, "Unsupported Cosigner", "Gordian Cosigner currently only supports the m/48h/\(Keys.coinType)h/0h/2h key origin.")
+            showAlert(self, "Derivation not supported", "Gordian Cosigner currently only supports the m/48h/\(Keys.coinType)h/0h/2h key origin.")
             return
         }
         
-        var cosigner = [String:Any]()
         cosigner["id"] = UUID()
         cosigner["label"] = "Cosigner"
-        cosigner["bip48SegwitAccount"] = account
+        cosigner["bip48SegwitAccount"] = segwitBip84Account
         cosigner["dateAdded"] = Date()
         cosigner["fingerprint"] = ds.fingerprint
         cosigner["lifehash"] = lifeHash
-        
         
         CoreDataService.saveEntity(dict: cosigner, entityName: .cosigner) { [weak self] (success, errorDesc) in
             guard let self = self else { return }
@@ -522,12 +537,14 @@ class KeysetsViewController: UIViewController, UITableViewDelegate, UITableViewD
             vc.doneBlock = { [weak self] result in
                 guard let self = self, let result = result else { return }
                 
-                if let account = URHelper.accountUr(result) {
+                if let account = URHelper.accountUrToCosigner(result) {
+                    self.addCosigner(account)
+                } else if let account = URHelper.urHdkeyToCosigner(result) {
                     self.addCosigner(account)
                 } else if result.contains("48h/\(Keys.coinType)h/0h/2h") || result.contains("48'/\(Keys.coinType)'/0'/2'") {
                     self.addCosigner(result)
                 } else {
-                    showAlert(self, "Cosigner not recognized!", "Gordian Cosigner currently only supports the m/48h/\(Keys.coinType)h/0h/2h key origin.")
+                    showAlert(self, "Derivation not supported", "Gordian Cosigner currently only supports the m/48h/\(Keys.coinType)h/0h/2h key origin.")
                 }
             }
             
