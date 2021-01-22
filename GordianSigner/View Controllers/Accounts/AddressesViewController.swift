@@ -12,8 +12,9 @@ import LibWally
 class AddressesViewController: UIViewController, UITableViewDelegate, UITableViewDataSource {
 
     @IBOutlet weak var addressesTable: UITableView!
-    var addresses = [String]()
+    var addresses = [[String:Any]]()
     var account:AccountStruct!
+    let spinner = Spinner()
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -26,13 +27,13 @@ class AddressesViewController: UIViewController, UITableViewDelegate, UITableVie
     }
     
     private func load() {
+        spinner.add(vc: self, description: "loading addresses, please wait...")
         let descriptor = account.descriptor
         let descriptorParser = DescriptorParser()
         let descriptorStruct = descriptorParser.descriptor(descriptor)
         let keys = descriptorStruct.multiSigKeys
         let sigsRequired = descriptorStruct.sigsRequired
         
-        //DispatchQueue.background(background: {
         DispatchQueue.background(background: { [weak self] in
             guard let self = self else { return }
             
@@ -58,7 +59,9 @@ class AddressesViewController: UIViewController, UITableViewDelegate, UITableVie
                         let scriptPubKey = ScriptPubKey(multisig: pubkeys, threshold: sigsRequired, isBIP67: true)
                         
                         if let multiSigAddress = try? Address(scriptPubKey: scriptPubKey, network: Keys.chain) {
-                            self.addresses.append(multiSigAddress.description)
+                            let lifehash = LifeHash.image(multiSigAddress.description)
+                            let dict = ["address": multiSigAddress.description, "lifehash": lifehash] as [String : Any]
+                            self.addresses.append(dict)
                         }
                         
                         pubkeys.removeAll()
@@ -68,6 +71,7 @@ class AddressesViewController: UIViewController, UITableViewDelegate, UITableVie
                 if i == 999 {
                     DispatchQueue.main.async { [weak self] in
                         self?.addressesTable.reloadData()
+                        self?.spinner.remove()
                     }
                 }
             }
@@ -82,19 +86,31 @@ class AddressesViewController: UIViewController, UITableViewDelegate, UITableVie
         let cell = tableView.dequeueReusableCell(withIdentifier: "addressCell", for: indexPath)
         cell.selectionStyle = .default
         
+        let dict = addresses[indexPath.row]
+        
         let label = cell.viewWithTag(1) as! UILabel
-        label.text = "#\(indexPath.row): " + addresses[indexPath.row]
+        label.text = "#\(indexPath.row): \(dict["address"] as! String)"
+        
+        let lifehash = cell.viewWithTag(2) as! UIImageView
+        lifehash.layer.magnificationFilter = .nearest
+        lifehash.image = (dict["lifehash"] as! UIImage)
+        
+        let copyButton = cell.viewWithTag(3) as! UIButton
+        copyButton.addTarget(self, action: #selector(copyAddress(_:)), for: .touchUpInside)
+        copyButton.restorationIdentifier = "\(dict["address"] as! String)"
         
         return cell
     }
     
-    func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
-        UIPasteboard.general.string = addresses[indexPath.row]
-        showAlert(self, "", "Address copied ✓")
-    }
-    
     func tableView(_ tableView: UITableView, heightForRowAt indexPath: IndexPath) -> CGFloat {
         return 80
+    }
+    
+    @objc func copyAddress(_ sender: UIButton) {
+        guard let address = sender.restorationIdentifier else { return }
+        
+        UIPasteboard.general.string = address
+        showAlert(self, "", "Address copied ✓")
     }
 
     /*
