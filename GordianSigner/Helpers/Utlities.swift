@@ -157,4 +157,8 @@ public extension Data {
     }
 }
 
+public func processedCharacters(_ string: String) -> String {
+    return string.filter("abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ ".contains).condenseWhitespace()
+}
+
 

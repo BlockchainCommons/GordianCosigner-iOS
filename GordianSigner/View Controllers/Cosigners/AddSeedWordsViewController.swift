@@ -15,6 +15,8 @@ class AddSignerViewController: UIViewController {
     @IBOutlet weak private var addSignerOutlet: UIButton!
     @IBOutlet weak private var aliasField: UITextField!
     @IBOutlet weak private var textView: UITextView!
+    @IBOutlet weak private var generateOutlet: UIButton!
+    
     
     private var addedWords = [String]()
     private var justWords = [String]()
@@ -23,6 +25,7 @@ class AddSignerViewController: UIViewController {
     private var timer = Timer()
     var doneBlock: (() -> Void)?
     var tempWords = false
+    var providedMnemonic = ""
 
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -33,6 +36,14 @@ class AddSignerViewController: UIViewController {
         configureTextView()
         addTapGesture()
         bip39Words = Bip39Words.valid
+    }
+    
+    override func viewDidAppear(_ animated: Bool) {
+        if providedMnemonic != "" {
+            generateOutlet.alpha = 0
+            textField.text = providedMnemonic
+            processTextfieldInput()
+        }
     }
     
     @IBAction func shareMnemonicAction(_ sender: Any) {
@@ -412,10 +423,6 @@ class AddSignerViewController: UIViewController {
         showAlert(self, "Valid ✓", "Ensure you have this mnemonic saved securely offline so that you may recover it if you lose this device!\n\nTap \"encrypt & save\" to encrypt the private keys and save them securely to the device.")
     }
     
-    private func processedCharacters(_ string: String) -> String {
-        return string.filter("abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ ".contains).condenseWhitespace()
-    }
-    
     func putColorFormattedTextInTextField(autocompleteResult: String, userQuery : String) {
         let coloredString: NSMutableAttributedString = NSMutableAttributedString(string: userQuery + autocompleteResult)
         coloredString.addAttribute(NSAttributedString.Key.foregroundColor,
@@ -482,7 +489,7 @@ class AddSignerViewController: UIViewController {
                 
                 guard let textInput = self.textField.text else { return }
                 
-                let processedInput = self.processedCharacters(textInput)
+                let processedInput = processedCharacters(textInput)
                 
                 if Keys.validMnemonicString(processedInput) {
                     self.processTextfieldInput()

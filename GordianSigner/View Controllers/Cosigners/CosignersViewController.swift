@@ -19,6 +19,7 @@ class KeysetsViewController: UIViewController, UITableViewDelegate, UITableViewD
     private var headerText = ""
     private var subheaderText = ""
     private var cosigner:CosignerStruct!
+    private var providedMnemonic = ""
     let spinner = Spinner()
 
     @IBOutlet weak private var keysetsTable: UITableView!
@@ -80,6 +81,9 @@ class KeysetsViewController: UIViewController, UITableViewDelegate, UITableViewD
             promptToAddCosigner(cosigner)
         } else if text.contains("48h/\(Keys.coinType)h/0h/2h") || text.contains("48'/\(Keys.coinType)'/0'/2'") {
             self.addCosigner(text.condenseWhitespace())
+        } else if Keys.validMnemonicString(processedCharacters(text)) {
+            self.providedMnemonic = processedCharacters(text)
+            self.addSeedWords()
         } else {
             showAlert(self, "", "Invalid cosigner text, we accept UR crypto-account or [<fingerprint>/48h/\(Keys.coinType)h/0h/2h]tpub.....")
         }
@@ -537,14 +541,17 @@ class KeysetsViewController: UIViewController, UITableViewDelegate, UITableViewD
             vc.doneBlock = { [weak self] result in
                 guard let self = self, let result = result else { return }
                 
-                if let account = URHelper.accountUrToCosigner(result) {
+                if result.lowercased().hasPrefix("ur:crypto-account"), let account = URHelper.accountUrToCosigner(result) {
                     self.addCosigner(account)
-                } else if let account = URHelper.urHdkeyToCosigner(result) {
+                } else if result.lowercased().hasPrefix("ur:crypto-hdkey"), let account = URHelper.urHdkeyToCosigner(result) {
                     self.addCosigner(account)
                 } else if result.contains("48h/\(Keys.coinType)h/0h/2h") || result.contains("48'/\(Keys.coinType)'/0'/2'") {
                     self.addCosigner(result)
+                } else if Keys.validMnemonicString(processedCharacters(result)) {
+                    self.providedMnemonic = processedCharacters(result)
+                    self.addSeedWords()
                 } else {
-                    showAlert(self, "Derivation not supported", "Gordian Cosigner currently only supports the m/48h/\(Keys.coinType)h/0h/2h key origin.")
+                    showAlert(self, "", "Unrecognized format.")
                 }
             }
             
@@ -555,6 +562,9 @@ class KeysetsViewController: UIViewController, UITableViewDelegate, UITableViewD
             
         case "segueToAddSeedWords":
             guard let vc = segue.destination as? AddSignerViewController else { fallthrough }
+            
+            vc.providedMnemonic = self.providedMnemonic
+            self.providedMnemonic = ""
             
             vc.doneBlock = {
                 self.load()

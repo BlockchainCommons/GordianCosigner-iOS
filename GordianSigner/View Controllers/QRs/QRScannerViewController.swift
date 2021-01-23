@@ -169,10 +169,14 @@ class QRScannerViewController: UIViewController {
         return text.lowercased().hasPrefix("ur:crypto-hdkey")
     }
     
+    private func isMnemonic(_ text: String) -> Bool {
+        return Keys.validMnemonicString(processedCharacters(text))
+    }
+    
     private func process(text: String) {
         isRunning = true
         
-        if !isAccountMap(text) && !isCryptoAccount(text) && !isCosigner(text) && !isCryptoHDKey(text) {
+        if !isAccountMap(text) && !isCryptoAccount(text) && !isCosigner(text) && !isCryptoHDKey(text) && !isMnemonic(text) {
             //keepRunning = true
             // Stop if we're already done with the decode.
             guard decoder.result == nil else {

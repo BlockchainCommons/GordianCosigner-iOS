@@ -59,7 +59,7 @@ enum URHelper {
                                 
                                 path = origin
                                 
-                                guard let xpubCheck = URHelper.xpub(keyData, chainCode) else { return nil }
+                                guard let xpubCheck = URHelper.xpub(keyData, chainCode, "") else { return nil }
                                 
                                 xpub = xpubCheck
                             }
@@ -77,7 +77,7 @@ enum URHelper {
     }
     
     static func urHdkeyToCosigner(_ urString: String) -> String? {
-        guard let ur = try? URDecoder.decode(urString),
+        guard let ur = try? URDecoder.decode(urString.condenseWhitespace()),
               let decodedCbor = try? CBOR.decode(ur.cbor.bytes),
               case let CBOR.map(dict) = decodedCbor else {
             return nil
@@ -89,6 +89,7 @@ enum URHelper {
         var isPrivate = false
         var origins:String?
         var fingerprint:String?
+        var network:String?
         
         for (key, value) in dict {
             switch key {
@@ -108,12 +109,16 @@ enum URHelper {
                 guard case let CBOR.byteString(bs) = value else { fallthrough }
                 
                 chainCode = Data(bs).hexString
+            case 5:
+                guard case let CBOR.tagged(_, useInfoCbor) = value else { fallthrough }
+                guard case let CBOR.map(map) = useInfoCbor else { fallthrough }
+                
+                network = URHelper.useInfo(map)
             case 6:
                 guard case let CBOR.tagged(_, originCbor) = value else { fallthrough }
                 guard case let CBOR.map(map) = originCbor else { fallthrough }
                 
                 origins = URHelper.origins(map)
-                
             case 8:
                 guard case let CBOR.unsignedInt(xfp) = value else { fallthrough }
                 
@@ -129,9 +134,9 @@ enum URHelper {
         guard let keydata = keyData, let chaincode = chainCode else { return nil }
         
         if !isPrivate && !isMaster {
-            extendedKey = URHelper.xpub(keydata, chaincode)
+            extendedKey = URHelper.xpub(keydata, chaincode, network ?? "main")
         } else {
-            extendedKey = URHelper.xprv(keydata, chaincode)
+            extendedKey = URHelper.xprv(keydata, chaincode, network ?? "main")
         }
         
         guard let key = extendedKey else { return nil }
@@ -147,10 +152,10 @@ enum URHelper {
         return cosigner
     }
     
-    static func xprv(_ keyData: String, _ chainCode: String) -> String? {
+    static func xprv(_ keyData: String, _ chainCode: String, _ network: String?) -> String? {
         var prefix = "0488ade4"//mainnet
         
-        if Keys.coinType == "1" {
+        if network == "test" {
             prefix = "04358394"//testnet
         }
         
@@ -165,11 +170,20 @@ enum URHelper {
         return Base58.encode([UInt8](hexData))
     }
     
-    static func xpub(_ keyData: String, _ chainCode: String) -> String? {
+    static func xpub(_ keyData: String, _ chainCode: String, _ network: String) -> String? {
         var prefix = "0488b21e"//mainnet
         
-        if Keys.coinType == "1" {
+        if network == "test" {
             prefix = "043587cf"//testnet
+        }
+        
+        // crypto-account omits use-info so need to go by our settings
+        if network == "" {
+            if Keys.coinType == "0" {
+                prefix = "0488b21e"
+            } else {
+                prefix = "043587cf"
+            }
         }
         
         var hexString = "\(prefix)000000000000000000\(chainCode)\(keyData)"
@@ -242,6 +256,36 @@ enum URHelper {
         }
         
         return path
+    }
+    
+    private static func useInfo(_ map: [CBOR : CBOR]) -> String? {
+        var network = ""
+        for (k, v) in map {
+            switch k {
+            case 1:
+                // type
+                switch v {
+                case CBOR.unsignedInt(0):
+                    print("btc")
+                default:
+                    break
+                }
+            case 2:
+                // network
+                switch v {
+                case CBOR.unsignedInt(0):
+                    network = "main"
+                case CBOR.unsignedInt(1):
+                    network = "test"
+                default:
+                    break
+                }
+            default:
+                break
+            }
+        }
+        
+        return network
     }
     
 //    static func account(_ account: String) -> UR? {
