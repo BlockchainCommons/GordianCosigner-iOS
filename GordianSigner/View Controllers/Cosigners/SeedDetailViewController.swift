@@ -219,22 +219,10 @@ class SeedDetailViewController: UIViewController, UITextFieldDelegate {
         } else {
             self.mnemonicLabel.text = "No mnemonic on device"
         }
-        
-        if let xprv = cosigner.xprv {
-            guard let decryptedXprv = Encryption.decrypt(xprv) else { return }
-            
-            DispatchQueue.main.async { [weak self] in
-                guard let self = self else { return }
-                
-                self.xprvLabel.text = decryptedXprv.utf8
-            }
-        } else {
-            self.xprvLabel.text = "No xprv on device"
-        }
 
         labelField.text = cosigner.label
                 
-        guard let cosigner = cosigner.bip48SegwitAccount else {
+        guard let bip48SegwitAccount = cosigner.bip48SegwitAccount else {
             DispatchQueue.main.async { [weak self] in
                 guard let self = self else { return }
 
@@ -246,7 +234,22 @@ class SeedDetailViewController: UIViewController, UITextFieldDelegate {
         DispatchQueue.main.async { [weak self] in
             guard let self = self else { return }
 
-            self.coSignerLabel.text = cosigner
+            self.coSignerLabel.text = bip48SegwitAccount
+        }
+        
+        if let xprv = cosigner.xprv {
+            guard let decryptedXprv = Encryption.decrypt(xprv) else { return }
+            
+            DispatchQueue.main.async { [weak self] in
+                guard let self = self else { return }
+                let dp = DescriptorParser()
+                let desc = "wsh(" + self.cosigner.bip48SegwitAccount! + "/0/*)"
+                let descStruct = dp.descriptor(desc)
+                
+                self.xprvLabel.text = bip48SegwitAccount.replacingOccurrences(of: descStruct.accountXpub, with: decryptedXprv.utf8)
+            }
+        } else {
+            self.xprvLabel.text = "No xprv on device"
         }
         
         lifehashImageView.layer.magnificationFilter = .nearest
