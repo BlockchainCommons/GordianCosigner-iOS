@@ -15,6 +15,7 @@ class AddressesViewController: UIViewController, UITableViewDelegate, UITableVie
     var addresses = [[String:Any]]()
     var account:AccountStruct!
     let spinner = Spinner()
+    var addressToExport = ""
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -27,7 +28,7 @@ class AddressesViewController: UIViewController, UITableViewDelegate, UITableVie
     }
     
     private func load() {
-        spinner.add(vc: self, description: "loading addresses, please wait...")
+        spinner.add(vc: self, description: "Loading addresses, this takes a few moments. Please wait.")
         let descriptor = account.descriptor
         let descriptorParser = DescriptorParser()
         let descriptorStruct = descriptorParser.descriptor(descriptor)
@@ -96,7 +97,7 @@ class AddressesViewController: UIViewController, UITableViewDelegate, UITableVie
         lifehash.image = (dict["lifehash"] as! UIImage)
         
         let copyButton = cell.viewWithTag(3) as! UIButton
-        copyButton.addTarget(self, action: #selector(copyAddress(_:)), for: .touchUpInside)
+        copyButton.addTarget(self, action: #selector(exportAddress(_:)), for: .touchUpInside)
         copyButton.restorationIdentifier = "\(dict["address"] as! String)"
         
         return cell
@@ -106,21 +107,29 @@ class AddressesViewController: UIViewController, UITableViewDelegate, UITableVie
         return 80
     }
     
-    @objc func copyAddress(_ sender: UIButton) {
+    @objc func exportAddress(_ sender: UIButton) {
         guard let address = sender.restorationIdentifier else { return }
         
-        UIPasteboard.general.string = address
-        showAlert(self, "", "Address copied ✓")
+        DispatchQueue.main.async { [weak self] in
+            guard let self = self else { return }
+            
+            self.addressToExport = address
+            self.performSegue(withIdentifier: "segueToExportAddress", sender: self)
+        }
     }
-
-    /*
+    
     // MARK: - Navigation
 
     // In a storyboard-based application, you will often want to do a little preparation before navigation
     override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
         // Get the new view controller using segue.destination.
         // Pass the selected object to the new view controller.
+        if segue.identifier == "segueToExportAddress" {
+            if let vc = segue.destination as? QRDisplayerViewController {
+                vc.text = self.addressToExport
+                vc.descriptionText = self.addressToExport
+                vc.header = "Receive Address"
+            }
+        }
     }
-    */
-
 }

@@ -137,6 +137,7 @@ class AccountDetailViewController: UIViewController, UITextFieldDelegate, UITabl
         
         let lifehashView = cell.viewWithTag(1) as! LifehashSeedView
         let isHotImage = cell.viewWithTag(2) as! UIImageView
+        let detailButton = cell.viewWithTag(3) as! UIButton
         
         lifehashView.backgroundColor = cell.backgroundColor
         lifehashView.background.backgroundColor = cell.backgroundColor
@@ -152,6 +153,9 @@ class AccountDetailViewController: UIViewController, UITextFieldDelegate, UITabl
         
         lifehashView.lifehashImage.image = UIImage(data: cosigner.lifehash) ?? UIImage()
         lifehashView.iconLabel.text = cosigner.label
+        
+        detailButton.addTarget(self, action: #selector(seeDetail(_:)), for: .touchUpInside)
+        detailButton.restorationIdentifier = "\(indexPath.row)"
         
         return cell
     }
@@ -177,11 +181,12 @@ class AccountDetailViewController: UIViewController, UITextFieldDelegate, UITabl
         }
     }
     
-    func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
-        self.cosignerToView = cosigners[indexPath.row]
+    @objc func seeDetail(_ sender: UIButton) {
+        guard let row = sender.restorationIdentifier, let index = Int(row) else { return }
+        
+        cosignerToView = cosigners[index]
         showCosignerDetail()
     }
-
     
     // MARK: - Navigation
 

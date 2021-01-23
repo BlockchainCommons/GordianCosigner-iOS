@@ -50,6 +50,7 @@
 		D0AD30002591825F00B9CBFC /* LicenseDisclaimerViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = D0AD2FFF2591825F00B9CBFC /* LicenseDisclaimerViewController.swift */; };
 		D0B4DDD725258B25009C8624 /* Bip39Words.swift in Sources */ = {isa = PBXBuildFile; fileRef = D0B4DDD625258B25009C8624 /* Bip39Words.swift */; };
 		D0B4DDD92525AC18009C8624 /* whiteFingerPrint.png in Resources */ = {isa = PBXBuildFile; fileRef = D0B4DDD82525AC18009C8624 /* whiteFingerPrint.png */; };
+		D0B88B0E25BBA67A00EC688E /* LabelMemoViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = D0B88B0D25BBA67A00EC688E /* LabelMemoViewController.swift */; };
 		D0CF1E342522E20C0059C541 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = D0CF1E332522E20C0059C541 /* AppDelegate.swift */; };
 		D0CF1E362522E20C0059C541 /* SceneDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = D0CF1E352522E20C0059C541 /* SceneDelegate.swift */; };
 		D0CF1E3B2522E20C0059C541 /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = D0CF1E392522E20C0059C541 /* Main.storyboard */; };
@@ -141,6 +142,7 @@
 		D0AD2FFF2591825F00B9CBFC /* LicenseDisclaimerViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = LicenseDisclaimerViewController.swift; sourceTree = "<group>"; };
 		D0B4DDD625258B25009C8624 /* Bip39Words.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Bip39Words.swift; sourceTree = "<group>"; };
 		D0B4DDD82525AC18009C8624 /* whiteFingerPrint.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = whiteFingerPrint.png; sourceTree = "<group>"; };
+		D0B88B0D25BBA67A00EC688E /* LabelMemoViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LabelMemoViewController.swift; sourceTree = "<group>"; };
 		D0CF1E302522E20C0059C541 /* Gordian Cosigner.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "Gordian Cosigner.app"; sourceTree = BUILT_PRODUCTS_DIR; };
 		D0CF1E332522E20C0059C541 /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
 		D0CF1E352522E20C0059C541 /* SceneDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SceneDelegate.swift; sourceTree = "<group>"; };
@@ -265,6 +267,7 @@
 			children = (
 				D0AD2FFF2591825F00B9CBFC /* LicenseDisclaimerViewController.swift */,
 				D093E2A825A6E4C40038B59A /* InfoViewController.swift */,
+				D0B88B0D25BBA67A00EC688E /* LabelMemoViewController.swift */,
 			);
 			path = Misc;
 			sourceTree = "<group>";
@@ -565,6 +568,7 @@
 				D090963B2560FE540098013A /* KeysetStruct.swift in Sources */,
 				D090963F256256500098013A /* AccountViewController.swift in Sources */,
 				D01ACBA42563EA8100B5B4E5 /* PaymentsViewController.swift in Sources */,
+				D0B88B0E25BBA67A00EC688E /* LabelMemoViewController.swift in Sources */,
 				D04D4984252C4FEF00D7383E /* QRDisplayerViewController.swift in Sources */,
 				D093E2A925A6E4C50038B59A /* InfoViewController.swift in Sources */,
 				D06F44572581B86200B42DEB /* AddressesViewController.swift in Sources */,

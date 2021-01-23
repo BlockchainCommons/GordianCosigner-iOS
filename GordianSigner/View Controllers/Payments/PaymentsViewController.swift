@@ -200,12 +200,9 @@ class PsbtViewController: UIViewController, UITableViewDelegate, UITableViewData
             lifehash.iconLabel.text = psbt.label
             lifehash.iconImage.image = UIImage(systemName: "bitcoinsign.circle")
             
-            let editButton = cell.viewWithTag(8) as! UIButton
-            editButton.addTarget(self, action: #selector(editLabel(_:)), for: .touchUpInside)
-            editButton.restorationIdentifier = "\(indexPath.section)"
-            
             let complete = cell.viewWithTag(9) as! UILabel
             let completeIcon = cell.viewWithTag(10) as! UIImageView
+            
             if completes[indexPath.section] {
                 complete.text = "fully signed"
                 completeIcon.image = UIImage(systemName: "checkmark.circle")
@@ -223,6 +220,7 @@ class PsbtViewController: UIViewController, UITableViewDelegate, UITableViewData
             
             let signedByUsImageView = cell.viewWithTag(12) as! UIImageView
             let signedByUsLabel = cell.viewWithTag(13) as! UILabel
+            
             if weSigned[indexPath.section] {
                 signedByUsImageView.tintColor = .systemGreen
                 signedByUsLabel.text = "Signed by us ✓"

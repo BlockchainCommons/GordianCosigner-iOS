@@ -38,9 +38,7 @@ class PsbtTableViewController: UIViewController, UITableViewDelegate, UITableVie
         if (UIDevice.current.userInterfaceIdiom == .pad) {
           alertStyle = UIAlertController.Style.alert
         }
-        
-        spinner.add(vc: self, description: "loading...")
-        
+                
         psbt = try? PSBT(psbt: psbtStruct.psbt, network: Keys.chain)
         
         if let psbtToFinalize = try? psbt.finalized() {
@@ -52,9 +50,13 @@ class PsbtTableViewController: UIViewController, UITableViewDelegate, UITableVie
                 }
             }
         }
+        
+        loadTable()
     }
     
-    override func viewDidAppear(_ animated: Bool) {
+    private func loadTable() {
+        spinner.add(vc: self, description: "loading...")
+        
         load { success in
             if success {
                 DispatchQueue.main.async { [weak self] in
@@ -230,7 +232,7 @@ class PsbtTableViewController: UIViewController, UITableViewDelegate, UITableVie
                                                 }
                                                 
                                             } else {
-                                                // It is an unknown keyset
+                                                // It is an unknown cosigner
                                                 if let sigs = input.signatures {
                                                     for sig in sigs {
                                                         let signedKey = sig.key.data.hexString
@@ -259,7 +261,6 @@ class PsbtTableViewController: UIViewController, UITableViewDelegate, UITableVie
                                     }
                                 }
                             }
-                            
                             
                             CoreDataService.retrieveEntity(entityName: .cosigner) { (cosigners, errorDescription) in
                                 if let cosigners = cosigners, cosigners.count > 0 {
@@ -407,27 +408,7 @@ class PsbtTableViewController: UIViewController, UITableViewDelegate, UITableVie
     }
     
     @IBAction func signAction(_ sender: Any) {
-        if canSign {
-            sign()
-        } else {
-            DispatchQueue.main.async { [weak self] in
-                guard let self = self else { return }
-                
-                let alert = UIAlertController(title: "No private keys to sign with", message: "", preferredStyle: self.alertStyle)
-                
-                alert.addAction(UIAlertAction(title: "add private keys", style: .default, handler: { action in
-                    DispatchQueue.main.async { [weak self] in
-                        guard let self = self else { return }
-                        
-                        self.performSegue(withIdentifier: "segueToSign", sender: self)
-                    }
-                }))
-                
-                alert.addAction(UIAlertAction(title: "Cancel", style: .cancel, handler: { action in }))
-                alert.popoverPresentationController?.sourceView = self.view
-                self.present(alert, animated: true) {}
-            }
-        }
+        sign()
     }
     
     @IBAction func exportAction(_ sender: Any) {
@@ -439,9 +420,9 @@ class PsbtTableViewController: UIViewController, UITableViewDelegate, UITableVie
             return (inputsArray[section]["pubKeyArray"] as? [[String:Any]] ?? [[:]]).count
         } else {
             switch section {
-            case 1:
+            case 3:
                 return psbt.inputs.count
-            case 2:
+            case 4:
                 return psbt.outputs.count
             default:
                 return 1
@@ -453,7 +434,7 @@ class PsbtTableViewController: UIViewController, UITableViewDelegate, UITableVie
         if tableView.tag == 3 {
             return 1
         } else {
-            return 4
+            return 6
         }
     }
     
@@ -514,20 +495,24 @@ class PsbtTableViewController: UIViewController, UITableViewDelegate, UITableVie
         } else {
             switch indexPath.section {
             case 0:
-                return completeCell(indexPath)
+                return labelCell(indexPath)
             case 1:
+                return memoCell(indexPath)
+            case 2:
+                return completeCell(indexPath)
+            case 3:
                 if inputsArray.count > 0 {
                     return inputCell(indexPath)
                 } else {
                     return UITableViewCell()
                 }
-            case 2:
+            case 4:
                 if outputsArray.count > 0 {
                     return outputCell(indexPath)
                 } else {
                     return UITableViewCell()
                 }
-            case 3:
+            case 5:
                 return feeCell(indexPath)
             default:
                 return UITableViewCell()
@@ -539,6 +524,8 @@ class PsbtTableViewController: UIViewController, UITableViewDelegate, UITableVie
         cell.clipsToBounds = true
         cell.layer.cornerRadius = 8
         cell.selectionStyle = .none
+        cell.layer.borderWidth = 0.5
+        cell.layer.borderColor = UIColor.lightGray.cgColor
     }
     
     private func configureView(_ view: UIView) {
@@ -729,18 +716,48 @@ class PsbtTableViewController: UIViewController, UITableViewDelegate, UITableVie
         return cell
     }
     
+    private func labelCell(_ indexPath: IndexPath) -> UITableViewCell {
+        let cell = tableView.dequeueReusableCell(withIdentifier: "labelCell", for: indexPath)
+        configureCell(cell)
+        
+        let label = cell.viewWithTag(1) as! UILabel
+        label.text = psbtStruct.label
+        
+        let editButton = cell.viewWithTag(2) as! UIButton
+        editButton.addTarget(self, action: #selector(editLabelMemo(_:)), for: .touchUpInside)
+        
+        return cell
+    }
+    
+    private func memoCell(_ indexPath: IndexPath) -> UITableViewCell {
+        let cell = tableView.dequeueReusableCell(withIdentifier: "labelCell", for: indexPath)
+        configureCell(cell)
+        
+        let label = cell.viewWithTag(1) as! UILabel
+        label.text = psbtStruct.memo
+        
+        let editButton = cell.viewWithTag(2) as! UIButton
+        editButton.addTarget(self, action: #selector(editLabelMemo(_:)), for: .touchUpInside)
+        
+        return cell
+    }
+    
     func tableView(_ tableView: UITableView, heightForRowAt indexPath: IndexPath) -> CGFloat {
          if tableView.tag == 3 {
             return 90
          } else {
             switch indexPath.section {
             case 0:
-                return 44
+                return 61
             case 1:
-                return 300
+                return 150
             case 2:
-                return 271
+                return 44
             case 3:
+                return 445
+            case 4:
+                return 271
+            case 5:
                 return 44
             default:
                 return 80
@@ -770,12 +787,16 @@ class PsbtTableViewController: UIViewController, UITableViewDelegate, UITableVie
             
             switch section {
             case 0:
-                textLabel.text = "Status"
+                textLabel.text = "Label"
             case 1:
-                textLabel.text = "Inputs"
+                textLabel.text = "Memo"
             case 2:
-                textLabel.text = "Outputs"
+                textLabel.text = "Status"
             case 3:
+                textLabel.text = "Inputs"
+            case 4:
+                textLabel.text = "Outputs"
+            case 5:
                 textLabel.text = "Mining Fee"
             default:
                 break
@@ -785,6 +806,14 @@ class PsbtTableViewController: UIViewController, UITableViewDelegate, UITableVie
             return header
         } else {
             return nil
+        }
+    }
+    
+    @objc func editLabelMemo(_ sender: UIButton) {
+        DispatchQueue.main.async { [weak self] in
+            guard let self = self else { return }
+            
+            self.performSegue(withIdentifier: "editPaymentLabel", sender: self)
         }
     }
     
@@ -866,7 +895,7 @@ class PsbtTableViewController: UIViewController, UITableViewDelegate, UITableVie
     
     public func exportPsbtToURL(data: Data) -> URL? {
         let documents = FileManager.default.urls(for: .documentDirectory, in: .userDomainMask).first
-        guard let path = documents?.appendingPathComponent("/GordianSigner.psbt") else {
+        guard let path = documents?.appendingPathComponent("/\(psbtStruct.label).psbt") else {
             return nil
         }
         
@@ -950,6 +979,27 @@ class PsbtTableViewController: UIViewController, UITableViewDelegate, UITableVie
                     guard let self = self else { return }
                     
                     self.sign()
+                }
+            }
+        }
+        
+        if segue.identifier == "editPaymentLabel" {
+            if let vc = segue.destination as? LabelMemoViewController {
+                vc.psbtStruct = self.psbtStruct
+                vc.doneBlock = { [weak self] in
+                    guard let self = self else { return }
+                    
+                    CoreDataService.retrieveEntity(entityName: .payment) { (payments, errorDescription) in
+                        guard let payments = payments else { return }
+                        
+                        for payment in payments {
+                            let paymentStruct =  PsbtStruct(dictionary: payment)
+                            if paymentStruct.id == self.psbtStruct.id {
+                                self.psbtStruct = paymentStruct
+                                self.loadTable()
+                            }
+                        }
+                    }
                 }
             }
         }

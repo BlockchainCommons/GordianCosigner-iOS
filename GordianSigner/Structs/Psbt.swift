@@ -15,6 +15,7 @@ public struct PsbtStruct: CustomStringConvertible {
     let psbt:Data
     let dateAdded:Date
     let dateSigned:Date?
+    let memo:String?
     
     init(dictionary: [String: Any]) {
         id = dictionary["id"] as! UUID
@@ -22,6 +23,7 @@ public struct PsbtStruct: CustomStringConvertible {
         psbt = dictionary["psbt"] as! Data
         dateAdded = dictionary["dateAdded"] as! Date
         dateSigned = dictionary["dateSigned"] as? Date
+        memo = dictionary["memo"] as? String
     }
     
     public var description: String {
