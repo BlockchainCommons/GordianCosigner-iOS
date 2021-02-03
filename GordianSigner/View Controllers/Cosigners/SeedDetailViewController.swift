@@ -13,12 +13,17 @@ class SeedDetailViewController: UIViewController, UITextFieldDelegate {
     var cosigner:CosignerStruct!
     private var qrText = ""
     private var qrDescription = ""
+    let dp = DescriptorParser()
+    var desc = ""
+    var descStruct:Descriptor!
     
     @IBOutlet weak var mnemonicLabel: UILabel!
     @IBOutlet weak var coSignerLabel: UILabel!
     @IBOutlet weak var xprvLabel: UILabel!
     @IBOutlet weak var labelField: UITextField!
     @IBOutlet weak var lifehashImageView: UIImageView!
+    @IBOutlet weak var formatSwitch: UISegmentedControl!
+    @IBOutlet weak var originLabel: UILabel!
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -27,7 +32,47 @@ class SeedDetailViewController: UIViewController, UITextFieldDelegate {
         labelField.delegate = self
         labelField.returnKeyType = .done
         configureTapGesture()
+        desc = "wsh(" + cosigner.bip48SegwitAccount! + "/0/*)"
+        descStruct = dp.descriptor(desc)
         load()
+    }
+    
+    @IBAction func didSwitchFormat(_ sender: Any) {
+        if formatSwitch.selectedSegmentIndex == 0 {
+            DispatchQueue.main.async { [weak self] in
+                guard let self = self else { return }
+                
+                self.coSignerLabel.text = self.descStruct.accountXpub
+            }
+        } else {
+            DispatchQueue.main.async { [weak self] in
+                guard let self = self else { return }
+                
+                self.coSignerLabel.text = URHelper.cosignerToUr(self.cosigner.bip48SegwitAccount ?? "", false)
+            }
+            
+            if descStruct.accountXprv != "" {
+                DispatchQueue.main.async { [weak self] in
+                    guard let self = self else { return }
+                    
+                    let privCosigner = self.cosigner.bip48SegwitAccount?.replacingOccurrences(of: self.descStruct.accountXpub, with: self.descStruct.accountXprv)
+                    
+                    self.xprvLabel.text = URHelper.cosignerToUr(privCosigner ?? "", true)
+                }
+            }
+            
+            if let xprv = cosigner.xprv {
+                guard let decryptedXprv = Encryption.decrypt(xprv) else { return }
+                
+                DispatchQueue.main.async { [weak self] in
+                    guard let self = self else { return }
+                    
+                    let privCosigner = self.cosigner.bip48SegwitAccount?.replacingOccurrences(of: self.descStruct.accountXpub, with: decryptedXprv.utf8)
+                    
+                    self.xprvLabel.text = URHelper.cosignerToUr(privCosigner ?? "", true)
+                }
+            }
+        }
     }
     
     private func reloadCosigner() {
@@ -156,18 +201,31 @@ class SeedDetailViewController: UIViewController, UITextFieldDelegate {
     }
     
     @IBAction func copyCosignerAction(_ sender: Any) {
-        UIPasteboard.general.string = cosigner.bip48SegwitAccount
-        
+        if formatSwitch.selectedSegmentIndex == 0 {
+            UIPasteboard.general.string = cosigner.bip48SegwitAccount ?? ""
+        } else {
+            UIPasteboard.general.string = URHelper.cosignerToUr(self.cosigner.bip48SegwitAccount ?? "", false) ?? ""
+        }
         showAlert(self, "", "Copied ✓")
     }
     
     @IBAction func exportCosigner(_ sender: Any) {
-        share(cosigner.bip48SegwitAccount ?? "")
+        if formatSwitch.selectedSegmentIndex == 0 {
+            share(cosigner.bip48SegwitAccount ?? "")
+        } else {
+            share(URHelper.cosignerToUr(self.cosigner.bip48SegwitAccount ?? "", false) ?? "")
+        }
     }
     
-    @IBAction func showCosignerQr(_ sender: Any) {
-        qrText = cosigner.bip48SegwitAccount ?? ""
-        qrDescription = cosigner.bip48SegwitAccount ?? ""
+    @IBAction func showCosignerQr(_ sender: Any) {        
+        if formatSwitch.selectedSegmentIndex == 0 {
+            qrText = cosigner.bip48SegwitAccount ?? ""
+            qrDescription = cosigner.bip48SegwitAccount ?? ""
+        } else {
+            qrText = URHelper.cosignerToUr(self.cosigner.bip48SegwitAccount ?? "", false) ?? ""
+            qrDescription = URHelper.cosignerToUr(self.cosigner.bip48SegwitAccount ?? "", false) ?? ""
+        }
+        
         goToQr()
     }
     
@@ -222,19 +280,10 @@ class SeedDetailViewController: UIViewController, UITextFieldDelegate {
 
         labelField.text = cosigner.label
                 
-        guard let bip48SegwitAccount = cosigner.bip48SegwitAccount else {
-            DispatchQueue.main.async { [weak self] in
-                guard let self = self else { return }
-
-                self.coSignerLabel.text = ""
-            }
-            return
-        }
-        
         DispatchQueue.main.async { [weak self] in
             guard let self = self else { return }
 
-            self.coSignerLabel.text = bip48SegwitAccount
+            self.coSignerLabel.text = self.descStruct.accountXpub
         }
         
         if let xprv = cosigner.xprv {
@@ -242,11 +291,8 @@ class SeedDetailViewController: UIViewController, UITextFieldDelegate {
             
             DispatchQueue.main.async { [weak self] in
                 guard let self = self else { return }
-                let dp = DescriptorParser()
-                let desc = "wsh(" + self.cosigner.bip48SegwitAccount! + "/0/*)"
-                let descStruct = dp.descriptor(desc)
                 
-                self.xprvLabel.text = bip48SegwitAccount.replacingOccurrences(of: descStruct.accountXpub, with: decryptedXprv.utf8)
+                self.xprvLabel.text = decryptedXprv.utf8
             }
         } else {
             self.xprvLabel.text = "No xprv on device"
@@ -254,6 +300,8 @@ class SeedDetailViewController: UIViewController, UITextFieldDelegate {
         
         lifehashImageView.layer.magnificationFilter = .nearest
         lifehashImageView.image = UIImage(data: self.cosigner.lifehash)
+        
+        originLabel.text = "\(descStruct.fingerprint)/48h/\(Keys.coinType)h/0h/2h"
     }
     
     func textFieldShouldReturn(_ textField: UITextField) -> Bool {

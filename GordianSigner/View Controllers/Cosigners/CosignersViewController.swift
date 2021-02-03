@@ -139,12 +139,7 @@ class KeysetsViewController: UIViewController, UITableViewDelegate, UITableViewD
         DispatchQueue.main.async { [weak self] in
             guard let self = self else { return }
             
-            var alertStyle = UIAlertController.Style.actionSheet
-            if (UIDevice.current.userInterfaceIdiom == .pad) {
-                alertStyle = UIAlertController.Style.alert
-            }
-            
-            let alert = UIAlertController(title: "Import Cosigner", message: "You may either paste one as text or scan a QR code.", preferredStyle: alertStyle)
+            let alert = UIAlertController(title: "Import Cosigner", message: "You may either paste one as text or scan a QR code.", preferredStyle: .alert)
             
             alert.addAction(UIAlertAction(title: "Paste", style: .default, handler: { action in
                 self.getPasteboard()
@@ -452,6 +447,7 @@ class KeysetsViewController: UIViewController, UITableViewDelegate, UITableViewD
     }
     
     private func addCosigner(_ account: String) {
+        print("account: \(account)")
         var segwitBip84Account = account
         var hack = "wsh(\(account)/0/*)"
         let dp = DescriptorParser()

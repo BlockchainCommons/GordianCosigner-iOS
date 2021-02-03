@@ -53,13 +53,13 @@ enum URHelper {
                     if case let CBOR.tagged(tag, rawCbor) = elem {
                         if tag.rawValue == 401 {
                             if case let CBOR.tagged(_, hdkeyCbor) = rawCbor {
-                                let (keydata, chaincode, origins) = cborToCosigner(cbor: hdkeyCbor)
+                                let (keydata, chaincode, origins, depth) = cborToCosigner(cbor: hdkeyCbor)
                                 
                                 guard let keyData = keydata, let chainCode = chaincode, let origin = origins else { return nil }
                                 
                                 path = origin
                                 
-                                guard let xpubCheck = URHelper.xpub(keyData, chainCode, "") else { return nil }
+                                guard let xpubCheck = URHelper.xpub(keyData, chainCode, "", xfp, depth) else { return nil }
                                 
                                 xpub = xpubCheck
                             }
@@ -88,7 +88,9 @@ enum URHelper {
         var chainCode:String?
         var isPrivate = false
         var origins:String?
-        var fingerprint:String?
+        var sourceXfp:String?
+        var depth:String?
+        var parentFingerprint:String?
         var network:String?
         
         for (key, value) in dict {
@@ -118,11 +120,11 @@ enum URHelper {
                 guard case let CBOR.tagged(_, originCbor) = value else { fallthrough }
                 guard case let CBOR.map(map) = originCbor else { fallthrough }
                 
-                origins = URHelper.origins(map)
+                (origins, depth, sourceXfp) = URHelper.origins(map)
             case 8:
                 guard case let CBOR.unsignedInt(xfp) = value else { fallthrough }
                 
-                fingerprint = String(Int(xfp), radix: 16)
+                parentFingerprint = String(Int(xfp), radix: 16)
             default:
                 break
             }
@@ -134,9 +136,9 @@ enum URHelper {
         guard let keydata = keyData, let chaincode = chainCode else { return nil }
         
         if !isPrivate && !isMaster {
-            extendedKey = URHelper.xpub(keydata, chaincode, network ?? "main")
+            extendedKey = URHelper.xpub(keydata, chaincode, network ?? "main", parentFingerprint, depth)
         } else {
-            extendedKey = URHelper.xprv(keydata, chaincode, network ?? "main")
+            extendedKey = URHelper.xprv(keydata, chaincode, network ?? "main", parentFingerprint, depth)
         }
         
         guard let key = extendedKey else { return nil }
@@ -144,7 +146,7 @@ enum URHelper {
         if isMaster {
             cosigner = Keys.bip48SegwitAccountXprv(key)
         } else {
-            guard let origin = origins, let xfp = fingerprint else { return nil }
+            guard let origin = origins, let xfp = sourceXfp else { return nil }
             
             cosigner = "[\(xfp + "/" + origin)]\(key)"
         }
@@ -152,14 +154,26 @@ enum URHelper {
         return cosigner
     }
     
-    static func xprv(_ keyData: String, _ chainCode: String, _ network: String?) -> String? {
+    static func xprv(_ keyData: String, _ chainCode: String, _ network: String?, _ xfp: String?, _ depth: String?) -> String? {
         var prefix = "0488ade4"//mainnet
         
         if network == "test" {
             prefix = "04358394"//testnet
         }
         
-        var hexString = "\(prefix)000000000000000000\(chainCode)\(keyData)"
+        // crypto-account omits use-info so need to go by our settings
+        if network == "" {
+            if Keys.coinType == "0" {
+                prefix = "0488ade4"
+            } else {
+                prefix = "04358394"
+            }
+        }
+        
+        let parentXfp = xfp ?? "00000000"
+        let childNumber = "80000002"
+        
+        var hexString = "\(prefix)\(depth ?? "00")\(parentXfp)\(childNumber)\(chainCode)\(keyData)"
         
         guard let data = Data(hexString: hexString) else { return nil }
         
@@ -170,7 +184,7 @@ enum URHelper {
         return Base58.encode([UInt8](hexData))
     }
     
-    static func xpub(_ keyData: String, _ chainCode: String, _ network: String) -> String? {
+    static func xpub(_ keyData: String, _ chainCode: String, _ network: String, _ xfp: String?, _ depth: String?) -> String? {
         var prefix = "0488b21e"//mainnet
         
         if network == "test" {
@@ -186,7 +200,10 @@ enum URHelper {
             }
         }
         
-        var hexString = "\(prefix)000000000000000000\(chainCode)\(keyData)"
+        let sourceXfp = xfp ?? "00000000"
+        let childNumber = "80000002"//hardened 2' derivation component
+        
+        var hexString = "\(prefix)\(depth ?? "00")\(sourceXfp)\(childNumber)\(chainCode)\(keyData)"
         
         guard let data = Data(hexString: hexString) else { return nil }
         
@@ -197,12 +214,13 @@ enum URHelper {
         return Base58.encode([UInt8](hexData))
     }
     
-    static func cborToCosigner(cbor: CBOR) -> (keyData: String?, chainCode: String?, origins: String?) {
-        guard case let CBOR.map(dict) = cbor else { return (nil, nil, nil) }
+    static func cborToCosigner(cbor: CBOR) -> (keyData: String?, chainCode: String?, origins: String?, depth: String?) {
+        guard case let CBOR.map(dict) = cbor else { return (nil, nil, nil, nil) }
         
         var keyData:String?
         var chainCode:String?
         var origins:String?
+        var depth:String?
         
         for (key, value) in dict {
             switch key {
@@ -215,18 +233,21 @@ enum URHelper {
             case 6:
                 guard case let CBOR.tagged(_, originCbor) = value else { fallthrough }
                 guard case let CBOR.map(map) = originCbor else { fallthrough }
-                guard let originsCheck = URHelper.origins(map) else { fallthrough }
+                let (originsCheck, depthCheck, _) = URHelper.origins(map)
                 origins = originsCheck
+                depth = depthCheck
                 
             default:
                 break
             }
         }
-        return (keyData, chainCode, origins)
+        return (keyData, chainCode, origins, depth)
     }
     
-    private static func origins(_ map: [CBOR : CBOR]) -> String? {
+    private static func origins(_ map: [CBOR : CBOR]) -> (path: String?, depth: String?, sourceXfp: String?) {
         var path = ""
+        var depthString = "00"
+        var sourceXfp = "00000000"
         for (k, v) in map {
             switch k {
             case 1:
@@ -250,12 +271,24 @@ enum URHelper {
                         }
                     }
                 }
+            case 2:
+                if case let CBOR.unsignedInt(xfp) = v {
+                    sourceXfp = String(format: "%08x", xfp)
+                }
+            case 3:
+                if case let CBOR.unsignedInt(depth) = v {
+                    if depth < 10 {
+                        depthString = String(format: "%02d", depth)
+                    } else {
+                        depthString = "\(depth)"
+                    }
+                }
             default:
                 break
             }
         }
         
-        return path
+        return (path, depthString, sourceXfp)
     }
     
     private static func useInfo(_ map: [CBOR : CBOR]) -> String? {
@@ -288,39 +321,57 @@ enum URHelper {
         return network
     }
     
-//    static func account(_ account: String) -> UR? {
-//        //[73756c7f/48h/0h/0h/2h]xpub6E3pgkahcxomzJRVmEQb9RjdB4Xx4tjRL6mmmfNzpgvFjL94jTQSHGqpfeWwE4wvhFbomye5mMQNrDiAdgEnfzcGWVgbsAiN4W86bKfpihD
-//    }
-//    
-//    static func keysetToUr(keyset: String) -> String? {
-//        let descriptorParser = DescriptorParser()
-//        let descriptor = "wsh(\(keyset))"
-//        let descriptorStruct = descriptorParser.descriptor(descriptor)
-//        let xfp = Data(value: descriptorStruct.fingerprint)
-//        let key = descriptorStruct.accountXpub
-//        
-//        let hdKeyWrapper:CBOR = .map([
-//            .unsignedInt(3) : .byteString(<#T##[UInt8]#>), //keyData bytestring
-//            .unsignedInt(4) : .byteString(<#T##[UInt8]#>) //chainCode bytestring
-//            .unsignedInt(6) : .byteString(<#T##[UInt8]#>) //chainCode bytestring
-//        ])
-//        
-//        let arrayWrapper:CBOR = .array([
-//            .tagged(.init(rawValue: 401), hdKeyWrapper)
-//        ])
-//        
-//        let wrapper:CBOR = .map([
-//            .unsignedInt(1) : .byteString(xfp.bytes),
-//            .unsignedInt(2) : .array([arrayWrapper])
-//        ])
-//        //let wrapper:CBOR = .tagged(.init(rawValue: 309), .byteString(data.bytes))
-//        let cbor = Data(wrapper.encode())
-//        do {
-//            let rawUr = try UR(type: "crypto-account", cbor: cbor)
-//            return UREncoder.encode(rawUr)
-//        } catch {
-//            return nil
-//        }
-//    }
+    static func cosignerToUr(_ cosigner: String, _ isPrivate: Bool) -> String? {
+        print("cosignerToUr: \(cosigner)")
+        let descriptorParser = DescriptorParser()
+        let descriptor = "wsh(\(cosigner))"
+        let descriptorStruct = descriptorParser.descriptor(descriptor)
+        var key = descriptorStruct.accountXpub
+        
+        if isPrivate {
+            key = descriptorStruct.accountXprv
+        }
+        
+        /// Decodes our original extended key to base58 data.
+        let b58 = Base58.decode(key)
+        let b58Data = Data(b58)
+        let depth = b58Data.subdata(in: Range(4...4))
+        let parentFingerprint = b58Data.subdata(in: Range(5...8))
+        let childIndex = b58Data.subdata(in: Range(9...12))
+        guard childIndex.hexString == "80000002" else { return nil }
+        let chaincode = b58Data.subdata(in: Range(13...44))
+        let keydata = b58Data.subdata(in: Range(45...77))
+        
+        var cointype:UInt64 = 1
+        if Keys.coinType == "0" {
+            cointype = 0
+        }
+        
+        let originsWrapper:CBOR = .map([
+            .unsignedInt(1) : .array([.unsignedInt(48), true, .unsignedInt(cointype), true, .unsignedInt(0), true, .unsignedInt(2), true]),// derivation
+            .unsignedInt(2) : .unsignedInt(UInt64(descriptorStruct.fingerprint, radix: 16) ?? 0),// source xfp
+            .unsignedInt(3) : .unsignedInt(UInt64(depth.hexString) ?? 0)// depth
+        ])
+        
+        let useInfoWrapper:CBOR = .map([
+            .unsignedInt(2) : .unsignedInt(cointype)
+        ])
+        
+        guard let hexValue = UInt64(parentFingerprint.hexString, radix: 16) else { return nil }
+        
+        let hdKeyWrapper:CBOR = .map([
+            .unsignedInt(1) : .boolean(false), //isMaster
+            .unsignedInt(2) : .boolean(isPrivate), //isPrivate
+            .unsignedInt(3) : .byteString([UInt8](keydata)), //keyData bytestring
+            .unsignedInt(4) : .byteString([UInt8](chaincode)), //chainCode bytestring
+            .unsignedInt(5) : .tagged(CBOR.Tag(rawValue: 305), useInfoWrapper), //use-info 1 = testnet-btc
+            .unsignedInt(6) : .tagged(CBOR.Tag(rawValue: 304), originsWrapper),
+            .unsignedInt(8) : .unsignedInt(hexValue)
+        ])
+        
+        guard let rawUr = try? UR(type: "crypto-hdkey", cbor: hdKeyWrapper) else { return nil }
+        
+        return UREncoder.encode(rawUr)
+    }
     
 }

@@ -18,7 +18,7 @@ enum Keys {
         guard let hdkey = try? HDKey(base58: masterKey), let path = try? BIP32Path(string: "m/48h/\(coinType)h/0h/2h"), let accountXprv = try? hdkey.derive(using: path) else {
             return nil
         }
-        
+                
         return accountXprv.xpriv
     }
     
