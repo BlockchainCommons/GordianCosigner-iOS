@@ -16,14 +16,27 @@ class SeedDetailViewController: UIViewController, UITextFieldDelegate {
     let dp = DescriptorParser()
     var desc = ""
     var descStruct:Descriptor!
+    private var privCosigner = ""
+    private var pubCosigner = ""
     
     @IBOutlet weak var mnemonicLabel: UILabel!
     @IBOutlet weak var coSignerLabel: UILabel!
     @IBOutlet weak var xprvLabel: UILabel!
     @IBOutlet weak var labelField: UITextField!
-    @IBOutlet weak var lifehashImageView: UIImageView!
     @IBOutlet weak var formatSwitch: UISegmentedControl!
     @IBOutlet weak var originLabel: UILabel!
+    @IBOutlet weak var lifehashView: LifehashSeedView!
+    
+    @IBOutlet weak var privKeyHeader: UILabel!
+    @IBOutlet weak var privKeyDelete: UIButton!
+    @IBOutlet weak var privKeyShare: UIButton!
+    @IBOutlet weak var privKeyQr: UIButton!
+    @IBOutlet weak var privKeyCopy: UIButton!
+    @IBOutlet weak var mnemonicHeader: UILabel!
+    @IBOutlet weak var mnemonicDelete: UIButton!
+    @IBOutlet weak var mnemonicExport: UIButton!
+    @IBOutlet weak var mnemonicQr: UIButton!
+    @IBOutlet weak var mnemonicCopy: UIButton!
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -43,22 +56,7 @@ class SeedDetailViewController: UIViewController, UITextFieldDelegate {
                 guard let self = self else { return }
                 
                 self.coSignerLabel.text = self.descStruct.accountXpub
-            }
-        } else {
-            DispatchQueue.main.async { [weak self] in
-                guard let self = self else { return }
-                
-                self.coSignerLabel.text = URHelper.cosignerToUr(self.cosigner.bip48SegwitAccount ?? "", false)
-            }
-            
-            if descStruct.accountXprv != "" {
-                DispatchQueue.main.async { [weak self] in
-                    guard let self = self else { return }
-                    
-                    let privCosigner = self.cosigner.bip48SegwitAccount?.replacingOccurrences(of: self.descStruct.accountXpub, with: self.descStruct.accountXprv)
-                    
-                    self.xprvLabel.text = URHelper.cosignerToUr(privCosigner ?? "", true)
-                }
+                self.pubCosigner = "[\(self.descStruct.fingerprint)/48h/\(Keys.coinType)h/0h/2h]\(self.descStruct.accountXpub)"
             }
             
             if let xprv = cosigner.xprv {
@@ -67,9 +65,25 @@ class SeedDetailViewController: UIViewController, UITextFieldDelegate {
                 DispatchQueue.main.async { [weak self] in
                     guard let self = self else { return }
                     
-                    let privCosigner = self.cosigner.bip48SegwitAccount?.replacingOccurrences(of: self.descStruct.accountXpub, with: decryptedXprv.utf8)
+                    self.privCosigner = self.cosigner.bip48SegwitAccount!.replacingOccurrences(of: self.descStruct.accountXpub, with: decryptedXprv.utf8)
                     
-                    self.xprvLabel.text = URHelper.cosignerToUr(privCosigner ?? "", true)
+                    self.xprvLabel.text = self.privCosigner
+                }
+            }
+        } else {
+            DispatchQueue.main.async { [weak self] in
+                guard let self = self else { return }
+                
+                self.pubCosigner = URHelper.cosignerToUr(self.cosigner.bip48SegwitAccount ?? "", false) ?? ""
+                self.coSignerLabel.text = self.pubCosigner
+            }
+            
+            if cosigner.xprv != nil {
+                DispatchQueue.main.async { [weak self] in
+                    guard let self = self else { return }
+                    
+                    self.privCosigner = URHelper.cosignerToUr(self.privCosigner, true) ?? ""
+                    self.xprvLabel.text = self.privCosigner
                 }
             }
         }
@@ -170,16 +184,15 @@ class SeedDetailViewController: UIViewController, UITextFieldDelegate {
     
     @IBAction func showQrXprv(_ sender: Any) {
         if cosigner.xprv != nil {
-            qrText = xprvLabel.text ?? ""
-            qrDescription = xprvLabel.text ?? ""
+            qrText = privCosigner
+            qrDescription = privCosigner
             goToQr()
         }
     }
     
     @IBAction func copyXprv(_ sender: Any) {
         if cosigner.xprv != nil {
-            UIPasteboard.general.string = xprvLabel.text ?? ""
-            
+            UIPasteboard.general.string = self.privCosigner
             showAlert(self, "", "Copied ✓")
         }
     }
@@ -201,31 +214,17 @@ class SeedDetailViewController: UIViewController, UITextFieldDelegate {
     }
     
     @IBAction func copyCosignerAction(_ sender: Any) {
-        if formatSwitch.selectedSegmentIndex == 0 {
-            UIPasteboard.general.string = cosigner.bip48SegwitAccount ?? ""
-        } else {
-            UIPasteboard.general.string = URHelper.cosignerToUr(self.cosigner.bip48SegwitAccount ?? "", false) ?? ""
-        }
+        UIPasteboard.general.string = pubCosigner
         showAlert(self, "", "Copied ✓")
     }
     
     @IBAction func exportCosigner(_ sender: Any) {
-        if formatSwitch.selectedSegmentIndex == 0 {
-            share(cosigner.bip48SegwitAccount ?? "")
-        } else {
-            share(URHelper.cosignerToUr(self.cosigner.bip48SegwitAccount ?? "", false) ?? "")
-        }
+        share(pubCosigner)
     }
     
     @IBAction func showCosignerQr(_ sender: Any) {        
-        if formatSwitch.selectedSegmentIndex == 0 {
-            qrText = cosigner.bip48SegwitAccount ?? ""
-            qrDescription = cosigner.bip48SegwitAccount ?? ""
-        } else {
-            qrText = URHelper.cosignerToUr(self.cosigner.bip48SegwitAccount ?? "", false) ?? ""
-            qrDescription = URHelper.cosignerToUr(self.cosigner.bip48SegwitAccount ?? "", false) ?? ""
-        }
-        
+        qrText = self.pubCosigner
+        qrDescription = self.pubCosigner
         goToQr()
     }
     
@@ -275,14 +274,20 @@ class SeedDetailViewController: UIViewController, UITextFieldDelegate {
                 self.mnemonicLabel.text = decryptedWords.utf8
             }
         } else {
-            self.mnemonicLabel.text = "No mnemonic on device"
+            self.mnemonicCopy.alpha = 0
+            self.mnemonicQr.alpha = 0
+            self.mnemonicExport.alpha = 0
+            self.mnemonicDelete.alpha = 0
+            self.mnemonicHeader.alpha = 0
+            self.mnemonicLabel.text = ""
         }
 
         labelField.text = cosigner.label
                 
         DispatchQueue.main.async { [weak self] in
             guard let self = self else { return }
-
+            
+            self.pubCosigner = "[\(self.descStruct.fingerprint)/48h/\(Keys.coinType)h/0h/2h]\(self.descStruct.accountXpub)"
             self.coSignerLabel.text = self.descStruct.accountXpub
         }
         
@@ -293,13 +298,20 @@ class SeedDetailViewController: UIViewController, UITextFieldDelegate {
                 guard let self = self else { return }
                 
                 self.xprvLabel.text = decryptedXprv.utf8
+                self.privCosigner = self.cosigner.bip48SegwitAccount!.replacingOccurrences(of: self.descStruct.accountXpub, with: decryptedXprv.utf8)
             }
         } else {
-            self.xprvLabel.text = "No xprv on device"
+            self.privKeyHeader.alpha = 0
+            self.privKeyDelete.alpha = 0
+            self.privKeyShare.alpha = 0
+            self.privKeyCopy.alpha = 0
+            self.privKeyQr.alpha = 0
+            self.xprvLabel.text = ""
         }
         
-        lifehashImageView.layer.magnificationFilter = .nearest
-        lifehashImageView.image = UIImage(data: self.cosigner.lifehash)
+        lifehashView.lifehashImage.image = UIImage(data: self.cosigner.lifehash)
+        lifehashView.iconLabel.text = ""
+        
         
         originLabel.text = "\(descStruct.fingerprint)/48h/\(Keys.coinType)h/0h/2h"
     }
