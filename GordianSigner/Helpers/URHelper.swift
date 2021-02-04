@@ -322,7 +322,6 @@ enum URHelper {
     }
     
     static func cosignerToUr(_ cosigner: String, _ isPrivate: Bool) -> String? {
-        print("cosignerToUr: \(cosigner)")
         let descriptorParser = DescriptorParser()
         let descriptor = "wsh(\(cosigner))"
         let descriptorStruct = descriptorParser.descriptor(descriptor)

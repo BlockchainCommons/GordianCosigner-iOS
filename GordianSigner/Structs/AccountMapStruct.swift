@@ -18,6 +18,7 @@ public struct AccountStruct: CustomStringConvertible {
     let birthblock:Int64?
     let complete:Bool
     let lifehash:Data?
+    let memo:String?
     
     init(dictionary: [String: Any]) {
         id = dictionary["id"] as! UUID
@@ -28,6 +29,7 @@ public struct AccountStruct: CustomStringConvertible {
         descriptor = dictionary["descriptor"] as! String
         complete = dictionary["complete"] as! Bool
         lifehash = dictionary["lifehash"] as? Data
+        memo = dictionary["memo"] as? String
     }
     
     public var description: String {

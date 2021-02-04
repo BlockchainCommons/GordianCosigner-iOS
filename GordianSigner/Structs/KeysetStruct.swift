@@ -21,6 +21,7 @@ public struct CosignerStruct: CustomStringConvertible {
     let words:Data?
     let lifehash:Data
     let masterKey:Data?
+    let memo:String?
     
     init(dictionary: [String: Any]) {
         id = dictionary["id"] as! UUID
@@ -34,6 +35,7 @@ public struct CosignerStruct: CustomStringConvertible {
         xprv = dictionary["xprv"] as? Data
         lifehash = dictionary["lifehash"] as! Data
         masterKey = dictionary["masterKey"] as? Data
+        memo = dictionary["memo"] as? String
     }
     
     public var description: String {

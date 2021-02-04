@@ -8,7 +8,7 @@
 
 import UIKit
 
-class SeedDetailViewController: UIViewController, UITextFieldDelegate {
+class SeedDetailViewController: UIViewController, UITextFieldDelegate, UITextViewDelegate {
     
     var cosigner:CosignerStruct!
     private var qrText = ""
@@ -26,6 +26,7 @@ class SeedDetailViewController: UIViewController, UITextFieldDelegate {
     @IBOutlet weak var formatSwitch: UISegmentedControl!
     @IBOutlet weak var originLabel: UILabel!
     @IBOutlet weak var lifehashView: LifehashSeedView!
+    private var memoEditing = false
     
     @IBOutlet weak var privKeyHeader: UILabel!
     @IBOutlet weak var privKeyDelete: UIButton!
@@ -37,17 +38,61 @@ class SeedDetailViewController: UIViewController, UITextFieldDelegate {
     @IBOutlet weak var mnemonicExport: UIButton!
     @IBOutlet weak var mnemonicQr: UIButton!
     @IBOutlet weak var mnemonicCopy: UIButton!
+    @IBOutlet weak var memoView: UITextView!
     
     override func viewDidLoad() {
         super.viewDidLoad()
 
         // Do any additional setup after loading the view.
         labelField.delegate = self
+        memoView.delegate = self
         labelField.returnKeyType = .done
         configureTapGesture()
+        memoView.clipsToBounds = true
+        memoView.layer.cornerRadius = 8
+        memoView.layer.borderWidth = 0.5
+        memoView.layer.borderColor = UIColor.lightGray.cgColor
         desc = "wsh(" + cosigner.bip48SegwitAccount! + "/0/*)"
         descStruct = dp.descriptor(desc)
+        NotificationCenter.default.addObserver(self, selector: #selector(keyboardWillShow), name: UIResponder.keyboardWillShowNotification, object: nil)
+        NotificationCenter.default.addObserver(self, selector: #selector(keyboardWillHide), name: UIResponder.keyboardWillHideNotification, object: nil)
         load()
+    }
+    
+    func textViewShouldBeginEditing(_ textView: UITextView) -> Bool {
+        memoEditing = true
+        return true
+    }
+    
+    func textViewDidEndEditing(_ textView: UITextView) {
+        memoEditing = false
+    }
+    
+    @objc func keyboardWillShow(notification: NSNotification) {
+        if memoEditing {
+            if let keyboardSize = (notification.userInfo?[UIResponder.keyboardFrameBeginUserInfoKey] as? NSValue)?.cgRectValue {
+                if self.view.frame.origin.y == 0 {
+                    self.view.frame.origin.y -= keyboardSize.height
+                }
+            }
+        }
+    }
+    
+    @objc func keyboardWillHide(notification: NSNotification) {
+        if memoEditing {
+            if self.view.frame.origin.y != 0 {
+                self.view.frame.origin.y = 0
+            }
+        }
+    }
+    
+    override func viewWillDisappear(_ animated: Bool) {
+        CoreDataService.updateEntity(id: cosigner.id, keyToUpdate: "memo", newValue: memoView.text ?? "", entityName: .cosigner) { (success, errorDescription) in
+            guard success else {
+                showAlert(self, "", "There was an error saving the Cosigner memo")
+                return
+            }
+        }
     }
     
     @IBAction func didSwitchFormat(_ sender: Any) {
@@ -205,6 +250,7 @@ class SeedDetailViewController: UIViewController, UITextFieldDelegate {
     
     @objc func dismissKeyboard (_ sender: UITapGestureRecognizer) {
         labelField.resignFirstResponder()
+        memoView.resignFirstResponder()
     }
     
     @IBAction func copyMnemonicAction(_ sender: Any) {
@@ -265,6 +311,8 @@ class SeedDetailViewController: UIViewController, UITextFieldDelegate {
     }
     
     private func load() {
+        memoView.text = cosigner.memo ?? "tap to add a memo"
+        
         if let words = cosigner.words {
             guard let decryptedWords = Encryption.decrypt(words) else { return }
             
@@ -326,6 +374,21 @@ class SeedDetailViewController: UIViewController, UITextFieldDelegate {
         
         CoreDataService.updateEntity(id: cosigner.id, keyToUpdate: "label", newValue: newLabel, entityName: .cosigner) { (success, errorDescription) in
             guard success else { showAlert(self, "", "Label not updated!"); return }
+            
+            CoreDataService.retrieveEntity(entityName: .cosigner) { [weak self] (cosigners, errorDescription) in
+                guard let self = self else { return }
+                
+                guard let cosigners = cosigners, cosigners.count > 0 else { return }
+                
+                for cosigner in cosigners {
+                    let cosignerStruct = CosignerStruct(dictionary: cosigner)
+                    
+                    if cosignerStruct.id == self.cosigner.id {
+                        self.cosigner = cosignerStruct
+                        self.load()
+                    }
+                }
+            }
         }
         
         reloadCosigners()

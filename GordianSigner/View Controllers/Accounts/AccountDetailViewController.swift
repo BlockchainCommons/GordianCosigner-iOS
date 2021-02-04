@@ -20,6 +20,7 @@ class AccountDetailViewController: UIViewController, UITextFieldDelegate, UITabl
     @IBOutlet weak var thresholdLabel: UILabel!
     @IBOutlet weak var scriptLabel: UILabel!
     @IBOutlet weak var cosignerTable: UITableView!
+    @IBOutlet weak var memoView: UITextView!
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -28,6 +29,13 @@ class AccountDetailViewController: UIViewController, UITextFieldDelegate, UITabl
         textField.delegate = self
         cosignerTable.delegate = self
         cosignerTable.dataSource = self
+        
+        memoView.clipsToBounds = true
+        memoView.layer.cornerRadius = 8
+        memoView.layer.borderColor = UIColor.darkGray.cgColor
+        memoView.layer.borderWidth = 0.5
+        
+        configureTapGesture()
         
         loadCosigners()
         
@@ -39,6 +47,28 @@ class AccountDetailViewController: UIViewController, UITextFieldDelegate, UITabl
         scriptLabel.text = "Script type: \(descStruct.format)"
         textField.text = account.label
         textField.returnKeyType = .done
+        
+        memoView.text = account.memo ?? "add a memo"
+    }
+    
+    private func configureTapGesture() {
+        let tapGesture = UITapGestureRecognizer(target: self, action: #selector(dismissKeyboard (_:)))
+        tapGesture.numberOfTapsRequired = 1
+        view.addGestureRecognizer(tapGesture)
+    }
+    
+    @objc func dismissKeyboard (_ sender: UITapGestureRecognizer) {
+        textField.resignFirstResponder()
+        memoView.resignFirstResponder()
+    }
+    
+    override func viewWillDisappear(_ animated: Bool) {
+        CoreDataService.updateEntity(id: account.id, keyToUpdate: "memo", newValue: memoView.text ?? "", entityName: .account) { (success, errorDescription) in
+            guard success else {
+                showAlert(self, "", "The Account memo was not saved.")
+                return
+            }
+        }
     }
     
     @IBAction func seeAddressesAction(_ sender: Any) {
@@ -86,9 +116,7 @@ class AccountDetailViewController: UIViewController, UITextFieldDelegate, UITabl
                         var isKnown = false
                         
                         for (c, cs) in self.cosigners.enumerated() {
-                            if cs.bip48SegwitAccount!.contains(keyPath) {
-                                isKnown = true
-                            }
+                            isKnown = cs.bip48SegwitAccount!.contains(keyPath)
                             
                             if c + 1 == self.cosigners.count {
                                 if !isKnown {
