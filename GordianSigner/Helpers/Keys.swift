@@ -10,9 +10,16 @@ import Foundation
 import LibWally
 
 enum Keys {
+
+    static var coinType = UserDefaults.standard.object(forKey: "coinType") as? String ?? "1"
     
-    static let chain:Network = .testnet
-    static let coinType = "1"
+    static var chain:Network {
+        if coinType == "0" {
+            return .mainnet
+        } else {
+            return .testnet
+        }
+    }
     
     static func accountXprv(_ masterKey: String) -> String? {
         guard let hdkey = try? HDKey(base58: masterKey), let path = try? BIP32Path(string: "m/48h/\(coinType)h/0h/2h"), let accountXprv = try? hdkey.derive(using: path) else {

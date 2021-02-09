@@ -163,18 +163,21 @@ class PsbtTableViewController: UIViewController, UITableViewDelegate, UITableVie
                             func loopCosigners() {
                                 for (k, keyset) in cosigners.enumerated() {
                                     let cosignerStruct = CosignerStruct(dictionary: keyset)
+                                    print("cosignerLabel: \(cosignerStruct.label)")
                                     
                                     if let descriptor = cosignerStruct.bip48SegwitAccount {
+                                        print("descriptor: \(descriptor)")
                                         let arr = descriptor.split(separator: "]")
                                         var xpub = ""
                                         
                                         if arr.count > 0 {
-                                            xpub = "\(arr[1])"
+                                            xpub = "\(arr[1])".replacingOccurrences(of: "))", with: "")
                                         }
                                         
                                         if let path = pubkeyDict["path"] as? BIP32Path,
                                             let hdkey = try? HDKey(base58: xpub),
                                             let childKey = try? hdkey.derive(using: path) {
+                                            print("path: \(path.description)")
                                             
                                             if originalPubkey == childKey.pubKey.data.hexString {
                                                 updatedDict["cosignerLabel"] = cosignerStruct.label

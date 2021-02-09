@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		0AAAB4B125D2693E00C77B52 /* SettingsViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0AAAB4B025D2693E00C77B52 /* SettingsViewController.swift */; };
 		D00F498D258B2ACD00941DBA /* accounts.png in Resources */ = {isa = PBXBuildFile; fileRef = D00F498C258B2ACD00941DBA /* accounts.png */; };
 		D00F498F258B2AFE00941DBA /* seeds.png in Resources */ = {isa = PBXBuildFile; fileRef = D00F498E258B2AFD00941DBA /* seeds.png */; };
 		D00F4991258B2B6D00941DBA /* cosigners.png in Resources */ = {isa = PBXBuildFile; fileRef = D00F4990258B2B6D00941DBA /* cosigners.png */; };
@@ -100,6 +101,7 @@
 /* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
+		0AAAB4B025D2693E00C77B52 /* SettingsViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsViewController.swift; sourceTree = "<group>"; };
 		D00F498C258B2ACD00941DBA /* accounts.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = accounts.png; sourceTree = "<group>"; };
 		D00F498E258B2AFD00941DBA /* seeds.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = seeds.png; sourceTree = "<group>"; };
 		D00F4990258B2B6D00941DBA /* cosigners.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = cosigners.png; sourceTree = "<group>"; };
@@ -292,6 +294,7 @@
 				D06D789B25B9471700769157 /* Cosigners */,
 				D06D789E25B9472900769157 /* QRs */,
 				D06D789525B946EF00769157 /* Accounts */,
+				0AAAB4B025D2693E00C77B52 /* SettingsViewController.swift */,
 			);
 			path = "View Controllers";
 			sourceTree = "<group>";
@@ -584,6 +587,7 @@
 				D01C2955255CE33F00C5ED55 /* PaymentDetailViewController.swift in Sources */,
 				D04423F325837A8700A25179 /* PaymentHash.swift in Sources */,
 				D04D4986252C509400D7383E /* QRGenerator.swift in Sources */,
+				0AAAB4B125D2693E00C77B52 /* SettingsViewController.swift in Sources */,
 				D0246DD7256B660100F812A5 /* Base58.swift in Sources */,
 				D0974A62255BA1B90013DC60 /* LifeHash.swift in Sources */,
 				D02E51F0258860C200A479A0 /* SeedDetailViewController.swift in Sources */,
