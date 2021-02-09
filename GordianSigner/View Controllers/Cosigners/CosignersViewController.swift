@@ -583,10 +583,9 @@ class KeysetsViewController: UIViewController, UITableViewDelegate, UITableViewD
             
             vc.doneBlock = { [weak self] result in
                 guard let self = self, let result = result else { return }
-                
-                if result.lowercased().hasPrefix("ur:crypto-account"), let account = URHelper.accountUrToCosigner(result) {
+                if result.lowercased().hasPrefix("ur:crypto-account"), let account = URHelper.accountUrToCosigner(result.lowercased()) {
                     self.addCosigner(account)
-                } else if result.lowercased().hasPrefix("ur:crypto-hdkey"), let account = URHelper.urHdkeyToCosigner(result) {
+                } else if result.lowercased().hasPrefix("ur:crypto-hdkey"), let account = URHelper.urHdkeyToCosigner(result.lowercased()) {
                     self.addCosigner(account)
                 } else if result.contains("48h/\(Keys.coinType)h/0h/2h") || result.contains("48'/\(Keys.coinType)'/0'/2'") {
                     self.addCosigner(result)
