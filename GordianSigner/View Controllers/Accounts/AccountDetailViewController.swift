@@ -124,8 +124,11 @@ class AccountDetailViewController: UIViewController, UITextFieldDelegate, UITabl
                                     let hack = "wsh(\(keyPath)/0/*)"
                                     let dp = DescriptorParser()
                                     let ds = dp.descriptor(hack)
+                                    
+                                    guard let ur = URHelper.cosignerToUr(keyPath, false) else { return }
+                                    guard let lifehashFingerprint = URHelper.fingerprint(ur) else { return }
                                     dict["label"] = "Unknown Cosigner"
-                                    dict["lifehash"] = LifeHash.hash(self.descStruct.multiSigKeys[k])
+                                    dict["lifehash"] = lifehashFingerprint
                                     dict["bip48SegwitAccount"] = keyPath
                                     dict["id"] = UUID()
                                     dict["dateAdded"] = Date()
@@ -179,7 +182,7 @@ class AccountDetailViewController: UIViewController, UITextFieldDelegate, UITabl
             isHotImage.tintColor = .white
         }
         
-        lifehashView.lifehashImage.image = UIImage(data: cosigner.lifehash) ?? UIImage()
+        lifehashView.lifehashImage.image = LifeHash.image(cosigner.lifehash) ?? UIImage()
         lifehashView.iconLabel.text = cosigner.label
         
         detailButton.addTarget(self, action: #selector(seeDetail(_:)), for: .touchUpInside)

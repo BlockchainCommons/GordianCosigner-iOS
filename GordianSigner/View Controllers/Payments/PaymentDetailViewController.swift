@@ -178,7 +178,8 @@ class PsbtTableViewController: UIViewController, UITableViewDelegate, UITableVie
                                             
                                             if originalPubkey == childKey.pubKey.data.hexString {
                                                 updatedDict["cosignerLabel"] = cosignerStruct.label
-                                                updatedDict["lifeHash"] = UIImage(data: cosignerStruct.lifehash)
+                                                updatedDict["lifeHash"] = LifeHash.image(cosignerStruct.lifehash) ?? UIImage()
+                                                
                                                 if let desc = cosignerStruct.bip48SegwitAccount {
                                                     let dp = DescriptorParser()
                                                     let ds = dp.descriptor("wsh(\(desc))")

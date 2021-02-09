@@ -373,4 +373,57 @@ enum URHelper {
         return UREncoder.encode(rawUr)
     }
     
+    static func fingerprint(_ hdKey: String) -> Data? {
+        var result: [CBOR] = []
+        
+        guard let ur = try? URDecoder.decode(hdKey.condenseWhitespace()),
+              let decodedCbor = try? CBOR.decode(ur.cbor.bytes),
+              case let CBOR.map(dict) = decodedCbor else {
+            return nil
+        }
+        
+        var keyData:Data!
+        var chainCode:Data?
+        var chain:UInt = 0
+        
+        for (key, value) in dict {
+            switch key {
+            case 3:
+                guard case let CBOR.byteString(bs) = value else { fallthrough }
+                
+                keyData = Data(bs)
+            case 4:
+                guard case let CBOR.byteString(bs) = value else { fallthrough }
+                
+                chainCode = Data(bs)
+            case 5:
+                guard case let CBOR.tagged(_, useInfoCbor) = value else { fallthrough }
+                guard case let CBOR.map(map) = useInfoCbor else { fallthrough }
+                
+                let network = URHelper.useInfo(map)
+                
+                if network == "main" {
+                    chain = 0
+                } else if network == "test" {
+                    chain = 1
+                }
+            default:
+                break
+            }
+        }
+        
+        result.append(CBOR.byteString(keyData.bytes))
+        
+        if let chainCode = chainCode {
+            result.append(CBOR.byteString(chainCode.bytes))
+        } else {
+            result.append(CBOR.null)
+        }
+        
+        result.append(CBOR.unsignedInt(UInt64(0)))
+        result.append(CBOR.unsignedInt(UInt64(chain)))
+        
+        return Data(result.encode())
+    }
+    
 }

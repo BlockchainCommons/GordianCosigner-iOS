@@ -292,7 +292,7 @@ class KeysetsViewController: UIViewController, UITableViewDelegate, UITableViewD
             
             keysetLifehash.backgroundColor = cell.backgroundColor
             keysetLifehash.background.backgroundColor = cell.backgroundColor
-            keysetLifehash.lifehashImage.image = UIImage(data: cosigner.lifehash)
+            keysetLifehash.lifehashImage.image = LifeHash.image(cosigner.lifehash) ?? UIImage()
             keysetLifehash.iconImage.image = UIImage(systemName: "person.2")
             keysetLifehash.iconLabel.text = cosigner.label
             
@@ -472,12 +472,18 @@ class KeysetsViewController: UIViewController, UITableViewDelegate, UITableViewD
             return
         }
         
+        guard let ur = URHelper.cosignerToUr(segwitBip84Account, false) else { return }
+        
+        guard let lifehashFingerprint = URHelper.fingerprint(ur) else { return }
+        
+        print("lifehashFingerprint: \(lifehashFingerprint)")
+        
         cosigner["id"] = UUID()
         cosigner["label"] = "Cosigner"
         cosigner["bip48SegwitAccount"] = segwitBip84Account
         cosigner["dateAdded"] = Date()
         cosigner["fingerprint"] = ds.fingerprint
-        cosigner["lifehash"] = lifeHash
+        cosigner["lifehash"] = lifehashFingerprint
         
         func save() {
             CoreDataService.saveEntity(dict: cosigner, entityName: .cosigner) { [weak self] (success, errorDesc) in

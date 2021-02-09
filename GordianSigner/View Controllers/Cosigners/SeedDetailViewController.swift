@@ -357,7 +357,7 @@ class SeedDetailViewController: UIViewController, UITextFieldDelegate, UITextVie
             self.xprvLabel.text = ""
         }
         
-        lifehashView.lifehashImage.image = UIImage(data: self.cosigner.lifehash)
+        lifehashView.lifehashImage.image = LifeHash.image(cosigner.lifehash) ?? UIImage()
         lifehashView.iconLabel.text = ""
         
         
