@@ -76,7 +76,10 @@ class KeysetsViewController: UIViewController, UITableViewDelegate, UITableViewD
             
             promptToAddCosigner(cosigner)
         } else if text.hasPrefix("ur:crypto-hdkey") {
-            guard let cosigner = URHelper.urHdkeyToCosigner(text.lowercased().condenseWhitespace()) else { return }
+            guard let cosigner = URHelper.urHdkeyToCosigner(text.lowercased().condenseWhitespace()) else {
+                showAlert(self, "", "Unsupported key, we only support Bitcoin mainnet/testnet hdkeys.")
+                return
+            }
             
             promptToAddCosigner(cosigner)
         } else if text.contains("48h/\(Keys.coinType)h/0h/2h") || text.contains("48'/\(Keys.coinType)'/0'/2'") {
@@ -447,7 +450,6 @@ class KeysetsViewController: UIViewController, UITableViewDelegate, UITableViewD
     }
     
     private func addCosigner(_ account: String) {
-        print("account: \(account)")
         var segwitBip84Account = account
         var hack = "wsh(\(account)/0/*)"
         let dp = DescriptorParser()
@@ -462,7 +464,7 @@ class KeysetsViewController: UIViewController, UITableViewDelegate, UITableViewD
             ds = dp.descriptor(hack)
         }
                 
-        guard let _ = try? HDKey(base58: ds.accountXpub), let lifeHash = LifeHash.hash(ds.accountXpub) else {
+        guard let _ = try? HDKey(base58: ds.accountXpub) else {
             showAlert(self, "Invalid key", "Gordian Cosigner is not yet compatible with slip132, please ensure you are adding a valid xpub and try again.")
             return
         }
@@ -472,12 +474,11 @@ class KeysetsViewController: UIViewController, UITableViewDelegate, UITableViewD
             return
         }
         
-        guard let ur = URHelper.cosignerToUr(segwitBip84Account, false) else { return }
-        
-        guard let lifehashFingerprint = URHelper.fingerprint(ur) else { return }
-        
-        print("lifehashFingerprint: \(lifehashFingerprint)")
-        
+        guard let ur = URHelper.cosignerToUr(segwitBip84Account, false), let lifehashFingerprint = URHelper.fingerprint(ur) else {
+            showAlert(self, "", "Unsupported key, we only support Bitcoin mainnet/testnet hdkeys.")
+            return
+        }
+                        
         cosigner["id"] = UUID()
         cosigner["label"] = "Cosigner"
         cosigner["bip48SegwitAccount"] = segwitBip84Account

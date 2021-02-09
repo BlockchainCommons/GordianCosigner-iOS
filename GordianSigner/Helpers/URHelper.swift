@@ -114,8 +114,12 @@ enum URHelper {
             case 5:
                 guard case let CBOR.tagged(_, useInfoCbor) = value else { fallthrough }
                 guard case let CBOR.map(map) = useInfoCbor else { fallthrough }
+                let (type, net) = URHelper.useInfo(map)
+                network = net
                 
-                network = URHelper.useInfo(map)
+                if type != "btc" {
+                    return nil
+                }
             case 6:
                 guard case let CBOR.tagged(_, originCbor) = value else { fallthrough }
                 guard case let CBOR.map(map) = originCbor else { fallthrough }
@@ -291,17 +295,20 @@ enum URHelper {
         return (path, depthString, sourceXfp)
     }
     
-    private static func useInfo(_ map: [CBOR : CBOR]) -> String? {
-        var network = ""
+    private static func useInfo(_ map: [CBOR : CBOR]) -> (type: String?, network: String?) {
+        var network = "main"
+        var type = "btc"
         for (k, v) in map {
             switch k {
             case 1:
                 // type
                 switch v {
                 case CBOR.unsignedInt(0):
-                    print("btc")
+                    type = "btc"
+                case CBOR.unsignedInt(145):
+                    type = "bcash"
                 default:
-                    break
+                    type = "?"
                 }
             case 2:
                 // network
@@ -318,7 +325,7 @@ enum URHelper {
             }
         }
         
-        return network
+        return (type, network)
     }
     
     static func cosignerToUr(_ cosigner: String, _ isPrivate: Bool) -> String? {
@@ -400,12 +407,16 @@ enum URHelper {
                 guard case let CBOR.tagged(_, useInfoCbor) = value else { fallthrough }
                 guard case let CBOR.map(map) = useInfoCbor else { fallthrough }
                 
-                let network = URHelper.useInfo(map)
+                let (type, network) = URHelper.useInfo(map)
                 
                 if network == "main" {
                     chain = 0
                 } else if network == "test" {
                     chain = 1
+                }
+                
+                if type != "btc" {
+                    return nil
                 }
             default:
                 break
