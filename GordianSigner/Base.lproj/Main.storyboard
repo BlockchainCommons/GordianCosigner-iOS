@@ -2129,8 +2129,8 @@ If you do not want to add seed words to create a cosigner go back and choose the
                             <segmentedControl opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="left" contentVerticalAlignment="top" segmentControlStyle="plain" selectedSegmentIndex="0" translatesAutoresizingMaskIntoConstraints="NO" id="Y0T-ec-JWU">
                                 <rect key="frame" x="303" y="108" width="91" height="32"/>
                                 <segments>
-                                    <segment title="Text"/>
                                     <segment title="UR"/>
+                                    <segment title="Text"/>
                                 </segments>
                                 <connections>
                                     <action selector="didSwitchFormat:" destination="iug-s9-0PF" eventType="valueChanged" id="biG-AE-mce"/>
@@ -2426,7 +2426,7 @@ The use of Gordian Cosigner is under the "BSD 2-Clause Plus Patent License" (htt
         <segue reference="RRe-xD-Awd"/>
         <segue reference="UaS-I9-AEd"/>
         <segue reference="KzM-QC-ivF"/>
-        <segue reference="cew-VD-Qtb"/>
+        <segue reference="MZ7-2Z-REz"/>
         <segue reference="hPq-I8-kVg"/>
     </inferredMetricsTieBreakers>
     <resources>

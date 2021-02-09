@@ -12,7 +12,7 @@ import URKit
 enum URHelper {
 
     static func psbtUr(_ data: Data) -> UR? {
-        let cbor = CBOR.byteString(data.bytes).encode().data
+        let cbor = CBOR.encodeByteString(data.bytes).data//CBOR.byteString(data.bytes).encode(<#_#>).data
         
         return try? UR(type: "crypto-psbt", cbor: cbor)
     }

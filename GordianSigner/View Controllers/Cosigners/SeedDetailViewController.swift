@@ -100,6 +100,22 @@ class SeedDetailViewController: UIViewController, UITextFieldDelegate, UITextVie
             DispatchQueue.main.async { [weak self] in
                 guard let self = self else { return }
                 
+                self.pubCosigner = URHelper.cosignerToUr(self.cosigner.bip48SegwitAccount ?? "", false) ?? ""
+                self.coSignerLabel.text = self.pubCosigner
+            }
+            
+            if cosigner.xprv != nil {
+                DispatchQueue.main.async { [weak self] in
+                    guard let self = self else { return }
+                    
+                    self.privCosigner = URHelper.cosignerToUr(self.privCosigner, true) ?? ""
+                    self.xprvLabel.text = self.privCosigner
+                }
+            }
+        } else {
+            DispatchQueue.main.async { [weak self] in
+                guard let self = self else { return }
+                
                 self.coSignerLabel.text = self.descStruct.accountXpub
                 self.pubCosigner = "[\(self.descStruct.fingerprint)/48h/\(Keys.coinType)h/0h/2h]\(self.descStruct.accountXpub)"
             }
@@ -112,23 +128,7 @@ class SeedDetailViewController: UIViewController, UITextFieldDelegate, UITextVie
                     
                     self.privCosigner = self.cosigner.bip48SegwitAccount!.replacingOccurrences(of: self.descStruct.accountXpub, with: decryptedXprv.utf8)
                     
-                    self.xprvLabel.text = self.privCosigner
-                }
-            }
-        } else {
-            DispatchQueue.main.async { [weak self] in
-                guard let self = self else { return }
-                
-                self.pubCosigner = URHelper.cosignerToUr(self.cosigner.bip48SegwitAccount ?? "", false) ?? ""
-                self.coSignerLabel.text = self.pubCosigner
-            }
-            
-            if cosigner.xprv != nil {
-                DispatchQueue.main.async { [weak self] in
-                    guard let self = self else { return }
-                    
-                    self.privCosigner = URHelper.cosignerToUr(self.privCosigner, true) ?? ""
-                    self.xprvLabel.text = self.privCosigner
+                    self.xprvLabel.text = decryptedXprv.utf8
                 }
             }
         }
@@ -335,8 +335,8 @@ class SeedDetailViewController: UIViewController, UITextFieldDelegate, UITextVie
         DispatchQueue.main.async { [weak self] in
             guard let self = self else { return }
             
-            self.pubCosigner = "[\(self.descStruct.fingerprint)/48h/\(Keys.coinType)h/0h/2h]\(self.descStruct.accountXpub)"
-            self.coSignerLabel.text = self.descStruct.accountXpub
+            self.pubCosigner = URHelper.cosignerToUr(self.cosigner.bip48SegwitAccount ?? "", false) ?? ""
+            self.coSignerLabel.text = self.pubCosigner
         }
         
         if let xprv = cosigner.xprv {
@@ -345,8 +345,8 @@ class SeedDetailViewController: UIViewController, UITextFieldDelegate, UITextVie
             DispatchQueue.main.async { [weak self] in
                 guard let self = self else { return }
                 
-                self.xprvLabel.text = decryptedXprv.utf8
-                self.privCosigner = self.cosigner.bip48SegwitAccount!.replacingOccurrences(of: self.descStruct.accountXpub, with: decryptedXprv.utf8)
+                self.privCosigner = "[\(self.descStruct.fingerprint)/48h/\(Keys.coinType)h/0h/2h]\(decryptedXprv.utf8)"
+                self.xprvLabel.text = URHelper.cosignerToUr(self.privCosigner, true) ?? ""
             }
         } else {
             self.privKeyHeader.alpha = 0
