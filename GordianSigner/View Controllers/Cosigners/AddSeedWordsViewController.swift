@@ -117,26 +117,76 @@ class AddSignerViewController: UIViewController {
             cosigner["words"] = encryptedWords
             cosigner["masterKey"] = encryptedMasterKey
             
-            func finish() {
+            func reload() {
+                DispatchQueue.main.async {
+                    showAlert(self, "Cosigner saved", "Account xprv and seed words encrypted and saved 🔐")
+                    
+                    self.textField.text = ""
+                    self.addedWords.removeAll()
+                    self.justWords.removeAll()
+                    self.bip39Words.removeAll()
+                    self.textView.text = ""
+                    
+                    self.doneBlock!()
+                    self.navigationController?.popViewController(animated: true)
+                }
+            }
+            
+            func saveNew() {
                 CoreDataService.saveEntity(dict: cosigner, entityName: .cosigner) { [weak self] (success, errorDescription) in
                     guard let self = self else { return }
-
+                    
                     guard success else {
                         showAlert(self, "Error ⚠️", "Failed saving cosigner to Core Data!")
                         return
                     }
                     
-                    DispatchQueue.main.async {
-                        showAlert(self, "Cosigner saved", "Account xprv and seed words encrypted and saved 🔐")
+                    reload()
+                }
+            }
+            
+            func update(_ id: UUID) {
+                CoreDataService.updateEntity(id: id, keyToUpdate: "xprv", newValue: encryptedXprv, entityName: .cosigner) { (success, errorDescription) in
+                    guard success else {
+                        showAlert(self, "", "There was an issue updating the Cosigner...")
+                        return
+                    }
+                    
+                    CoreDataService.updateEntity(id: id, keyToUpdate: "words", newValue: encryptedWords, entityName: .cosigner) { (success, errorDescription) in
+                        guard success else {
+                            showAlert(self, "", "There was an issue updating the Cosigner...")
+                            return
+                        }
                         
-                        self.textField.text = ""
-                        self.addedWords.removeAll()
-                        self.justWords.removeAll()
-                        self.bip39Words.removeAll()
-                        self.textView.text = ""
-                        
-                        self.doneBlock!()
-                        self.navigationController?.popViewController(animated: true)
+                        reload()
+                    }
+                }
+            }
+            
+            func finish() {
+                CoreDataService.retrieveEntity(entityName: .cosigner) { (cosigners, errorDescription) in
+                    if let cosigners = cosigners, cosigners.count > 0 {
+                        var idToUpdate:UUID?
+                        for (i, cosignerDict) in cosigners.enumerated() {
+                            let cosignerStruct = CosignerStruct(dictionary: cosignerDict)
+                            
+                            if cosignerStruct.bip48SegwitAccount == bip48SegwitAccount {
+                                //update existing
+                                idToUpdate = cosignerStruct.id
+                            }
+                            
+                            if i + 1 == cosigners.count {
+                                if idToUpdate == nil {
+                                    saveNew()
+                                } else if cosigner["xprv"] != nil {
+                                    update(idToUpdate!)
+                                } else {
+                                    showAlert(self, "", "That Cosigner already exists.")
+                                }
+                            }
+                        }
+                    } else {
+                        saveNew()
                     }
                 }
             }
