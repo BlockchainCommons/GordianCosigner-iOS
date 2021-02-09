@@ -14,6 +14,7 @@ enum Keys {
     static var coinType = UserDefaults.standard.object(forKey: "coinType") as? String ?? "1"
     
     static var chain:Network {
+        coinType = UserDefaults.standard.object(forKey: "coinType") as? String ?? "1"
         if coinType == "0" {
             return .mainnet
         } else {

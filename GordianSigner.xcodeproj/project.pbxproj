@@ -772,7 +772,7 @@
 				CLANG_ENABLE_MODULES = YES;
 				CODE_SIGN_ENTITLEMENTS = GordianSigner/GordianSigner.entitlements;
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 0.1.12;
+				CURRENT_PROJECT_VERSION = 0.1.14;
 				DEVELOPMENT_TEAM = YZHG975W3A;
 				ENABLE_BITCODE = NO;
 				INFOPLIST_FILE = GordianSigner/Info.plist;
@@ -781,7 +781,7 @@
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				MARKETING_VERSION = 0.1.12;
+				MARKETING_VERSION = 0.1.14;
 				PRODUCT_BUNDLE_IDENTIFIER = com.blockchaincommons.GordianSigner;
 				PRODUCT_NAME = "Gordian Cosigner";
 				SUPPORTS_MACCATALYST = YES;
@@ -799,7 +799,7 @@
 				CLANG_ENABLE_MODULES = YES;
 				CODE_SIGN_ENTITLEMENTS = GordianSigner/GordianSigner.entitlements;
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 0.1.12;
+				CURRENT_PROJECT_VERSION = 0.1.14;
 				DEVELOPMENT_TEAM = YZHG975W3A;
 				ENABLE_BITCODE = NO;
 				INFOPLIST_FILE = GordianSigner/Info.plist;
@@ -808,7 +808,7 @@
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				MARKETING_VERSION = 0.1.12;
+				MARKETING_VERSION = 0.1.14;
 				PRODUCT_BUNDLE_IDENTIFIER = com.blockchaincommons.GordianSigner;
 				PRODUCT_NAME = "Gordian Cosigner";
 				SUPPORTS_MACCATALYST = YES;

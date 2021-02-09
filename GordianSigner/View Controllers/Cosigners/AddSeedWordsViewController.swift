@@ -100,8 +100,8 @@ class AddSignerViewController: UIViewController {
                 let bip48SegwitAccount = Keys.bip48SegwitAccount(masterKey),
                 let xprv = Keys.accountXprv(masterKey),
                 let encryptedXprv = Encryption.encrypt(xprv.utf8),
-                let xpub = Keys.accountXpub(masterKey),
-                let lifeHash = LifeHash.hash(xpub) else {
+                let ur = URHelper.cosignerToUr(bip48SegwitAccount, false),
+                let lifehash = URHelper.fingerprint(ur) else {
                 showAlert(self, "Error ⚠️", "Something went wrong, Cosigner not saved!")
                 return
             }
@@ -110,7 +110,7 @@ class AddSignerViewController: UIViewController {
             cosigner["id"] = UUID()
             cosigner["label"] = alias
             cosigner["dateAdded"] = Date()
-            cosigner["lifehash"] = lifeHash
+            cosigner["lifehash"] = lifehash
             cosigner["fingerprint"] = fingerprint
             cosigner["xprv"] = encryptedXprv
             cosigner["bip48SegwitAccount"] = bip48SegwitAccount
