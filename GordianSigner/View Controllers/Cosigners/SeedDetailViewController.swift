@@ -345,8 +345,8 @@ class SeedDetailViewController: UIViewController, UITextFieldDelegate, UITextVie
             DispatchQueue.main.async { [weak self] in
                 guard let self = self else { return }
                 
-                self.privCosigner = "[\(self.descStruct.fingerprint)/48h/\(Keys.coinType)h/0h/2h]\(decryptedXprv.utf8)"
-                self.xprvLabel.text = URHelper.cosignerToUr(self.privCosigner, true) ?? ""
+                self.privCosigner = URHelper.cosignerToUr("[\(self.descStruct.fingerprint)/48h/\(Keys.coinType)h/0h/2h]\(decryptedXprv.utf8)", true) ?? ""//
+                self.xprvLabel.text = self.privCosigner
             }
         } else {
             self.privKeyHeader.alpha = 0

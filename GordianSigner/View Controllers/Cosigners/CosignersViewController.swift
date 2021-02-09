@@ -479,34 +479,74 @@ class KeysetsViewController: UIViewController, UITableViewDelegate, UITableViewD
         cosigner["fingerprint"] = ds.fingerprint
         cosigner["lifehash"] = lifeHash
         
-        CoreDataService.saveEntity(dict: cosigner, entityName: .cosigner) { [weak self] (success, errorDesc) in
-            guard let self = self else { return }
-            
-            guard success else {
-                showAlert(self, "Cosigner not saved!", "Please let us know about this bug.")
-                return
-            }
-            
-            DispatchQueue.main.async {
-                self.keysetsTable.reloadData()
+        func save() {
+            CoreDataService.saveEntity(dict: cosigner, entityName: .cosigner) { [weak self] (success, errorDesc) in
+                guard let self = self else { return }
                 
-                var alertStyle = UIAlertController.Style.actionSheet
-                if (UIDevice.current.userInterfaceIdiom == .pad) {
-                  alertStyle = UIAlertController.Style.alert
+                guard success else {
+                    showAlert(self, "Cosigner not saved!", "Please let us know about this bug.")
+                    return
                 }
                 
-                let alert = UIAlertController(title: "Cosigner imported ✓", message: "Would you like to give it a label now? You can edit the label at any time.", preferredStyle: alertStyle)
+                DispatchQueue.main.async {
+                    self.keysetsTable.reloadData()
+                    
+                    var alertStyle = UIAlertController.Style.actionSheet
+                    if (UIDevice.current.userInterfaceIdiom == .pad) {
+                      alertStyle = UIAlertController.Style.alert
+                    }
+                    
+                    let alert = UIAlertController(title: "Cosigner imported ✓", message: "Would you like to give it a label now? You can edit the label at any time.", preferredStyle: alertStyle)
+                    
+                    alert.addAction(UIAlertAction(title: "Add label", style: .default, handler: { action in
+                        self.promptToEditLabel(CosignerStruct(dictionary: cosigner))
+                    }))
+                                    
+                    alert.addAction(UIAlertAction(title: "Cancel", style: .cancel, handler: { action in
+                        self.load()
+                    }))
+                    
+                    alert.popoverPresentationController?.sourceView = self.view
+                    self.present(alert, animated: true, completion: nil)
+                }
+            }
+        }
+        
+        func update(_ id: UUID) {
+            CoreDataService.updateEntity(id: id, keyToUpdate: "xprv", newValue: cosigner["xprv"] as! Data, entityName: .cosigner) { (success, errorDescription) in
+                guard success else {
+                    showAlert(self, "", "There was an issue updating the Cosigner...")
+                    return
+                }
                 
-                alert.addAction(UIAlertAction(title: "Add label", style: .default, handler: { action in
-                    self.promptToEditLabel(CosignerStruct(dictionary: cosigner))
-                }))
-                                
-                alert.addAction(UIAlertAction(title: "Cancel", style: .cancel, handler: { action in
-                    self.load()
-                }))
-                
-                alert.popoverPresentationController?.sourceView = self.view
-                self.present(alert, animated: true, completion: nil)
+                self.load()
+                showAlert(self, "", "Cosigner updated with xprv.")
+            }
+        }
+        
+        CoreDataService.retrieveEntity(entityName: .cosigner) { (cosigners, errorDescription) in
+            if let cosigners = cosigners, cosigners.count > 0 {
+                var idToUpdate:UUID?
+                for (i, cosignerDict) in cosigners.enumerated() {
+                    let cosignerStruct = CosignerStruct(dictionary: cosignerDict)
+                    
+                    if cosignerStruct.bip48SegwitAccount == segwitBip84Account {
+                        //update existing
+                        idToUpdate = cosignerStruct.id
+                    }
+                    
+                    if i + 1 == cosigners.count {
+                        if idToUpdate == nil {
+                            save()
+                        } else if cosigner["xprv"] != nil {
+                            update(idToUpdate!)
+                        } else {
+                            showAlert(self, "", "That Cosigner already exists.")
+                        }
+                    }
+                }
+            } else {
+                save()
             }
         }
     }
