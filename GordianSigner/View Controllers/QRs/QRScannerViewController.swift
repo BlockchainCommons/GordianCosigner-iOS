@@ -81,15 +81,15 @@ class QRScannerViewController: UIViewController {
         
         configureImagePicker()
         
-        #if targetEnvironment(macCatalyst)
-        chooseQRCodeFromLibrary()
-        
-        #else
+//        #if targetEnvironment(macCatalyst)
+//        chooseQRCodeFromLibrary()
+//
+//        #else
         configureUploadButton()
         configureTorchButton()
         configureCloseButton()
         configureDownSwipe()
-        #endif
+        //#endif
     }
     
     func addScannerButtons() {

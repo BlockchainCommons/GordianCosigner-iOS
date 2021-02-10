@@ -105,6 +105,8 @@ class PsbtTableViewController: UIViewController, UITableViewDelegate, UITableVie
                     
                     var dict:[String:Any]!
                     
+                    self.inputsArray[i]["fullPath"] = origin.value.path.description
+                    
                     if let path = try? origin.value.path.chop(depth: 4) {
                         dict = ["pubkey":pubkey, "hasSigned": false, "cosignerLabel": "unknown", "path": path, "fullPath": origin.value.path] as [String : Any]
                     } else {
@@ -163,10 +165,8 @@ class PsbtTableViewController: UIViewController, UITableViewDelegate, UITableVie
                             func loopCosigners() {
                                 for (k, keyset) in cosigners.enumerated() {
                                     let cosignerStruct = CosignerStruct(dictionary: keyset)
-                                    print("cosignerLabel: \(cosignerStruct.label)")
                                     
                                     if let descriptor = cosignerStruct.bip48SegwitAccount {
-                                        print("descriptor: \(descriptor)")
                                         let arr = descriptor.split(separator: "]")
                                         var xpub = ""
                                         
@@ -177,7 +177,6 @@ class PsbtTableViewController: UIViewController, UITableViewDelegate, UITableVie
                                         if let path = pubkeyDict["path"] as? BIP32Path,
                                             let hdkey = try? HDKey(base58: xpub),
                                             let childKey = try? hdkey.derive(using: path) {
-                                            print("path: \(path.description)")
                                             
                                             if originalPubkey == childKey.pubKey.data.hexString {
                                                 updatedDict["cosignerLabel"] = cosignerStruct.label
@@ -570,6 +569,7 @@ class PsbtTableViewController: UIViewController, UITableViewDelegate, UITableVie
     }
     
     private func inputCell(_ indexPath: IndexPath) -> UITableViewCell {
+        print("indexPath: \(indexPath.row)")
         let cell = tableView.dequeueReusableCell(withIdentifier: "inputCell", for: indexPath)
         configureCell(cell)
                 
@@ -585,49 +585,46 @@ class PsbtTableViewController: UIViewController, UITableViewDelegate, UITableVie
         let inputNumberLabel = cell.viewWithTag(7) as! UILabel
         inputNumberLabel.text = "Input #\(indexPath.row + 1)"
         
-        let inputTypeImageView = cell.viewWithTag(4) as! UIImageView
+        let inputTypeImageView = cell.viewWithTag(9) as! UIImageView
         let inputTypeLabel = cell.viewWithTag(5) as! UILabel
                 
         let inputDict = inputsArray[indexPath.row]
         let input = inputDict["input"] as! PSBTInput
         
-        if let pubkeyArray = inputDict["pubKeyArray"] as? [[String:Any]] {
-            numberOfSigsLabel.text = "?"
+        if let fullPath = inputDict["fullPath"] as? String {
+            print("fullPath: \(fullPath)")
+            pathLabel.text = fullPath
             
-            if pubkeyArray.count > 0 {
-                var numberOfSigs = 0
-                                
-                for pubkey in pubkeyArray {
-                    let hasSigned = pubkey["hasSigned"] as! Bool
-                    let fullPath = pubkey["fullPath"] as! BIP32Path
-                    
-                    if hasSigned {
-                        numberOfSigs += 1
-                    }
-                    
-                    pathLabel.text = fullPath.description
-                    
-                    if fullPath.description.contains("/0/") {
-                        inputTypeImageView.image = UIImage(systemName: "arrow.down.right")
-                        inputTypeLabel.text = "Receive Input"
-                        inputTypeImageView.tintColor = .systemGreen
-                    } else if fullPath.description.contains("/1/") {
-                        inputTypeImageView.image = UIImage(systemName: "arrow.2.circlepath")
-                        inputTypeLabel.text = "Change Input"
-                        inputTypeImageView.tintColor = .gray
-                    } else {
-                        inputTypeImageView.image = UIImage(systemName: "questionmark.circle")
-                        inputTypeLabel.text = "Unknown type"
-                        inputTypeImageView.tintColor = .systemRed
-                    }
-                }
-                
-                numberOfSigsLabel.text = "\(numberOfSigs) signatures"
-                
+            if fullPath.contains("/0/") {
+                inputTypeImageView.image = UIImage(systemName: "arrow.down.right")
+                inputTypeLabel.text = "Receive Input"
+                inputTypeImageView.tintColor = .systemGreen
+            } else if fullPath.contains("/1/") {
+                inputTypeImageView.image = UIImage(systemName: "arrow.2.circlepath")
+                inputTypeLabel.text = "Change Input"
+                inputTypeImageView.tintColor = .gray
             } else {
-                numberOfSigsLabel.text = "?"
+                inputTypeImageView.image = UIImage(systemName: "questionmark.circle")
+                inputTypeLabel.text = "Unknown type"
+                inputTypeImageView.tintColor = .systemRed
             }
-            
+        } else {
+            pathLabel.text = "unknown"
+            inputTypeImageView.image = UIImage(systemName: "questionmark.circle")
+            inputTypeLabel.text = "Unknown type"
+            inputTypeImageView.tintColor = .systemRed
+        }
+        
+        if let pubkeyArray = inputDict["pubKeyArray"] as? [[String:Any]], pubkeyArray.count > 0 {
+            numberOfSigsLabel.text = "?"
+            var numberOfSigs = 0
+            for pubkey in pubkeyArray {
+                let hasSigned = pubkey["hasSigned"] as! Bool
+                if hasSigned {
+                    numberOfSigs += 1
+                }
+            }
+            numberOfSigsLabel.text = "\(numberOfSigs) signatures"
         } else {
             numberOfSigsLabel.text = "?"
         }

@@ -604,7 +604,7 @@ class AccountMapsViewController: UIViewController, UITableViewDelegate, UITableV
             let ds = dp.descriptor(hack)
             let bip48SegwitAccount = fullKey.replacingOccurrences(of: "/0/*", with: "")
             
-            guard let lifeHash = LifeHash.hash(ds.accountXpub) else {
+            guard let ur = URHelper.cosignerToUr(bip48SegwitAccount, false), let lifehash = URHelper.fingerprint(ur) else {
                 showAlert(self, "", "Error deriving Cosigner lifehash.")
                 return
             }
@@ -617,7 +617,7 @@ class AccountMapsViewController: UIViewController, UITableViewDelegate, UITableV
             cosignerToSave["fingerprint"] = ds.fingerprint
             cosignerToSave["sharedWith"] = accountId
             cosignerToSave["dateShared"] = Date()
-            cosignerToSave["lifehash"] = lifeHash
+            cosignerToSave["lifehash"] = lifehash
             
             // First fetch all existing cosigners to ensure we do not save duplicates
             CoreDataService.retrieveEntity(entityName: .cosigner) { (cosigners, errorDescription) in

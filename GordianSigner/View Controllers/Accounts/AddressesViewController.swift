@@ -11,6 +11,8 @@ import LibWally
 
 class AddressesViewController: UIViewController, UITableViewDelegate, UITableViewDataSource {
 
+    @IBOutlet weak var header: UILabel!
+    @IBOutlet weak var toggle: UISegmentedControl!
     @IBOutlet weak var addressesTable: UITableView!
     var addresses = [[String:Any]]()
     var account:AccountStruct!
@@ -23,12 +25,24 @@ class AddressesViewController: UIViewController, UITableViewDelegate, UITableVie
         // Do any additional setup after loading the view.
         addressesTable.delegate = self
         addressesTable.dataSource = self
-        load()
+        load(0)
         showAlert(self, "⚠️ Verify first!", "To avoid any loss of funds ensure the first few addresses match what your other multisig wallet is showing.")
     }
     
-    private func load() {
+    @IBAction func toggleAction(_ sender: Any) {
+        load(toggle.selectedSegmentIndex)
+        
+        if toggle.selectedSegmentIndex == 1 {
+            header.text = "Change addresses"
+        } else {
+            header.text = "Receive addresses"
+        }
+    }
+    
+    
+    private func load(_ type: Int) {
         spinner.add(vc: self, description: "Loading addresses, this takes a few moments. Please wait.")
+        addresses.removeAll()
         let descriptor = account.descriptor
         let descriptorParser = DescriptorParser()
         let descriptorStruct = descriptorParser.descriptor(descriptor)
@@ -47,7 +61,7 @@ class AddressesViewController: UIViewController, UITableViewDelegate, UITableVie
                         return
                     }
                     
-                    let path = "0" + "/" + "\(i)"
+                    let path = "\(type)" + "/" + "\(i)"
                     
                     guard let bip32path = try? BIP32Path(string: path), let key = try? hdKey.derive(using: bip32path) else {
                         showAlert(self, "", "There was an error deriving your addresses")
@@ -87,18 +101,20 @@ class AddressesViewController: UIViewController, UITableViewDelegate, UITableVie
         let cell = tableView.dequeueReusableCell(withIdentifier: "addressCell", for: indexPath)
         cell.selectionStyle = .default
         
-        let dict = addresses[indexPath.row]
-        
-        let label = cell.viewWithTag(1) as! UILabel
-        label.text = "#\(indexPath.row): \(dict["address"] as! String)"
-        
-        let lifehash = cell.viewWithTag(2) as! UIImageView
-        lifehash.layer.magnificationFilter = .nearest
-        lifehash.image = (dict["lifehash"] as! UIImage)
-        
-        let copyButton = cell.viewWithTag(3) as! UIButton
-        copyButton.addTarget(self, action: #selector(exportAddress(_:)), for: .touchUpInside)
-        copyButton.restorationIdentifier = "\(dict["address"] as! String)"
+        if addresses.count >= indexPath.row {
+            let dict = addresses[indexPath.row]
+            
+            let label = cell.viewWithTag(1) as! UILabel
+            label.text = "#\(indexPath.row): \(dict["address"] as! String)"
+            
+            let lifehash = cell.viewWithTag(2) as! UIImageView
+            lifehash.layer.magnificationFilter = .nearest
+            lifehash.image = (dict["lifehash"] as! UIImage)
+            
+            let copyButton = cell.viewWithTag(3) as! UIButton
+            copyButton.addTarget(self, action: #selector(exportAddress(_:)), for: .touchUpInside)
+            copyButton.restorationIdentifier = "\(dict["address"] as! String)"
+        }
         
         return cell
     }

@@ -728,7 +728,7 @@
                                                     <color key="textColor" white="0.66666666666666663" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                                                     <nil key="highlightedColor"/>
                                                 </label>
-                                                <imageView clipsSubviews="YES" userInteractionEnabled="NO" tag="4" contentMode="scaleAspectFit" horizontalHuggingPriority="251" verticalHuggingPriority="251" translatesAutoresizingMaskIntoConstraints="NO" id="ptd-OT-4zP">
+                                                <imageView clipsSubviews="YES" userInteractionEnabled="NO" tag="9" contentMode="scaleAspectFit" horizontalHuggingPriority="251" verticalHuggingPriority="251" translatesAutoresizingMaskIntoConstraints="NO" id="ptd-OT-4zP">
                                                     <rect key="frame" x="150" y="65.5" width="30" height="30"/>
                                                     <constraints>
                                                         <constraint firstAttribute="height" constant="30" id="2Yr-HD-FY2"/>
@@ -1729,11 +1729,23 @@
                                     <outlet property="delegate" destination="6NQ-R2-fha" id="jx1-Q0-dvC"/>
                                 </connections>
                             </tableView>
+                            <segmentedControl opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="left" contentVerticalAlignment="top" segmentControlStyle="plain" selectedSegmentIndex="0" translatesAutoresizingMaskIntoConstraints="NO" id="FPL-pu-IPu">
+                                <rect key="frame" x="259" y="109.5" width="135" height="32"/>
+                                <segments>
+                                    <segment title="Receive"/>
+                                    <segment title="Change"/>
+                                </segments>
+                                <connections>
+                                    <action selector="toggleAction:" destination="6NQ-R2-fha" eventType="valueChanged" id="yWj-r8-3n3"/>
+                                </connections>
+                            </segmentedControl>
                         </subviews>
                         <viewLayoutGuide key="safeArea" id="xPv-sy-l61"/>
                         <color key="backgroundColor" white="0.0" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                         <constraints>
                             <constraint firstItem="3bK-dG-SMk" firstAttribute="leading" secondItem="xPv-sy-l61" secondAttribute="leading" constant="20" id="D1l-0X-J4l"/>
+                            <constraint firstItem="FPL-pu-IPu" firstAttribute="centerY" secondItem="Jbd-Mk-4Hz" secondAttribute="centerY" id="ZmY-6h-Azk"/>
+                            <constraint firstItem="xPv-sy-l61" firstAttribute="trailing" secondItem="FPL-pu-IPu" secondAttribute="trailing" constant="20" id="bOT-AP-p2h"/>
                             <constraint firstItem="xPv-sy-l61" firstAttribute="trailing" secondItem="3bK-dG-SMk" secondAttribute="trailing" constant="20" id="esa-4b-HRE"/>
                             <constraint firstItem="Jbd-Mk-4Hz" firstAttribute="top" secondItem="xPv-sy-l61" secondAttribute="top" constant="20" id="g1t-HI-CBH"/>
                             <constraint firstItem="3bK-dG-SMk" firstAttribute="top" secondItem="Jbd-Mk-4Hz" secondAttribute="bottom" constant="7.5" id="jYS-cn-GDp"/>
@@ -1744,6 +1756,8 @@
                     <navigationItem key="navigationItem" id="E0z-Gu-Fjv"/>
                     <connections>
                         <outlet property="addressesTable" destination="3bK-dG-SMk" id="GRA-Dv-WiO"/>
+                        <outlet property="header" destination="Jbd-Mk-4Hz" id="Pwo-GM-Chh"/>
+                        <outlet property="toggle" destination="FPL-pu-IPu" id="e4Y-T6-yeg"/>
                         <segue destination="9Vu-3O-YNg" kind="show" identifier="segueToExportAddress" id="5Zf-xV-Pre"/>
                     </connections>
                 </viewController>
@@ -2458,7 +2472,7 @@ If you do not want to add seed words to create a cosigner go back and choose the
                             <textView clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="scaleToFill" editable="NO" textAlignment="natural" translatesAutoresizingMaskIntoConstraints="NO" id="Nhp-d8-eCA">
                                 <rect key="frame" x="16" y="127" width="382" height="677"/>
                                 <color key="backgroundColor" white="0.0" alpha="0.0" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
-                                <mutableString key="text">WARNING!
+                                <string key="text">WARNING!
 
 Gordian cosigner is an alpha release! It operates on Testnet by default but is also Mainnet compatible. The app is in development and bugs will happen, do not use with real funds! It is designed to only work with segwit m/48' account based derivations, other derivations will not work!
 
@@ -2466,7 +2480,7 @@ We are very grateful for your usage, and for any bugs, comments, or fixes, which
 
 Please read and accept the terms of our disclaimer:
 
-The use of Gordian Cosigner is under the "BSD 2-Clause Plus Patent License" (https://spdx.org/licenses/BSD-2-Clause-Patent.html). Copyright © 2019 BlockchainCommons. All rights reserved. With the disclaimer: THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDERS OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.</mutableString>
+The use of Gordian Cosigner is under the "BSD 2-Clause Plus Patent License" (https://spdx.org/licenses/BSD-2-Clause-Patent.html). Copyright © 2019 BlockchainCommons. All rights reserved. With the disclaimer: THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDERS OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.</string>
                                 <color key="textColor" white="0.66666666669999997" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                                 <fontDescription key="fontDescription" type="system" pointSize="14"/>
                                 <textInputTraits key="textInputTraits" autocapitalizationType="sentences"/>
@@ -2506,7 +2520,7 @@ The use of Gordian Cosigner is under the "BSD 2-Clause Plus Patent License" (htt
         <segue reference="RRe-xD-Awd"/>
         <segue reference="UaS-I9-AEd"/>
         <segue reference="KzM-QC-ivF"/>
-        <segue reference="MZ7-2Z-REz"/>
+        <segue reference="JgM-9d-RH3"/>
         <segue reference="hPq-I8-kVg"/>
     </inferredMetricsTieBreakers>
     <resources>
