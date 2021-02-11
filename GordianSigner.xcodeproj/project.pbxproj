@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		0A0D3A7125D4F4C600E86F70 /* AuthViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0A0D3A7025D4F4C600E86F70 /* AuthViewController.swift */; };
 		0AAAB4B125D2693E00C77B52 /* SettingsViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0AAAB4B025D2693E00C77B52 /* SettingsViewController.swift */; };
 		0AF6442325D4DB91003E619E /* CloudKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 0AF6442225D4DB91003E619E /* CloudKit.framework */; };
 		D00F498D258B2ACD00941DBA /* accounts.png in Resources */ = {isa = PBXBuildFile; fileRef = D00F498C258B2ACD00941DBA /* accounts.png */; };
@@ -102,6 +103,7 @@
 /* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
+		0A0D3A7025D4F4C600E86F70 /* AuthViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AuthViewController.swift; sourceTree = "<group>"; };
 		0AAAB4B025D2693E00C77B52 /* SettingsViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsViewController.swift; sourceTree = "<group>"; };
 		0AF6442225D4DB91003E619E /* CloudKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CloudKit.framework; path = System/Library/Frameworks/CloudKit.framework; sourceTree = SDKROOT; };
 		D00F498C258B2ACD00941DBA /* accounts.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = accounts.png; sourceTree = "<group>"; };
@@ -298,6 +300,7 @@
 				D06D789E25B9472900769157 /* QRs */,
 				D06D789525B946EF00769157 /* Accounts */,
 				0AAAB4B025D2693E00C77B52 /* SettingsViewController.swift */,
+				0A0D3A7025D4F4C600E86F70 /* AuthViewController.swift */,
 			);
 			path = "View Controllers";
 			sourceTree = "<group>";
@@ -558,6 +561,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				0A0D3A7125D4F4C600E86F70 /* AuthViewController.swift in Sources */,
 				D064BCC8252D62FD00D42D66 /* URHelper.swift in Sources */,
 				D0CF1E732523012A0059C541 /* FirstTime.swift in Sources */,
 				D090964325625CED0098013A /* Descriptor.swift in Sources */,

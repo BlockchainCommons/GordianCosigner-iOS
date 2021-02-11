@@ -571,7 +571,6 @@ class PsbtTableViewController: UIViewController, UITableViewDelegate, UITableVie
     }
     
     private func inputCell(_ indexPath: IndexPath) -> UITableViewCell {
-        print("indexPath: \(indexPath.row)")
         let cell = tableView.dequeueReusableCell(withIdentifier: "inputCell", for: indexPath)
         configureCell(cell)
                 
@@ -594,7 +593,6 @@ class PsbtTableViewController: UIViewController, UITableViewDelegate, UITableVie
         let input = inputDict["input"] as! PSBTInput
         
         if let fullPath = inputDict["fullPath"] as? String {
-            print("fullPath: \(fullPath)")
             pathLabel.text = fullPath
             
             if fullPath.contains("/0/") {
@@ -1010,14 +1008,22 @@ class PsbtTableViewController: UIViewController, UITableViewDelegate, UITableVie
     
     // MARK: AUTH
     private func showAuth() {
-        DispatchQueue.main.async { [weak self] in
-            guard let self = self else { return }
-            
-            let request = ASAuthorizationAppleIDProvider().createRequest()
-            let controller = ASAuthorizationController(authorizationRequests: [request])
-            controller.delegate = self
-            controller.presentationContextProvider = self
-            controller.performRequests()
+        if UserDefaults.standard.object(forKey: "userIdentifier") != nil {
+            DispatchQueue.main.async { [weak self] in
+                guard let self = self else { return }
+                
+                let request = ASAuthorizationAppleIDProvider().createRequest()
+                let controller = ASAuthorizationController(authorizationRequests: [request])
+                controller.delegate = self
+                controller.presentationContextProvider = self
+                controller.performRequests()
+            }
+        } else {
+            DispatchQueue.main.async { [weak self] in
+                guard let self = self else { return }
+                
+                self.performSegue(withIdentifier: "segueToAuth", sender: self)
+            }
         }
     }
         
@@ -1035,7 +1041,6 @@ class PsbtTableViewController: UIViewController, UITableViewDelegate, UITableVie
                     
                     switch (state) {
                     case .authorized:
-                        print("Account Found - Signed In")
                         self.sign()
                     case .revoked:
                         print("No Account Found")

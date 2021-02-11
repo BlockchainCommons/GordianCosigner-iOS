@@ -8,9 +8,8 @@
 
 import UIKit
 import LibWally
-import AuthenticationServices
 
-class KeysetsViewController: UIViewController, UITableViewDelegate, UITableViewDataSource, ASAuthorizationControllerDelegate, ASAuthorizationControllerPresentationContextProviding, UINavigationControllerDelegate {
+class KeysetsViewController: UIViewController, UITableViewDelegate, UITableViewDataSource {
     
     var addButton = UIBarButtonItem()
     var editButton = UIBarButtonItem()
@@ -27,11 +26,12 @@ class KeysetsViewController: UIViewController, UITableViewDelegate, UITableViewD
     
     override func viewDidLoad() {
         super.viewDidLoad()
+        
+        UserDefaults.standard.removeObject(forKey: "userIdentifier")
 
         // Do any additional setup after loading the view.
         keysetsTable.delegate = self
         keysetsTable.dataSource = self
-        navigationController?.delegate = self
         
         if !FirstTime.firstTimeHere() {
             showAlert(self, "Fatal error", "We were unable to set and save an encryption key to your secure enclave, the app will not function without this key.")
@@ -50,15 +50,11 @@ class KeysetsViewController: UIViewController, UITableViewDelegate, UITableViewD
                 self.performSegue(withIdentifier: "segueToDisclaimer", sender: self)
             }
         } else {
-            if UserDefaults.standard.object(forKey: "userIdentifier") == nil {
-                authenticate()
-            } else {
-                self.load()
-                
-                if UserDefaults.standard.object(forKey: "seenCosignerInfo") == nil {
-                    showInfo()
-                    UserDefaults.standard.set(true, forKey: "seenCosignerInfo")
-                }
+            self.load()
+            
+            if UserDefaults.standard.object(forKey: "seenCosignerInfo") == nil {
+                showInfo()
+                UserDefaults.standard.set(true, forKey: "seenCosignerInfo")
             }
         }
     }
@@ -624,29 +620,10 @@ class KeysetsViewController: UIViewController, UITableViewDelegate, UITableViewD
     }
     
     private func authenticate() {
-        let request = ASAuthorizationAppleIDProvider().createRequest()
-        let controller = ASAuthorizationController(authorizationRequests: [request])
-        controller.delegate = self
-        controller.presentationContextProvider = self
-        controller.performRequests()
-    }
-    
-    func authorizationController(controller: ASAuthorizationController, didCompleteWithAuthorization authorization: ASAuthorization) {
-        switch authorization.credential {
-        case let appleIDCredential as ASAuthorizationAppleIDCredential:
-            DispatchQueue.main.async { [weak self] in
-                guard let self = self else { return }
-                
-                UserDefaults.standard.setValue(appleIDCredential.user, forKeyPath: "userIdentifier")
-                print("userIdentifier set")
-                self.navigationController?.popToRootViewController(animated: true)
-            }
-        default:
-            break
+        DispatchQueue.main.async { [weak self] in
+            guard let self = self else { return }
+            
+            self.performSegue(withIdentifier: "segueToAuth", sender: self)
         }
-    }
-        
-    func presentationAnchor(for controller: ASAuthorizationController) -> ASPresentationAnchor {
-        return self.view.window!
     }
 }
