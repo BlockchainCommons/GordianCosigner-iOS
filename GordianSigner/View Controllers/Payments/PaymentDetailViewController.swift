@@ -178,7 +178,6 @@ class PsbtTableViewController: UIViewController, UITableViewDelegate, UITableVie
                                         if let path = pubkeyDict["path"] as? BIP32Path,
                                             let hdkey = try? HDKey(base58: xpub),
                                             let childKey = try? hdkey.derive(using: path) {
-                                            
                                             if originalPubkey == childKey.pubKey.data.hexString {
                                                 updatedDict["cosignerLabel"] = cosignerStruct.label
                                                 updatedDict["lifeHash"] = LifeHash.image(cosignerStruct.lifehash) ?? UIImage()
@@ -412,7 +411,6 @@ class PsbtTableViewController: UIViewController, UITableViewDelegate, UITableVie
     }
     
     @IBAction func signAction(_ sender: Any) {
-        //sign()
         showAuth()
     }
     

@@ -27,8 +27,6 @@ class KeysetsViewController: UIViewController, UITableViewDelegate, UITableViewD
     override func viewDidLoad() {
         super.viewDidLoad()
         
-        UserDefaults.standard.removeObject(forKey: "userIdentifier")
-
         // Do any additional setup after loading the view.
         keysetsTable.delegate = self
         keysetsTable.dataSource = self
