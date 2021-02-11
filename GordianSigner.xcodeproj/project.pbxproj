@@ -8,6 +8,7 @@
 
 /* Begin PBXBuildFile section */
 		0AAAB4B125D2693E00C77B52 /* SettingsViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0AAAB4B025D2693E00C77B52 /* SettingsViewController.swift */; };
+		0AF6442325D4DB91003E619E /* CloudKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 0AF6442225D4DB91003E619E /* CloudKit.framework */; };
 		D00F498D258B2ACD00941DBA /* accounts.png in Resources */ = {isa = PBXBuildFile; fileRef = D00F498C258B2ACD00941DBA /* accounts.png */; };
 		D00F498F258B2AFE00941DBA /* seeds.png in Resources */ = {isa = PBXBuildFile; fileRef = D00F498E258B2AFD00941DBA /* seeds.png */; };
 		D00F4991258B2B6D00941DBA /* cosigners.png in Resources */ = {isa = PBXBuildFile; fileRef = D00F4990258B2B6D00941DBA /* cosigners.png */; };
@@ -102,6 +103,7 @@
 
 /* Begin PBXFileReference section */
 		0AAAB4B025D2693E00C77B52 /* SettingsViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsViewController.swift; sourceTree = "<group>"; };
+		0AF6442225D4DB91003E619E /* CloudKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CloudKit.framework; path = System/Library/Frameworks/CloudKit.framework; sourceTree = SDKROOT; };
 		D00F498C258B2ACD00941DBA /* accounts.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = accounts.png; sourceTree = "<group>"; };
 		D00F498E258B2AFD00941DBA /* seeds.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = seeds.png; sourceTree = "<group>"; };
 		D00F4990258B2B6D00941DBA /* cosigners.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = cosigners.png; sourceTree = "<group>"; };
@@ -175,6 +177,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				D0974A56255B8E300013DC60 /* LifeHash in Frameworks */,
+				0AF6442325D4DB91003E619E /* CloudKit.framework in Frameworks */,
 				D064BCC6252D5BD700D42D66 /* URKit in Frameworks */,
 				D016AE5D25B0031600A59E93 /* LibWally.xcframework in Frameworks */,
 			);
@@ -374,6 +377,7 @@
 		D0CF1E672522E5DB0059C541 /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
+				0AF6442225D4DB91003E619E /* CloudKit.framework */,
 				D016AE5825B0031300A59E93 /* LibWally.xcframework */,
 			);
 			name = Frameworks;
@@ -772,7 +776,7 @@
 				CLANG_ENABLE_MODULES = YES;
 				CODE_SIGN_ENTITLEMENTS = GordianSigner/GordianSigner.entitlements;
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 0.1.14;
+				CURRENT_PROJECT_VERSION = 0.1.15;
 				DEVELOPMENT_TEAM = YZHG975W3A;
 				ENABLE_BITCODE = NO;
 				INFOPLIST_FILE = GordianSigner/Info.plist;
@@ -781,7 +785,7 @@
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				MARKETING_VERSION = 0.1.14;
+				MARKETING_VERSION = 0.1.15;
 				PRODUCT_BUNDLE_IDENTIFIER = com.blockchaincommons.GordianSigner;
 				PRODUCT_NAME = "Gordian Cosigner";
 				SUPPORTS_MACCATALYST = YES;
@@ -799,7 +803,7 @@
 				CLANG_ENABLE_MODULES = YES;
 				CODE_SIGN_ENTITLEMENTS = GordianSigner/GordianSigner.entitlements;
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 0.1.14;
+				CURRENT_PROJECT_VERSION = 0.1.15;
 				DEVELOPMENT_TEAM = YZHG975W3A;
 				ENABLE_BITCODE = NO;
 				INFOPLIST_FILE = GordianSigner/Info.plist;
@@ -808,7 +812,7 @@
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				MARKETING_VERSION = 0.1.14;
+				MARKETING_VERSION = 0.1.15;
 				PRODUCT_BUNDLE_IDENTIFIER = com.blockchaincommons.GordianSigner;
 				PRODUCT_NAME = "Gordian Cosigner";
 				SUPPORTS_MACCATALYST = YES;

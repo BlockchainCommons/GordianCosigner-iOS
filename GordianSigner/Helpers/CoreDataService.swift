@@ -11,17 +11,35 @@ import CoreData
 class CoreDataService {
             
     // MARK: - Core Data stack
-//    static var persistentContainer: NSPersistentCloudKitContainer = {
-//        let container = NSPersistentCloudKitContainer(name: "GordianWallet")
+    static var persistentContainer: NSPersistentCloudKitContainer = {
+        let container = NSPersistentCloudKitContainer(name: "GordianSigner")
+
+        // get the store description
+        guard let description = container.persistentStoreDescriptions.first else {
+            fatalError("Could not retrieve a persistent store description.")
+        }
+
+        description.cloudKitContainerOptions = NSPersistentCloudKitContainerOptions(containerIdentifier: "iCloud.com.blockchaincommons.gordian.cosigner")
+
+        description.cloudKitContainerOptions = NSPersistentCloudKitContainerOptions(containerIdentifier: "iCloud.com.blockchaincommons.gordian.cosigner")
+
+        container.loadPersistentStores(completionHandler: { (storeDescription, error) in
+            if let error = error as NSError? {
+                fatalError("Unresolved error \(error), \(error.userInfo)")
+            }
+        })
+
+        return container
+    }()
+    
+//    static var persistentContainer: NSPersistentContainer = {
+//        let container = NSPersistentContainer(name: "GordianSigner")
 //
 //        // get the store description
 //        guard let description = container.persistentStoreDescriptions.first else {
 //            fatalError("Could not retrieve a persistent store description.")
 //        }
-//
-//        description.cloudKitContainerOptions = NSPersistentCloudKitContainerOptions(containerIdentifier: "iCloud.com.blockchaincommons.standupios.FullyNoded2")
-//
-//        description.cloudKitContainerOptions = NSPersistentCloudKitContainerOptions(containerIdentifier: "iCloud.com.blockchaincommons.standupios.FullyNoded2")
+//        description.setOption(true as NSNumber, forKey: NSPersistentHistoryTrackingKey)
 //
 //        container.loadPersistentStores(completionHandler: { (storeDescription, error) in
 //            if let error = error as NSError? {
@@ -31,24 +49,6 @@ class CoreDataService {
 //
 //        return container
 //    }()
-    
-    static var persistentContainer: NSPersistentContainer = {
-        let container = NSPersistentContainer(name: "GordianSigner")
-        
-        // get the store description
-        guard let description = container.persistentStoreDescriptions.first else {
-            fatalError("Could not retrieve a persistent store description.")
-        }
-        description.setOption(true as NSNumber, forKey: NSPersistentHistoryTrackingKey)
-        
-        container.loadPersistentStores(completionHandler: { (storeDescription, error) in
-            if let error = error as NSError? {
-                fatalError("Unresolved error \(error), \(error.userInfo)")
-            }
-        })
-        
-        return container
-    }()
     
     static var viewContext: NSManagedObjectContext {
         let viewContext = CoreDataService.persistentContainer.viewContext
