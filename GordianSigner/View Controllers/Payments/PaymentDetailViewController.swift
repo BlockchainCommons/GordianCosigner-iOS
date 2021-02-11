@@ -998,6 +998,10 @@ class PsbtTableViewController: UIViewController, UITableViewDelegate, UITableVie
                             if paymentStruct.id == self.psbtStruct.id {
                                 self.psbtStruct = paymentStruct
                                 self.loadTable()
+                                
+                                DispatchQueue.main.async {
+                                    NotificationCenter.default.post(name: .psbtSaved, object: nil, userInfo: nil)
+                                }
                             }
                         }
                     }
