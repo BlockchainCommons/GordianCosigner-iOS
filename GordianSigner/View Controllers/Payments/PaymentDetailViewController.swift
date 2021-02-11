@@ -8,8 +8,9 @@
 
 import UIKit
 import LibWally
+import AuthenticationServices
 
-class PsbtTableViewController: UIViewController, UITableViewDelegate, UITableViewDataSource {
+class PsbtTableViewController: UIViewController, UITableViewDelegate, UITableViewDataSource, ASAuthorizationControllerDelegate, ASAuthorizationControllerPresentationContextProviding {
 
     @IBOutlet weak private var tableView: UITableView!
     @IBOutlet weak private var signButtonOutlet: UIButton!
@@ -411,7 +412,8 @@ class PsbtTableViewController: UIViewController, UITableViewDelegate, UITableVie
     }
     
     @IBAction func signAction(_ sender: Any) {
-        sign()
+        //sign()
+        showAuth()
     }
     
     @IBAction func exportAction(_ sender: Any) {
@@ -979,7 +981,7 @@ class PsbtTableViewController: UIViewController, UITableViewDelegate, UITableVie
                 vc.doneBlock = { [weak self] in
                     guard let self = self else { return }
                     
-                    self.sign()
+                    self.showAuth()
                 }
             }
         }
@@ -1002,6 +1004,50 @@ class PsbtTableViewController: UIViewController, UITableViewDelegate, UITableVie
                         }
                     }
                 }
+            }
+        }
+    }
+    
+    // MARK: AUTH
+    private func showAuth() {
+        DispatchQueue.main.async { [weak self] in
+            guard let self = self else { return }
+            
+            let request = ASAuthorizationAppleIDProvider().createRequest()
+            let controller = ASAuthorizationController(authorizationRequests: [request])
+            controller.delegate = self
+            controller.presentationContextProvider = self
+            controller.performRequests()
+        }
+    }
+        
+    func presentationAnchor(for controller: ASAuthorizationController) -> ASPresentationAnchor {
+        return self.view.window!
+    }
+    
+    func authorizationController(controller: ASAuthorizationController, didCompleteWithAuthorization authorization: ASAuthorization) {
+        if let username = UserDefaults.standard.object(forKey: "userIdentifier") as? String {
+            switch authorization.credential {
+            case _ as ASAuthorizationAppleIDCredential:
+                let authorizationProvider = ASAuthorizationAppleIDProvider()
+                authorizationProvider.getCredentialState(forUserID: username) { [weak self] (state, error) in
+                    guard let self = self else { return }
+                    
+                    switch (state) {
+                    case .authorized:
+                        print("Account Found - Signed In")
+                        self.sign()
+                    case .revoked:
+                        print("No Account Found")
+                        fallthrough
+                    case .notFound:
+                        print("No Account Found")
+                    default:
+                        break
+                    }
+                }
+            default:
+                break
             }
         }
     }
