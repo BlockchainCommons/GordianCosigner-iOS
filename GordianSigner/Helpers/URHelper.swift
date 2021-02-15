@@ -8,8 +8,61 @@
 
 import Foundation
 import URKit
+import LibWally
 
 enum URHelper {
+    
+    static func mnemonicToCryptoSeed(_ words: String) -> String? {
+        guard let entropy = try? BIP39Mnemonic(words: words).entropy else { return nil }
+        
+        return URHelper.entropyToUr(data: entropy.data)
+    }
+    
+    static func cryptoSeedToMnemonic(cryptoSeed: String) -> String? {
+        guard let data = URHelper.urToEntropy(urString: cryptoSeed).data, let mnemonic = try? BIP39Mnemonic(entropy: BIP39Mnemonic.Entropy(data)) else { return nil }
+        
+        return mnemonic.words.joined(separator: " ")
+    }
+    
+    // crypto-seed > mnemonic
+    static func urToEntropy(urString: String) -> (data: Data?, birthdate: UInt64?) {
+        do {
+            let ur = try URDecoder.decode(urString)
+            let decodedCbor = try CBOR.decode(ur.cbor.bytes)
+            guard case let CBOR.map(dict) = decodedCbor! else { return (nil, nil) }
+            var data:Data?
+            var birthdate:UInt64?
+            for (key, value) in dict {
+                switch key {
+                case 1:
+                    guard case let CBOR.byteString(byteString) = value else { fallthrough }
+                    data = Data(byteString)
+                case 2:
+                    guard case let CBOR.unsignedInt(n) = value else { fallthrough }
+                    birthdate = n
+                default:
+                    break
+                }
+            }
+            return (data, birthdate)
+        } catch {
+            return (nil, nil)
+        }
+    }
+    
+    // mnemonic > crypto-seed
+    static func entropyToUr(data: Data) -> String? {
+        let wrapper:CBOR = .map([
+            .unsignedInt(1) : .byteString(data.bytes),
+        ])
+        let cbor = Data(wrapper.cborEncode())
+        do {
+            let rawUr = try UR(type: "crypto-seed", cbor: cbor)
+            return UREncoder.encode(rawUr)
+        } catch {
+            return nil
+        }
+    }
 
     static func psbtUr(_ data: Data) -> UR? {
         let cbor = CBOR.encodeByteString(data.bytes).data//CBOR.byteString(data.bytes).encode(<#_#>).data

@@ -82,6 +82,10 @@ class KeysetsViewController: UIViewController, UITableViewDelegate, UITableViewD
             }
             
             promptToAddCosigner(cosigner)
+        } else if text.lowercased().contains("ur:crypto-seed") {
+            guard let mnemonic = URHelper.cryptoSeedToMnemonic(cryptoSeed: text.lowercased()) else { return }
+            self.providedMnemonic = mnemonic
+            self.addSeedWords()
         } else if text.contains("48h/\(Keys.coinType)h/0h/2h") || text.contains("48'/\(Keys.coinType)'/0'/2'") {
             self.addCosigner(text.condenseWhitespace())
         } else if Keys.validMnemonicString(processedCharacters(text)) {
@@ -589,6 +593,10 @@ class KeysetsViewController: UIViewController, UITableViewDelegate, UITableViewD
                     self.addCosigner(account)
                 } else if result.contains("48h/\(Keys.coinType)h/0h/2h") || result.contains("48'/\(Keys.coinType)'/0'/2'") {
                     self.addCosigner(result)
+                } else if result.lowercased().contains("ur:crypto-seed") {
+                    guard let mnemonic = URHelper.cryptoSeedToMnemonic(cryptoSeed: result.lowercased()) else { return }
+                    self.providedMnemonic = mnemonic
+                    self.addSeedWords()
                 } else if Keys.validMnemonicString(processedCharacters(result)) {
                     self.providedMnemonic = processedCharacters(result)
                     self.addSeedWords()

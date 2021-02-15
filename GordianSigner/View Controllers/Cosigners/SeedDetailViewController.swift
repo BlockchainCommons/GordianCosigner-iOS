@@ -112,6 +112,16 @@ class SeedDetailViewController: UIViewController, UITextFieldDelegate, UITextVie
                     self.xprvLabel.text = self.privCosigner
                 }
             }
+            
+            if let words = cosigner.words {
+                guard let decryptedWords = Encryption.decrypt(words), let cryptoSeed = URHelper.mnemonicToCryptoSeed(decryptedWords.utf8) else { return }
+                            
+                DispatchQueue.main.async { [weak self] in
+                    guard let self = self else { return }
+                    
+                    self.mnemonicLabel.text = cryptoSeed
+                }
+            }
         } else {
             DispatchQueue.main.async { [weak self] in
                 guard let self = self else { return }
@@ -129,6 +139,16 @@ class SeedDetailViewController: UIViewController, UITextFieldDelegate, UITextVie
                     self.privCosigner = self.cosigner.bip48SegwitAccount!.replacingOccurrences(of: self.descStruct.accountXpub, with: decryptedXprv.utf8)
                     
                     self.xprvLabel.text = decryptedXprv.utf8
+                }
+            }
+            
+            if let words = cosigner.words {
+                guard let decryptedWords = Encryption.decrypt(words) else { return }
+                            
+                DispatchQueue.main.async { [weak self] in
+                    guard let self = self else { return }
+                    
+                    self.mnemonicLabel.text = decryptedWords.utf8
                 }
             }
         }
@@ -314,12 +334,12 @@ class SeedDetailViewController: UIViewController, UITextFieldDelegate, UITextVie
         memoView.text = cosigner.memo ?? "tap to add a memo"
         
         if let words = cosigner.words {
-            guard let decryptedWords = Encryption.decrypt(words) else { return }
-            
+            guard let decryptedWords = Encryption.decrypt(words), let cryptoSeed = URHelper.mnemonicToCryptoSeed(decryptedWords.utf8) else { return }
+                        
             DispatchQueue.main.async { [weak self] in
                 guard let self = self else { return }
                 
-                self.mnemonicLabel.text = decryptedWords.utf8
+                self.mnemonicLabel.text = cryptoSeed
             }
         } else {
             self.mnemonicCopy.alpha = 0
