@@ -31,6 +31,14 @@ class KeysetsViewController: UIViewController, UITableViewDelegate, UITableViewD
         keysetsTable.delegate = self
         keysetsTable.dataSource = self
         
+        if UserDefaults.standard.object(forKey: "hasUpdated") == nil {
+            KeyChain.removeAll()
+            CoreDataService.deleteAllData(entity: .account) { (_) in }
+            CoreDataService.deleteAllData(entity: .cosigner) { (_) in }
+            CoreDataService.deleteAllData(entity: .payment) { (_) in }
+            UserDefaults.standard.setValue(true, forKey: "hasUpdated")
+        }
+        
         if !FirstTime.firstTimeHere() {
             showAlert(self, "Fatal error", "We were unable to set and save an encryption key to your secure enclave, the app will not function without this key.")
         }
