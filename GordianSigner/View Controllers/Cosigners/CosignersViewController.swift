@@ -39,6 +39,11 @@ class KeysetsViewController: UIViewController, UITableViewDelegate, UITableViewD
         editButton = UIBarButtonItem.init(barButtonSystemItem: .edit, target: self, action: #selector(editCosigners))
         self.navigationItem.setRightBarButtonItems([addButton, editButton], animated: true)
         NotificationCenter.default.addObserver(self, selector: #selector(refreshTable), name: .cosignerAdded, object: nil)
+        
+        if UserDefaults.standard.object(forKey: "coinType") == nil {
+            UserDefaults.standard.setValue("0", forKey: "coinType")
+        }
+        
         load()
     }
     
