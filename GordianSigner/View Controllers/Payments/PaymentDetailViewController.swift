@@ -411,7 +411,11 @@ class PsbtTableViewController: UIViewController, UITableViewDelegate, UITableVie
     }
     
     @IBAction func signAction(_ sender: Any) {
+        #if DEBUG
+        sign()
+        #else
         showAuth()
+        #endif
     }
     
     @IBAction func exportAction(_ sender: Any) {
