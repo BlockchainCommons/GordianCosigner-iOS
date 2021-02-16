@@ -4,7 +4,7 @@
 
 ![](images/logos/gordian-signer-screen.jpg)
 
-**Gordian Cosigner** allows users to participate in a multisig by adding a signature to an otherwise unsigned or partially signed PSBT that was created on another device. It's largely intended as an offline signing tool, which allows signing without a direct connection to a full node: a real wallet is need to initiate a transaction.
+**Gordian Cosigner** allows users to participate in a multisig by adding a signature to an otherwise unsigned or partially signed PSBT that was created on another device. It's largely intended as an offline signing tool, which allows signing without a direct connection to a full node: a wallet that can create PSBTs or another transaction coordinator service is needed to initiate a transaction.
 
 (Gordian Cosigner can also be used for signing a single-signature PSBT, though that's not its main purpose.)
 
@@ -31,7 +31,7 @@ At current, this Catalyst repo is only used for our iOS release, but we hope to 
 
 ## Usage Instructions
 
-**Gordian Cosigner** supports the middle step of multisig signing, after a multisig has been Initiated, while it is being Cosigned, and before it is Finalized. Usually, it will be used by a cosigner holding one of the keys for a multisignature before handing it back to another user for finalization.
+**Gordian Cosigner** supports the middle step of multisig signing, after a multisig has been Initiated, while it is being Cosigned, and before it is Finalized. Usually, it will be used by a cosigner holding oone of the keys used in a multisig account transaction before handing it back to another user for finalization.
 
 ### Preparing for Usage
 
@@ -39,13 +39,13 @@ To prepare **Gordian Cosigner** for usage, you must first create a copy of the m
 
 To prepare an account for usage:
 
-1. **Gather Cosigners.** Create or import all cosigners who will be involved in the multisig account in the **Cosigners** tab.
-   * To create a cosigner, select "Create". Afterward, be sure to record offline backups of your cosigner's QR codes and text, especially the seed info (if any).
-      * _This feature is primarily intended for testing and may be removed in a future version of **Gordian Cosigner**._
+1. **Gather Cosigners.** Import all cosigners who will be involved in the multisig account in the **Cosigners** tab.
    * To import a cosigner, select "Import" and paste in origin info, `crypto-account`, `crypto-hdkey`, `crypto-seed`, or BIP39 words, or else scan a QR code.
-2. **Form Account.** Create or import an account from the **Accounts** tab. 
-   * To create an account, select "Create", set a policy and then select which cosigners you would like to add to the account. Once a sufficient number of cosigners have been added to the account, it will automatically complete.
+      * _You will typically import public-key information for other signers, and you may import private-key information for your own signatures._
+   * There is currently a "Create Cosigner" function available mainly for testing that allows you to create seeds on the device itself. To create a cosigner, select "Create". Afterward, be sure to record offline backups of your cosigner's QR codes and text, especially the seed info (if any).
+2. **Form Account.** Import an account from the **Accounts** tab. 
    * To import an account, select "Import" and scan an "Account Map" (wallet backup QR) from Gordian Wallet, Fully Noded, or Specter. 
+   * There is currently a "Create Cosigner" function available mainly for testing that allows you to create new maps on the device itself. To create an account, select "Create", set a policy and then select which cosigners you would like to add to the account. Once a sufficient number of cosigners have been added to the account, it will automatically complete.
 3. **Check Address.** Tap the detail button, then the **address explorer** button on the **Accounts** tab to see each address for the account; cross-check the first several "Receive" addresses with your other wallet software to ensure they match.
 
 ### Signing Multisigs
