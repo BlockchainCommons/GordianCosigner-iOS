@@ -4,7 +4,9 @@
 
 ![](images/logos/gordian-signer-screen.jpg)
 
-**Gordian Cosigner** allows users to participate in a multisig by adding a signature to an otherwise unsigned or partially signed PSBT, where they may or may not have initiated the transaction. It can also be used for signing a single-signature PSBT. It's largely intended as an offline signing tool, which allows signing without the usage of a full node: a real wallet is need to both initiate an account map and to initiate a transaction.
+**Gordian Cosigner** allows users to participate in a multisig by adding a signature to an otherwise unsigned or partially signed PSBT that was created on another device. It's largely intended as an offline signing tool, which allows signing without a direct connection to a full node: a real wallet is need to initiate a transaction.
+
+(Gordian Cosigner can also be used for signing a single-signature PSBT, though that's not its main purpose.)
 
 ## Additional Information
 
@@ -23,20 +25,35 @@ GordianCosigner-Catalyst is currently a late alpha. It should not be used for pr
 
 At current, this Catalyst repo is only used for our iOS release, but we hope to eventually use it for the MacOS release as well. (A security lock on the MacOS camera currently prevents us from doing so.)
 
-## Installation
+## Installation Instructions
 
 **Gordian Cosigner** is available for testing from Testflight [here](https://testflight.apple.com/join/sJTaoUsM).
 
-## Usage
+## Usage Instructions
 
-To use **Gordian Cosigner**, you should:
+**Gordian Cosigner** supports the middle step of multisig signing, after a multisig has been Initiated, while it is being Cosigned, and before it is Finalized. Usually, it will be used by a cosigner holding one of the keys for a multisignature before handing it back to another user for finalization.
 
-1. Create or import a cosigner from the **cosigner** tab.
-2. Record offline backups of your cosigners QR codes and text, especially the seed info (if any).
-3. Create or import an account from the **account** tab. To import an account users may scan or paste in an "Account Map" (wallet backup QR) from Gordian Wallet, Fully Noded and Specter. To create an account simply choose the policy and then select which cosigners you would like to add to the account, once sufficient number of cosigners have been added to the account it will automatically complete.
-4. From the **account** tab tap the detail button, then the **address explorer** button to see each address for the account, cross check these addresses with your other wallet software to ensure they match.
-5. Create a psbt with a network connected wallet using the same **account** and pass that psbt to Gordian Cosigner in the **payments** tab.
-6. Sign the psbt (ensuring you have added the necessary cosigner), export either the incomplete psbt to another signer or the finalized hex raw transaction for broadcasting.
+### Preparing for Usage
+
+To prepare **Gordian Cosigner** for usage, you must first create a copy of the multisig that is being used. This is done by defining an account containing all of the cosigners in the multisig. The user of **Gordian Cosigner** will typically have a private key or seed for his own cosigner element, and then will typically be given xpubs or QR codes for other users' cosigner elements. When he combines these into an account, it should match the multisig created by other people on their own wallets. (See our [Scenarios page](Docs/Scenarios.md) for more discussion of how **Gordian Cosigner** might be used.)
+
+To prepare an account for usage:
+
+1. **Gather Cosigners.** Create or import all cosigners who will be involved in the multisig account in the **Cosigners** tab.
+   * To create a cosigner, select "Create". Afterward, be sure to record offline backups of your cosigner's QR codes and text, especially the seed info (if any).
+      * _This feature is primarily intended for testing and may be removed in a future version of **Gordian Cosigner**._
+   * To import a cosigner, select "Import" and paste in origin info, `crypto-account`, `crypto-hdkey`, `crypto-seed`, or BIP39 words, or else scan a QR code.
+2. **Form Account.** Create or import an account from the **Accounts** tab. 
+   * To create an account, select "Create", set a policy and then select which cosigners you would like to add to the account. Once a sufficient number of cosigners have been added to the account, it will automatically complete.
+   * To import an account, select "Import" and scan an "Account Map" (wallet backup QR) from Gordian Wallet, Fully Noded, or Specter. 
+3. **Check Address.** Tap the detail button, then the **address explorer** button on the **Accounts** tab to see each address for the account; cross-check the first several "Receive" addresses with your other wallet software to ensure they match.
+
+### Signing Multisigs
+
+To use **Gordian Cosigner** for cosigning for multisig addresses, you must import a PSBT, sign, and then export it.
+
+1. Create a psbt with a network connected wallet using the same **account** and pass that psbt to Gordian Cosigner in the **payments** tab.
+2. Sign the psbt (ensuring you have added the necessary cosigner), export either the incomplete psbt to another signer or the finalized hex raw transaction for broadcasting.
 
 ## Backup & Recovery
 
