@@ -16,7 +16,8 @@ class AccountMapsViewController: UIViewController, UITableViewDelegate, UITableV
     var accounts = [[String:Any]]()
     let descriptorParser = DescriptorParser()
     var mapToExport = [String:Any]()
-    var addressesAm:AccountStruct!
+    var accountToView:AccountStruct!
+    private var coinType = "0"
     
     @IBOutlet weak var accountMapTable: UITableView!
     
@@ -32,6 +33,7 @@ class AccountMapsViewController: UIViewController, UITableViewDelegate, UITableV
     }
     
     override func viewDidAppear(_ animated: Bool) {
+        coinType = UserDefaults.standard.object(forKey: "coinType") as? String ?? "0"
         load()
         if UserDefaults.standard.object(forKey: "seenAccountInfo") == nil {
             showInfo()
@@ -138,44 +140,23 @@ class AccountMapsViewController: UIViewController, UITableViewDelegate, UITableV
         let script = cell.viewWithTag(3) as! UILabel
         script.text = descriptorStruct.format
         
-        let participantsLabel = cell.viewWithTag(4) as! UILabel
-        if let participants = accounts[indexPath.section]["participants"] as? String {
-            participantsLabel.text = participants
-        } else {
-            participantsLabel.text = ""
-        }
-        
         let completeLabel = cell.viewWithTag(12) as! UILabel
         let addButton = cell.viewWithTag(14) as! UIButton
         addButton.addTarget(self, action: #selector(addCosigner(_:)), for: .touchUpInside)
         addButton.restorationIdentifier = "\(indexPath.section)"
         
-        let addressesButton = cell.viewWithTag(15) as! UIButton
-        addressesButton.addTarget(self, action: #selector(seeAddresses(_:)), for: .touchUpInside)
-        addressesButton.restorationIdentifier = "\(indexPath.section)"
-        
-        let editButton = cell.viewWithTag(9) as! UIButton
-        editButton.addTarget(self, action: #selector(editLabel(_:)), for: .touchUpInside)
-        editButton.restorationIdentifier = "\(indexPath.section)"
-        
-        let exportButton = cell.viewWithTag(10) as! UIButton
-        exportButton.clipsToBounds = true
-        exportButton.layer.cornerRadius = 8
-        exportButton.restorationIdentifier = "\(indexPath.section)"
-        exportButton.addTarget(self, action: #selector(exportQr(_:)), for: .touchUpInside)
+        let seeDetail = cell.viewWithTag(15) as! UIButton
+        seeDetail.addTarget(self, action: #selector(seeDetail(_:)), for: .touchUpInside)
+        seeDetail.restorationIdentifier = "\(indexPath.section)"
         
         if account.descriptor.contains("keyset") {
             completeLabel.text = "⚠️ Account incomplete!"
             addButton.alpha = 1
-            addressesButton.alpha = 0
-            editButton.alpha = 0
-            exportButton.alpha = 0
+            seeDetail.alpha = 0
         } else {
-            editButton.alpha = 1
-            exportButton.alpha = 1
             completeLabel.text = ""
             addButton.alpha = 0
-            addressesButton.alpha = 1
+            seeDetail.alpha = 1
         }
         
         let date = cell.viewWithTag(11) as! UILabel
@@ -184,7 +165,7 @@ class AccountMapsViewController: UIViewController, UITableViewDelegate, UITableV
         let lifehash = cell.viewWithTag(13) as! LifehashSeedView
         lifehash.background.backgroundColor = cell.backgroundColor
         lifehash.backgroundColor = cell.backgroundColor
-        
+
         if let lifehashData = account.lifehash {
             lifehash.lifehashImage.image = UIImage(data: lifehashData)
             lifehash.iconImage.image = UIImage(systemName: "person.2.square.stack")
@@ -218,33 +199,34 @@ class AccountMapsViewController: UIViewController, UITableViewDelegate, UITableV
     
     func tableView(_ tableView: UITableView, heightForRowAt indexPath: IndexPath) -> CGFloat {
         if accounts.count > 0 {
-            var height = 211
-            let account = accounts[indexPath.section]["account"] as! AccountStruct
-            let descParser = DescriptorParser()
-            let descStruct = descParser.descriptor(account.descriptor)
-            let hack = descStruct.mOfNType.replacingOccurrences(of: " of ", with: "*")
-            let arr = hack.split(separator: "*")
-            if arr.count > 0 {
-                if let numberOfCosigners = Int("\(arr[1])") {
-                    height += (numberOfCosigners * 10)
-                }
-            }
-            return CGFloat(height)
+            return 152
         } else {
             return 44
         }
     }
     
-    @objc func seeAddresses(_ sender: UIButton) {
+    @objc func seeDetail(_ sender: UIButton) {
         guard let sectionString = sender.restorationIdentifier, let int = Int(sectionString) else { return }
         
-        let am = accounts[int]["account"] as! AccountStruct
+        accountToView = (accounts[int]["account"] as! AccountStruct)
         
-        DispatchQueue.main.async {
-            self.addressesAm = am
-            self.performSegue(withIdentifier: "segueToAddresses", sender: self)
+        DispatchQueue.main.async { [weak self] in
+            guard let self = self else { return }
+            
+            self.performSegue(withIdentifier: "segueToAccountDetail", sender: self)
         }
     }
+    
+//    @objc func seeAddresses(_ sender: UIButton) {
+//        guard let sectionString = sender.restorationIdentifier, let int = Int(sectionString) else { return }
+//
+//        let am = accounts[int]["account"] as! AccountStruct
+//
+//        DispatchQueue.main.async {
+//            self.addressesAm = am
+//            self.performSegue(withIdentifier: "segueToAddresses", sender: self)
+//        }
+//    }
     
     @objc func addCosigner(_ sender: UIButton) {
         guard let sectionString = sender.restorationIdentifier, let int = Int(sectionString) else { return }
@@ -302,8 +284,8 @@ class AccountMapsViewController: UIViewController, UITableViewDelegate, UITableV
         
         for keyWithPath in descStruct.keysWithPath {
             
-            guard keyWithPath.contains("/48h/\(Keys.coinType)h/0h/2h") || keyWithPath.contains("/48'/\(Keys.coinType)'/0'/2'") else {
-                showAlert(self, "Unsupported key origin", "Gordian Cosigner currently only supports the m/48'/\(Keys.coinType)'/0'/2' origin.")
+            guard keyWithPath.contains("/48h/\(coinType)h/0h/2h") || keyWithPath.contains("/48'/\(coinType)'/0'/2'") else {
+                showAlert(self, "Unsupported key origin", "Gordian Cosigner currently only supports the m/48'/\(coinType)'/0'/2' origin, you can toggle on mainnet/testnet in settings to switch between the supported derivation paths.")
                 return nil
             }
             
@@ -624,7 +606,7 @@ class AccountMapsViewController: UIViewController, UITableViewDelegate, UITableV
             let ds = dp.descriptor(hack)
             let bip48SegwitAccount = fullKey.replacingOccurrences(of: "/0/*", with: "")
             
-            guard let lifeHash = LifeHash.hash(ds.accountXpub) else {
+            guard let ur = URHelper.cosignerToUr(bip48SegwitAccount, false), let lifehash = URHelper.fingerprint(ur) else {
                 showAlert(self, "", "Error deriving Cosigner lifehash.")
                 return
             }
@@ -637,7 +619,7 @@ class AccountMapsViewController: UIViewController, UITableViewDelegate, UITableV
             cosignerToSave["fingerprint"] = ds.fingerprint
             cosignerToSave["sharedWith"] = accountId
             cosignerToSave["dateShared"] = Date()
-            cosignerToSave["lifehash"] = lifeHash
+            cosignerToSave["lifehash"] = lifehash
             
             // First fetch all existing cosigners to ensure we do not save duplicates
             CoreDataService.retrieveEntity(entityName: .cosigner) { (cosigners, errorDescription) in
@@ -718,10 +700,10 @@ class AccountMapsViewController: UIViewController, UITableViewDelegate, UITableV
             vc.isPsbt = false
             vc.text = mapToExport.json() ?? ""
             
-        case "segueToAddresses":
-            guard let vc = segue.destination as? AddressesViewController else { fallthrough }
+        case "segueToAccountDetail":
+            guard let vc = segue.destination as? AccountDetailViewController else { fallthrough }
             
-            vc.account = self.addressesAm
+            vc.account = self.accountToView
             
         case "createAccountMap":
             guard let vc = segue.destination as? CreateAccountMapViewController else { fallthrough }

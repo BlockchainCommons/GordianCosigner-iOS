@@ -8,26 +8,150 @@
 
 import UIKit
 
-class SeedDetailViewController: UIViewController, UITextFieldDelegate {
+class SeedDetailViewController: UIViewController, UITextFieldDelegate, UITextViewDelegate {
     
     var cosigner:CosignerStruct!
     private var qrText = ""
     private var qrDescription = ""
+    let dp = DescriptorParser()
+    var desc = ""
+    var descStruct:Descriptor!
+    private var privCosigner = ""
+    private var pubCosigner = ""
     
     @IBOutlet weak var mnemonicLabel: UILabel!
     @IBOutlet weak var coSignerLabel: UILabel!
     @IBOutlet weak var xprvLabel: UILabel!
     @IBOutlet weak var labelField: UITextField!
-    @IBOutlet weak var lifehashImageView: UIImageView!
+    @IBOutlet weak var formatSwitch: UISegmentedControl!
+    @IBOutlet weak var originLabel: UILabel!
+    @IBOutlet weak var lifehashView: LifehashSeedView!
+    private var memoEditing = false
+    
+    @IBOutlet weak var privKeyHeader: UILabel!
+    @IBOutlet weak var privKeyDelete: UIButton!
+    @IBOutlet weak var privKeyShare: UIButton!
+    @IBOutlet weak var privKeyQr: UIButton!
+    @IBOutlet weak var privKeyCopy: UIButton!
+    @IBOutlet weak var mnemonicHeader: UILabel!
+    @IBOutlet weak var mnemonicDelete: UIButton!
+    @IBOutlet weak var mnemonicExport: UIButton!
+    @IBOutlet weak var mnemonicQr: UIButton!
+    @IBOutlet weak var mnemonicCopy: UIButton!
+    @IBOutlet weak var memoView: UITextView!
     
     override func viewDidLoad() {
         super.viewDidLoad()
 
         // Do any additional setup after loading the view.
         labelField.delegate = self
+        memoView.delegate = self
         labelField.returnKeyType = .done
         configureTapGesture()
+        memoView.clipsToBounds = true
+        memoView.layer.cornerRadius = 8
+        memoView.layer.borderWidth = 0.5
+        memoView.layer.borderColor = UIColor.lightGray.cgColor
+        desc = "wsh(" + cosigner.bip48SegwitAccount! + "/0/*)"
+        descStruct = dp.descriptor(desc)
+        NotificationCenter.default.addObserver(self, selector: #selector(keyboardWillShow), name: UIResponder.keyboardWillShowNotification, object: nil)
+        NotificationCenter.default.addObserver(self, selector: #selector(keyboardWillHide), name: UIResponder.keyboardWillHideNotification, object: nil)
         load()
+    }
+    
+    func textViewShouldBeginEditing(_ textView: UITextView) -> Bool {
+        memoEditing = true
+        return true
+    }
+    
+    func textViewDidEndEditing(_ textView: UITextView) {
+        memoEditing = false
+    }
+    
+    @objc func keyboardWillShow(notification: NSNotification) {
+        if memoEditing {
+            if let keyboardSize = (notification.userInfo?[UIResponder.keyboardFrameBeginUserInfoKey] as? NSValue)?.cgRectValue {
+                if self.view.frame.origin.y == 0 {
+                    self.view.frame.origin.y -= keyboardSize.height
+                }
+            }
+        }
+    }
+    
+    @objc func keyboardWillHide(notification: NSNotification) {
+        if memoEditing {
+            if self.view.frame.origin.y != 0 {
+                self.view.frame.origin.y = 0
+            }
+        }
+    }
+    
+    override func viewWillDisappear(_ animated: Bool) {
+        CoreDataService.updateEntity(id: cosigner.id, keyToUpdate: "memo", newValue: memoView.text ?? "", entityName: .cosigner) { (success, errorDescription) in
+            guard success else {
+                showAlert(self, "", "There was an error saving the Cosigner memo")
+                return
+            }
+        }
+    }
+    
+    @IBAction func didSwitchFormat(_ sender: Any) {
+        if formatSwitch.selectedSegmentIndex == 0 {
+            DispatchQueue.main.async { [weak self] in
+                guard let self = self else { return }
+                
+                self.pubCosigner = URHelper.cosignerToUr(self.cosigner.bip48SegwitAccount ?? "", false) ?? ""
+                self.coSignerLabel.text = self.pubCosigner
+            }
+            
+            if cosigner.xprv != nil {
+                DispatchQueue.main.async { [weak self] in
+                    guard let self = self else { return }
+                    
+                    self.privCosigner = URHelper.cosignerToUr(self.privCosigner, true) ?? ""
+                    self.xprvLabel.text = self.privCosigner
+                }
+            }
+            
+            if let words = cosigner.words {
+                guard let decryptedWords = Encryption.decrypt(words), let cryptoSeed = URHelper.mnemonicToCryptoSeed(decryptedWords.utf8) else { return }
+                            
+                DispatchQueue.main.async { [weak self] in
+                    guard let self = self else { return }
+                    
+                    self.mnemonicLabel.text = cryptoSeed
+                }
+            }
+        } else {
+            DispatchQueue.main.async { [weak self] in
+                guard let self = self else { return }
+                
+                self.coSignerLabel.text = self.descStruct.accountXpub
+                self.pubCosigner = "[\(self.descStruct.fingerprint)/48h/\(Keys.coinType)h/0h/2h]\(self.descStruct.accountXpub)"
+            }
+            
+            if let xprv = cosigner.xprv {
+                guard let decryptedXprv = Encryption.decrypt(xprv) else { return }
+                
+                DispatchQueue.main.async { [weak self] in
+                    guard let self = self else { return }
+                    
+                    self.privCosigner = self.cosigner.bip48SegwitAccount!.replacingOccurrences(of: self.descStruct.accountXpub, with: decryptedXprv.utf8)
+                    
+                    self.xprvLabel.text = decryptedXprv.utf8
+                }
+            }
+            
+            if let words = cosigner.words {
+                guard let decryptedWords = Encryption.decrypt(words) else { return }
+                            
+                DispatchQueue.main.async { [weak self] in
+                    guard let self = self else { return }
+                    
+                    self.mnemonicLabel.text = decryptedWords.utf8
+                }
+            }
+        }
     }
     
     private func reloadCosigner() {
@@ -125,16 +249,15 @@ class SeedDetailViewController: UIViewController, UITextFieldDelegate {
     
     @IBAction func showQrXprv(_ sender: Any) {
         if cosigner.xprv != nil {
-            qrText = xprvLabel.text ?? ""
-            qrDescription = xprvLabel.text ?? ""
+            qrText = privCosigner
+            qrDescription = privCosigner
             goToQr()
         }
     }
     
     @IBAction func copyXprv(_ sender: Any) {
         if cosigner.xprv != nil {
-            UIPasteboard.general.string = xprvLabel.text ?? ""
-            
+            UIPasteboard.general.string = self.privCosigner
             showAlert(self, "", "Copied ✓")
         }
     }
@@ -147,6 +270,7 @@ class SeedDetailViewController: UIViewController, UITextFieldDelegate {
     
     @objc func dismissKeyboard (_ sender: UITapGestureRecognizer) {
         labelField.resignFirstResponder()
+        memoView.resignFirstResponder()
     }
     
     @IBAction func copyMnemonicAction(_ sender: Any) {
@@ -156,18 +280,17 @@ class SeedDetailViewController: UIViewController, UITextFieldDelegate {
     }
     
     @IBAction func copyCosignerAction(_ sender: Any) {
-        UIPasteboard.general.string = cosigner.bip48SegwitAccount
-        
+        UIPasteboard.general.string = pubCosigner
         showAlert(self, "", "Copied ✓")
     }
     
     @IBAction func exportCosigner(_ sender: Any) {
-        share(cosigner.bip48SegwitAccount ?? "")
+        share(pubCosigner)
     }
     
-    @IBAction func showCosignerQr(_ sender: Any) {
-        qrText = cosigner.bip48SegwitAccount ?? ""
-        qrDescription = cosigner.bip48SegwitAccount ?? ""
+    @IBAction func showCosignerQr(_ sender: Any) {        
+        qrText = self.pubCosigner
+        qrDescription = self.pubCosigner
         goToQr()
     }
     
@@ -208,16 +331,32 @@ class SeedDetailViewController: UIViewController, UITextFieldDelegate {
     }
     
     private func load() {
+        memoView.text = cosigner.memo ?? "tap to add a memo"
+        
         if let words = cosigner.words {
-            guard let decryptedWords = Encryption.decrypt(words) else { return }
-            
+            guard let decryptedWords = Encryption.decrypt(words), let cryptoSeed = URHelper.mnemonicToCryptoSeed(decryptedWords.utf8) else { return }
+                        
             DispatchQueue.main.async { [weak self] in
                 guard let self = self else { return }
                 
-                self.mnemonicLabel.text = decryptedWords.utf8
+                self.mnemonicLabel.text = cryptoSeed
             }
         } else {
-            self.mnemonicLabel.text = "No mnemonic on device"
+            self.mnemonicCopy.alpha = 0
+            self.mnemonicQr.alpha = 0
+            self.mnemonicExport.alpha = 0
+            self.mnemonicDelete.alpha = 0
+            self.mnemonicHeader.alpha = 0
+            self.mnemonicLabel.text = ""
+        }
+
+        labelField.text = cosigner.label
+                
+        DispatchQueue.main.async { [weak self] in
+            guard let self = self else { return }
+            
+            self.pubCosigner = URHelper.cosignerToUr(self.cosigner.bip48SegwitAccount ?? "", false) ?? ""
+            self.coSignerLabel.text = self.pubCosigner
         }
         
         if let xprv = cosigner.xprv {
@@ -226,31 +365,23 @@ class SeedDetailViewController: UIViewController, UITextFieldDelegate {
             DispatchQueue.main.async { [weak self] in
                 guard let self = self else { return }
                 
-                self.xprvLabel.text = decryptedXprv.utf8
+                self.privCosigner = URHelper.cosignerToUr("[\(self.descStruct.fingerprint)/48h/\(Keys.coinType)h/0h/2h]\(decryptedXprv.utf8)", true) ?? ""//
+                self.xprvLabel.text = self.privCosigner
             }
         } else {
-            self.xprvLabel.text = "No xprv on device"
-        }
-
-        labelField.text = cosigner.label
-                
-        guard let cosigner = cosigner.bip48SegwitAccount else {
-            DispatchQueue.main.async { [weak self] in
-                guard let self = self else { return }
-
-                self.coSignerLabel.text = ""
-            }
-            return
+            self.privKeyHeader.alpha = 0
+            self.privKeyDelete.alpha = 0
+            self.privKeyShare.alpha = 0
+            self.privKeyCopy.alpha = 0
+            self.privKeyQr.alpha = 0
+            self.xprvLabel.text = ""
         }
         
-        DispatchQueue.main.async { [weak self] in
-            guard let self = self else { return }
-
-            self.coSignerLabel.text = cosigner
-        }
+        lifehashView.lifehashImage.image = LifeHash.image(cosigner.lifehash) ?? UIImage()
+        lifehashView.iconLabel.text = ""
         
-        lifehashImageView.layer.magnificationFilter = .nearest
-        lifehashImageView.image = UIImage(data: self.cosigner.lifehash)
+        
+        originLabel.text = "\(descStruct.fingerprint)/48h/\(Keys.coinType)h/0h/2h"
     }
     
     func textFieldShouldReturn(_ textField: UITextField) -> Bool {
@@ -263,6 +394,21 @@ class SeedDetailViewController: UIViewController, UITextFieldDelegate {
         
         CoreDataService.updateEntity(id: cosigner.id, keyToUpdate: "label", newValue: newLabel, entityName: .cosigner) { (success, errorDescription) in
             guard success else { showAlert(self, "", "Label not updated!"); return }
+            
+            CoreDataService.retrieveEntity(entityName: .cosigner) { [weak self] (cosigners, errorDescription) in
+                guard let self = self else { return }
+                
+                guard let cosigners = cosigners, cosigners.count > 0 else { return }
+                
+                for cosigner in cosigners {
+                    let cosignerStruct = CosignerStruct(dictionary: cosigner)
+                    
+                    if cosignerStruct.id == self.cosigner.id {
+                        self.cosigner = cosignerStruct
+                        self.load()
+                    }
+                }
+            }
         }
         
         reloadCosigners()

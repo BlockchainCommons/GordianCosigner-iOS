@@ -81,15 +81,15 @@ class QRScannerViewController: UIViewController {
         
         configureImagePicker()
         
-        #if targetEnvironment(macCatalyst)
-        chooseQRCodeFromLibrary()
-        
-        #else
+//        #if targetEnvironment(macCatalyst)
+//        chooseQRCodeFromLibrary()
+//
+//        #else
         configureUploadButton()
         configureTorchButton()
         configureCloseButton()
         configureDownSwipe()
-        #endif
+        //#endif
     }
     
     func addScannerButtons() {
@@ -157,18 +157,30 @@ class QRScannerViewController: UIViewController {
         return true
     }
     
+    private func isCryptoSeed(_ text: String) -> Bool {
+        return text.lowercased().hasPrefix("ur:crypto-seed")
+    }
+    
     private func isCryptoAccount(_ text: String) -> Bool {
         return text.lowercased().hasPrefix("ur:crypto-account")
     }
     
-    private func isKeyset(_ text: String) -> Bool {
+    private func isCosigner(_ text: String) -> Bool {
         return text.contains("48h/\(Keys.coinType)h/0h/2h")
+    }
+    
+    private func isCryptoHDKey(_ text: String) -> Bool {
+        return text.lowercased().hasPrefix("ur:crypto-hdkey")
+    }
+    
+    private func isMnemonic(_ text: String) -> Bool {
+        return Keys.validMnemonicString(processedCharacters(text))
     }
     
     private func process(text: String) {
         isRunning = true
         
-        if !isAccountMap(text) && !isCryptoAccount(text) && !isKeyset(text) {
+        if !isAccountMap(text) && !isCryptoAccount(text) && !isCosigner(text) && !isCryptoHDKey(text) && !isMnemonic(text) && !isCryptoSeed(text) {
             //keepRunning = true
             // Stop if we're already done with the decode.
             guard decoder.result == nil else {

@@ -7,6 +7,9 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		0A0D3A7125D4F4C600E86F70 /* AuthViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0A0D3A7025D4F4C600E86F70 /* AuthViewController.swift */; };
+		0AAAB4B125D2693E00C77B52 /* SettingsViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0AAAB4B025D2693E00C77B52 /* SettingsViewController.swift */; };
+		0AF6442325D4DB91003E619E /* CloudKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 0AF6442225D4DB91003E619E /* CloudKit.framework */; };
 		D00F498D258B2ACD00941DBA /* accounts.png in Resources */ = {isa = PBXBuildFile; fileRef = D00F498C258B2ACD00941DBA /* accounts.png */; };
 		D00F498F258B2AFE00941DBA /* seeds.png in Resources */ = {isa = PBXBuildFile; fileRef = D00F498E258B2AFD00941DBA /* seeds.png */; };
 		D00F4991258B2B6D00941DBA /* cosigners.png in Resources */ = {isa = PBXBuildFile; fileRef = D00F4990258B2B6D00941DBA /* cosigners.png */; };
@@ -32,6 +35,7 @@
 		D04D4986252C509400D7383E /* QRGenerator.swift in Sources */ = {isa = PBXBuildFile; fileRef = D04D4985252C509400D7383E /* QRGenerator.swift */; };
 		D064BCC6252D5BD700D42D66 /* URKit in Frameworks */ = {isa = PBXBuildFile; productRef = D064BCC5252D5BD700D42D66 /* URKit */; };
 		D064BCC8252D62FD00D42D66 /* URHelper.swift in Sources */ = {isa = PBXBuildFile; fileRef = D064BCC7252D62FD00D42D66 /* URHelper.swift */; };
+		D06D789225B946E000769157 /* AccountDetailViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = D06D789125B946E000769157 /* AccountDetailViewController.swift */; };
 		D06F44572581B86200B42DEB /* AddressesViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = D06F44562581B86200B42DEB /* AddressesViewController.swift */; };
 		D090963B2560FE540098013A /* KeysetStruct.swift in Sources */ = {isa = PBXBuildFile; fileRef = D090963A2560FE540098013A /* KeysetStruct.swift */; };
 		D090963D25610D440098013A /* CosignersViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = D090963C25610D440098013A /* CosignersViewController.swift */; };
@@ -49,6 +53,7 @@
 		D0AD30002591825F00B9CBFC /* LicenseDisclaimerViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = D0AD2FFF2591825F00B9CBFC /* LicenseDisclaimerViewController.swift */; };
 		D0B4DDD725258B25009C8624 /* Bip39Words.swift in Sources */ = {isa = PBXBuildFile; fileRef = D0B4DDD625258B25009C8624 /* Bip39Words.swift */; };
 		D0B4DDD92525AC18009C8624 /* whiteFingerPrint.png in Resources */ = {isa = PBXBuildFile; fileRef = D0B4DDD82525AC18009C8624 /* whiteFingerPrint.png */; };
+		D0B88B0E25BBA67A00EC688E /* LabelMemoViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = D0B88B0D25BBA67A00EC688E /* LabelMemoViewController.swift */; };
 		D0CF1E342522E20C0059C541 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = D0CF1E332522E20C0059C541 /* AppDelegate.swift */; };
 		D0CF1E362522E20C0059C541 /* SceneDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = D0CF1E352522E20C0059C541 /* SceneDelegate.swift */; };
 		D0CF1E3B2522E20C0059C541 /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = D0CF1E392522E20C0059C541 /* Main.storyboard */; };
@@ -98,6 +103,9 @@
 /* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
+		0A0D3A7025D4F4C600E86F70 /* AuthViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AuthViewController.swift; sourceTree = "<group>"; };
+		0AAAB4B025D2693E00C77B52 /* SettingsViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsViewController.swift; sourceTree = "<group>"; };
+		0AF6442225D4DB91003E619E /* CloudKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CloudKit.framework; path = System/Library/Frameworks/CloudKit.framework; sourceTree = SDKROOT; };
 		D00F498C258B2ACD00941DBA /* accounts.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = accounts.png; sourceTree = "<group>"; };
 		D00F498E258B2AFD00941DBA /* seeds.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = seeds.png; sourceTree = "<group>"; };
 		D00F4990258B2B6D00941DBA /* cosigners.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = cosigners.png; sourceTree = "<group>"; };
@@ -123,6 +131,7 @@
 		D04D4983252C4FEF00D7383E /* QRDisplayerViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = QRDisplayerViewController.swift; sourceTree = "<group>"; };
 		D04D4985252C509400D7383E /* QRGenerator.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = QRGenerator.swift; sourceTree = "<group>"; };
 		D064BCC7252D62FD00D42D66 /* URHelper.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = URHelper.swift; sourceTree = "<group>"; };
+		D06D789125B946E000769157 /* AccountDetailViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AccountDetailViewController.swift; sourceTree = "<group>"; };
 		D06F44562581B86200B42DEB /* AddressesViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AddressesViewController.swift; sourceTree = "<group>"; };
 		D090963A2560FE540098013A /* KeysetStruct.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = KeysetStruct.swift; sourceTree = "<group>"; };
 		D090963C25610D440098013A /* CosignersViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CosignersViewController.swift; sourceTree = "<group>"; };
@@ -139,6 +148,7 @@
 		D0AD2FFF2591825F00B9CBFC /* LicenseDisclaimerViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = LicenseDisclaimerViewController.swift; sourceTree = "<group>"; };
 		D0B4DDD625258B25009C8624 /* Bip39Words.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Bip39Words.swift; sourceTree = "<group>"; };
 		D0B4DDD82525AC18009C8624 /* whiteFingerPrint.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = whiteFingerPrint.png; sourceTree = "<group>"; };
+		D0B88B0D25BBA67A00EC688E /* LabelMemoViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LabelMemoViewController.swift; sourceTree = "<group>"; };
 		D0CF1E302522E20C0059C541 /* Gordian Cosigner.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "Gordian Cosigner.app"; sourceTree = BUILT_PRODUCTS_DIR; };
 		D0CF1E332522E20C0059C541 /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
 		D0CF1E352522E20C0059C541 /* SceneDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SceneDelegate.swift; sourceTree = "<group>"; };
@@ -169,6 +179,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				D0974A56255B8E300013DC60 /* LifeHash in Frameworks */,
+				0AF6442325D4DB91003E619E /* CloudKit.framework in Frameworks */,
 				D064BCC6252D5BD700D42D66 /* URKit in Frameworks */,
 				D016AE5D25B0031600A59E93 /* LibWally.xcframework in Frameworks */,
 			);
@@ -218,6 +229,56 @@
 			path = "Lifehash Secondary";
 			sourceTree = "<group>";
 		};
+		D06D789525B946EF00769157 /* Accounts */ = {
+			isa = PBXGroup;
+			children = (
+				D090963E2562564F0098013A /* AccountViewController.swift */,
+				D0E0EA012567A10900F2403C /* CreateAccountViewController.swift */,
+				D06F44562581B86200B42DEB /* AddressesViewController.swift */,
+				D06D789125B946E000769157 /* AccountDetailViewController.swift */,
+			);
+			path = Accounts;
+			sourceTree = "<group>";
+		};
+		D06D789825B9470200769157 /* Payments */ = {
+			isa = PBXGroup;
+			children = (
+				D04B029725249EEB00C249B8 /* AddPaymentViewController.swift */,
+				D01C2954255CE33F00C5ED55 /* PaymentDetailViewController.swift */,
+				D01ACBA32563EA8100B5B4E5 /* PaymentsViewController.swift */,
+			);
+			path = Payments;
+			sourceTree = "<group>";
+		};
+		D06D789B25B9471700769157 /* Cosigners */ = {
+			isa = PBXGroup;
+			children = (
+				D04B029B2524A9F800C249B8 /* AddSeedWordsViewController.swift */,
+				D090963C25610D440098013A /* CosignersViewController.swift */,
+				D02E51EF258860C200A479A0 /* SeedDetailViewController.swift */,
+			);
+			path = Cosigners;
+			sourceTree = "<group>";
+		};
+		D06D789E25B9472900769157 /* QRs */ = {
+			isa = PBXGroup;
+			children = (
+				D04D497F252C19E000D7383E /* QRScannerViewController.swift */,
+				D04D4983252C4FEF00D7383E /* QRDisplayerViewController.swift */,
+			);
+			path = QRs;
+			sourceTree = "<group>";
+		};
+		D06D78A125B9473900769157 /* Misc */ = {
+			isa = PBXGroup;
+			children = (
+				D0AD2FFF2591825F00B9CBFC /* LicenseDisclaimerViewController.swift */,
+				D093E2A825A6E4C40038B59A /* InfoViewController.swift */,
+				D0B88B0D25BBA67A00EC688E /* LabelMemoViewController.swift */,
+			);
+			path = Misc;
+			sourceTree = "<group>";
+		};
 		D0974A5F255B99CF0013DC60 /* Structs */ = {
 			isa = PBXGroup;
 			children = (
@@ -233,19 +294,13 @@
 		D0974A60255B9C870013DC60 /* View Controllers */ = {
 			isa = PBXGroup;
 			children = (
-				D0AD2FFF2591825F00B9CBFC /* LicenseDisclaimerViewController.swift */,
-				D04B029725249EEB00C249B8 /* AddPaymentViewController.swift */,
-				D04B029B2524A9F800C249B8 /* AddSeedWordsViewController.swift */,
-				D04D497F252C19E000D7383E /* QRScannerViewController.swift */,
-				D04D4983252C4FEF00D7383E /* QRDisplayerViewController.swift */,
-				D01C2954255CE33F00C5ED55 /* PaymentDetailViewController.swift */,
-				D090963C25610D440098013A /* CosignersViewController.swift */,
-				D090963E2562564F0098013A /* AccountViewController.swift */,
-				D01ACBA32563EA8100B5B4E5 /* PaymentsViewController.swift */,
-				D0E0EA012567A10900F2403C /* CreateAccountViewController.swift */,
-				D06F44562581B86200B42DEB /* AddressesViewController.swift */,
-				D02E51EF258860C200A479A0 /* SeedDetailViewController.swift */,
-				D093E2A825A6E4C40038B59A /* InfoViewController.swift */,
+				D06D78A125B9473900769157 /* Misc */,
+				D06D789825B9470200769157 /* Payments */,
+				D06D789B25B9471700769157 /* Cosigners */,
+				D06D789E25B9472900769157 /* QRs */,
+				D06D789525B946EF00769157 /* Accounts */,
+				0AAAB4B025D2693E00C77B52 /* SettingsViewController.swift */,
+				0A0D3A7025D4F4C600E86F70 /* AuthViewController.swift */,
 			);
 			path = "View Controllers";
 			sourceTree = "<group>";
@@ -325,6 +380,7 @@
 		D0CF1E672522E5DB0059C541 /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
+				0AF6442225D4DB91003E619E /* CloudKit.framework */,
 				D016AE5825B0031300A59E93 /* LibWally.xcframework */,
 			);
 			name = Frameworks;
@@ -505,6 +561,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				0A0D3A7125D4F4C600E86F70 /* AuthViewController.swift in Sources */,
 				D064BCC8252D62FD00D42D66 /* URHelper.swift in Sources */,
 				D0CF1E732523012A0059C541 /* FirstTime.swift in Sources */,
 				D090964325625CED0098013A /* Descriptor.swift in Sources */,
@@ -522,6 +579,7 @@
 				D090963B2560FE540098013A /* KeysetStruct.swift in Sources */,
 				D090963F256256500098013A /* AccountViewController.swift in Sources */,
 				D01ACBA42563EA8100B5B4E5 /* PaymentsViewController.swift in Sources */,
+				D0B88B0E25BBA67A00EC688E /* LabelMemoViewController.swift in Sources */,
 				D04D4984252C4FEF00D7383E /* QRDisplayerViewController.swift in Sources */,
 				D093E2A925A6E4C50038B59A /* InfoViewController.swift in Sources */,
 				D06F44572581B86200B42DEB /* AddressesViewController.swift in Sources */,
@@ -532,10 +590,12 @@
 				D0AD30002591825F00B9CBFC /* LicenseDisclaimerViewController.swift in Sources */,
 				D0CF1E79252360EC0059C541 /* Signer.swift in Sources */,
 				D0CF1E70252300B80059C541 /* Keychain.swift in Sources */,
+				D06D789225B946E000769157 /* AccountDetailViewController.swift in Sources */,
 				D0CF1E75252302A00059C541 /* Encryption.swift in Sources */,
 				D01C2955255CE33F00C5ED55 /* PaymentDetailViewController.swift in Sources */,
 				D04423F325837A8700A25179 /* PaymentHash.swift in Sources */,
 				D04D4986252C509400D7383E /* QRGenerator.swift in Sources */,
+				0AAAB4B125D2693E00C77B52 /* SettingsViewController.swift in Sources */,
 				D0246DD7256B660100F812A5 /* Base58.swift in Sources */,
 				D0974A62255BA1B90013DC60 /* LifeHash.swift in Sources */,
 				D02E51F0258860C200A479A0 /* SeedDetailViewController.swift in Sources */,
@@ -720,7 +780,7 @@
 				CLANG_ENABLE_MODULES = YES;
 				CODE_SIGN_ENTITLEMENTS = GordianSigner/GordianSigner.entitlements;
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 0.1.8;
+				CURRENT_PROJECT_VERSION = 0.2.2;
 				DEVELOPMENT_TEAM = YZHG975W3A;
 				ENABLE_BITCODE = NO;
 				INFOPLIST_FILE = GordianSigner/Info.plist;
@@ -729,7 +789,7 @@
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				MARKETING_VERSION = 0.1.8;
+				MARKETING_VERSION = 0.2.2;
 				PRODUCT_BUNDLE_IDENTIFIER = com.blockchaincommons.GordianSigner;
 				PRODUCT_NAME = "Gordian Cosigner";
 				SUPPORTS_MACCATALYST = YES;
@@ -747,7 +807,7 @@
 				CLANG_ENABLE_MODULES = YES;
 				CODE_SIGN_ENTITLEMENTS = GordianSigner/GordianSigner.entitlements;
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 0.1.8;
+				CURRENT_PROJECT_VERSION = 0.2.2;
 				DEVELOPMENT_TEAM = YZHG975W3A;
 				ENABLE_BITCODE = NO;
 				INFOPLIST_FILE = GordianSigner/Info.plist;
@@ -756,7 +816,7 @@
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				MARKETING_VERSION = 0.1.8;
+				MARKETING_VERSION = 0.2.2;
 				PRODUCT_BUNDLE_IDENTIFIER = com.blockchaincommons.GordianSigner;
 				PRODUCT_NAME = "Gordian Cosigner";
 				SUPPORTS_MACCATALYST = YES;
@@ -905,7 +965,7 @@
 			repositoryURL = "https://github.com/BlockchainCommons/LifeHash";
 			requirement = {
 				kind = upToNextMajorVersion;
-				minimumVersion = 4.2.0;
+				minimumVersion = 6.0.2;
 			};
 		};
 /* End XCRemoteSwiftPackageReference section */

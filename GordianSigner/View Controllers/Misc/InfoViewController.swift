@@ -25,8 +25,8 @@ class InfoViewController: UIViewController {
         // Do any additional setup after loading the view.
         if isAccount {
             setAccount()
-        } else if isSeed {
-            setSeed()
+//        } else if isSeed {
+//            setSeed()
         } else if isCosigner {
             setCosigner()
         } else if isPayment {
@@ -54,31 +54,29 @@ class InfoViewController: UIViewController {
         let text = """
         Accounts are holders of Bitcoin value. An account map describes the account. An account can also generate addresses, where you will receive money.
 
-        To create an account, define the policy of how many cosigners are possible and how many of those signatures are required, and then import cosigners from your cosigners tab (including the seeds from your seeds tab, which you will be using to sign). You can alternatively import an account map using a QR code. When you are done, you can export your account map or your addresses, receive transactions, and make payments on the payments tab.
+        To create an account, define the policy of how many cosigners are possible and how many of those signatures are required, and then import cosigners from your cosigners tab (including the seeds from your seeds tab, which you will be using to sign). You can alternatively import an account map using the QR code from apps like Gordian Wallet, Specter and Fully Noded. When you are done, you can export your account map or your addresses, receive transactions, and make payments on the payments tab.
         """
         
         configureView(icon: UIImage(systemName: "person.2.square.stack")!, blurbText: text, headerLabel: "Accounts")
     }
     
-    private func setSeed() {
-        let text = """
-        Seeds are the foundation of your own signatures. They're the root of HD pubkey pairs; private keys are derived from them to sign payments.
-
-        Enter BIP39 mnemonic phrases for any seeds that you want to sign with (or generate new BIP39 seeds here). When you are done, proceed to the cosigners tab to add the xpubs of any other participants in your multisignature accounts.
-
-        Seeds are always encrypted before being saved.
-        """
-                
-        configureView(icon: UIImage(systemName: "person.crop.circle")!, blurbText: text, headerLabel: "Seeds")
-    }
+//    private func setSeed() {
+//        let text = """
+//        Seeds are the foundation of your own signatures. They're the root of HD pubkey pairs; private keys are derived from them to sign payments.
+//
+//        Enter BIP39 mnemonic phrases for any seeds that you want to sign with (or generate new BIP39 seeds here). When you are done, proceed to the cosigners tab to add the xpubs of any other participants in your multisignature accounts.
+//
+//        Seeds are always encrypted before being saved.
+//        """
+//
+//        configureView(icon: UIImage(systemName: "person.crop.circle")!, blurbText: text, headerLabel: "Seeds")
+//    }
     
     private func setCosigner() {
         let text = """
         Cosigners represent the individuals or devices that can be used to create multisignatures accounts.
 
-        Enter xpubs or QR codes for everyone who will be participating in a multisignature account. When you are done, proceed to the accounts tab to combine seeds and other cosigners into multisignatures.
-
-        Cosigners are automatically derived from seeds, so you only need to add cosigners for seeds not present on this device.
+        Paste xpubs with origin info, crypto-account, crypto-hdkey, crypto-seed, bip39 words or QR codes for everyone who will be participating in a multisignature account. When you are done, proceed to the accounts tab to combine seeds and other cosigners into a multisignature account.
         """
                 
         configureView(icon: UIImage(systemName: "person.2")!, blurbText: text, headerLabel: "Cosigners")

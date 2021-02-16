@@ -21,19 +21,19 @@ enum LifeHash {
         } else {
             bare = input.replacingOccurrences(of: "'", with: "h")
         }
-        
-        return LifeHashGenerator.generateSync(bare)
+                        
+        return LifeHashGenerator.generateSync(bare, version: .version2)
     }
     
     static func hash(_ input: Data) -> Data? {
-        return LifeHashGenerator.generateSync(input).pngData()
+        return LifeHashGenerator.generateSync(input, version: .version2).pngData()
     }
     
     static func hash(_ input: String) -> Data? {
-        return LifeHashGenerator.generateSync(input).pngData()
+        return LifeHashGenerator.generateSync(input, version: .version2).pngData()
     }
     
     static func image(_ input: Data) -> UIImage? {
-       return LifeHashGenerator.generateSync(input)
+        return LifeHashGenerator.generateSync(input, version: .version2)
     }
 }

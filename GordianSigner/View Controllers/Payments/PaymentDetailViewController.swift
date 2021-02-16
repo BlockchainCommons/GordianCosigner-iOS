@@ -8,18 +8,18 @@
 
 import UIKit
 import LibWally
+import AuthenticationServices
 
-class PsbtTableViewController: UIViewController, UITableViewDelegate, UITableViewDataSource {
+class PsbtTableViewController: UIViewController, UITableViewDelegate, UITableViewDataSource, ASAuthorizationControllerDelegate, ASAuthorizationControllerPresentationContextProviding {
 
     @IBOutlet weak private var tableView: UITableView!
     @IBOutlet weak private var signButtonOutlet: UIButton!
     
     private var spinner = Spinner()
-    var psbtText = ""
     var rawTx = ""
+    var psbtStruct:PsbtStruct!
     var psbt:PSBT!
     private var canSign = false
-    private var export = false
     private var alertStyle = UIAlertController.Style.actionSheet
     var inputsArray = [[String:Any]]()
     var outputsArray = [[String:Any]]()
@@ -39,29 +39,25 @@ class PsbtTableViewController: UIViewController, UITableViewDelegate, UITableVie
         if (UIDevice.current.userInterfaceIdiom == .pad) {
           alertStyle = UIAlertController.Style.alert
         }
+                
+        psbt = try? PSBT(psbt: psbtStruct.psbt, network: Keys.chain)
         
-        spinner.add(vc: self, description: "loading...")
-        
-        if psbtText != "" {
-            psbt = try? PSBT(psbt: psbtText, network: Keys.chain)
-            
-            if let psbtToFinalize = try? psbt.finalized() {
-                if psbtToFinalize.isComplete {
-                    self.export = true
-                    DispatchQueue.main.async {
-                        self.signButtonOutlet.setTitle("export", for: .normal)
-                    }
-                    if let final = psbtToFinalize.transactionFinal {
-                        if let hex = final.description {
-                            self.rawTx = hex
-                        }
+        if let psbtToFinalize = try? psbt.finalized() {
+            if psbtToFinalize.isComplete {
+                if let final = psbtToFinalize.transactionFinal {
+                    if let hex = final.description {
+                        self.rawTx = hex
                     }
                 }
             }
         }
+        
+        loadTable()
     }
     
-    override func viewDidAppear(_ animated: Bool) {
+    private func loadTable() {
+        spinner.add(vc: self, description: "loading...")
+        
         load { success in
             if success {
                 DispatchQueue.main.async { [weak self] in
@@ -109,6 +105,8 @@ class PsbtTableViewController: UIViewController, UITableViewDelegate, UITableVie
                     let pubkey = origin.key.data.hexString
                     
                     var dict:[String:Any]!
+                    
+                    self.inputsArray[i]["fullPath"] = origin.value.path.description
                     
                     if let path = try? origin.value.path.chop(depth: 4) {
                         dict = ["pubkey":pubkey, "hasSigned": false, "cosignerLabel": "unknown", "path": path, "fullPath": origin.value.path] as [String : Any]
@@ -174,16 +172,16 @@ class PsbtTableViewController: UIViewController, UITableViewDelegate, UITableVie
                                         var xpub = ""
                                         
                                         if arr.count > 0 {
-                                            xpub = "\(arr[1])"
+                                            xpub = "\(arr[1])".replacingOccurrences(of: "))", with: "")
                                         }
                                         
                                         if let path = pubkeyDict["path"] as? BIP32Path,
                                             let hdkey = try? HDKey(base58: xpub),
                                             let childKey = try? hdkey.derive(using: path) {
-                                            
                                             if originalPubkey == childKey.pubKey.data.hexString {
                                                 updatedDict["cosignerLabel"] = cosignerStruct.label
-                                                updatedDict["lifeHash"] = UIImage(data: cosignerStruct.lifehash)
+                                                updatedDict["lifeHash"] = LifeHash.image(cosignerStruct.lifehash) ?? UIImage()
+                                                
                                                 if let desc = cosignerStruct.bip48SegwitAccount {
                                                     let dp = DescriptorParser()
                                                     let ds = dp.descriptor("wsh(\(desc))")
@@ -237,7 +235,7 @@ class PsbtTableViewController: UIViewController, UITableViewDelegate, UITableVie
                                                 }
                                                 
                                             } else {
-                                                // It is an unknown keyset
+                                                // It is an unknown cosigner
                                                 if let sigs = input.signatures {
                                                     for sig in sigs {
                                                         let signedKey = sig.key.data.hexString
@@ -266,7 +264,6 @@ class PsbtTableViewController: UIViewController, UITableViewDelegate, UITableVie
                                     }
                                 }
                             }
-                            
                             
                             CoreDataService.retrieveEntity(entityName: .cosigner) { (cosigners, errorDescription) in
                                 if let cosigners = cosigners, cosigners.count > 0 {
@@ -322,18 +319,18 @@ class PsbtTableViewController: UIViewController, UITableViewDelegate, UITableVie
     
     private func updateButton() {
         for input in inputsArray {
-            let pubkeyArray = input["pubKeyArray"] as! [[String:Any]]
-            
-            for pubkey in pubkeyArray {
-                let canSign = pubkey["canSign"] as! Bool
-                let hasSigned = pubkey["hasSigned"] as! Bool
-                
-                if canSign {
-                    if !hasSigned {
-                        DispatchQueue.main.async { [weak self] in
-                            guard let self = self else { return }
-                            
-                            self.signButtonOutlet.alpha = 1
+            if let pubkeyArray = input["pubKeyArray"] as? [[String:Any]] {
+                for pubkey in pubkeyArray {
+                    let canSign = pubkey["canSign"] as? Bool ?? false
+                    let hasSigned = pubkey["hasSigned"] as? Bool ?? false
+                    
+                    if canSign {
+                        if !hasSigned {
+                            DispatchQueue.main.async { [weak self] in
+                                guard let self = self else { return }
+                                
+                                self.signButtonOutlet.alpha = 1
+                            }
                         }
                     }
                 }
@@ -414,28 +411,11 @@ class PsbtTableViewController: UIViewController, UITableViewDelegate, UITableVie
     }
     
     @IBAction func signAction(_ sender: Any) {
-        if canSign {
-            sign()
-        } else {
-            
-            DispatchQueue.main.async { [weak self] in
-                guard let self = self else { return }
-                
-                let alert = UIAlertController(title: "No private keys to sign with", message: "", preferredStyle: self.alertStyle)
-                
-                alert.addAction(UIAlertAction(title: "add private keys", style: .default, handler: { action in
-                    DispatchQueue.main.async { [weak self] in
-                        guard let self = self else { return }
-                        
-                        self.performSegue(withIdentifier: "segueToSign", sender: self)
-                    }
-                }))
-                
-                alert.addAction(UIAlertAction(title: "Cancel", style: .cancel, handler: { action in }))
-                alert.popoverPresentationController?.sourceView = self.view
-                self.present(alert, animated: true) {}
-            }
-        }
+        #if DEBUG
+        sign()
+        #else
+        showAuth()
+        #endif
     }
     
     @IBAction func exportAction(_ sender: Any) {
@@ -447,9 +427,9 @@ class PsbtTableViewController: UIViewController, UITableViewDelegate, UITableVie
             return (inputsArray[section]["pubKeyArray"] as? [[String:Any]] ?? [[:]]).count
         } else {
             switch section {
-            case 1:
+            case 3:
                 return psbt.inputs.count
-            case 2:
+            case 4:
                 return psbt.outputs.count
             default:
                 return 1
@@ -461,7 +441,7 @@ class PsbtTableViewController: UIViewController, UITableViewDelegate, UITableVie
         if tableView.tag == 3 {
             return 1
         } else {
-            return 4
+            return 6
         }
     }
     
@@ -481,9 +461,9 @@ class PsbtTableViewController: UIViewController, UITableViewDelegate, UITableVie
         
         if let participants = inputsArray[indexPath.section]["pubKeyArray"] as? [[String:Any]] {
             let participant = participants[indexPath.row]
-            let cosignerLabel = participant["cosignerLabel"] as! String
-            let hasSigned = participant["hasSigned"] as! Bool
-            let canSign = participant["canSign"] as! Bool
+            let cosignerLabel = participant["cosignerLabel"] as? String ?? "unknown"
+            let hasSigned = participant["hasSigned"] as? Bool ?? false
+            let canSign = participant["canSign"] as? Bool ?? false
             
             if canSign {
                 isHotImage.image = UIImage(systemName: "flame")
@@ -510,6 +490,12 @@ class PsbtTableViewController: UIViewController, UITableViewDelegate, UITableVie
                 lifeHashView.lifehashImage.image = UIImage(systemName: "person.crop.circle.badge.exclam")
                 lifeHashView.lifehashImage.tintColor = .systemRed
             }
+        } else {
+            isHotImage.alpha = 0
+            sigImage.alpha = 0
+            lifeHashView.iconLabel.text = "UNKNOWN COSIGNER!"
+            lifeHashView.lifehashImage.image = UIImage(systemName: "person.crop.circle.badge.exclam")
+            lifeHashView.lifehashImage.tintColor = .systemRed
         }
         
         return cell
@@ -522,20 +508,24 @@ class PsbtTableViewController: UIViewController, UITableViewDelegate, UITableVie
         } else {
             switch indexPath.section {
             case 0:
-                return completeCell(indexPath)
+                return labelCell(indexPath)
             case 1:
+                return memoCell(indexPath)
+            case 2:
+                return completeCell(indexPath)
+            case 3:
                 if inputsArray.count > 0 {
                     return inputCell(indexPath)
                 } else {
                     return UITableViewCell()
                 }
-            case 2:
+            case 4:
                 if outputsArray.count > 0 {
                     return outputCell(indexPath)
                 } else {
                     return UITableViewCell()
                 }
-            case 3:
+            case 5:
                 return feeCell(indexPath)
             default:
                 return UITableViewCell()
@@ -547,6 +537,8 @@ class PsbtTableViewController: UIViewController, UITableViewDelegate, UITableVie
         cell.clipsToBounds = true
         cell.layer.cornerRadius = 8
         cell.selectionStyle = .none
+        cell.layer.borderWidth = 0.5
+        cell.layer.borderColor = UIColor.lightGray.cgColor
     }
     
     private func configureView(_ view: UIView) {
@@ -566,7 +558,6 @@ class PsbtTableViewController: UIViewController, UITableViewDelegate, UITableVie
                 label.text = "Signatures complete"
                 icon.image = UIImage(systemName: "checkmark.square")
                 icon.tintColor = .systemGreen
-                export = true
             } else {
                 label.text = "Signatures required"
                 icon.image = UIImage(systemName: "exclamationmark.square")
@@ -577,7 +568,6 @@ class PsbtTableViewController: UIViewController, UITableViewDelegate, UITableVie
                 label.text = "Signatures complete"
                 icon.image = UIImage(systemName: "checkmark.square")
                 icon.tintColor = .systemGreen
-                export = true
             } else {
                 label.text = "Signatures required"
                 icon.image = UIImage(systemName: "exclamationmark.square")
@@ -603,33 +593,46 @@ class PsbtTableViewController: UIViewController, UITableViewDelegate, UITableVie
         
         let inputNumberLabel = cell.viewWithTag(7) as! UILabel
         inputNumberLabel.text = "Input #\(indexPath.row + 1)"
+        
+        let inputTypeImageView = cell.viewWithTag(9) as! UIImageView
+        let inputTypeLabel = cell.viewWithTag(5) as! UILabel
                 
         let inputDict = inputsArray[indexPath.row]
         let input = inputDict["input"] as! PSBTInput
         
-        if let pubkeyArray = inputDict["pubKeyArray"] as? [[String:Any]] {
-            numberOfSigsLabel.text = "?"
+        if let fullPath = inputDict["fullPath"] as? String {
+            pathLabel.text = fullPath
             
-            if pubkeyArray.count > 0 {
-                var numberOfSigs = 0
-                                
-                for pubkey in pubkeyArray {
-                    let hasSigned = pubkey["hasSigned"] as! Bool
-                    let fullPath = pubkey["fullPath"] as! BIP32Path
-                    
-                    if hasSigned {
-                        numberOfSigs += 1
-                    }
-                    
-                    pathLabel.text = fullPath.description
-                }
-                
-                numberOfSigsLabel.text = "\(numberOfSigs) signatures"
-                
+            if fullPath.contains("/0/") {
+                inputTypeImageView.image = UIImage(systemName: "arrow.down.right")
+                inputTypeLabel.text = "Receive Input"
+                inputTypeImageView.tintColor = .systemGreen
+            } else if fullPath.contains("/1/") {
+                inputTypeImageView.image = UIImage(systemName: "arrow.2.circlepath")
+                inputTypeLabel.text = "Change Input"
+                inputTypeImageView.tintColor = .gray
             } else {
-                numberOfSigsLabel.text = "?"
+                inputTypeImageView.image = UIImage(systemName: "questionmark.circle")
+                inputTypeLabel.text = "Unknown type"
+                inputTypeImageView.tintColor = .systemRed
             }
-            
+        } else {
+            pathLabel.text = "unknown"
+            inputTypeImageView.image = UIImage(systemName: "questionmark.circle")
+            inputTypeLabel.text = "Unknown type"
+            inputTypeImageView.tintColor = .systemRed
+        }
+        
+        if let pubkeyArray = inputDict["pubKeyArray"] as? [[String:Any]], pubkeyArray.count > 0 {
+            numberOfSigsLabel.text = "?"
+            var numberOfSigs = 0
+            for pubkey in pubkeyArray {
+                let hasSigned = pubkey["hasSigned"] as! Bool
+                if hasSigned {
+                    numberOfSigs += 1
+                }
+            }
+            numberOfSigsLabel.text = "\(numberOfSigs) signatures"
         } else {
             numberOfSigsLabel.text = "?"
         }
@@ -657,7 +660,6 @@ class PsbtTableViewController: UIViewController, UITableViewDelegate, UITableVie
         
         let amountLabel = cell.viewWithTag(3) as! UILabel
         let addressLabel = cell.viewWithTag(4) as! UILabel
-        //let accountMapLabel = cell.viewWithTag(5) as! UILabel
         let pathLabel = cell.viewWithTag(6) as! UILabel
         let addressTypeImage = cell.viewWithTag(7) as! UIImageView
         let addressTypeLabel = cell.viewWithTag(8) as! UILabel
@@ -688,8 +690,6 @@ class PsbtTableViewController: UIViewController, UITableViewDelegate, UITableVie
             addressLabel.text = "no address..."
         }
         addressLabel.adjustsFontSizeToFitWidth = true
-        
-        
         
         let path = outputDict["path"] as! String
         pathLabel.text = path
@@ -725,18 +725,48 @@ class PsbtTableViewController: UIViewController, UITableViewDelegate, UITableVie
         return cell
     }
     
+    private func labelCell(_ indexPath: IndexPath) -> UITableViewCell {
+        let cell = tableView.dequeueReusableCell(withIdentifier: "labelCell", for: indexPath)
+        configureCell(cell)
+        
+        let label = cell.viewWithTag(1) as! UILabel
+        label.text = psbtStruct.label
+        
+        let editButton = cell.viewWithTag(2) as! UIButton
+        editButton.addTarget(self, action: #selector(editLabelMemo(_:)), for: .touchUpInside)
+        
+        return cell
+    }
+    
+    private func memoCell(_ indexPath: IndexPath) -> UITableViewCell {
+        let cell = tableView.dequeueReusableCell(withIdentifier: "labelCell", for: indexPath)
+        configureCell(cell)
+        
+        let label = cell.viewWithTag(1) as! UILabel
+        label.text = psbtStruct.memo
+        
+        let editButton = cell.viewWithTag(2) as! UIButton
+        editButton.addTarget(self, action: #selector(editLabelMemo(_:)), for: .touchUpInside)
+        
+        return cell
+    }
+    
     func tableView(_ tableView: UITableView, heightForRowAt indexPath: IndexPath) -> CGFloat {
          if tableView.tag == 3 {
             return 90
          } else {
             switch indexPath.section {
             case 0:
-                return 44
+                return 61
             case 1:
-                return 300
+                return 150
             case 2:
-                return 271
+                return 44
             case 3:
+                return 445
+            case 4:
+                return 271
+            case 5:
                 return 44
             default:
                 return 80
@@ -766,12 +796,16 @@ class PsbtTableViewController: UIViewController, UITableViewDelegate, UITableVie
             
             switch section {
             case 0:
-                textLabel.text = "Status"
+                textLabel.text = "Label"
             case 1:
-                textLabel.text = "Inputs"
+                textLabel.text = "Memo"
             case 2:
-                textLabel.text = "Outputs"
+                textLabel.text = "Status"
             case 3:
+                textLabel.text = "Inputs"
+            case 4:
+                textLabel.text = "Outputs"
+            case 5:
                 textLabel.text = "Mining Fee"
             default:
                 break
@@ -784,14 +818,20 @@ class PsbtTableViewController: UIViewController, UITableViewDelegate, UITableVie
         }
     }
     
+    @objc func editLabelMemo(_ sender: UIButton) {
+        DispatchQueue.main.async { [weak self] in
+            guard let self = self else { return }
+            
+            self.performSegue(withIdentifier: "editPaymentLabel", sender: self)
+        }
+    }
+    
     private func sign() {
         spinner.add(vc: self, description: "signing")
         
         PSBTSigner.sign(psbt.description) { [weak self] (signedPsbt, signedFor, errorMessage) in
             guard let self = self else { return }
-            
-            self.spinner.remove()
-            
+                        
             guard let signedPsbt = signedPsbt, let signedFor = signedFor else {
                 showAlert(self, "Something is not right...", errorMessage ?? "unable to sign that psbt: unknown error")
                 return
@@ -811,31 +851,27 @@ class PsbtTableViewController: UIViewController, UITableViewDelegate, UITableVie
                 }
             }
             
-            DispatchQueue.main.async {
-                self.export = true
+            DispatchQueue.main.async { [weak self] in
+                guard let self = self else { return }
+                
                 self.psbt = signedPsbt
-                self.signButtonOutlet.setTitle("export", for: .normal)
+                self.signButtonOutlet.alpha = 0
                 self.load { success in
-                    DispatchQueue.main.async {
+                    DispatchQueue.main.async { [weak self] in
+                        guard let self = self else { return }
                         self.tableView.reloadData()
+                        self.spinner.remove()
+                        showAlert(self, "Payment Signed ✓", "The signed payment has been saved. Export it by tapping the share button in top right.")
                     }
                 }
             }
-                        
-            showAlert(self, "Payment signed ✓", "The signed copy of the payment has been saved. You may export it at anytime by tapping the \"export\" button.")
         }
     }
     
     private func save(_ psbtToSave: PSBT) {
-        var dict = [String:Any]()
-        dict["dateAdded"] = Date()
-        dict["psbt"] = psbtToSave.data
-        dict["label"] = "Signed PSBT"
-        dict["id"] = UUID()
-        
-        CoreDataService.saveEntity(dict: dict, entityName: .payment, completion: { (success, errorDescription) in
+        CoreDataService.updateEntity(id: self.psbtStruct.id, keyToUpdate: "psbt", newValue: psbtToSave.data, entityName: .payment) { (success, errorDescription) in
             guard success else {
-                showAlert(self, "Not saved!", "There was an issue encrypting and saving your psbt. Please reach out and let us know. Error: \(errorDescription ?? "unknown")")
+                showAlert(self, "Not saved!", "There was an issue saving the updated psbt. Please reach out and let us know. Error: \(errorDescription ?? "unknown")")
                 
                 return
             }
@@ -843,7 +879,7 @@ class PsbtTableViewController: UIViewController, UITableViewDelegate, UITableVie
             DispatchQueue.main.async {
                 NotificationCenter.default.post(name: .psbtSaved, object: nil, userInfo: nil)
             }
-        })
+        }
     }
     
     private func exportAsFile(_ psbt: Data) {
@@ -868,7 +904,7 @@ class PsbtTableViewController: UIViewController, UITableViewDelegate, UITableVie
     
     public func exportPsbtToURL(data: Data) -> URL? {
         let documents = FileManager.default.urls(for: .documentDirectory, in: .userDomainMask).first
-        guard let path = documents?.appendingPathComponent("/GordianSigner.psbt") else {
+        guard let path = documents?.appendingPathComponent("/\(psbtStruct.label).psbt") else {
             return nil
         }
         
@@ -951,10 +987,85 @@ class PsbtTableViewController: UIViewController, UITableViewDelegate, UITableVie
                 vc.doneBlock = { [weak self] in
                     guard let self = self else { return }
                     
-                    self.sign()
+                    self.showAuth()
+                }
+            }
+        }
+        
+        if segue.identifier == "editPaymentLabel" {
+            if let vc = segue.destination as? LabelMemoViewController {
+                vc.psbtStruct = self.psbtStruct
+                vc.doneBlock = { [weak self] in
+                    guard let self = self else { return }
+                    
+                    CoreDataService.retrieveEntity(entityName: .payment) { (payments, errorDescription) in
+                        guard let payments = payments else { return }
+                        
+                        for payment in payments {
+                            let paymentStruct =  PsbtStruct(dictionary: payment)
+                            if paymentStruct.id == self.psbtStruct.id {
+                                self.psbtStruct = paymentStruct
+                                self.loadTable()
+                                
+                                DispatchQueue.main.async {
+                                    NotificationCenter.default.post(name: .psbtSaved, object: nil, userInfo: nil)
+                                }
+                            }
+                        }
+                    }
                 }
             }
         }
     }
-
+    
+    // MARK: AUTH
+    private func showAuth() {
+        if UserDefaults.standard.object(forKey: "userIdentifier") != nil {
+            DispatchQueue.main.async { [weak self] in
+                guard let self = self else { return }
+                
+                let request = ASAuthorizationAppleIDProvider().createRequest()
+                let controller = ASAuthorizationController(authorizationRequests: [request])
+                controller.delegate = self
+                controller.presentationContextProvider = self
+                controller.performRequests()
+            }
+        } else {
+            DispatchQueue.main.async { [weak self] in
+                guard let self = self else { return }
+                
+                self.performSegue(withIdentifier: "segueToAuth", sender: self)
+            }
+        }
+    }
+        
+    func presentationAnchor(for controller: ASAuthorizationController) -> ASPresentationAnchor {
+        return self.view.window!
+    }
+    
+    func authorizationController(controller: ASAuthorizationController, didCompleteWithAuthorization authorization: ASAuthorization) {
+        if let username = UserDefaults.standard.object(forKey: "userIdentifier") as? String {
+            switch authorization.credential {
+            case _ as ASAuthorizationAppleIDCredential:
+                let authorizationProvider = ASAuthorizationAppleIDProvider()
+                authorizationProvider.getCredentialState(forUserID: username) { [weak self] (state, error) in
+                    guard let self = self else { return }
+                    
+                    switch (state) {
+                    case .authorized:
+                        self.sign()
+                    case .revoked:
+                        print("No Account Found")
+                        fallthrough
+                    case .notFound:
+                        print("No Account Found")
+                    default:
+                        break
+                    }
+                }
+            default:
+                break
+            }
+        }
+    }
 }

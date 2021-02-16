@@ -13,9 +13,9 @@ enum KeyChain {
     static func set(_ data: Data, forKey: String) -> Bool {
         let query = [
             kSecClass as String       : kSecClassGenericPassword as String,
-            //kSecAttrSynchronizable as String : kCFBooleanTrue!,
+            kSecAttrSynchronizable as String : kCFBooleanTrue!,
             kSecAttrAccessible as String : kSecAttrAccessibleAfterFirstUnlock,
-            //kSecAttrAccessGroup as String: "YZHG975W3A.com.blockchaincommons.sharedItems",
+            kSecAttrAccessGroup as String: "YZHG975W3A.com.blockchaincommons.sharedItems",
             kSecAttrAccount as String : forKey,
             kSecValueData as String   : data ] as [String : Any]
 
@@ -28,6 +28,7 @@ enum KeyChain {
         } else {
             if let err = SecCopyErrorMessageString(status, nil) {
                 print("Set failed: \(err)")
+                print(err)
             }
             return false
         }
@@ -39,8 +40,8 @@ enum KeyChain {
             kSecAttrAccount as String : key,
             kSecReturnData as String  : kCFBooleanTrue!,
             kSecAttrAccessible as String : kSecAttrAccessibleAfterFirstUnlock,
-            //kSecAttrSynchronizable as String : kCFBooleanTrue!,
-            //kSecAttrAccessGroup as String: "YZHG975W3A.com.blockchaincommons.sharedItems",
+            kSecAttrSynchronizable as String : kCFBooleanTrue!,
+            kSecAttrAccessGroup as String: "YZHG975W3A.com.blockchaincommons.sharedItems",
             kSecMatchLimit as String  : kSecMatchLimitOne ] as [String : Any]
 
         var dataTypeRef: AnyObject? = nil
@@ -60,7 +61,7 @@ enum KeyChain {
     static func remove(key: String) -> Bool {
         let query = [
             kSecClass as String       : kSecClassGenericPassword as String,
-            //kSecAttrSynchronizable as String : kCFBooleanTrue!,
+            kSecAttrSynchronizable as String : kCFBooleanTrue!,
             kSecAttrAccessible as String : kSecAttrAccessibleAfterFirstUnlock,
             kSecAttrAccount as String : key] as [String : Any]
 

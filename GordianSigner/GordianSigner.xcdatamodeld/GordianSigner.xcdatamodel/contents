@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
-<model type="com.apple.IDECoreDataModeler.DataModel" documentVersion="1.0" lastSavedToolsVersion="17709" systemVersion="19E242d" minimumToolsVersion="Automatic" sourceLanguage="Swift" userDefinedModelVersionIdentifier="">
+<model type="com.apple.IDECoreDataModeler.DataModel" documentVersion="1.0" lastSavedToolsVersion="17709" systemVersion="20B29" minimumToolsVersion="Automatic" sourceLanguage="Swift" userDefinedModelVersionIdentifier="">
     <entity name="Account" representedClassName="Account" syncable="YES" codeGenerationType="class">
         <attribute name="blockheight" optional="YES" attributeType="Integer 64" defaultValueString="0" usesScalarValueType="YES"/>
         <attribute name="complete" optional="YES" attributeType="Boolean" usesScalarValueType="YES"/>
@@ -9,6 +9,7 @@
         <attribute name="label" optional="YES" attributeType="String"/>
         <attribute name="lifehash" optional="YES" attributeType="Binary"/>
         <attribute name="map" optional="YES" attributeType="Binary"/>
+        <attribute name="memo" optional="YES" attributeType="String"/>
     </entity>
     <entity name="Cosigner" representedClassName="Cosigner" syncable="YES" codeGenerationType="class">
         <attribute name="bip48SegwitAccount" optional="YES" attributeType="String"/>
@@ -19,6 +20,7 @@
         <attribute name="label" optional="YES" attributeType="String"/>
         <attribute name="lifehash" optional="YES" attributeType="Binary"/>
         <attribute name="masterKey" optional="YES" attributeType="Binary"/>
+        <attribute name="memo" optional="YES" attributeType="String"/>
         <attribute name="sharedWith" optional="YES" attributeType="UUID" usesScalarValueType="NO"/>
         <attribute name="words" optional="YES" attributeType="Binary"/>
         <attribute name="xprv" optional="YES" attributeType="Binary"/>
@@ -28,11 +30,12 @@
         <attribute name="dateSigned" optional="YES" attributeType="Date" usesScalarValueType="NO"/>
         <attribute name="id" optional="YES" attributeType="UUID" usesScalarValueType="NO"/>
         <attribute name="label" optional="YES" attributeType="String"/>
+        <attribute name="memo" optional="YES" attributeType="String"/>
         <attribute name="psbt" optional="YES" attributeType="Binary"/>
     </entity>
     <elements>
-        <element name="Account" positionX="-54" positionY="18" width="128" height="163"/>
-        <element name="Cosigner" positionX="-54" positionY="54" width="128" height="208"/>
-        <element name="Payment" positionX="-54" positionY="117" width="128" height="118"/>
+        <element name="Account" positionX="-54" positionY="18" width="128" height="164"/>
+        <element name="Cosigner" positionX="-54" positionY="54" width="128" height="209"/>
+        <element name="Payment" positionX="-54" positionY="117" width="128" height="133"/>
     </elements>
 </model>

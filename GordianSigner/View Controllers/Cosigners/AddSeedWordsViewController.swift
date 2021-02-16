@@ -15,6 +15,8 @@ class AddSignerViewController: UIViewController {
     @IBOutlet weak private var addSignerOutlet: UIButton!
     @IBOutlet weak private var aliasField: UITextField!
     @IBOutlet weak private var textView: UITextView!
+    @IBOutlet weak private var generateOutlet: UIButton!
+    
     
     private var addedWords = [String]()
     private var justWords = [String]()
@@ -23,6 +25,7 @@ class AddSignerViewController: UIViewController {
     private var timer = Timer()
     var doneBlock: (() -> Void)?
     var tempWords = false
+    var providedMnemonic = ""
 
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -34,6 +37,37 @@ class AddSignerViewController: UIViewController {
         addTapGesture()
         bip39Words = Bip39Words.valid
     }
+    
+    override func viewDidAppear(_ animated: Bool) {
+        if providedMnemonic != "" {
+            generateOutlet.alpha = 0
+            textField.text = providedMnemonic
+            processTextfieldInput()
+        }
+    }
+    
+    @IBAction func shareMnemonicAction(_ sender: Any) {
+        if Keys.validMnemonicArray(self.justWords) {
+            share(self.justWords.joined(separator: " "))
+        } else {
+            showAlert(self, "", "Add or generate a valid mnemonic first.")
+        }
+    }
+    
+    private func share(_ item: Any) {
+        DispatchQueue.main.async {
+            let itemToShare = [item]
+            let activityViewController = UIActivityViewController(activityItems: itemToShare, applicationActivities: nil)
+            
+            if UIDevice.current.userInterfaceIdiom == .pad {
+                activityViewController.popoverPresentationController?.sourceView = self.view
+                activityViewController.popoverPresentationController?.sourceRect = CGRect(x: 0, y: 0, width: 100, height: 100)
+            }
+            
+            self.present(activityViewController, animated: true) {}
+        }
+    }
+    
     
     @IBAction func generateAction(_ sender: Any) {
         guard let words = Keys.seed() else { return }
@@ -66,8 +100,8 @@ class AddSignerViewController: UIViewController {
                 let bip48SegwitAccount = Keys.bip48SegwitAccount(masterKey),
                 let xprv = Keys.accountXprv(masterKey),
                 let encryptedXprv = Encryption.encrypt(xprv.utf8),
-                let xpub = Keys.accountXpub(masterKey),
-                let lifeHash = LifeHash.hash(xpub) else {
+                let ur = URHelper.cosignerToUr(bip48SegwitAccount, false),
+                let lifehash = URHelper.fingerprint(ur) else {
                 showAlert(self, "Error ⚠️", "Something went wrong, Cosigner not saved!")
                 return
             }
@@ -76,33 +110,83 @@ class AddSignerViewController: UIViewController {
             cosigner["id"] = UUID()
             cosigner["label"] = alias
             cosigner["dateAdded"] = Date()
-            cosigner["lifehash"] = lifeHash
+            cosigner["lifehash"] = lifehash
             cosigner["fingerprint"] = fingerprint
             cosigner["xprv"] = encryptedXprv
             cosigner["bip48SegwitAccount"] = bip48SegwitAccount
             cosigner["words"] = encryptedWords
             cosigner["masterKey"] = encryptedMasterKey
             
-            func finish() {
+            func reload() {
+                DispatchQueue.main.async {
+                    showAlert(self, "Cosigner saved", "Account xprv and seed words encrypted and saved 🔐")
+                    
+                    self.textField.text = ""
+                    self.addedWords.removeAll()
+                    self.justWords.removeAll()
+                    self.bip39Words.removeAll()
+                    self.textView.text = ""
+                    
+                    self.doneBlock!()
+                    self.navigationController?.popViewController(animated: true)
+                }
+            }
+            
+            func saveNew() {
                 CoreDataService.saveEntity(dict: cosigner, entityName: .cosigner) { [weak self] (success, errorDescription) in
                     guard let self = self else { return }
-
+                    
                     guard success else {
                         showAlert(self, "Error ⚠️", "Failed saving cosigner to Core Data!")
                         return
                     }
                     
-                    DispatchQueue.main.async {
-                        showAlert(self, "Cosigner saved", "Account xprv and seed words encrypted and saved 🔐")
+                    reload()
+                }
+            }
+            
+            func update(_ id: UUID) {
+                CoreDataService.updateEntity(id: id, keyToUpdate: "xprv", newValue: encryptedXprv, entityName: .cosigner) { (success, errorDescription) in
+                    guard success else {
+                        showAlert(self, "", "There was an issue updating the Cosigner...")
+                        return
+                    }
+                    
+                    CoreDataService.updateEntity(id: id, keyToUpdate: "words", newValue: encryptedWords, entityName: .cosigner) { (success, errorDescription) in
+                        guard success else {
+                            showAlert(self, "", "There was an issue updating the Cosigner...")
+                            return
+                        }
                         
-                        self.textField.text = ""
-                        self.addedWords.removeAll()
-                        self.justWords.removeAll()
-                        self.bip39Words.removeAll()
-                        self.textView.text = ""
-                        
-                        self.doneBlock!()
-                        self.navigationController?.popViewController(animated: true)
+                        reload()
+                    }
+                }
+            }
+            
+            func finish() {
+                CoreDataService.retrieveEntity(entityName: .cosigner) { (cosigners, errorDescription) in
+                    if let cosigners = cosigners, cosigners.count > 0 {
+                        var idToUpdate:UUID?
+                        for (i, cosignerDict) in cosigners.enumerated() {
+                            let cosignerStruct = CosignerStruct(dictionary: cosignerDict)
+                            
+                            if cosignerStruct.bip48SegwitAccount == bip48SegwitAccount {
+                                //update existing
+                                idToUpdate = cosignerStruct.id
+                            }
+                            
+                            if i + 1 == cosigners.count {
+                                if idToUpdate == nil {
+                                    saveNew()
+                                } else if cosigner["xprv"] != nil {
+                                    update(idToUpdate!)
+                                } else {
+                                    showAlert(self, "", "That Cosigner already exists.")
+                                }
+                            }
+                        }
+                    } else {
+                        saveNew()
                     }
                 }
             }
@@ -389,10 +473,6 @@ class AddSignerViewController: UIViewController {
         showAlert(self, "Valid ✓", "Ensure you have this mnemonic saved securely offline so that you may recover it if you lose this device!\n\nTap \"encrypt & save\" to encrypt the private keys and save them securely to the device.")
     }
     
-    private func processedCharacters(_ string: String) -> String {
-        return string.filter("abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ ".contains).condenseWhitespace()
-    }
-    
     func putColorFormattedTextInTextField(autocompleteResult: String, userQuery : String) {
         let coloredString: NSMutableAttributedString = NSMutableAttributedString(string: userQuery + autocompleteResult)
         coloredString.addAttribute(NSAttributedString.Key.foregroundColor,
@@ -459,7 +539,7 @@ class AddSignerViewController: UIViewController {
                 
                 guard let textInput = self.textField.text else { return }
                 
-                let processedInput = self.processedCharacters(textInput)
+                let processedInput = processedCharacters(textInput)
                 
                 if Keys.validMnemonicString(processedInput) {
                     self.processTextfieldInput()

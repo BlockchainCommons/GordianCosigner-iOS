@@ -19,16 +19,28 @@ class KeysetsViewController: UIViewController, UITableViewDelegate, UITableViewD
     private var headerText = ""
     private var subheaderText = ""
     private var cosigner:CosignerStruct!
+    private var providedMnemonic = ""
+    private var coinType = "0"
     let spinner = Spinner()
 
     @IBOutlet weak private var keysetsTable: UITableView!
     
     override func viewDidLoad() {
         super.viewDidLoad()
-
+        
         // Do any additional setup after loading the view.
         keysetsTable.delegate = self
         keysetsTable.dataSource = self
+        
+        if KeyChain.getData("hasUpdated") == nil {
+            KeyChain.removeAll()
+            CoreDataService.deleteAllData(entity: .account) { (_) in }
+            CoreDataService.deleteAllData(entity: .cosigner) { (_) in }
+            CoreDataService.deleteAllData(entity: .payment) { (_) in }
+            UserDefaults.standard.setValue(true, forKey: "hasUpdated")
+            KeyChain.set("true".utf8, forKey: "hasUpdated")
+            //showAlert(self, "", "This update is not backwards compatible and all existing data has been deleted to allow for iCloud backups across devices.")
+        }
         
         if !FirstTime.firstTimeHere() {
             showAlert(self, "Fatal error", "We were unable to set and save an encryption key to your secure enclave, the app will not function without this key.")
@@ -38,16 +50,23 @@ class KeysetsViewController: UIViewController, UITableViewDelegate, UITableViewD
         editButton = UIBarButtonItem.init(barButtonSystemItem: .edit, target: self, action: #selector(editCosigners))
         self.navigationItem.setRightBarButtonItems([addButton, editButton], animated: true)
         NotificationCenter.default.addObserver(self, selector: #selector(refreshTable), name: .cosignerAdded, object: nil)
+        
+        if UserDefaults.standard.object(forKey: "coinType") == nil {
+            UserDefaults.standard.setValue("0", forKey: "coinType")
+        }
+        
         load()
     }
     
     override func viewDidAppear(_ animated: Bool) {
+        coinType = UserDefaults.standard.object(forKey: "coinType") as? String ?? "0"
+        
         if UserDefaults.standard.object(forKey: "acceptDisclaimer") == nil {
             DispatchQueue.main.async {
                 self.performSegue(withIdentifier: "segueToDisclaimer", sender: self)
             }
         } else {
-            load()
+            self.load()
             
             if UserDefaults.standard.object(forKey: "seenCosignerInfo") == nil {
                 showInfo()
@@ -69,33 +88,50 @@ class KeysetsViewController: UIViewController, UITableViewDelegate, UITableViewD
     }
     
     private func getPasteboard() {
-        if let pasteBoard = UIPasteboard.general.string {
-            if let account = URHelper.accountUr(pasteBoard) {
-                DispatchQueue.main.async { [weak self] in
-                    guard let self = self else { return }
-                    
-                    var alertStyle = UIAlertController.Style.actionSheet
-                    if (UIDevice.current.userInterfaceIdiom == .pad) {
-                        alertStyle = UIAlertController.Style.alert
-                    }
-                    
-                    let alert = UIAlertController(title: "Import Cosigner?", message: "You have a valid cosigner on your clipboard, would you like to import it?", preferredStyle: alertStyle)
-                    
-                    alert.addAction(UIAlertAction(title: "Yes", style: .default, handler: { action in
-                        self.addCosigner(account)
-                    }))
-                    
-                    alert.addAction(UIAlertAction(title: "Cancel", style: .cancel, handler: { action in }))
-                    alert.popoverPresentationController?.sourceView = self.view
-                    self.present(alert, animated: true, completion: nil)
-                }
-            } else if pasteBoard.contains("48h/\(Keys.coinType)h/0h/2h") || pasteBoard.contains("48'/\(Keys.coinType)'/0'/2'") {
-                self.addCosigner(pasteBoard)
-            } else {
-                showAlert(self, "", "Invalid cosigner text, we accept UR crypto-account or [<fingerprint>/48h/\(Keys.coinType)h/0h/2h]xpub.....")
+        guard let text = UIPasteboard.general.string else { return }
+        if text.hasPrefix("ur:crypto-account") {
+            guard let cosigner = URHelper.accountUrToCosigner(text.lowercased().condenseWhitespace()) else { return }
+            
+            promptToAddCosigner(cosigner)
+        } else if text.hasPrefix("ur:crypto-hdkey") {
+            guard let cosigner = URHelper.urHdkeyToCosigner(text.lowercased().condenseWhitespace()) else {
+                showAlert(self, "", "Unsupported key, we only support Bitcoin mainnet/testnet hdkeys.")
+                return
             }
+            
+            promptToAddCosigner(cosigner)
+        } else if text.lowercased().contains("ur:crypto-seed") {
+            guard let mnemonic = URHelper.cryptoSeedToMnemonic(cryptoSeed: text.lowercased()) else { return }
+            self.providedMnemonic = mnemonic
+            self.addSeedWords()
+        } else if text.contains("48h/\(coinType)h/0h/2h") || text.contains("48'/\(coinType)'/0'/2'") {
+            self.addCosigner(text.condenseWhitespace())
+        } else if Keys.validMnemonicString(processedCharacters(text)) {
+            self.providedMnemonic = processedCharacters(text)
+            self.addSeedWords()
         } else {
-            showAlert(self, "Invalid cosigner text", "We accept UR crypto-account or [<fingerprint>/48h/\(Keys.coinType)h/0h/2h]xpub.....")
+            showAlert(self, "", "Invalid cosigner text, we accept UR crypto-account or [<fingerprint>/48h/\(coinType)h/0h/2h]tpub.....")
+        }
+    }
+    
+    private func promptToAddCosigner(_ cosigner: String) {
+        DispatchQueue.main.async { [weak self] in
+            guard let self = self else { return }
+            
+            var alertStyle = UIAlertController.Style.actionSheet
+            if (UIDevice.current.userInterfaceIdiom == .pad) {
+                alertStyle = UIAlertController.Style.alert
+            }
+            
+            let alert = UIAlertController(title: "Import Cosigner?", message: "You have a valid cosigner on your clipboard, would you like to import it?", preferredStyle: alertStyle)
+            
+            alert.addAction(UIAlertAction(title: "Yes", style: .default, handler: { action in
+                self.addCosigner(cosigner)
+            }))
+            
+            alert.addAction(UIAlertAction(title: "Cancel", style: .cancel, handler: { action in }))
+            alert.popoverPresentationController?.sourceView = self.view
+            self.present(alert, animated: true, completion: nil)
         }
     }
     
@@ -128,12 +164,7 @@ class KeysetsViewController: UIViewController, UITableViewDelegate, UITableViewD
         DispatchQueue.main.async { [weak self] in
             guard let self = self else { return }
             
-            var alertStyle = UIAlertController.Style.actionSheet
-            if (UIDevice.current.userInterfaceIdiom == .pad) {
-                alertStyle = UIAlertController.Style.alert
-            }
-            
-            let alert = UIAlertController(title: "Import Cosigner", message: "You may either paste one as text or scan a QR code.", preferredStyle: alertStyle)
+            let alert = UIAlertController(title: "Import Cosigner", message: "You may either paste one as text or scan a QR code.", preferredStyle: .alert)
             
             alert.addAction(UIAlertAction(title: "Paste", style: .default, handler: { action in
                 self.getPasteboard()
@@ -158,7 +189,7 @@ class KeysetsViewController: UIViewController, UITableViewDelegate, UITableViewD
     }
     
     private func load() {
-        spinner.add(vc: self, description: "loading...")
+        //spinner.add(vc: self, description: "loading...")
         cosigners.removeAll()
         accounts.removeAll()
         
@@ -174,7 +205,7 @@ class KeysetsViewController: UIViewController, UITableViewDelegate, UITableViewD
             guard let self = self else { return }
             
             guard let cosigners = cosigners, cosigners.count > 0 else {
-                self.spinner.remove()
+                //self.spinner.remove()
                 return
             }
             
@@ -187,7 +218,7 @@ class KeysetsViewController: UIViewController, UITableViewDelegate, UITableViewD
                         guard let self = self else { return }
                         
                         self.keysetsTable.reloadData()
-                        self.spinner.remove()
+                        //self.spinner.remove()
                     }
                 }
             }
@@ -195,13 +226,13 @@ class KeysetsViewController: UIViewController, UITableViewDelegate, UITableViewD
     }
     
     private func refresh(_ section: Int) {
-        spinner.add(vc: self, description: "")
+        //spinner.add(vc: self, description: "")
         cosigners.removeAll()
         
         CoreDataService.retrieveEntity(entityName: .cosigner) { [weak self] (cosigners, errorDescription) in
             guard let self = self else { return }
             
-            guard let cosigners = cosigners, cosigners.count > 0 else { self.spinner.remove(); return }
+            guard let cosigners = cosigners, cosigners.count > 0 else { return }
             
             for (i, cosigner) in cosigners.enumerated() {
                 let cosignerStruct = CosignerStruct(dictionary: cosigner)
@@ -212,7 +243,7 @@ class KeysetsViewController: UIViewController, UITableViewDelegate, UITableViewD
                         guard let self = self else { return }
                         
                         self.keysetsTable.reloadSections(IndexSet(arrayLiteral: section), with: .none)
-                        self.spinner.remove()
+                        //self.spinner.remove()
                     }
                 }
             }
@@ -286,7 +317,7 @@ class KeysetsViewController: UIViewController, UITableViewDelegate, UITableViewD
             
             keysetLifehash.backgroundColor = cell.backgroundColor
             keysetLifehash.background.backgroundColor = cell.backgroundColor
-            keysetLifehash.lifehashImage.image = UIImage(data: cosigner.lifehash)
+            keysetLifehash.lifehashImage.image = LifeHash.image(cosigner.lifehash) ?? UIImage()
             keysetLifehash.iconImage.image = UIImage(systemName: "person.2")
             keysetLifehash.iconLabel.text = cosigner.label
             
@@ -441,57 +472,111 @@ class KeysetsViewController: UIViewController, UITableViewDelegate, UITableViewD
     }
     
     private func addCosigner(_ account: String) {
-        let hack = "wsh(\(account)/0/*)"
+        print("account: \(account)")
+        var segwitBip84Account = account
+        var hack = "wsh(\(account)/0/*)"
         let dp = DescriptorParser()
-        let ds = dp.descriptor(hack)
+        var ds = dp.descriptor(hack)
+        var cosigner = [String:Any]()
+        
+        if let hdkey = try? HDKey(base58: ds.accountXprv) {
+            guard let encryptedXprv = Encryption.encrypt(ds.accountXprv.utf8) else { return }
+            cosigner["xprv"] = encryptedXprv
+            hack = hack.replacingOccurrences(of: ds.accountXprv, with: hdkey.xpub)
+            segwitBip84Account = segwitBip84Account.replacingOccurrences(of: ds.accountXprv, with: hdkey.xpub)
+            ds = dp.descriptor(hack)
+        }
                 
-        guard let _ = try? HDKey(base58: ds.accountXpub), let lifeHash = LifeHash.hash(ds.accountXpub) else {
+        guard let _ = try? HDKey(base58: ds.accountXpub) else {
             showAlert(self, "Invalid key", "Gordian Cosigner is not yet compatible with slip132, please ensure you are adding a valid xpub and try again.")
             return
         }
         
-        guard account.contains("/48h/\(Keys.coinType)h/0h/2h") || account.contains("/48'/\(Keys.coinType)'/0'/2'") else {
-            showAlert(self, "Unsupported Cosigner", "Gordian Cosigner currently only supports the m/48h/\(Keys.coinType)h/0h/2h key origin.")
+        guard account.contains("/48h/\(coinType)h/0h/2h") || account.contains("/48'/\(coinType)'/0'/2'") else {
+            showAlert(self, "Derivation not supported", "Gordian Cosigner currently only supports the m/48h/\(coinType)h/0h/2h key origin.")
             return
         }
         
-        var cosigner = [String:Any]()
+        guard let ur = URHelper.cosignerToUr(segwitBip84Account, false), let lifehashFingerprint = URHelper.fingerprint(ur) else {
+            showAlert(self, "", "Unsupported key, we only support Bitcoin mainnet/testnet hdkeys.")
+            return
+        }
+                        
         cosigner["id"] = UUID()
         cosigner["label"] = "Cosigner"
-        cosigner["bip48SegwitAccount"] = account
+        cosigner["bip48SegwitAccount"] = segwitBip84Account
         cosigner["dateAdded"] = Date()
         cosigner["fingerprint"] = ds.fingerprint
-        cosigner["lifehash"] = lifeHash
+        cosigner["lifehash"] = lifehashFingerprint
         
-        
-        CoreDataService.saveEntity(dict: cosigner, entityName: .cosigner) { [weak self] (success, errorDesc) in
-            guard let self = self else { return }
-            
-            guard success else {
-                showAlert(self, "Cosigner not saved!", "Please let us know about this bug.")
-                return
-            }
-            
-            DispatchQueue.main.async {
-                self.keysetsTable.reloadData()
+        func save() {
+            CoreDataService.saveEntity(dict: cosigner, entityName: .cosigner) { [weak self] (success, errorDesc) in
+                guard let self = self else { return }
                 
-                var alertStyle = UIAlertController.Style.actionSheet
-                if (UIDevice.current.userInterfaceIdiom == .pad) {
-                  alertStyle = UIAlertController.Style.alert
+                guard success else {
+                    showAlert(self, "Cosigner not saved!", "Please let us know about this bug.")
+                    return
                 }
                 
-                let alert = UIAlertController(title: "Cosigner imported ✓", message: "Would you like to give it a label now? You can edit the label at any time.", preferredStyle: alertStyle)
+                DispatchQueue.main.async {
+                    self.keysetsTable.reloadData()
+                    
+                    var alertStyle = UIAlertController.Style.actionSheet
+                    if (UIDevice.current.userInterfaceIdiom == .pad) {
+                      alertStyle = UIAlertController.Style.alert
+                    }
+                    
+                    let alert = UIAlertController(title: "Cosigner imported ✓", message: "Would you like to give it a label now? You can edit the label at any time.", preferredStyle: alertStyle)
+                    
+                    alert.addAction(UIAlertAction(title: "Add label", style: .default, handler: { action in
+                        self.promptToEditLabel(CosignerStruct(dictionary: cosigner))
+                    }))
+                                    
+                    alert.addAction(UIAlertAction(title: "Cancel", style: .cancel, handler: { action in
+                        self.load()
+                    }))
+                    
+                    alert.popoverPresentationController?.sourceView = self.view
+                    self.present(alert, animated: true, completion: nil)
+                }
+            }
+        }
+        
+        func update(_ id: UUID) {
+            CoreDataService.updateEntity(id: id, keyToUpdate: "xprv", newValue: cosigner["xprv"] as! Data, entityName: .cosigner) { (success, errorDescription) in
+                guard success else {
+                    showAlert(self, "", "There was an issue updating the Cosigner...")
+                    return
+                }
                 
-                alert.addAction(UIAlertAction(title: "Add label", style: .default, handler: { action in
-                    self.promptToEditLabel(CosignerStruct(dictionary: cosigner))
-                }))
-                                
-                alert.addAction(UIAlertAction(title: "Cancel", style: .cancel, handler: { action in
-                    self.load()
-                }))
-                
-                alert.popoverPresentationController?.sourceView = self.view
-                self.present(alert, animated: true, completion: nil)
+                self.load()
+                showAlert(self, "", "Cosigner updated with xprv.")
+            }
+        }
+        
+        CoreDataService.retrieveEntity(entityName: .cosigner) { (cosigners, errorDescription) in
+            if let cosigners = cosigners, cosigners.count > 0 {
+                var idToUpdate:UUID?
+                for (i, cosignerDict) in cosigners.enumerated() {
+                    let cosignerStruct = CosignerStruct(dictionary: cosignerDict)
+                    
+                    if cosignerStruct.bip48SegwitAccount == segwitBip84Account {
+                        //update existing
+                        idToUpdate = cosignerStruct.id
+                    }
+                    
+                    if i + 1 == cosigners.count {
+                        if idToUpdate == nil {
+                            save()
+                        } else if cosigner["xprv"] != nil {
+                            update(idToUpdate!)
+                        } else {
+                            showAlert(self, "", "That Cosigner already exists.")
+                        }
+                    }
+                }
+            } else {
+                save()
             }
         }
     }
@@ -521,13 +606,21 @@ class KeysetsViewController: UIViewController, UITableViewDelegate, UITableViewD
             
             vc.doneBlock = { [weak self] result in
                 guard let self = self, let result = result else { return }
-                
-                if let account = URHelper.accountUr(result) {
+                if result.lowercased().hasPrefix("ur:crypto-account"), let account = URHelper.accountUrToCosigner(result.lowercased()) {
                     self.addCosigner(account)
-                } else if result.contains("48h/\(Keys.coinType)h/0h/2h") || result.contains("48'/\(Keys.coinType)'/0'/2'") {
+                } else if result.lowercased().hasPrefix("ur:crypto-hdkey"), let account = URHelper.urHdkeyToCosigner(result.lowercased()) {
+                    self.addCosigner(account)
+                } else if result.contains("48h/\(self.coinType)h/0h/2h") || result.contains("48'/\(self.coinType)'/0'/2'") {
                     self.addCosigner(result)
+                } else if result.lowercased().contains("ur:crypto-seed") {
+                    guard let mnemonic = URHelper.cryptoSeedToMnemonic(cryptoSeed: result.lowercased()) else { return }
+                    self.providedMnemonic = mnemonic
+                    self.addSeedWords()
+                } else if Keys.validMnemonicString(processedCharacters(result)) {
+                    self.providedMnemonic = processedCharacters(result)
+                    self.addSeedWords()
                 } else {
-                    showAlert(self, "Cosigner not recognized!", "Gordian Cosigner currently only supports the m/48h/\(Keys.coinType)h/0h/2h key origin.")
+                    showAlert(self, "", "Unrecognized format.")
                 }
             }
             
@@ -539,12 +632,23 @@ class KeysetsViewController: UIViewController, UITableViewDelegate, UITableViewD
         case "segueToAddSeedWords":
             guard let vc = segue.destination as? AddSignerViewController else { fallthrough }
             
+            vc.providedMnemonic = self.providedMnemonic
+            self.providedMnemonic = ""
+            
             vc.doneBlock = {
                 self.load()
             }
             
         default:
             break
+        }
+    }
+    
+    private func authenticate() {
+        DispatchQueue.main.async { [weak self] in
+            guard let self = self else { return }
+            
+            self.performSegue(withIdentifier: "segueToAuth", sender: self)
         }
     }
 }
