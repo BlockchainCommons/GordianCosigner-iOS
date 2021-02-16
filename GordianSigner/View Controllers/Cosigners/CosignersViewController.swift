@@ -20,6 +20,7 @@ class KeysetsViewController: UIViewController, UITableViewDelegate, UITableViewD
     private var subheaderText = ""
     private var cosigner:CosignerStruct!
     private var providedMnemonic = ""
+    private var coinType = "0"
     let spinner = Spinner()
 
     @IBOutlet weak private var keysetsTable: UITableView!
@@ -38,7 +39,7 @@ class KeysetsViewController: UIViewController, UITableViewDelegate, UITableViewD
             CoreDataService.deleteAllData(entity: .payment) { (_) in }
             UserDefaults.standard.setValue(true, forKey: "hasUpdated")
             KeyChain.set("true".utf8, forKey: "hasUpdated")
-            showAlert(self, "", "This update is not backwards compatible and all existing data has been deleted to allow for iCloud backups across devices.")
+            //showAlert(self, "", "This update is not backwards compatible and all existing data has been deleted to allow for iCloud backups across devices.")
         }
         
         if !FirstTime.firstTimeHere() {
@@ -58,6 +59,8 @@ class KeysetsViewController: UIViewController, UITableViewDelegate, UITableViewD
     }
     
     override func viewDidAppear(_ animated: Bool) {
+        coinType = UserDefaults.standard.object(forKey: "coinType") as? String ?? "0"
+        
         if UserDefaults.standard.object(forKey: "acceptDisclaimer") == nil {
             DispatchQueue.main.async {
                 self.performSegue(withIdentifier: "segueToDisclaimer", sender: self)
@@ -101,13 +104,13 @@ class KeysetsViewController: UIViewController, UITableViewDelegate, UITableViewD
             guard let mnemonic = URHelper.cryptoSeedToMnemonic(cryptoSeed: text.lowercased()) else { return }
             self.providedMnemonic = mnemonic
             self.addSeedWords()
-        } else if text.contains("48h/\(Keys.coinType)h/0h/2h") || text.contains("48'/\(Keys.coinType)'/0'/2'") {
+        } else if text.contains("48h/\(coinType)h/0h/2h") || text.contains("48'/\(coinType)'/0'/2'") {
             self.addCosigner(text.condenseWhitespace())
         } else if Keys.validMnemonicString(processedCharacters(text)) {
             self.providedMnemonic = processedCharacters(text)
             self.addSeedWords()
         } else {
-            showAlert(self, "", "Invalid cosigner text, we accept UR crypto-account or [<fingerprint>/48h/\(Keys.coinType)h/0h/2h]tpub.....")
+            showAlert(self, "", "Invalid cosigner text, we accept UR crypto-account or [<fingerprint>/48h/\(coinType)h/0h/2h]tpub.....")
         }
     }
     
@@ -489,8 +492,8 @@ class KeysetsViewController: UIViewController, UITableViewDelegate, UITableViewD
             return
         }
         
-        guard account.contains("/48h/\(Keys.coinType)h/0h/2h") || account.contains("/48'/\(Keys.coinType)'/0'/2'") else {
-            showAlert(self, "Derivation not supported", "Gordian Cosigner currently only supports the m/48h/\(Keys.coinType)h/0h/2h key origin.")
+        guard account.contains("/48h/\(coinType)h/0h/2h") || account.contains("/48'/\(coinType)'/0'/2'") else {
+            showAlert(self, "Derivation not supported", "Gordian Cosigner currently only supports the m/48h/\(coinType)h/0h/2h key origin.")
             return
         }
         
@@ -607,7 +610,7 @@ class KeysetsViewController: UIViewController, UITableViewDelegate, UITableViewD
                     self.addCosigner(account)
                 } else if result.lowercased().hasPrefix("ur:crypto-hdkey"), let account = URHelper.urHdkeyToCosigner(result.lowercased()) {
                     self.addCosigner(account)
-                } else if result.contains("48h/\(Keys.coinType)h/0h/2h") || result.contains("48'/\(Keys.coinType)'/0'/2'") {
+                } else if result.contains("48h/\(self.coinType)h/0h/2h") || result.contains("48'/\(self.coinType)'/0'/2'") {
                     self.addCosigner(result)
                 } else if result.lowercased().contains("ur:crypto-seed") {
                     guard let mnemonic = URHelper.cryptoSeedToMnemonic(cryptoSeed: result.lowercased()) else { return }

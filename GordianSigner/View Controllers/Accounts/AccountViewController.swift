@@ -17,6 +17,7 @@ class AccountMapsViewController: UIViewController, UITableViewDelegate, UITableV
     let descriptorParser = DescriptorParser()
     var mapToExport = [String:Any]()
     var accountToView:AccountStruct!
+    private var coinType = "0"
     
     @IBOutlet weak var accountMapTable: UITableView!
     
@@ -32,6 +33,7 @@ class AccountMapsViewController: UIViewController, UITableViewDelegate, UITableV
     }
     
     override func viewDidAppear(_ animated: Bool) {
+        coinType = UserDefaults.standard.object(forKey: "coinType") as? String ?? "0"
         load()
         if UserDefaults.standard.object(forKey: "seenAccountInfo") == nil {
             showInfo()
@@ -282,8 +284,8 @@ class AccountMapsViewController: UIViewController, UITableViewDelegate, UITableV
         
         for keyWithPath in descStruct.keysWithPath {
             
-            guard keyWithPath.contains("/48h/\(Keys.coinType)h/0h/2h") || keyWithPath.contains("/48'/\(Keys.coinType)'/0'/2'") else {
-                showAlert(self, "Unsupported key origin", "Gordian Cosigner currently only supports the m/48'/\(Keys.coinType)'/0'/2' origin.")
+            guard keyWithPath.contains("/48h/\(coinType)h/0h/2h") || keyWithPath.contains("/48'/\(coinType)'/0'/2'") else {
+                showAlert(self, "Unsupported key origin", "Gordian Cosigner currently only supports the m/48'/\(coinType)'/0'/2' origin, you can toggle on mainnet/testnet in settings to switch between the supported derivation paths.")
                 return nil
             }
             
