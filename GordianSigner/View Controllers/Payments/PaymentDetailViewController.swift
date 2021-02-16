@@ -319,18 +319,18 @@ class PsbtTableViewController: UIViewController, UITableViewDelegate, UITableVie
     
     private func updateButton() {
         for input in inputsArray {
-            let pubkeyArray = input["pubKeyArray"] as! [[String:Any]]
-            
-            for pubkey in pubkeyArray {
-                let canSign = pubkey["canSign"] as? Bool ?? false
-                let hasSigned = pubkey["hasSigned"] as? Bool ?? false
-                
-                if canSign {
-                    if !hasSigned {
-                        DispatchQueue.main.async { [weak self] in
-                            guard let self = self else { return }
-                            
-                            self.signButtonOutlet.alpha = 1
+            if let pubkeyArray = input["pubKeyArray"] as? [[String:Any]] {
+                for pubkey in pubkeyArray {
+                    let canSign = pubkey["canSign"] as? Bool ?? false
+                    let hasSigned = pubkey["hasSigned"] as? Bool ?? false
+                    
+                    if canSign {
+                        if !hasSigned {
+                            DispatchQueue.main.async { [weak self] in
+                                guard let self = self else { return }
+                                
+                                self.signButtonOutlet.alpha = 1
+                            }
                         }
                     }
                 }
@@ -486,6 +486,12 @@ class PsbtTableViewController: UIViewController, UITableViewDelegate, UITableVie
                 lifeHashView.lifehashImage.image = UIImage(systemName: "person.crop.circle.badge.exclam")
                 lifeHashView.lifehashImage.tintColor = .systemRed
             }
+        } else {
+            isHotImage.alpha = 0
+            sigImage.alpha = 0
+            lifeHashView.iconLabel.text = "UNKNOWN COSIGNER!"
+            lifeHashView.lifehashImage.image = UIImage(systemName: "person.crop.circle.badge.exclam")
+            lifeHashView.lifehashImage.tintColor = .systemRed
         }
         
         return cell

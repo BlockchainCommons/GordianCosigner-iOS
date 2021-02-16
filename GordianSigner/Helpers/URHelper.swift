@@ -181,7 +181,7 @@ enum URHelper {
             case 8:
                 guard case let CBOR.unsignedInt(xfp) = value else { fallthrough }
                 
-                parentFingerprint = String(Int(xfp), radix: 16)
+                parentFingerprint = String(format: "%08x", xfp)
             default:
                 break
             }

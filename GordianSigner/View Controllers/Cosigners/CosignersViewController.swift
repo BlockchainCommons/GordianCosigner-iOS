@@ -31,12 +31,14 @@ class KeysetsViewController: UIViewController, UITableViewDelegate, UITableViewD
         keysetsTable.delegate = self
         keysetsTable.dataSource = self
         
-        if UserDefaults.standard.object(forKey: "hasUpdated") == nil {
+        if KeyChain.getData("hasUpdated") == nil {
             KeyChain.removeAll()
             CoreDataService.deleteAllData(entity: .account) { (_) in }
             CoreDataService.deleteAllData(entity: .cosigner) { (_) in }
             CoreDataService.deleteAllData(entity: .payment) { (_) in }
             UserDefaults.standard.setValue(true, forKey: "hasUpdated")
+            KeyChain.set("true".utf8, forKey: "hasUpdated")
+            showAlert(self, "", "This update is not backwards compatible and all existing data has been deleted to allow for iCloud backups across devices.")
         }
         
         if !FirstTime.firstTimeHere() {
@@ -184,7 +186,7 @@ class KeysetsViewController: UIViewController, UITableViewDelegate, UITableViewD
     }
     
     private func load() {
-        spinner.add(vc: self, description: "loading...")
+        //spinner.add(vc: self, description: "loading...")
         cosigners.removeAll()
         accounts.removeAll()
         
@@ -200,7 +202,7 @@ class KeysetsViewController: UIViewController, UITableViewDelegate, UITableViewD
             guard let self = self else { return }
             
             guard let cosigners = cosigners, cosigners.count > 0 else {
-                self.spinner.remove()
+                //self.spinner.remove()
                 return
             }
             
@@ -213,7 +215,7 @@ class KeysetsViewController: UIViewController, UITableViewDelegate, UITableViewD
                         guard let self = self else { return }
                         
                         self.keysetsTable.reloadData()
-                        self.spinner.remove()
+                        //self.spinner.remove()
                     }
                 }
             }
@@ -221,13 +223,13 @@ class KeysetsViewController: UIViewController, UITableViewDelegate, UITableViewD
     }
     
     private func refresh(_ section: Int) {
-        spinner.add(vc: self, description: "")
+        //spinner.add(vc: self, description: "")
         cosigners.removeAll()
         
         CoreDataService.retrieveEntity(entityName: .cosigner) { [weak self] (cosigners, errorDescription) in
             guard let self = self else { return }
             
-            guard let cosigners = cosigners, cosigners.count > 0 else { self.spinner.remove(); return }
+            guard let cosigners = cosigners, cosigners.count > 0 else { return }
             
             for (i, cosigner) in cosigners.enumerated() {
                 let cosignerStruct = CosignerStruct(dictionary: cosigner)
@@ -238,7 +240,7 @@ class KeysetsViewController: UIViewController, UITableViewDelegate, UITableViewD
                         guard let self = self else { return }
                         
                         self.keysetsTable.reloadSections(IndexSet(arrayLiteral: section), with: .none)
-                        self.spinner.remove()
+                        //self.spinner.remove()
                     }
                 }
             }
@@ -467,6 +469,7 @@ class KeysetsViewController: UIViewController, UITableViewDelegate, UITableViewD
     }
     
     private func addCosigner(_ account: String) {
+        print("account: \(account)")
         var segwitBip84Account = account
         var hack = "wsh(\(account)/0/*)"
         let dp = DescriptorParser()
