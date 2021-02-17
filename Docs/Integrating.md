@@ -2,9 +2,11 @@
 
 Gordian Cosigner is meant to be used with a wallet that can initiate PSBT transactions, or some other transaction coordinator service. Following are documents on using it with other services.
 
-## Using Bitcoin Core to Support GCS
+## Using Bitcoin Core as Initiator & Finalizer
 
 Perhaps the best way to use Gordian Cosigner with Bitcoin Core is to fully create your keys and accounts in other systems, such as **Gordian Wallet** and **Gordian Cosigner**, but then to take advantage of the full-node capabilities of Bitcoin Core to Initiate and Finalize transactions. Following is a description of how to do so.
+
+***Scenario Description:*** Bitcoin Core acts as an Initiator and Finalizer; Gordian Cosigner acts as a cosigner; other users cosign by other means.
 
 ### Creating a Descriptor for Bitcoin Core
 
@@ -325,3 +327,34 @@ And you can use the hex to send:
 $ bitcoin-cli sendrawtransaction "020000000001012cea5f1b189a276b2042a96bc280bf13647a37287c3271565fa059b87097d50c0100000000feffffff02eb85010000000000220020c5b5d1dec1ed5bd62e4b982dc73892ddd563913b69a2ed05cc4f17ee970696e5801a060000000000160014afd6f1c43bda9ca8cfa0bf98f8a47b7d4d587d89040047304402205d643dbfc053777ac1a548bc3e2d359268a7e6d81ed4128108ed77e9eb1fd000022062c7330109494b346550edaf112b91ad90dd54fad917587865f4fab5c16139e701483045022100c019d623f49843790087269bb280789107ce6b77101f557197a6b5f71f15488f02205e2b6ce734a4d54c96ef7d42ef820ac45b230ede16652db005d9ccf86f2fd1b00147522102ce0bf430b313736922bda288018d070a3b64c10bdf9b21f06a88497ef2ed45d12103337e5bed2ea882253741e007b3351ede24ba09b05dedf63dd7e6e8c3a0d26f6852ae00000000"a967ae537eebc3222ed591e47eb951790ad16a72706bfc17b2ac482fd9c7901f
 ```
 Congratulations, you've finished the round-trip for a multisig PSBT, using **Gordian Cosigner** and Bitcoin Core.
+
+## Using Gordian Wallet as a Cosigner
+
+Currently, you can not use **Gordian Wallet** to generate a key for use in creating an account on **Gordian Cosigner**. That's because Gordian Wallet's hot account uses a different derivation path.
+
+However, you can generate a warm account on **Gordian Wallet** and then use **Gordian Cosigner** to store the offline key:
+
+1. Create a warm account on **Gordian Wallet**
+2. Backup your node key by whatever means you prefer
+3. Backup your offline key by sending or copying the 12 mnemonic works
+4. On **Gordian Cosigner**, go to the **Cosigners** tab and "Create" a cosigner by pasting in the mnemonics
+
+You now have your 
+
+### Signing with your Gordian Wallet Cosigner
+
+[TODO]
+
+## Using Gordian Wallet as Initiator & Finalizer
+
+However you create your account in **Gordian Cosigner**, you can then import your account into **Gordian Wallet**, to use it as your Initiator and Finalizer.
+
+***Scenario Description:*** Gordian Wallet acts as an Initiator and Finalizer; Gordian Cosigner acts as a cosigner; other users cosign by other means.
+
+### Importing Your Account into Gordian Wallet
+
+Importing a account from **Gordian Cosigner** to **Gordian Wallet** is a simple three-step process.
+
+1. In **Gordian Cosigner**, go to the **Accounts** tab, choose an account and export; choose "Copy QR".
+2. In **Gordian Wallet**, go to the **Accounts** tab, add a new account, and choose to "Recover". You should be given a pop-up option to "Upload Account Map QR".
+3. Verify the addresses shown here match with those seen in **Gordian Cosigner** by going to the **Accounts** tab there, clicking the account in question and choosing "Address Explorer". If so, "Confirm".
