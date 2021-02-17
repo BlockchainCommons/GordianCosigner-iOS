@@ -2,11 +2,17 @@
 
 Gordian Cosigner is meant to be used with a wallet that can initiate PSBT transactions, or some other transaction coordinator service. Following are documents on using it with other services.
 
-## Using GCS with Bitcoin Core
+## Using Bitcoin Core to Support GCS
 
-To create an account in Bitcoin Core that matches your multisig in **Gordian Cosigner** requires creating a `wsh(sortmulti` descriptor. There are two ways to do this: you can either export the "descriptor" from the **Accounts** tab, or you can export the individual origins and public keys from the **Cosigners** tab and build a complete descriptor on your own. You might want to just examine your multisig account on Bitcoin Core, but if you prefer, you can fully import a watchonly version of the account, which will allow you to use Bitcoin Core as a transaction coordinator with **Gordian Cosigner**.
+Perhaps the best way to use Gordian Cosigner with Bitcoin Core is to fully create your keys and accounts in other systems, such as **Gordian Wallet** and **Gordian Cosigner**, but then to take advantage of the full-node capabilities of Bitcoin Core to Initiate and Finalize transactions. Following is a description of how to do so.
 
-### Exporting from Accounts
+### Creating a Descriptor for Bitcoin Core
+
+To do any work on existing cosigners or accounts in Bitcoin Core requires creating a descriptor that Bitcoin Core will be able to understand. This should be a `wsh(sortmulti` descriptor, to match the methodology of **Gordian Cosigner**. There are two ways to create this descriptor: you can either export the "descriptor" from the **Accounts** tab of **Gordian Cosigner**, or you can export the individual origins and public keys from the **Cosigners** tab and build a complete descriptor on your own. 
+
+Once you have creating a proper descriptor, you'll be able to use it for a variety of functions on Bitcoin Core.
+
+#### Creating a Descriptor from Accounts Information
 
 The export function on the **Accounts** tab in **Gordian Cosigner** will produce text like the following:
 ```
@@ -36,17 +42,13 @@ $ bitcoin-cli getdescriptorinfo $multi_desc
   "hasprivatekeys": false
 }
 ```
-
-5. Use that modified and checksummed descriptor with any `bitcoin-cli` functions to test your addresses with `deriveaddress`:
-
+Your final descriptor for use with Bitcoin Core should be the `descriptor` with checksum output by `getdescriptorinfo`.
 ```
-multi_desc_with_cs="wsh(sortedmulti(2,[a890879a/48'/1'/0'/2']tpubDEzcZKQ5N3ymDtUv6ekeyiESkAr5BwKSFdL4afXDDLf2f7KhJ5cyr2XrKqHwYutxYEVoUcDxdTFM2qPvvr1nwaa7HtAeJN4b4RuGRhPSS83/0/*,[90081696/48'/1'/0'/2']tpubDFhpmpiYsqtknPaom1M3hDM17gm4UPhCbjqj33k27tGf1bHWMcfyuNPLYozB1uzaaYyFz3CxJU7wzBdQ1FiRSfMaftbUYHgMZ5SrV5FcxV1/0/*))#clyps7au"
-$ bitcoin-cli deriveaddresses $multi_desc_with_cs [0,10]
+$ multi_desc_with_cs="wsh(sortedmulti(2,[a890879a/48'/1'/0'/2']tpubDEzcZKQ5N3ymDtUv6ekeyiESkAr5BwKSFdL4afXDDLf2f7KhJ5cyr2XrKqHwYutxYEVoUcDxdTFM2qPvvr1nwaa7HtAeJN4b4RuGRhPSS83/0/*,[90081696/48'/1'/0'/2']tpubDFhpmpiYsqtknPaom1M3hDM17gm4UPhCbjqj33k27tGf1bHWMcfyuNPLYozB1uzaaYyFz3CxJU7wzBdQ1FiRSfMaftbUYHgMZ5SrV5FcxV1/0/*))#clyps7au"
 ```
+#### Creating a Descriptor from Cosigners Information
 
-### Exporting from Cosigners
-
-Alternatively, you have everything you need in the **Cosigners** tab. You can go to each individual cosigner and incorporate all of that information to create your descriptor.
+Alternatively, you have everything you need in the **Cosigners** tab. You can go to each individual cosigner and incorporate all of that information to create your descriptor by hand.
 
 For example, look at the "Cosigner Detailer" for the first cosigner above and tap the "Text" button, which will give you an `xpub` that Bitcoin Core can understand:
 ```
@@ -58,7 +60,7 @@ Public key:
 
 tpubDEzcZKQ5N3ymDtUv6ekeyiESkAr5BwKSFdL4afXDDLf2f7KhJ5cyr2XrKqHwYutxYEVoUcDxdTFM2qPvvr1nwaa7HtAeJN4b4RuGRhPSS83
 ```
-You can put together your own descriptor as follows, using the example of this 2-of-2 multisig:
+You'll need to repeat this for each cosigner. You can then pull together a complete descriptor as follows, using the example of this 2-of-2 multisig:
 ```
 wsh(sortedmulti($M,[$ORIGIN1],$PUBKEY1/0/*,[$ORIGIN2],$PUBKEY2/0/*))#$CS
 ```
@@ -71,20 +73,54 @@ Where:
 * $CS is the checksub derived by `getdescriptorinfo`
 
 This should generate the same descriptor as created by **Gordian Cosigner**, but this methodology allows you to create it from the individual keys on your own.
+```
+wsh(sortedmulti(2,[a890879a/48'/1'/0'/2']tpubDEzcZKQ5N3ymDtUv6ekeyiESkAr5BwKSFdL4afXDDLf2f7KhJ5cyr2XrKqHwYutxYEVoUcDxdTFM2qPvvr1nwaa7HtAeJN4b4RuGRhPSS83/0/*,[90081696/48'/1'/0'/2']tpubDFhpmpiYsqtknPaom1M3hDM17gm4UPhCbjqj33k27tGf1bHWMcfyuNPLYozB1uzaaYyFz3CxJU7wzBdQ1FiRSfMaftbUYHgMZ5SrV5FcxV1/0/*))
+```
+From here, checksum the descriptor as above.
+```
+$ bitcoin-cli getdescriptorinfo $multi_desc
+{
+  "descriptor": "wsh(sortedmulti(2,[a890879a/48'/1'/0'/2']tpubDEzcZKQ5N3ymDtUv6ekeyiESkAr5BwKSFdL4afXDDLf2f7KhJ5cyr2XrKqHwYutxYEVoUcDxdTFM2qPvvr1nwaa7HtAeJN4b4RuGRhPSS83/0/*,[90081696/48'/1'/0'/2']tpubDFhpmpiYsqtknPaom1M3hDM17gm4UPhCbjqj33k27tGf1bHWMcfyuNPLYozB1uzaaYyFz3CxJU7wzBdQ1FiRSfMaftbUYHgMZ5SrV5FcxV1/0/*))#clyps7au",
+  "checksum": "hym8n9jx",
+  "isrange": true,
+  "issolvable": true,
+  "hasprivatekeys": false
+}
+```
 
-From here, checksum the descriptor and you can use it to test  addresses with `deriveaddresses` as discussed above.
+### Testing Addresses on Bitcoin Core
+
+With a descriptor with checksum in hand, you can now use it for functions in Bitcoin Core. One thing that you can do is derive addresses, so that you can check your addresses in **Gordian Cosigner** against another service. All that requires is the `deriveaddresses` RPC call in `bitcoin-cli`:
+```
+multi_desc_with_cs="wsh(sortedmulti(2,[a890879a/48'/1'/0'/2']tpubDEzcZKQ5N3ymDtUv6ekeyiESkAr5BwKSFdL4afXDDLf2f7KhJ5cyr2XrKqHwYutxYEVoUcDxdTFM2qPvvr1nwaa7HtAeJN4b4RuGRhPSS83/0/*,[90081696/48'/1'/0'/2']tpubDFhpmpiYsqtknPaom1M3hDM17gm4UPhCbjqj33k27tGf1bHWMcfyuNPLYozB1uzaaYyFz3CxJU7wzBdQ1FiRSfMaftbUYHgMZ5SrV5FcxV1/0/*))#clyps7au"
+$ bitcoin-cli deriveaddresses $multi_desc_with_cs [0,10]
+[
+  "tb1q64xk7lxyccmr77ulr82a7zvxq8radpmhk9hgsx85qwks88lqcyzsk489k6",
+  "tb1q6t8d35rzry92s3xeaa27hsglgu5s4j6pr9fsxzvpu2f7le0mf5dqapjnhx",
+  "tb1qp4whlnjheen73ul5ewc6h9trw27zjvquaxc2glmjwnmwyv47xs6qcfnq7d",
+  "tb1qr99x5gffuhhe59cef3m2dkhqwz4zq793czg4xr8xck8872uup8tq8ueaz9",
+  "tb1qlerjd5uuhk29yry4uc5p8dte262ay4uhnc0yqmwe56pj8umec6nshn9x8n",
+  "tb1qm6t7kzfdh2tza9mv4w8klmla35f5tmt0ye2p7kl2f4jl728jw9vqa7hduj",
+  "tb1qrrc9s66x6f67ppn54fprfjz7jkh9m5pe24rj498e5f9lmpshyu9snxpe8d",
+  "tb1q7dl555ch6k327dkkqmg7dxky89d7yny3xqvmz88rcngmjz2prt3s94u65r",
+  "tb1qcvtajx33fek50y5ghcv5tl525fqkhz0zlgp7hu98hjl2x0eyy5eqk58jhd",
+  "tb1qzqeuf7yva0dv4vqsrmflnvqxl538mtvdt4fsd97j0k7net86vwwqcruvzz",
+  "tb1q00deke3cfsp224clld5ea3denrcdemsz7ey3x668urguy04hkzsqmjf8cv"
+]
+```
+You can compare these in **Gordian Cosigner** by going to the **Accounts** tab, clicking the account in question and choosing "Address Explorer". Just click through the first few receive addresses; they should match the first few Bitcoin Core derived addresses.
 
 ### Importing An Account into Bitcoin Core
 
-If you'd like to make Bitcoin Core a fully functional part of your **Gordian Cosigner** ecosystem, you can do so by creating a wallet that contains watchonly copies of your multisig account addresses.
+If you'd like to make Bitcoin Core a fully functional part of your **Gordian Cosigner** ecosystem, you can do so by creating a Bitcoin Core wallet that contains watchonly copies of your multisig account addresses.
 
 You should start off creating a new wallet:
 ```
 $bitcoin-cli createwallet  "test" true true
 ```
-This create a wallet without private keys (that's the first `true`) and with no keys of its own (that's the second `true`).
+This creates a wallet called `test` without private keys (that's the first `true`) and with no keys of its own (that's the second `true`).
 
-You can then import your addresses using the descriptor you already modified:
+You can then import your addresses using the descriptor.
 ```
 $ bitcoin-cli -rpcwallet=test importmulti '[{"desc": "'$multi_desc_with_cs'", "timestamp": "now", "range": 100}]'
 [
@@ -96,13 +132,13 @@ $ bitcoin-cli -rpcwallet=test importmulti '[{"desc": "'$multi_desc_with_cs'", "t
   }
 ]
 ```
-Note: this imports just 100 addresses. You might want more, but for best safety you should just import a limited number at once.
+Note: this imports just 100 addresses. You might want more in the future, but for best safety you should import a limited number at any time.
 
 ### Creating PSBTs on Bitcoin Core
 
-If, as discussed above, you set Bitcoin Core up to be a watch-only wallet for your multisig account, you can also use it to be a transaction coordinator, acting as an Initiator for your PSBT by creating a multisig transaction. 
+Once you've set Bitcoin Core up as a watch-only wallet for your multisig account, you can also use it to be a transaction coordinator, acting as an Initiator for your multisigs.
 
-One of the easiest ways to create a PSBT is with `walletcreatefundedpsbt` (but see [Learning Bitcoin from the Command Line §7.1](https://github.com/BlockchainCommons/Learning-Bitcoin-from-the-Command-Line/blob/master/07_1_Creating_a_Partially_Signed_Bitcoin_Transaction.md) for more options). To use it you'll need a change address, which you have to create by hand because of the lack of keys in your wallet. You might use another address from your wallet. (Here, the change address is set to `$change`; a recipient is also set to `$recipient`).
+One of the easiest ways to create a PSBT is with `walletcreatefundedpsbt` (but see [Learning Bitcoin from the Command Line §7.1](https://github.com/BlockchainCommons/Learning-Bitcoin-from-the-Command-Line/blob/master/07_1_Creating_a_Partially_Signed_Bitcoin_Transaction.md) for more options). To use it you'll need a change address, which you have to create by hand because of the lack of keys in your wallet. You might use another address from your wallet. (Here, the change address is set to `$change` and a recipient is set as `$recipient`).
 
 With your change address in hand, it's easy to run `walletcreatefundedpsbt`:
 ```
@@ -114,8 +150,11 @@ $ bitcoin-cli -rpcwallet=test -named walletcreatefundedpsbt inputs='''[]''' outp
   "changepos": 0
 }
 ```
+This sends 0.004 BTC to the `$recipient`. Bitcoin Core figures out how to collect the funds and makes sure your change goes back to `$change`.
+
 Here's what that PSBT looks like:
 ```
+$ fundedpsbt="cHNidP8BAH0CAAAAASzqXxsYmidrIEKpa8KAvxNkejcofDJxVl+gWbhwl9UMAQAAAAD+////AuuFAQAAAAAAIgAgxbXR3sHtW9YuS5gtxziS3dVjkTtpou0FzE8X7pcGluWAGgYAAAAAABYAFK/W8cQ72pyoz6C/mPike31NWH2JAAAAAAABASsgoQcAAAAAACIAINVNb3zExjY/e58Z1d8JhgHH1od3sW6IGPQDrQOf4MEFAQVHUiECzgv0MLMTc2kivaKIAY0HCjtkwQvfmyHwaohJfvLtRdEhAzN+W+0uqIIlN0HgB7M1Ht4kugmwXe32Pdfm6MOg0m9oUq4iBgLOC/QwsxNzaSK9oogBjQcKO2TBC9+bIfBqiEl+8u1F0RyokIeaMAAAgAEAAIAAAACAAgAAgAAAAAAAAAAAIgYDM35b7S6ogiU3QeAHszUe3iS6CbBd7fY91+bow6DSb2gckAgWljAAAIABAACAAAAAgAIAAIAAAAAAAAAAAAABAUdSIQKxOzcdmNl6+F+bVu7Y4nVIzqratVycnfu9k/3akm/rFCEDCgsPnBjIgl/6pLaUpUg3FUi4Cs3fCPokQRCASIxH0B1SriICArE7Nx2Y2Xr4X5tW7tjidUjOqtq1XJyd+72T/dqSb+sUHJAIFpYwAACAAQAAgAAAAIACAACAAQAAACgAAAAiAgMKCw+cGMiCX/qktpSlSDcVSLgKzd8I+iRBEIBIjEfQHRyokIeaMAAAgAEAAIAAAACAAgAAgAEAAAAoAAAAAAA="
 $ bitcoin-cli analyzepsbt $fundedpsbt
 {
   "inputs": [
@@ -139,7 +178,7 @@ $ bitcoin-cli analyzepsbt $fundedpsbt
 ```
 As the `analyze` shows, all the data is there, all you're missing is the `signer`. That's the state that a PSBT needs to be in when you send it to **Gordian Cosigner**.
 
-Here's what that looks like in detail:
+Here's what that PSBT looks like in detail:
 ```
 standup@btctest:~$ bitcoin-cli decodepsbt $fundedpsbt
 {
@@ -285,4 +324,4 @@ And you can use the hex to send:
 ```
 $ bitcoin-cli sendrawtransaction "020000000001012cea5f1b189a276b2042a96bc280bf13647a37287c3271565fa059b87097d50c0100000000feffffff02eb85010000000000220020c5b5d1dec1ed5bd62e4b982dc73892ddd563913b69a2ed05cc4f17ee970696e5801a060000000000160014afd6f1c43bda9ca8cfa0bf98f8a47b7d4d587d89040047304402205d643dbfc053777ac1a548bc3e2d359268a7e6d81ed4128108ed77e9eb1fd000022062c7330109494b346550edaf112b91ad90dd54fad917587865f4fab5c16139e701483045022100c019d623f49843790087269bb280789107ce6b77101f557197a6b5f71f15488f02205e2b6ce734a4d54c96ef7d42ef820ac45b230ede16652db005d9ccf86f2fd1b00147522102ce0bf430b313736922bda288018d070a3b64c10bdf9b21f06a88497ef2ed45d12103337e5bed2ea882253741e007b3351ede24ba09b05dedf63dd7e6e8c3a0d26f6852ae00000000"a967ae537eebc3222ed591e47eb951790ad16a72706bfc17b2ac482fd9c7901f
 ```
-Congratulations, you've finished the round-trip for a multisig PSBT, using **Gordian Cosigner**.
+Congratulations, you've finished the round-trip for a multisig PSBT, using **Gordian Cosigner** and Bitcoin Core.
