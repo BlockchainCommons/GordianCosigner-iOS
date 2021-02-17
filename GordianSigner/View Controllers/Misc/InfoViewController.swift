@@ -57,6 +57,8 @@ class InfoViewController: UIViewController {
         An account map is a full Bitcoin descriptor of an account, including metadata, but built using only xpubs. For a multisignature account, the account map describes the multisig.
 
         To create an account, CREATE a policy defining how many cosigners are possible and how many of those signatures are required, and then ADD cosigners from your cosigners tab. You can alternatively IMPORT an account map using a QR code from an app like Gordian Wallet, Specter, or Fully Noded. When you are done, you can export your account map or your addresses, receive transactions, or make payments on the payments tab.
+        
+        You will typically import an account map created from another device, defining a multisig account.
         """
         
         configureView(icon: UIImage(systemName: "person.2.square.stack")!, blurbText: text, headerLabel: "Accounts")
@@ -78,7 +80,9 @@ class InfoViewController: UIViewController {
         let text = """
         A cosigner is an individuals or device that can be used to create multisignatures accounts.
 
-        To add a consigner, choose IMPORT to paste an xpub with origin info, crypto-account, crypto-hdkey, crypto-seed, or bip39 words, or scan a QR code. This must be done for everyone who will be participating in a multisignature account. When you are done, proceed to the accounts tab to combine cosigners into a multisignature account.
+        To add a cosigner, choose IMPORT to paste an xpub with origin info, crypto-account, crypto-hdkey, crypto-seed, or bip39 words, or scan a QR code. This must be done for everyone who will be participating in a multisignature account. When you are done, proceed to the accounts tab to combine cosigners into a multisignature account.
+        
+        You will typically add the cosigner that you sign with for a multisig account that you have been given.
         """
                 
         configureView(icon: UIImage(systemName: "person.2")!, blurbText: text, headerLabel: "Cosigners")
