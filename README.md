@@ -10,6 +10,9 @@
 
 ## Additional Information
 
+* [Integration](Docs/Integrating.md) — Using **Gordian Cosigner** with other applications.
+* [User Scenarios](Docs/Scenarios.md) — Reasons that you might use multisignatures to ensure the [#SmartCustody](https://www.smartcustody.com/) of your funds.
+
 This is a companion app for the Gordian system:
 
 * [Gordian system](https://github.com/BlockchainCommons/Gordian) — A self-sovereign Bitcoin wallet and node
@@ -31,11 +34,11 @@ At current, this Catalyst repo is only used for our iOS release, but we hope to 
 
 ## Usage Instructions
 
-**Gordian Cosigner** supports the middle step of multisig signing, after a multisig has been Initiated, while it is being Cosigned, and before it is Finalized. Usually, it will be used by a cosigner holding oone of the keys used in a multisig account transaction before handing it back to another user for finalization.
+**Gordian Cosigner** supports the middle step of multisig signing, after a multisig has been Initiated, while it is being Cosigned, and before it is Finalized. Usually, it will be used by a cosigner holding one of the keys used in a multisig account transaction before handing it back to another user for finalization.
 
 ### Preparing for Usage
 
-To prepare **Gordian Cosigner** for usage, you must first create a copy of the multisig that is being used. This is done by defining an account containing all of the cosigners in the multisig. The user of **Gordian Cosigner** will typically have a private key or seed for his own cosigner element, and then will typically be given xpubs or QR codes for other users' cosigner elements. When he combines these into an account, it should match the multisig created by other people on their own wallets. (See our [Scenarios page](Docs/Scenarios.md) for more discussion of how **Gordian Cosigner** might be used.)
+To prepare **Gordian Cosigner** for usage, you must first create a copy of the multisig that is being used. This is done by defining an account containing all of the cosigners in the multisig. The user of **Gordian Cosigner** will typically have a private key or seed for his own cosigner element, and then will typically be given an account map for the multisig and/or xpubs or QR codes for other users' cosigner elements. When he imports the account map or combines the cosigners into an account, it should match the multisig created by other people on their own wallets. (See our [Scenarios page](Docs/Scenarios.md) for more discussion of how **Gordian Cosigner** might be used.)
 
 To prepare an account for usage:
 
@@ -52,14 +55,13 @@ To prepare an account for usage:
 
 To use **Gordian Cosigner** for cosigning for multisig addresses, you must import a PSBT, sign, and then export it.
 
-1. Create a psbt with a network connected wallet using the same **account** and pass that psbt to Gordian Cosigner in the **payments** tab.
-2. Sign the psbt (ensuring you have added the necessary cosigner), export either the incomplete psbt to another signer or the finalized hex raw transaction for broadcasting.
+1. **Create PSBT.** Create a PSBT with a network connected wallet using the same **account** and pass that PSBT to Gordian Cosigner in the **Payments** tab.
+2. **Sign PSBT.** Sign the psbt (ensuring you have added the necessary cosigner).
+3. **Export PSBT.** Either export the incomplete PSBT to another signer or else the export finalized hex raw transaction to a networked wallet for broadcasting.
 
-## Backup & Recovery
+### Backup & Recovery
 
-**Gordian Cosigner** will automatically backup all data if your device is logged in to iCloud. If keychain "iCloud sync" is enabled you may easily recover all data across different devices which are signed in to the same iCloud account, if you do not have keychain sync enabled then you will only be able to automatically recover from the same device.
-
-See [Gordian Cosigner User Scenarios](Docs/Scenarios.md) for reasons that you might use multisignatures to ensure the [#SmartCustody](https://www.smartcustody.com/) of your funds.
+**Gordian Cosigner** will automatically backup all data if your device is logged in to iCloud. If keychain "iCloud sync" is enabled you may easily recover all data across different devices which are signed in to the same iCloud account. If you do not have keychain sync enabled then you will only be able to automatically recover from the same device.
 
 ## Origin, Authors, Copyright & Licenses
 
