@@ -14,7 +14,7 @@ To do any work on existing cosigners or accounts in Bitcoin Core requires creati
 
 Once you have creating a proper descriptor, you'll be able to use it for a variety of functions on Bitcoin Core.
 
-![](../images/integrating-btccore-setup.jpg)
+![](../images/integrating-btccore-setup.png)
 
 #### Creating a Descriptor from Accounts Information
 
