@@ -6,7 +6,7 @@ Following are three major scenarios in which it can be used.
 
 ## Scenario: Self-sovereign Account
 
-In a _self-sovereign account_, a user utilizes a multi-sig account to ensure the safety and security of his funds. He does so by creating a 2-of-3 multisignature account where he controls all three of the keys himself, but where he separates them in an intelligent way to ensure their safety.
+In a _self-sovereign account_, a user utilizes a multi-sig account to ensure the safety and security of his funds. He does so by creating a 2-of-3 multisignature account where he controls all three of the keys himself, but where he partitions them in an intelligent way to ensure their safety.
 
 1. Key #1 is generated as a seed on the phone and left there.
 2. Key #2 is generated as a seed on the phone, but after the BIP39 mnemonic phrase is recorded in steel and the multi-sig account is created, the seed is deleted from the phone.
@@ -14,9 +14,9 @@ In a _self-sovereign account_, a user utilizes a multi-sig account to ensure the
 
 The self-sovereign user will usually sign with his hardware wallet (#3) and his Gordian Cosigner app (#1), but if either is lost, he can recover the funds by importing the offline key (#2).
 
-## Scenario: Joint Account
+## Scenario: Dual Control w/Backup
 
-In a _self-sovereign account_, two users utilize a multi-sig account for joint funds, but also maintain a third, offline key in case either of them loses their phone or is incapacitated.
+In a _dual-control account_, two users utilize a multi-sig account for joint funds, but also maintain a third, offline "Emergency Responder" key in case either of them loses their phone or is incapacitated.
 
 1. Key #1 is generated on the first user's phone and imported into the other's as a cosigner using an xpub.
 1. Key #2 is generated on the second user's phone and imported into the other's as a cosigner using an xpub.
@@ -24,7 +24,7 @@ In a _self-sovereign account_, two users utilize a multi-sig account for joint f
 
 The joint users will usually sign, each using their own Gordian Cosigner, but at any time either one could go to the safe storage for the third key and retrieve it for signing. 
 
-### Scenario Variant: Key Service
+### Scenario Variant: Backup Service
 
 In a variant of this scenario, the third key might be held by an online service.
 
