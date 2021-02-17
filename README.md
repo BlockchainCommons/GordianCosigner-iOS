@@ -59,6 +59,8 @@ To use **Gordian Cosigner** for cosigning for multisig addresses, you must impor
 2. **Sign PSBT.** Sign the psbt (ensuring you have added the necessary cosigner).
 3. **Export PSBT.** Either export the incomplete PSBT to another signer or else the export finalized hex raw transaction to a networked wallet for broadcasting.
 
+Be sure to see the article on [Integrating Gordian Cosigner](Docs/Integrating.md) for some complete examples of how other systems can be used to build up the initial and final parts of the multisigning process.
+
 ### Backup & Recovery
 
 **Gordian Cosigner** will automatically backup all data if your device is logged in to iCloud. If keychain "iCloud sync" is enabled you may easily recover all data across different devices which are signed in to the same iCloud account. If you do not have keychain sync enabled then you will only be able to automatically recover from the same device.
