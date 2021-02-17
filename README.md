@@ -4,9 +4,14 @@
 
 ![](images/logos/gordian-signer-screen.jpg)
 
-**Gordian Cosigner** allows users to participate in a multisig by adding a signature to an otherwise unsigned or partially signed PSBT, where they may or may not have initiated the transaction. It can also be used for signing a single-signature PSBT. It's largely intended as an offline signing tool, which allows signing without the usage of a full node: a real wallet is need to both initiate an account map and to initiate a transaction.
+**Gordian Cosigner** allows users to participate in a multisig by adding a signature to an otherwise unsigned or partially signed PSBT that was created on another device. It's largely intended as an offline signing tool, which allows signing without a direct connection to a full node: a wallet that can create PSBTs or another transaction coordinator service is needed to initiate a transaction.
+
+(Gordian Cosigner can also be used for signing a single-signature PSBT, though that's not its main purpose.)
 
 ## Additional Information
+
+* [Integration](Docs/Integrating.md) — Using **Gordian Cosigner** with other applications.
+* [User Scenarios](Docs/Scenarios.md) — Reasons that you might use multisignatures to ensure the [#SmartCustody](https://www.smartcustody.com/) of your funds.
 
 This is a companion app for the Gordian system:
 
@@ -23,26 +28,42 @@ GordianCosigner-Catalyst is currently a late alpha. It should not be used for pr
 
 At current, this Catalyst repo is only used for our iOS release, but we hope to eventually use it for the MacOS release as well. (A security lock on the MacOS camera currently prevents us from doing so.)
 
-## Installation
+## Installation Instructions
 
 **Gordian Cosigner** is available for testing from Testflight [here](https://testflight.apple.com/join/sJTaoUsM).
 
-## Usage
+## Usage Instructions
 
-To use **Gordian Cosigner**, you should:
+**Gordian Cosigner** supports the middle step of multisig signing, after a multisig has been Initiated, while it is being Cosigned, and before it is Finalized. Usually, it will be used by a cosigner holding one of the keys used in a multisig account transaction before handing it back to another user for finalization.
 
-1. Create or import a cosigner from the **cosigner** tab.
-2. Record offline backups of your cosigners QR codes and text, especially the seed info (if any).
-3. Create or import an account from the **account** tab. To import an account users may scan or paste in an "Account Map" (wallet backup QR) from Gordian Wallet, Fully Noded and Specter. To create an account simply choose the policy and then select which cosigners you would like to add to the account, once sufficient number of cosigners have been added to the account it will automatically complete.
-4. From the **account** tab tap the detail button, then the **address explorer** button to see each address for the account, cross check these addresses with your other wallet software to ensure they match.
-5. Create a psbt with a network connected wallet using the same **account** and pass that psbt to Gordian Cosigner in the **payments** tab.
-6. Sign the psbt (ensuring you have added the necessary cosigner), export either the incomplete psbt to another signer or the finalized hex raw transaction for broadcasting.
+### Preparing for Usage
 
-## Backup & Recovery
+To prepare **Gordian Cosigner** for usage, you must first create a copy of the multisig that is being used. This is done by defining an account containing all of the cosigners in the multisig. The user of **Gordian Cosigner** will typically have a private key or seed for his own cosigner element, and then will typically be given an account map for the multisig and/or xpubs or QR codes for other users' cosigner elements. When he imports the account map or combines the cosigners into an account, it should match the multisig created by other people on their own wallets. (See our [Scenarios page](Docs/Scenarios.md) for more discussion of how **Gordian Cosigner** might be used.)
 
-**Gordian Cosigner** will automatically backup all data if your device is logged in to iCloud. If keychain "iCloud sync" is enabled you may easily recover all data across different devices which are signed in to the same iCloud account, if you do not have keychain sync enabled then you will only be able to automatically recover from the same device.
+To prepare an account for usage:
 
-See [Gordian Cosigner User Scenarios](Docs/Scenarios.md) for reasons that you might use multisignatures to ensure the [#SmartCustody](https://www.smartcustody.com/) of your funds.
+1. **Gather Cosigners.** Import all cosigners who will be involved in the multisig account in the **Cosigners** tab.
+   * To import a cosigner, select "Import" and paste in origin info, `crypto-account`, `crypto-hdkey`, `crypto-seed`, or BIP39 words, or else scan a QR code.
+      * _You will typically import public-key information for other signers, and you may import private-key information for your own signatures._
+   * There is currently a "Create Cosigner" function available mainly for testing that allows you to create seeds on the device itself. To create a cosigner, select "Create". Afterward, be sure to record offline backups of your cosigner's QR codes and text, especially the seed info (if any).
+2. **Form Account.** Import an account from the **Accounts** tab. 
+   * To import an account, select "Import" and scan an "Account Map" (wallet backup QR) from Gordian Wallet, Fully Noded, or Specter. 
+   * There is currently a "Create Cosigner" function available mainly for testing that allows you to create new maps on the device itself. To create an account, select "Create", set a policy and then select which cosigners you would like to add to the account. Once a sufficient number of cosigners have been added to the account, it will automatically complete.
+3. **Check Address.** Tap the detail button, then the **address explorer** button on the **Accounts** tab to see each address for the account; cross-check the first several "Receive" addresses with your other wallet software to ensure they match.
+
+### Signing Multisigs
+
+To use **Gordian Cosigner** for cosigning for multisig addresses, you must import a PSBT, sign, and then export it.
+
+1. **Create PSBT.** Create a PSBT with a network connected wallet using the same **account** and pass that PSBT to Gordian Cosigner in the **Payments** tab.
+2. **Sign PSBT.** Sign the psbt (ensuring you have added the necessary cosigner).
+3. **Export PSBT.** Either export the incomplete PSBT to another signer or else the export finalized hex raw transaction to a networked wallet for broadcasting.
+
+Be sure to see the article on [Integrating Gordian Cosigner](Docs/Integrating.md) for some complete examples of how other systems can be used to build up the initial and final parts of the multisigning process.
+
+### Backup & Recovery
+
+**Gordian Cosigner** will automatically backup all data if your device is logged in to iCloud. If keychain "iCloud sync" is enabled you may easily recover all data across different devices which are signed in to the same iCloud account. If you do not have keychain sync enabled then you will only be able to automatically recover from the same device.
 
 ## Origin, Authors, Copyright & Licenses
 
