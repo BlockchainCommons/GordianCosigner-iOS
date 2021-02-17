@@ -48,6 +48,23 @@ $ bitcoin-cli deriveaddresses $multi_desc_with_cs [0,10]
 ```
 And even import individual addresses if you like.
 
+If you prefer to import a range of address, you can create a new wallet:
+```
+$bitcoin-cli createwallet  "test" true true
+```
+And do so:
+```
+$ bitcoin-cli -rpcwallet=test importmulti '[{"desc": "'$multi_desc_with_cs'", "timestamp": "now", "range": 100}]'
+[
+  {
+    "success": true,
+    "warnings": [
+      "Some private keys are missing, outputs will be considered watchonly. If this is intentional, specify the watchonly flag."
+    ]
+  }
+]
+```
+
 ### Exporting from Cosigners
 
 Alternatively, you have everything you need in the **Cosigners** tab. You can go to each individual cosigner and incorporate all of that information to create your descriptor.
