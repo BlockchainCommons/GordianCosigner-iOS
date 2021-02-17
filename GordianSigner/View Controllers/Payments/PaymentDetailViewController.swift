@@ -19,12 +19,14 @@ class PsbtTableViewController: UIViewController, UITableViewDelegate, UITableVie
     var rawTx = ""
     var psbtStruct:PsbtStruct!
     var psbt:PSBT!
+    var signedPsbt:PSBT!
     private var canSign = false
     private var alertStyle = UIAlertController.Style.actionSheet
     var inputsArray = [[String:Any]]()
     var outputsArray = [[String:Any]]()
     var signedFor = [String]()
     var accounts = [AccountStruct]()
+    var isComplete = false
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -41,16 +43,6 @@ class PsbtTableViewController: UIViewController, UITableViewDelegate, UITableVie
         }
                 
         psbt = try? PSBT(psbt: psbtStruct.psbt, network: Keys.chain)
-        
-        if let psbtToFinalize = try? psbt.finalized() {
-            if psbtToFinalize.isComplete {
-                if let final = psbtToFinalize.transactionFinal {
-                    if let hex = final.description {
-                        self.rawTx = hex
-                    }
-                }
-            }
-        }
         
         loadTable()
     }
@@ -91,6 +83,12 @@ class PsbtTableViewController: UIViewController, UITableViewDelegate, UITableVie
                         }
                     }
                 }
+            }
+        }
+        
+        if let final = try? psbt.finalized() {
+            if let _ = final.transactionFinal {
+                self.isComplete = true
             }
         }
         
@@ -553,27 +551,15 @@ class PsbtTableViewController: UIViewController, UITableViewDelegate, UITableVie
         let label = cell.viewWithTag(1) as! UILabel
         let icon = cell.viewWithTag(2) as! UIImageView
         
-        if let psbtToFinalize = try? psbt.finalized() {
-            if psbtToFinalize.isComplete {
-                label.text = "Signatures complete"
-                icon.image = UIImage(systemName: "checkmark.square")
-                icon.tintColor = .systemGreen
-            } else {
-                label.text = "Signatures required"
-                icon.image = UIImage(systemName: "exclamationmark.square")
-                icon.tintColor = .systemPink
-            }
+        if isComplete {
+            label.text = "Signatures complete"
+            icon.image = UIImage(systemName: "checkmark.square")
+            icon.tintColor = .systemGreen
         } else {
-            if psbt.isComplete {
-                label.text = "Signatures complete"
-                icon.image = UIImage(systemName: "checkmark.square")
-                icon.tintColor = .systemGreen
-            } else {
-                label.text = "Signatures required"
-                icon.image = UIImage(systemName: "exclamationmark.square")
-                icon.tintColor = .systemPink
-            }
-        }        
+            label.text = "Signatures required"
+            icon.image = UIImage(systemName: "exclamationmark.square")
+            icon.tintColor = .systemPink
+        }
         
         return cell
     }
@@ -837,28 +823,18 @@ class PsbtTableViewController: UIViewController, UITableViewDelegate, UITableVie
                 return
             }
             
-            self.signedFor = signedFor
-            
-            self.save(signedPsbt)
-            
-            if let psbtToFinalize = try? signedPsbt.finalized() {
-                if psbtToFinalize.isComplete {
-                    if let final = psbtToFinalize.transactionFinal {
-                        if let hex = final.description {
-                            self.rawTx = hex
-                        }
-                    }
-                }
-            }
-            
             DispatchQueue.main.async { [weak self] in
                 guard let self = self else { return }
                 
+                self.signedFor = signedFor
+                self.save(signedPsbt)
                 self.psbt = signedPsbt
                 self.signButtonOutlet.alpha = 0
+                
                 self.load { success in
                     DispatchQueue.main.async { [weak self] in
                         guard let self = self else { return }
+                        
                         self.tableView.reloadData()
                         self.spinner.remove()
                         showAlert(self, "Payment Signed ✓", "The signed payment has been saved. Export it by tapping the share button in top right.")
@@ -928,6 +904,7 @@ class PsbtTableViewController: UIViewController, UITableViewDelegate, UITableVie
             }))
             
             alert.addAction(UIAlertAction(title: "psbt base64 text", style: .default, handler: { action in
+                //print("psbt to export: \(self.psbt.description)")
                 self.exportText(self.psbt.description)
             }))
             

@@ -147,10 +147,14 @@ class PsbtViewController: UIViewController, UITableViewDelegate, UITableViewData
                         
                         self.amounts.append(amount)
                         
-                        if let finalized = try? psbtWally.finalized() {
-                            self.completes.append(finalized.isComplete)
+                        if let final = try? psbtWally.finalized() {
+                            if let _ = final.transactionFinal {
+                                self.completes.append(true)
+                            } else {
+                                self.completes.append(false)
+                            }
                         } else {
-                            self.completes.append(psbtWally.isComplete)
+                            self.completes.append(false)
                         }
                         
                         self.lifeHashes.append(image)
