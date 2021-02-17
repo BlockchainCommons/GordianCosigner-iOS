@@ -14,6 +14,8 @@ To do any work on existing cosigners or accounts in Bitcoin Core requires creati
 
 Once you have creating a proper descriptor, you'll be able to use it for a variety of functions on Bitcoin Core.
 
+![](../images/integrating-btccore-setup.jpg)
+
 #### Creating a Descriptor from Accounts Information
 
 The export function on the **Accounts** tab in **Gordian Cosigner** will produce text like the following:
