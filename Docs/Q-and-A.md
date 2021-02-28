@@ -83,15 +83,25 @@ We've done our best to protect the privacy of the Github by investigating the im
 # Q&A section General
 
 ## *Q: What is Gordian Cosigner?
-A signing tool for multisignatures
-
+An offline signing tool for multisignatures.
+Gordian Cosigner allows users to participate in a multisig by adding a signature to an otherwise unsigned or partially signed `PSBT` that was created on another device.
 <img src="../images/logos/gordian-signer-logo-white.png" alt="Gordian Cosigner logo" border="0" width="400">
 
-## For who is Gordian Cosigner?
 
-## WHy should I use Gordian Cosigner?
+## *Q: What is a PBST?
+Partially signed bitcoin transactions (PSBTs) Also covering BIP174. Partially Signed Bitcoin Transactions (PSBTs) are a data format that allows wallets and other tools to exchange information about a Bitcoin transaction and the signatures necessary to complete it. 
 
-## When should I use Gordian Cosigner?
+<img src="../images/snap-psbt-visualized.png" alt="Snapshot PSBT visualized" border="0" width="200">
+
+## *Q: For who is Gordian Cosigner?
+It's largely intended as an offline signing tool, which allows signing without a direct connection to a full node: a wallet that can create `PSBT`s or another transaction coordinator service is needed to initiate a transaction.
+
+## *Q: WHy should I use Gordian Cosigner?
+(Partially) Sign multisignature transactions offline.\
+Gordian Cosigner can also be used for signing a single-signature `PSBT`, though that's not its main purpose.
+
+## **Q: When should I use Gordian Cosigner?
+Gordian Cosigner supports the middle step of multisig signing, after a multisig has been Initiated, while it is being Cosigned, and before it is Finalized. Usually, it will be used by a cosigner holding one of the keys used in a multisig account transaction before handing it back to another user for finalization.
 
 # Q&A section Gordian Cosigner operational
 
@@ -99,3 +109,9 @@ A signing tool for multisignatures
 Gordian Cosigner is a multiplatform utility that's also available as:
 - [GordianCosigner for Android](https://github.com/BlockchainCommons/GordianSigner-Android)
 - [GordianCosigner for MacOS](https://github.com/BlockchainCommons/GordianSigner-macOS)
+
+## *Q: What do I need to run Gordian Cosigner? 
+Currently (Feb 2021), Cosigner only runs in Testflight on iOS 14.4. So yu need to get a invitation code first from Blockchaincommons.
+
+## **Q: How do I run Gordian Cosigner?
+To prepare Gordian Cosigner for usage, you must first create a copy of the multisig that is being used. This is done by defining an account containing all of the cosigners in the multisig. The user of Gordian Cosigner will typically have a private key or seed for his own cosigner element, and then will typically be given an account map for the multisig and/or xpubs or QR codes for other users' cosigner elements. When he imports the account map or combines the cosigners into an account, it should match the multisig created by other people on their own wallets. (See our [Scenarios](https://github.com/BlockchainCommons/GordianCosigner-Catalyst/blob/master/Docs/Scenarios.md) page for more discussion of how Gordian Cosigner might be used.)
