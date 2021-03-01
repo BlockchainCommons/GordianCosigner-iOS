@@ -44,6 +44,12 @@ class PsbtTableViewController: UIViewController, UITableViewDelegate, UITableVie
                 
         psbt = try? PSBT(psbt: psbtStruct.psbt, network: Keys.chain)
         
+        NotificationCenter.default.addObserver(self, selector: #selector(refresh), name: .cosignerAdded, object: nil)
+        
+        loadTable()
+    }
+    
+    @objc func refresh() {
         loadTable()
     }
     
@@ -550,15 +556,20 @@ class PsbtTableViewController: UIViewController, UITableViewDelegate, UITableVie
         
         let label = cell.viewWithTag(1) as! UILabel
         let icon = cell.viewWithTag(2) as! UIImageView
+        let addCosignerButton = cell.viewWithTag(3) as! UIButton
+        
+        addCosignerButton.addTarget(self, action: #selector(addCosigner(_:)), for: .touchUpInside)
         
         if isComplete {
             label.text = "Signatures complete"
             icon.image = UIImage(systemName: "checkmark.square")
             icon.tintColor = .systemGreen
+            addCosignerButton.alpha = 0
         } else {
             label.text = "Signatures required"
             icon.image = UIImage(systemName: "exclamationmark.square")
             icon.tintColor = .systemPink
+            addCosignerButton.alpha = 1
         }
         
         return cell
@@ -804,6 +815,14 @@ class PsbtTableViewController: UIViewController, UITableViewDelegate, UITableVie
         }
     }
     
+    @objc func addCosigner(_ sender: UIButton) {
+        DispatchQueue.main.async { [weak self] in
+            guard let self = self else { return }
+            
+            self.performSegue(withIdentifier: "segueToAddSignerFromPsbt", sender: self)
+        }
+    }
+    
     @objc func editLabelMemo(_ sender: UIButton) {
         DispatchQueue.main.async { [weak self] in
             guard let self = self else { return }
@@ -950,6 +969,11 @@ class PsbtTableViewController: UIViewController, UITableViewDelegate, UITableVie
     override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
         // Get the new view controller using segue.destination.
         // Pass the selected object to the new view controller.
+        if segue.identifier == "segueToAddSignerFromPsbt" {
+            if let vc = segue.destination as? KeysetsViewController {
+                vc.isAdding = true
+            }
+        }
         if segue.identifier == "segueToQRDisplayer" {
             if let vc = segue.destination as? QRDisplayerViewController {
                 vc.text = psbt.description

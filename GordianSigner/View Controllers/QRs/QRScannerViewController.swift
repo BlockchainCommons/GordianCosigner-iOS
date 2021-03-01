@@ -177,10 +177,14 @@ class QRScannerViewController: UIViewController {
         return Keys.validMnemonicString(processedCharacters(text))
     }
     
+    private func isPsbt(_ text: String) -> Bool {
+        return text.lowercased().hasPrefix("ur:crypto-psbt")
+    }
+    
     private func process(text: String) {
         isRunning = true
         
-        if !isAccountMap(text) && !isCryptoAccount(text) && !isCosigner(text) && !isCryptoHDKey(text) && !isMnemonic(text) && !isCryptoSeed(text) {
+        if isPsbt(text) {
             //keepRunning = true
             // Stop if we're already done with the decode.
             guard decoder.result == nil else {
@@ -226,13 +230,21 @@ class QRScannerViewController: UIViewController {
                 self.progressView.alpha = 1
                 self.progressDescriptionLabel.alpha = 1
             }
-        } else {
+        } else if isAccountMap(text) || isCryptoAccount(text) || isCosigner(text) || isCryptoHDKey(text) || isMnemonic(text) || isCryptoSeed(text) {
             DispatchQueue.main.async {
                 self.avCaptureSession.stopRunning()
                 let impact = UIImpactFeedbackGenerator()
                 impact.impactOccurred()
                 AudioServicesPlaySystemSound(1103)
                 self.stopScanning(text)
+            }
+        } else {
+            DispatchQueue.main.async {
+                self.avCaptureSession.stopRunning()
+                let impact = UIImpactFeedbackGenerator()
+                impact.impactOccurred()
+                AudioServicesPlaySystemSound(1103)
+                showAlert(self, "That is not a supported QR code", "Please let us know about it at https://github.com/BlockchainCommons/GordianCosigner-iOS/issues")
             }
         }
     }

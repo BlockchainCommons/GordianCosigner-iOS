@@ -9,7 +9,7 @@
 import UIKit
 import LibWally
 
-class KeysetsViewController: UIViewController, UITableViewDelegate, UITableViewDataSource {
+class KeysetsViewController: UIViewController, UITableViewDelegate, UITableViewDataSource, UINavigationControllerDelegate {
     
     var addButton = UIBarButtonItem()
     var editButton = UIBarButtonItem()
@@ -21,6 +21,7 @@ class KeysetsViewController: UIViewController, UITableViewDelegate, UITableViewD
     private var cosigner:CosignerStruct!
     private var providedMnemonic = ""
     private var coinType = "0"
+    var isAdding = false
     let spinner = Spinner()
 
     @IBOutlet weak private var keysetsTable: UITableView!
@@ -31,6 +32,7 @@ class KeysetsViewController: UIViewController, UITableViewDelegate, UITableViewD
         // Do any additional setup after loading the view.
         keysetsTable.delegate = self
         keysetsTable.dataSource = self
+        navigationController?.delegate = self
         
         if KeyChain.getData("hasUpdated") == nil {
             KeyChain.removeAll()
@@ -56,6 +58,10 @@ class KeysetsViewController: UIViewController, UITableViewDelegate, UITableViewD
         }
         
         load()
+        
+        if isAdding {
+            promptToAdd()
+        }
     }
     
     override func viewDidAppear(_ animated: Bool) {
@@ -136,6 +142,10 @@ class KeysetsViewController: UIViewController, UITableViewDelegate, UITableViewD
     }
     
     @objc func add() {
+        promptToAdd()
+    }
+    
+    private func promptToAdd() {
         DispatchQueue.main.async { [weak self] in
             guard let self = self else { return }
             

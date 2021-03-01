@@ -14,6 +14,7 @@
             <objects>
                 <navigationController id="Inf-1k-cZk" sceneMemberID="viewController">
                     <tabBarItem key="tabBarItem" title="Cosigners" image="person.2" catalog="system" id="lj9-LP-8Db"/>
+                    <navigationItem key="navigationItem" id="JFE-8W-1q0"/>
                     <navigationBar key="navigationBar" contentMode="scaleToFill" insetsLayoutMarginsFromSafeArea="NO" barStyle="black" translucent="NO" id="4bi-7m-Lwm">
                         <rect key="frame" x="0.0" y="44" width="414" height="44"/>
                         <autoresizingMask key="autoresizingMask"/>
@@ -905,12 +906,20 @@
                                                     <color key="textColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                                                     <nil key="highlightedColor"/>
                                                 </label>
+                                                <button opaque="NO" tag="3" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="system" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="hFd-KB-RCu">
+                                                    <rect key="frame" x="241" y="7" width="73" height="30"/>
+                                                    <state key="normal" title="add signer">
+                                                        <color key="titleColor" systemColor="systemTealColor"/>
+                                                    </state>
+                                                </button>
                                             </subviews>
                                             <constraints>
                                                 <constraint firstItem="tOw-6L-nth" firstAttribute="centerY" secondItem="jZ4-5q-3vW" secondAttribute="centerY" id="7xy-5z-r6E"/>
                                                 <constraint firstItem="DBI-yb-b5V" firstAttribute="centerY" secondItem="jZ4-5q-3vW" secondAttribute="centerY" id="BZd-gN-F65"/>
                                                 <constraint firstItem="tOw-6L-nth" firstAttribute="leading" secondItem="jZ4-5q-3vW" secondAttribute="leading" constant="20" id="CeC-xz-ZVs"/>
+                                                <constraint firstAttribute="trailing" secondItem="hFd-KB-RCu" secondAttribute="trailing" constant="20" symbolic="YES" id="Teb-0d-YMB"/>
                                                 <constraint firstItem="DBI-yb-b5V" firstAttribute="centerY" secondItem="jZ4-5q-3vW" secondAttribute="centerY" id="bgu-OH-kS3"/>
+                                                <constraint firstItem="hFd-KB-RCu" firstAttribute="centerY" secondItem="jZ4-5q-3vW" secondAttribute="centerY" id="lFX-Ki-4RM"/>
                                                 <constraint firstItem="DBI-yb-b5V" firstAttribute="leading" secondItem="tOw-6L-nth" secondAttribute="trailing" constant="8" id="s93-Ob-u4X"/>
                                             </constraints>
                                         </tableViewCellContentView>
@@ -2605,7 +2614,7 @@ Blockchain Commons and Gordian Cosigner never share any data with any third part
         <segue reference="6Zt-E7-EEd"/>
         <segue reference="UaS-I9-AEd"/>
         <segue reference="KzM-QC-ivF"/>
-        <segue reference="MZ7-2Z-REz"/>
+        <segue reference="JgM-9d-RH3"/>
         <segue reference="hha-MU-QkB"/>
     </inferredMetricsTieBreakers>
     <resources>
