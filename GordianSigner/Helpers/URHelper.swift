@@ -65,7 +65,7 @@ enum URHelper {
     }
 
     static func psbtUr(_ data: Data) -> UR? {
-        let cbor = CBOR.encodeByteString(data.bytes).data//CBOR.byteString(data.bytes).encode(<#_#>).data
+        let cbor = CBOR.encodeByteString(data.bytes).data
         
         return try? UR(type: "crypto-psbt", cbor: cbor)
     }
@@ -488,6 +488,49 @@ enum URHelper {
         result.append(CBOR.unsignedInt(UInt64(chain)))
         
         return Data(result.encode())
+    }
+    
+    static func requestXprv(_ xpub: String, _ sourceXfp: String, _ description: String) -> String? {
+        var coinType:UInt64 = 0
+        
+        if Keys.coinType == "1" {
+            coinType = 1
+        }
+        
+        let b58 = Base58.decode(xpub)
+        let b58Data = Data(b58)
+        let depth = b58Data.subdata(in: Range(4...4))
+        
+        var requestId = UUID().uuidString
+        requestId = requestId.replacingOccurrences(of: "-", with: "")
+        let uuidByteString = CBOR.byteString([UInt8](Data(value: requestId)))
+        
+        var originsWrapper:[OrderedMapEntry] = []
+        originsWrapper.append(.init(key: 1, value: .array([.unsignedInt(48), true, .unsignedInt(coinType), true, .unsignedInt(0), true, .unsignedInt(2), true])))
+        originsWrapper.append(.init(key: 2, value: .unsignedInt(UInt64(sourceXfp, radix: 16) ?? 0)))
+        originsWrapper.append(.init(key: 3, value: .unsignedInt(UInt64(depth.hexString) ?? 0)))
+        let originsCbor = CBOR.orderedMap(originsWrapper)
+        
+        var useInfoWrapper:[OrderedMapEntry] = []
+        useInfoWrapper.append(.init(key: 2, value: .unsignedInt(1)))
+        let useInfoCbor = CBOR.orderedMap(useInfoWrapper)
+        
+        var hdkeyRequest:[OrderedMapEntry] = []
+        hdkeyRequest.append(.init(key: 1, value: .boolean(true)))
+        hdkeyRequest.append(.init(key: 2, value: .tagged(CBOR.Tag(rawValue: 304), originsCbor)))
+        hdkeyRequest.append(.init(key: 3, value: .tagged(CBOR.Tag(rawValue: 305), useInfoCbor)))
+        let hdkeyRequestCbor = CBOR.orderedMap(hdkeyRequest)
+        
+        var request:[OrderedMapEntry] = []
+        request.append(.init(key: 1, value: .tagged(CBOR.Tag(rawValue: UInt64(37)), uuidByteString)))
+        request.append(.init(key: 2, value: .tagged(CBOR.Tag(rawValue: UInt64(501)), hdkeyRequestCbor)))
+        request.append(.init(key: 3, value: .utf8String(description)))
+        
+        let cbor = CBOR.orderedMap(request)
+        
+        guard let rawUr = try? UR(type: "crypto-request", cbor: cbor) else { return nil }
+        
+        return UREncoder.encode(rawUr)
     }
     
 }

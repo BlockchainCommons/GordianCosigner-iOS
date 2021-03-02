@@ -569,7 +569,12 @@ class PsbtTableViewController: UIViewController, UITableViewDelegate, UITableVie
             label.text = "Signatures required"
             icon.image = UIImage(systemName: "exclamationmark.square")
             icon.tintColor = .systemPink
-            addCosignerButton.alpha = 1
+            if !canSign {
+                addCosignerButton.alpha = 1
+            } else {
+                addCosignerButton.alpha = 0
+            }
+            
         }
         
         return cell
