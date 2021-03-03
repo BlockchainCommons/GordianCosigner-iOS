@@ -40,8 +40,7 @@ class KeysetsViewController: UIViewController, UITableViewDelegate, UITableViewD
             CoreDataService.deleteAllData(entity: .cosigner) { (_) in }
             CoreDataService.deleteAllData(entity: .payment) { (_) in }
             UserDefaults.standard.setValue(true, forKey: "hasUpdated")
-            KeyChain.set("true".utf8, forKey: "hasUpdated")
-            //showAlert(self, "", "This update is not backwards compatible and all existing data has been deleted to allow for iCloud backups across devices.")
+            let _ = KeyChain.set("true".utf8, forKey: "hasUpdated")
         }
         
         if !FirstTime.firstTimeHere() {
@@ -482,111 +481,38 @@ class KeysetsViewController: UIViewController, UITableViewDelegate, UITableViewD
     }
     
     private func addCosigner(_ account: String) {
-        print("account: \(account)")
-        var segwitBip84Account = account
-        var hack = "wsh(\(account)/0/*)"
-        let dp = DescriptorParser()
-        var ds = dp.descriptor(hack)
-        var cosigner = [String:Any]()
-        
-        if let hdkey = try? HDKey(base58: ds.accountXprv) {
-            guard let encryptedXprv = Encryption.encrypt(ds.accountXprv.utf8) else { return }
-            cosigner["xprv"] = encryptedXprv
-            hack = hack.replacingOccurrences(of: ds.accountXprv, with: hdkey.xpub)
-            segwitBip84Account = segwitBip84Account.replacingOccurrences(of: ds.accountXprv, with: hdkey.xpub)
-            ds = dp.descriptor(hack)
-        }
-                
-        guard let _ = try? HDKey(base58: ds.accountXpub) else {
-            showAlert(self, "Invalid key", "Gordian Cosigner is not yet compatible with slip132, please ensure you are adding a valid xpub and try again.")
-            return
-        }
-        
-        guard account.contains("/48h/\(coinType)h/0h/2h") || account.contains("/48'/\(coinType)'/0'/2'") else {
-            showAlert(self, "Derivation not supported", "Gordian Cosigner currently only supports the m/48h/\(coinType)h/0h/2h key origin.")
-            return
-        }
-        
-        guard let ur = URHelper.cosignerToUr(segwitBip84Account, false), let lifehashFingerprint = URHelper.fingerprint(ur) else {
-            showAlert(self, "", "Unsupported key, we only support Bitcoin mainnet/testnet hdkeys.")
-            return
-        }
-                        
-        cosigner["id"] = UUID()
-        cosigner["label"] = "Cosigner"
-        cosigner["bip48SegwitAccount"] = segwitBip84Account
-        cosigner["dateAdded"] = Date()
-        cosigner["fingerprint"] = ds.fingerprint
-        cosigner["lifehash"] = lifehashFingerprint
-        
-        func save() {
-            CoreDataService.saveEntity(dict: cosigner, entityName: .cosigner) { [weak self] (success, errorDesc) in
-                guard let self = self else { return }
-                
-                guard success else {
-                    showAlert(self, "Cosigner not saved!", "Please let us know about this bug.")
-                    return
-                }
-                
-                DispatchQueue.main.async {
-                    self.keysetsTable.reloadData()
-                    
-                    var alertStyle = UIAlertController.Style.actionSheet
-                    if (UIDevice.current.userInterfaceIdiom == .pad) {
-                      alertStyle = UIAlertController.Style.alert
-                    }
-                    
-                    let alert = UIAlertController(title: "Cosigner imported ✓", message: "Would you like to give it a label now? You can edit the label at any time.", preferredStyle: alertStyle)
-                    
-                    alert.addAction(UIAlertAction(title: "Add label", style: .default, handler: { action in
-                        self.promptToEditLabel(CosignerStruct(dictionary: cosigner))
-                    }))
-                                    
-                    alert.addAction(UIAlertAction(title: "Cancel", style: .cancel, handler: { action in
-                        self.load()
-                    }))
-                    
-                    alert.popoverPresentationController?.sourceView = self.view
-                    self.present(alert, animated: true, completion: nil)
-                }
+        AddCosigner.add(account) { (success, message, errorDescription, savedNew, cosignerStruct) in
+            guard success, let cosignerStruct = cosignerStruct else {
+                showAlert(self, message, errorDescription ?? "unknown error")
+                return
             }
-        }
-        
-        func update(_ id: UUID) {
-            CoreDataService.updateEntity(id: id, keyToUpdate: "xprv", newValue: cosigner["xprv"] as! Data, entityName: .cosigner) { (success, errorDescription) in
-                guard success else {
-                    showAlert(self, "", "There was an issue updating the Cosigner...")
-                    return
-                }
-                
+            
+            guard savedNew else {
                 self.load()
-                showAlert(self, "", "Cosigner updated with xprv.")
+                showAlert(self, "", "\(cosignerStruct.label) updated with xprv.")
+                return
             }
-        }
-        
-        CoreDataService.retrieveEntity(entityName: .cosigner) { (cosigners, errorDescription) in
-            if let cosigners = cosigners, cosigners.count > 0 {
-                var idToUpdate:UUID?
-                for (i, cosignerDict) in cosigners.enumerated() {
-                    let cosignerStruct = CosignerStruct(dictionary: cosignerDict)
-                    
-                    if cosignerStruct.bip48SegwitAccount == segwitBip84Account {
-                        //update existing
-                        idToUpdate = cosignerStruct.id
-                    }
-                    
-                    if i + 1 == cosigners.count {
-                        if idToUpdate == nil {
-                            save()
-                        } else if cosigner["xprv"] != nil {
-                            update(idToUpdate!)
-                        } else {
-                            showAlert(self, "", "That Cosigner already exists.")
-                        }
-                    }
+            
+            DispatchQueue.main.async {
+                self.keysetsTable.reloadData()
+                
+                var alertStyle = UIAlertController.Style.actionSheet
+                if (UIDevice.current.userInterfaceIdiom == .pad) {
+                  alertStyle = UIAlertController.Style.alert
                 }
-            } else {
-                save()
+                
+                let alert = UIAlertController(title: "Cosigner imported ✓", message: "Would you like to give it a label now? You can edit the label at any time.", preferredStyle: alertStyle)
+                
+                alert.addAction(UIAlertAction(title: "Add label", style: .default, handler: { action in
+                    self.promptToEditLabel(cosignerStruct)
+                }))
+                                
+                alert.addAction(UIAlertAction(title: "Cancel", style: .cancel, handler: { action in
+                    self.load()
+                }))
+                
+                alert.popoverPresentationController?.sourceView = self.view
+                self.present(alert, animated: true, completion: nil)
             }
         }
     }

@@ -41,7 +41,10 @@ class QRScannerViewController: UIViewController {
     }
     
     override func viewDidAppear(_ animated: Bool) {
+        #if targetEnvironment(macCatalyst)
+        #else
         scanNow()
+        #endif
     }
     
     @IBAction func closeAction(_ sender: Any) {

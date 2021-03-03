@@ -27,6 +27,7 @@ class PsbtTableViewController: UIViewController, UITableViewDelegate, UITableVie
     var signedFor = [String]()
     var accounts = [AccountStruct]()
     var isComplete = false
+    var providedMnemonic = ""
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -821,11 +822,7 @@ class PsbtTableViewController: UIViewController, UITableViewDelegate, UITableVie
     }
     
     @objc func addCosigner(_ sender: UIButton) {
-        DispatchQueue.main.async { [weak self] in
-            guard let self = self else { return }
-            
-            self.performSegue(withIdentifier: "segueToAddSignerFromPsbt", sender: self)
-        }
+        promptToAdd()
     }
     
     @objc func editLabelMemo(_ sender: UIButton) {
@@ -968,6 +965,128 @@ class PsbtTableViewController: UIViewController, UITableViewDelegate, UITableVie
         }
     }
     
+    private func promptToRequest() {
+        DispatchQueue.main.async { [weak self] in
+            guard let self = self else { return }
+            
+            var alertStyle = UIAlertController.Style.actionSheet
+            if (UIDevice.current.userInterfaceIdiom == .pad) {
+                alertStyle = UIAlertController.Style.alert
+            }
+            
+            let alert = UIAlertController(title: "Private Key Request", message: "One of your cosigners needs a private key to sign this payment. Create a request for the appropriate key.", preferredStyle: alertStyle)
+            
+            alert.addAction(UIAlertAction(title: "Request Key", style: .default, handler: { action in
+                self.requestKey()
+            }))
+            
+            alert.addAction(UIAlertAction(title: "Cancel", style: .cancel, handler: { action in }))
+            alert.popoverPresentationController?.sourceView = self.view
+            self.present(alert, animated: true, completion: nil)
+        }
+    }
+    
+    private func requestKey() {
+        
+    }
+    
+    private func promptToAdd() {
+        DispatchQueue.main.async { [weak self] in
+            guard let self = self else { return }
+            
+            var alertStyle = UIAlertController.Style.actionSheet
+            if (UIDevice.current.userInterfaceIdiom == .pad) {
+                alertStyle = UIAlertController.Style.alert
+            }
+            
+            let alert = UIAlertController(title: "Add Cosigner", message: "You will need to add a private key Cosigner in order to be able to sign this payment.", preferredStyle: alertStyle)
+            
+            alert.addAction(UIAlertAction(title: "Scan QR", style: .default, handler: { action in
+                DispatchQueue.main.async { [weak self] in
+                    guard let self = self else { return }
+                    
+                    self.performSegue(withIdentifier: "segueToScanCosigner", sender: self)
+                }
+            }))
+            
+            alert.addAction(UIAlertAction(title: "Paste", style: .default, handler: { action in
+                self.getPasteboard()
+            }))
+            
+            alert.addAction(UIAlertAction(title: "Cancel", style: .cancel, handler: { action in }))
+            alert.popoverPresentationController?.sourceView = self.view
+            self.present(alert, animated: true, completion: nil)
+        }
+    }
+    
+    private func getPasteboard() {
+        guard let text = UIPasteboard.general.string else { return }
+        if text.hasPrefix("ur:crypto-account") {
+            guard let cosigner = URHelper.accountUrToCosigner(text.lowercased().condenseWhitespace()) else { return }
+            
+            promptToAddCosigner(cosigner)
+        } else if text.hasPrefix("ur:crypto-hdkey") {
+            guard let cosigner = URHelper.urHdkeyToCosigner(text.lowercased().condenseWhitespace()) else {
+                showAlert(self, "", "Unsupported key, we only support Bitcoin mainnet/testnet hdkeys.")
+                return
+            }
+            
+            promptToAddCosigner(cosigner)
+        } else if text.lowercased().contains("ur:crypto-seed") {
+            guard let mnemonic = URHelper.cryptoSeedToMnemonic(cryptoSeed: text.lowercased()) else { return }
+            self.providedMnemonic = mnemonic
+            self.addSeedWords()
+        } else if text.contains("48h/\(Keys.coinType)h/0h/2h") || text.contains("48'/\(Keys.coinType)'/0'/2'") {
+            self.addCosignerNow(text.condenseWhitespace())
+        } else if Keys.validMnemonicString(processedCharacters(text)) {
+            self.providedMnemonic = processedCharacters(text)
+            self.addSeedWords()
+        } else {
+            showAlert(self, "", "Invalid cosigner text, we accept UR crypto-account or [<fingerprint>/48h/\(Keys.coinType)h/0h/2h]tpub.....")
+        }
+    }
+    
+    private func promptToAddCosigner(_ cosigner: String) {
+        DispatchQueue.main.async { [weak self] in
+            guard let self = self else { return }
+            
+            var alertStyle = UIAlertController.Style.actionSheet
+            if (UIDevice.current.userInterfaceIdiom == .pad) {
+                alertStyle = UIAlertController.Style.alert
+            }
+            
+            let alert = UIAlertController(title: "Import Cosigner?", message: "You have a valid cosigner on your clipboard, would you like to import it?", preferredStyle: alertStyle)
+            
+            alert.addAction(UIAlertAction(title: "Yes", style: .default, handler: { action in
+                self.addCosignerNow(cosigner)
+            }))
+            
+            alert.addAction(UIAlertAction(title: "Cancel", style: .cancel, handler: { action in }))
+            alert.popoverPresentationController?.sourceView = self.view
+            self.present(alert, animated: true, completion: nil)
+        }
+    }
+    
+    private func addCosignerNow(_ cosigner: String) {
+        AddCosigner.add(cosigner) { (success, message, errorDesc, savedNew, cosignerStruct) in
+            guard success else {
+                showAlert(self, message, errorDesc ?? "")
+                return
+            }
+            
+            showAlert(self, "Cosigner Added ✓", "")
+            self.loadTable()
+        }
+    }
+    
+    private func addSeedWords() {
+        DispatchQueue.main.async { [weak self] in
+            guard let self = self else { return }
+            
+            self.performSegue(withIdentifier: "segueToSign", sender: self)
+        }
+    }
+    
     // MARK: - Navigation
 
     // In a storyboard-based application, you will often want to do a little preparation before navigation
@@ -988,12 +1107,12 @@ class PsbtTableViewController: UIViewController, UITableViewDelegate, UITableVie
         
         if segue.identifier == "segueToSign" {
             if let vc = segue.destination as? AddSignerViewController {
-                vc.tempWords = true
+                vc.providedMnemonic = self.providedMnemonic
                 
                 vc.doneBlock = { [weak self] in
                     guard let self = self else { return }
                     
-                    self.showAuth()
+                    self.loadTable()
                 }
             }
         }

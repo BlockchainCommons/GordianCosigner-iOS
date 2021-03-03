@@ -1010,6 +1010,7 @@
                         <segue destination="vZg-oW-Ek8" kind="show" identifier="segueToSign" id="UaS-I9-AEd"/>
                         <segue destination="L8r-ds-Dk1" kind="presentation" identifier="editPaymentLabel" id="ly6-ws-tN5"/>
                         <segue destination="okc-Vs-IoW" kind="presentation" identifier="segueToAuth" id="ji4-mX-q7w"/>
+                        <segue destination="4dz-cW-ULS" kind="presentation" identifier="segueToScanCosigner" id="Oi5-2y-6bw"/>
                     </connections>
                 </viewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="tsY-j5-GmE" userLabel="First Responder" customClass="UIResponder" sceneMemberID="firstResponder"/>
@@ -1944,6 +1945,7 @@ If you do not want to add seed words to create a cosigner go back and choose the
                         <outlet property="addSignerOutlet" destination="tXJ-Ca-pfZ" id="yAV-3C-uFh"/>
                         <outlet property="aliasField" destination="Fgt-26-vN0" id="yzd-61-Yi9"/>
                         <outlet property="generateOutlet" destination="EzJ-7h-OG7" id="rrN-Fy-9Cv"/>
+                        <outlet property="headerLabel" destination="bnh-FZ-tjQ" id="ama-pa-luQ"/>
                         <outlet property="passphraseField" destination="wpH-XP-q7h" id="lB7-08-63s"/>
                         <outlet property="textField" destination="hp1-4b-9IK" id="psN-M6-Q9t"/>
                         <outlet property="textView" destination="ioS-z5-N7c" id="i7x-JN-x8Y"/>
@@ -2615,7 +2617,7 @@ Blockchain Commons and Gordian Cosigner never share any data with any third part
         <segue reference="UaS-I9-AEd"/>
         <segue reference="KzM-QC-ivF"/>
         <segue reference="JgM-9d-RH3"/>
-        <segue reference="hha-MU-QkB"/>
+        <segue reference="Oi5-2y-6bw"/>
     </inferredMetricsTieBreakers>
     <resources>
         <image name="arrow.clockwise" catalog="system" width="115" height="128"/>

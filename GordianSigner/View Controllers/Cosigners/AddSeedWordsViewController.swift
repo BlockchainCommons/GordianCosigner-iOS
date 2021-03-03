@@ -16,6 +16,7 @@ class AddSignerViewController: UIViewController {
     @IBOutlet weak private var aliasField: UITextField!
     @IBOutlet weak private var textView: UITextView!
     @IBOutlet weak private var generateOutlet: UIButton!
+    @IBOutlet weak var headerLabel: UILabel!
     
     
     private var addedWords = [String]()
@@ -31,6 +32,9 @@ class AddSignerViewController: UIViewController {
         super.viewDidLoad()
 
         setDelegates()
+        if providedMnemonic != "" {
+            headerLabel.text = "Add Cosigner"
+        }
         configureTextField()
         configureSignerOutlet()
         configureTextView()
@@ -212,69 +216,6 @@ class AddSignerViewController: UIViewController {
             showAlert(self, "Invalid bip39 mnemonic", "Take a deep breath and make sure you input your words and optional passphrase correctly. If you add the words one by one autocorrect will assist you to ensure no errors are made.")
         }
     }
-    
-//    private func saveCosigners(_ masterKey: String, _ label: String, _ xfp: String) {
-//        var cosigner = [String:Any]()
-//        cosigner["id"] = UUID()
-//        cosigner["label"] = label
-//        cosigner["fingerprint"] = xfp
-//
-//        guard let bip48SegwitAccount = Keys.bip48SegwitAccount(masterKey, "main") else {
-//                showAlert(self, "Key derivation failed", "")
-//                return
-//        }
-//
-//        cosigner["bip48SegwitAccount"] = bip48SegwitAccount
-//        cosigner["dateAdded"] = Date()
-//
-//        func finish() {
-//            CoreDataService.saveEntity(dict: cosigner, entityName: .cosigner) { [weak self] (success, errorDescription) in
-//                guard let self = self else { return }
-//
-//                guard success else {
-//                    showAlert(self, "Failed to save cosigner", errorDescription ?? "unknown error")
-//                    return
-//                }
-//
-//                DispatchQueue.main.async {
-//                    NotificationCenter.default.post(name: .cosignerAdded, object: nil, userInfo: nil)
-//                }
-//
-//                if self.tempWords {
-//                    self.doneBlock!()
-//                    self.navigationController?.popViewController(animated: true)
-//                } else {
-//                    showAlert(self, "Private keys encrypted and saved 🔐", "")
-//
-//                    self.textField.text = ""
-//                    self.addedWords.removeAll()
-//                    self.justWords.removeAll()
-//                    self.bip39Words.removeAll()
-//                    self.textView.text = ""
-//
-//                    self.navigationController?.popViewController(animated: true)
-//                }
-//            }
-//        }
-//
-//        CoreDataService.retrieveEntity(entityName: .account) { (accounts, errorDescription) in
-//            if let accounts = accounts, accounts.count > 0 {
-//                for (i, account) in accounts.enumerated() {
-//                    let accountStruct = AccountStruct(dictionary: account)
-//                    if accountStruct.descriptor.contains(bip48SegwitAccount) {
-//                        cosigner["dateShared"] = Date()
-//                        cosigner["sharedWith"] = accountStruct.id
-//                    }
-//
-//                    if i + 1 == accounts.count {
-//                        finish()
-//                    }
-//                }
-//            } else {
-//                finish()
-//            }
-//        }
-//    }
     
     @IBAction func removeWordAction(_ sender: Any) {
         guard self.justWords.count > 0 else { return }

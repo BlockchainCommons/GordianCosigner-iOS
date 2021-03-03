@@ -406,11 +406,11 @@ enum URHelper {
             cointype = 0
         }
         
-        let originsWrapper:CBOR = .map([
-            .unsignedInt(1) : .array([.unsignedInt(48), true, .unsignedInt(cointype), true, .unsignedInt(0), true, .unsignedInt(2), true]),// derivation
-            .unsignedInt(2) : .unsignedInt(UInt64(descriptorStruct.fingerprint, radix: 16) ?? 0),// source xfp
-            .unsignedInt(3) : .unsignedInt(UInt64(depth.hexString) ?? 0)// depth
-        ])
+        var originsArray:[OrderedMapEntry] = []
+        originsArray.append(.init(key: 1, value: .array([.unsignedInt(48), true, .unsignedInt(cointype), true, .unsignedInt(0), true, .unsignedInt(2), true])))
+        originsArray.append(.init(key: 2, value: .unsignedInt(UInt64(descriptorStruct.fingerprint, radix: 16) ?? 0)))
+        originsArray.append(.init(key: 3, value: .unsignedInt(UInt64(depth.hexString) ?? 0)))
+        let originsWrapper = CBOR.orderedMap(originsArray)
         
         let useInfoWrapper:CBOR = .map([
             .unsignedInt(2) : .unsignedInt(cointype)
@@ -418,15 +418,15 @@ enum URHelper {
         
         guard let hexValue = UInt64(parentFingerprint.hexString, radix: 16) else { return nil }
         
-        let hdKeyWrapper:CBOR = .map([
-            .unsignedInt(1) : .boolean(false), //isMaster
-            .unsignedInt(2) : .boolean(isPrivate), //isPrivate
-            .unsignedInt(3) : .byteString([UInt8](keydata)), //keyData bytestring
-            .unsignedInt(4) : .byteString([UInt8](chaincode)), //chainCode bytestring
-            .unsignedInt(5) : .tagged(CBOR.Tag(rawValue: 305), useInfoWrapper), //use-info 1 = testnet-btc
-            .unsignedInt(6) : .tagged(CBOR.Tag(rawValue: 304), originsWrapper),
-            .unsignedInt(8) : .unsignedInt(hexValue)
-        ])
+        var hdkeyArray:[OrderedMapEntry] = []
+        hdkeyArray.append(.init(key: 1, value: .boolean(false)))
+        hdkeyArray.append(.init(key: 2, value: .boolean(isPrivate)))
+        hdkeyArray.append(.init(key: 3, value: .byteString([UInt8](keydata))))
+        hdkeyArray.append(.init(key: 4, value: .byteString([UInt8](chaincode))))
+        hdkeyArray.append(.init(key: 5, value: .tagged(CBOR.Tag(rawValue: 305), useInfoWrapper)))
+        hdkeyArray.append(.init(key: 6, value: .tagged(CBOR.Tag(rawValue: 304), originsWrapper)))
+        hdkeyArray.append(.init(key: 8, value: .unsignedInt(hexValue)))
+        let hdKeyWrapper = CBOR.orderedMap(hdkeyArray)
         
         guard let rawUr = try? UR(type: "crypto-hdkey", cbor: hdKeyWrapper) else { return nil }
         

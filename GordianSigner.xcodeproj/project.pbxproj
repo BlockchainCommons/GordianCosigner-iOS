@@ -8,6 +8,7 @@
 
 /* Begin PBXBuildFile section */
 		0A0D3A7125D4F4C600E86F70 /* AuthViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0A0D3A7025D4F4C600E86F70 /* AuthViewController.swift */; };
+		0A79C6DD25EF4F2F002470C5 /* AddCosigner.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0A79C6DC25EF4F2F002470C5 /* AddCosigner.swift */; };
 		0AAAB4B125D2693E00C77B52 /* SettingsViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0AAAB4B025D2693E00C77B52 /* SettingsViewController.swift */; };
 		0AF6442325D4DB91003E619E /* CloudKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 0AF6442225D4DB91003E619E /* CloudKit.framework */; };
 		D00F498D258B2ACD00941DBA /* accounts.png in Resources */ = {isa = PBXBuildFile; fileRef = D00F498C258B2ACD00941DBA /* accounts.png */; };
@@ -104,6 +105,7 @@
 
 /* Begin PBXFileReference section */
 		0A0D3A7025D4F4C600E86F70 /* AuthViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AuthViewController.swift; sourceTree = "<group>"; };
+		0A79C6DC25EF4F2F002470C5 /* AddCosigner.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AddCosigner.swift; sourceTree = "<group>"; };
 		0AAAB4B025D2693E00C77B52 /* SettingsViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsViewController.swift; sourceTree = "<group>"; };
 		0AF6442225D4DB91003E619E /* CloudKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CloudKit.framework; path = System/Library/Frameworks/CloudKit.framework; sourceTree = SDKROOT; };
 		D00F498C258B2ACD00941DBA /* accounts.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = accounts.png; sourceTree = "<group>"; };
@@ -408,6 +410,7 @@
 				D0246DD8256B663800F812A5 /* base58.h */,
 				D0246DDA256B667800F812A5 /* base58.c */,
 				D04423F225837A8700A25179 /* PaymentHash.swift */,
+				0A79C6DC25EF4F2F002470C5 /* AddCosigner.swift */,
 			);
 			path = Helpers;
 			sourceTree = "<group>";
@@ -571,6 +574,7 @@
 				D0CF1E3E2522E20C0059C541 /* GordianSigner.xcdatamodeld in Sources */,
 				D04D4980252C19E000D7383E /* QRScannerViewController.swift in Sources */,
 				D0CF1E77252303370059C541 /* Utlities.swift in Sources */,
+				0A79C6DD25EF4F2F002470C5 /* AddCosigner.swift in Sources */,
 				D090964125625CC30098013A /* DescriptorParser.swift in Sources */,
 				D0E0EA022567A10900F2403C /* CreateAccountViewController.swift in Sources */,
 				D04423FB258705B900A25179 /* LifehashSeedSecondary.swift in Sources */,
