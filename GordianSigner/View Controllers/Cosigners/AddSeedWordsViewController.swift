@@ -120,6 +120,7 @@ class AddSignerViewController: UIViewController {
             cosigner["bip48SegwitAccount"] = bip48SegwitAccount
             cosigner["words"] = encryptedWords
             cosigner["masterKey"] = encryptedMasterKey
+            cosigner["shouldSign"] = true
             
             func reload() {
                 DispatchQueue.main.async {

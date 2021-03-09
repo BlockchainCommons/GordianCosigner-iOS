@@ -28,6 +28,8 @@ class PsbtTableViewController: UIViewController, UITableViewDelegate, UITableVie
     var accounts = [AccountStruct]()
     var isComplete = false
     var providedMnemonic = ""
+    var shouldSign = false
+    var cosignerThatShouldSign:CosignerStruct?
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -173,6 +175,13 @@ class PsbtTableViewController: UIViewController, UITableViewDelegate, UITableVie
                                     let cosignerStruct = CosignerStruct(dictionary: keyset)
                                     
                                     if let descriptor = cosignerStruct.bip48SegwitAccount {
+                                        if let shouldSignPayment = cosignerStruct.shouldSign {
+                                            if shouldSignPayment && cosignerStruct.xprv == nil && cosignerStruct.words == nil {
+                                                self.shouldSign = true
+                                                self.cosignerThatShouldSign = cosignerStruct
+                                            }
+                                        }
+                                        
                                         let arr = descriptor.split(separator: "]")
                                         var xpub = ""
                                         
@@ -335,6 +344,12 @@ class PsbtTableViewController: UIViewController, UITableViewDelegate, UITableVie
                                 guard let self = self else { return }
                                 
                                 self.signButtonOutlet.alpha = 1
+                                
+                                if self.shouldSign {
+                                    if let _ = self.cosignerThatShouldSign {
+                                        self.promptToRequest()
+                                    }
+                                }
                             }
                         }
                     }
@@ -987,7 +1002,10 @@ class PsbtTableViewController: UIViewController, UITableViewDelegate, UITableVie
     }
     
     private func requestKey() {
+        guard let shouldSigner = cosignerThatShouldSign else { return }
         
+        let request = URHelper.requestXprv(shouldSigner.bip48SegwitAccount!, "Gordian Cosigner needs a private key from \(shouldSigner.label) to sign a payment")
+        print("request: \(request)")
     }
     
     private func promptToAdd() {
@@ -1093,11 +1111,6 @@ class PsbtTableViewController: UIViewController, UITableViewDelegate, UITableVie
     override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
         // Get the new view controller using segue.destination.
         // Pass the selected object to the new view controller.
-        if segue.identifier == "segueToAddSignerFromPsbt" {
-            if let vc = segue.destination as? KeysetsViewController {
-                vc.isAdding = true
-            }
-        }
         if segue.identifier == "segueToQRDisplayer" {
             if let vc = segue.destination as? QRDisplayerViewController {
                 vc.text = psbt.description

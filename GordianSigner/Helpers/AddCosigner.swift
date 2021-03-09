@@ -17,10 +17,12 @@ enum AddCosigner {
         let dp = DescriptorParser()
         var ds = dp.descriptor(hack)
         var cosigner = [String:Any]()
+        var shouldSign = false
         
         if let hdkey = try? HDKey(base58: ds.accountXprv) {
             guard let encryptedXprv = Encryption.encrypt(ds.accountXprv.utf8) else { return }
             cosigner["xprv"] = encryptedXprv
+            shouldSign = true
             hack = hack.replacingOccurrences(of: ds.accountXprv, with: hdkey.xpub)
             segwitBip84Account = segwitBip84Account.replacingOccurrences(of: ds.accountXprv, with: hdkey.xpub)
             ds = dp.descriptor(hack)
@@ -47,6 +49,7 @@ enum AddCosigner {
         cosigner["dateAdded"] = Date()
         cosigner["fingerprint"] = ds.fingerprint
         cosigner["lifehash"] = lifehashFingerprint
+        cosigner["shouldSign"] = shouldSign
         
         func save() {
             CoreDataService.saveEntity(dict: cosigner, entityName: .cosigner) { (success, errorDesc) in
@@ -59,14 +62,21 @@ enum AddCosigner {
             }
         }
         
-        func update(_ id: UUID) {
-            CoreDataService.updateEntity(id: id, keyToUpdate: "xprv", newValue: cosigner["xprv"] as! Data, entityName: .cosigner) { (success, errorDescription) in
+        func update(_ cosignerToUpdate: CosignerStruct) {
+            CoreDataService.updateEntity(id: cosignerToUpdate.id, keyToUpdate: "xprv", newValue: cosigner["xprv"] as! Data, entityName: .cosigner) { (success, errorDescription) in
                 guard success else {
                     completion((false, "Cosigner not updated!", "Please let us know about this bug.", false, nil))
                     return
                 }
                 
-                completion((true, "Cosigner updated ✓", nil, false, CosignerStruct(dictionary: cosigner)))
+                CoreDataService.updateEntity(id: cosignerToUpdate.id, keyToUpdate: "shouldSign", newValue: true, entityName: .cosigner) { (success, errorDescription) in
+                    guard success else {
+                        completion((false, "Cosigner not updated!", "Please let us know about this bug.", false, nil))
+                        return
+                    }
+                    
+                    completion((true, "Cosigner updated ✓", nil, false, cosignerToUpdate))
+                }                
             }
         }
         
@@ -85,7 +95,7 @@ enum AddCosigner {
                         if idToUpdate == nil {
                             save()
                         } else if cosigner["xprv"] != nil {
-                            update(idToUpdate!)
+                            update(cosignerStruct)
                         } else {
                             completion((false, "", "That Cosigner already exists.", false, nil))
                         }

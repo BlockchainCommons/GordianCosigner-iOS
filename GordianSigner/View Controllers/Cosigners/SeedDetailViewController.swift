@@ -13,6 +13,7 @@ class SeedDetailViewController: UIViewController, UITextFieldDelegate, UITextVie
     var cosigner:CosignerStruct!
     private var qrText = ""
     private var qrDescription = ""
+    private var qrHeader = ""
     let dp = DescriptorParser()
     var desc = ""
     var descStruct:Descriptor!
@@ -39,6 +40,7 @@ class SeedDetailViewController: UIViewController, UITextFieldDelegate, UITextVie
     @IBOutlet weak var mnemonicQr: UIButton!
     @IBOutlet weak var mnemonicCopy: UIButton!
     @IBOutlet weak var memoView: UITextView!
+    @IBOutlet weak var shouldSignSwitch: UISwitch!
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -58,6 +60,61 @@ class SeedDetailViewController: UIViewController, UITextFieldDelegate, UITextVie
         NotificationCenter.default.addObserver(self, selector: #selector(keyboardWillHide), name: UIResponder.keyboardWillHideNotification, object: nil)
         load()
     }
+    
+    @IBAction func switchAction(_ sender: Any) {
+        if shouldSignSwitch.isOn {
+            // update entity
+            CoreDataService.updateEntity(id: cosigner.id, keyToUpdate: "shouldSign", newValue: true, entityName: .cosigner) { (success, errorDescription) in
+                guard success else {
+                    showAlert(self, "", "There was an issue updating your cosigner, please let us know about it.")
+                    return
+                }
+            }
+            
+            promptToCreateRequest()
+            
+        } else {
+            if cosigner.xprv != nil || cosigner.words != nil {
+                showAlert(self, "", "First you need to delete the private key and seed.")
+                self.shouldSignSwitch.isOn = true
+            } else {
+                CoreDataService.updateEntity(id: cosigner.id, keyToUpdate: "shouldSign", newValue: false, entityName: .cosigner) { (success, errorDescription) in
+                    guard success else {
+                        showAlert(self, "", "There was an issue updating your cosigner, please let us know about it.")
+                        return
+                    }
+                }
+                
+                showAlert(self, "", "Cosigner updated ✓")
+            }
+        }
+    }
+    
+    private func promptToCreateRequest() {
+        DispatchQueue.main.async { [weak self] in
+            guard let self = self else { return }
+            
+            let alert = UIAlertController(title: "Request Private Key?", message: "This setting lets us know you expect to sign payments with this Cosigner. You can create a request for the private key now or you will be automatically prompted when adding a payment.", preferredStyle: .alert)
+            
+            alert.addAction(UIAlertAction(title: "Request Private Key", style: .default, handler: { action in
+                guard let request = URHelper.requestXprv(self.cosigner.bip48SegwitAccount!, "Gordian Cosigner needs a private key from \(self.cosigner.label) to sign a payment") else {
+                    showAlert(self, "", "There was an issue creating the key request, please let us know about it.")
+                    return
+                }
+                
+                self.qrDescription = request
+                self.qrText = request
+                self.qrHeader = "Private Key Request"
+                self.goToQr()
+            }))
+                            
+            alert.addAction(UIAlertAction(title: "Cancel", style: .cancel, handler: { action in }))
+            
+            alert.popoverPresentationController?.sourceView = self.view
+            self.present(alert, animated: true, completion: nil)
+        }
+    }
+    
     
     func textViewShouldBeginEditing(_ textView: UITextView) -> Bool {
         memoEditing = true
@@ -108,6 +165,7 @@ class SeedDetailViewController: UIViewController, UITextFieldDelegate, UITextVie
                 DispatchQueue.main.async { [weak self] in
                     guard let self = self else { return }
                     
+                    self.shouldSignSwitch.isOn = true
                     self.privCosigner = URHelper.cosignerToUr(self.privCosigner, true) ?? ""
                     self.xprvLabel.text = self.privCosigner
                 }
@@ -119,6 +177,7 @@ class SeedDetailViewController: UIViewController, UITextFieldDelegate, UITextVie
                 DispatchQueue.main.async { [weak self] in
                     guard let self = self else { return }
                     
+                    self.shouldSignSwitch.isOn = true
                     self.mnemonicLabel.text = cryptoSeed
                 }
             }
@@ -136,6 +195,8 @@ class SeedDetailViewController: UIViewController, UITextFieldDelegate, UITextVie
                 DispatchQueue.main.async { [weak self] in
                     guard let self = self else { return }
                     
+                    self.shouldSignSwitch.isOn = true
+                    
                     self.privCosigner = self.cosigner.bip48SegwitAccount!.replacingOccurrences(of: self.descStruct.accountXpub, with: decryptedXprv.utf8)
                     
                     self.xprvLabel.text = decryptedXprv.utf8
@@ -147,6 +208,8 @@ class SeedDetailViewController: UIViewController, UITextFieldDelegate, UITextVie
                             
                 DispatchQueue.main.async { [weak self] in
                     guard let self = self else { return }
+                    
+                    self.shouldSignSwitch.isOn = true
                     
                     self.mnemonicLabel.text = decryptedWords.utf8
                 }
@@ -221,6 +284,7 @@ class SeedDetailViewController: UIViewController, UITextFieldDelegate, UITextVie
     
     @IBAction func showQrMnemonic(_ sender: Any) {
         if cosigner.words != nil {
+            qrHeader = cosigner.label
             qrText = mnemonicLabel.text ?? ""
             qrDescription = mnemonicLabel.text ?? ""
             goToQr()
@@ -249,6 +313,7 @@ class SeedDetailViewController: UIViewController, UITextFieldDelegate, UITextVie
     
     @IBAction func showQrXprv(_ sender: Any) {
         if cosigner.xprv != nil {
+            qrHeader = cosigner.label
             qrText = privCosigner
             qrDescription = privCosigner
             goToQr()
@@ -288,7 +353,8 @@ class SeedDetailViewController: UIViewController, UITextFieldDelegate, UITextVie
         share(pubCosigner)
     }
     
-    @IBAction func showCosignerQr(_ sender: Any) {        
+    @IBAction func showCosignerQr(_ sender: Any) {
+        qrHeader = cosigner.label
         qrText = self.pubCosigner
         qrDescription = self.pubCosigner
         goToQr()
@@ -331,6 +397,12 @@ class SeedDetailViewController: UIViewController, UITextFieldDelegate, UITextVie
     }
     
     private func load() {
+        DispatchQueue.main.async { [weak self] in
+            guard let self = self else { return }
+            
+            self.shouldSignSwitch.isOn = false
+        }
+        
         memoView.text = cosigner.memo ?? "tap to add a memo"
         
         if let words = cosigner.words {
@@ -338,6 +410,8 @@ class SeedDetailViewController: UIViewController, UITextFieldDelegate, UITextVie
                         
             DispatchQueue.main.async { [weak self] in
                 guard let self = self else { return }
+                
+                self.shouldSignSwitch.isOn = true
                 
                 self.mnemonicLabel.text = cryptoSeed
             }
@@ -365,6 +439,7 @@ class SeedDetailViewController: UIViewController, UITextFieldDelegate, UITextVie
             DispatchQueue.main.async { [weak self] in
                 guard let self = self else { return }
                 
+                self.shouldSignSwitch.isOn = true
                 self.privCosigner = URHelper.cosignerToUr("[\(self.descStruct.fingerprint)/48h/\(Keys.coinType)h/0h/2h]\(decryptedXprv.utf8)", true) ?? ""//
                 self.xprvLabel.text = self.privCosigner
             }
@@ -382,6 +457,16 @@ class SeedDetailViewController: UIViewController, UITextFieldDelegate, UITextVie
         
         
         originLabel.text = "\(descStruct.fingerprint)/48h/\(Keys.coinType)h/0h/2h"
+        
+        guard let shouldSign = cosigner.shouldSign else { return }
+        
+        if !shouldSign {
+            DispatchQueue.main.async { [weak self] in
+                guard let self = self else { return }
+                
+                self.shouldSignSwitch.isOn = false
+            }
+        }
     }
     
     func textFieldShouldReturn(_ textField: UITextField) -> Bool {
@@ -443,7 +528,7 @@ class SeedDetailViewController: UIViewController, UITextFieldDelegate, UITextVie
         if segue.identifier == "segueToCosignerQr" {
             if let vc = segue.destination as? QRDisplayerViewController {
                 vc.descriptionText = qrDescription
-                vc.header = cosigner.label
+                vc.header = qrHeader
                 vc.isPsbt = false
                 vc.text = qrText
             }

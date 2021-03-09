@@ -21,7 +21,6 @@ class KeysetsViewController: UIViewController, UITableViewDelegate, UITableViewD
     private var cosigner:CosignerStruct!
     private var providedMnemonic = ""
     private var coinType = "0"
-    var isAdding = false
     let spinner = Spinner()
 
     @IBOutlet weak private var keysetsTable: UITableView!
@@ -58,8 +57,9 @@ class KeysetsViewController: UIViewController, UITableViewDelegate, UITableViewD
         
         load()
         
-        if isAdding {
-            promptToAdd()
+        if UserDefaults.standard.object(forKey: "hasUpdatedShouldSign") == nil {
+            updateCosignersForShouldSign()
+            UserDefaults.standard.setValue(true, forKey: "hasUpdatedShouldSign")
         }
     }
     
@@ -78,6 +78,33 @@ class KeysetsViewController: UIViewController, UITableViewDelegate, UITableViewD
                 UserDefaults.standard.set(true, forKey: "seenCosignerInfo")
             }
         }
+    }
+    
+    @IBAction func scanQrAction(_ sender: Any) {
+        segueToScanner()
+    }
+    
+    
+    private func updateCosignersForShouldSign() {
+        CoreDataService.retrieveEntity(entityName: .cosigner) { [weak self] (cosigners, errorDescription) in
+            guard let self = self else { return }
+            
+            guard let cosigners = cosigners, cosigners.count > 0 else { return }
+            
+            for cosigner in cosigners {
+                let str = CosignerStruct(dictionary: cosigner)
+                
+                if str.xprv != nil || str.words != nil {
+                    self.update(str.id, true)
+                } else {
+                    self.update(str.id, false)
+                }
+            }
+        }
+    }
+    
+    private func update(_ id: UUID, _ shouldSign: Bool) {
+        CoreDataService.updateEntity(id: id, keyToUpdate: "shouldSign", newValue: shouldSign, entityName: .cosigner) { (_, _) in }
     }
     
     @IBAction func infoAction(_ sender: Any) {
@@ -180,11 +207,7 @@ class KeysetsViewController: UIViewController, UITableViewDelegate, UITableViewD
             }))
             
             alert.addAction(UIAlertAction(title: "Scan QR", style: .default, handler: { action in
-                DispatchQueue.main.async { [weak self] in
-                    guard let self = self else { return }
-                    
-                    self.performSegue(withIdentifier: "segueToScanKeyset", sender: self)
-                }
+                self.segueToScanner()
             }))
             
             alert.addAction(UIAlertAction(title: "Cancel", style: .cancel, handler: { action in }))
@@ -193,12 +216,19 @@ class KeysetsViewController: UIViewController, UITableViewDelegate, UITableViewD
         }
     }
     
+    private func segueToScanner() {
+        DispatchQueue.main.async { [weak self] in
+            guard let self = self else { return }
+            
+            self.performSegue(withIdentifier: "segueToScanKeyset", sender: self)
+        }
+    }
+    
     @objc func refreshTable() {
         load()
     }
     
     private func load() {
-        //spinner.add(vc: self, description: "loading...")
         cosigners.removeAll()
         accounts.removeAll()
         
@@ -459,7 +489,6 @@ class KeysetsViewController: UIViewController, UITableViewDelegate, UITableViewD
                     self?.editCosigners()
                     self?.keysetsTable.reloadData()
                 }
-                
             }            
         }
     }
@@ -489,7 +518,7 @@ class KeysetsViewController: UIViewController, UITableViewDelegate, UITableViewD
             
             guard savedNew else {
                 self.load()
-                showAlert(self, "", "\(cosignerStruct.label) updated with xprv.")
+                showAlert(self, "", "\(cosignerStruct.label) has been updated with a private key ✓")
                 return
             }
             
@@ -555,6 +584,8 @@ class KeysetsViewController: UIViewController, UITableViewDelegate, UITableViewD
                 } else if Keys.validMnemonicString(processedCharacters(result)) {
                     self.providedMnemonic = processedCharacters(result)
                     self.addSeedWords()
+                } else if result.lowercased().hasPrefix("ur:crypto-response"), let account = URHelper.decodeResponse(result.lowercased()) {
+                    self.addCosigner(account)
                 } else {
                     showAlert(self, "", "Unrecognized format.")
                 }

@@ -211,6 +211,86 @@ enum URHelper {
         return cosigner
     }
     
+    static func hdkeyToCosigner(_ hdkey: CBOR) -> String? {
+        guard case let CBOR.map(dict) = hdkey else {
+            return nil
+        }
+        
+        var isMaster = false
+        var keyData:String?
+        var chainCode:String?
+        var isPrivate = false
+        var origins:String?
+        var sourceXfp:String?
+        var depth:String?
+        var parentFingerprint:String?
+        var network:String?
+        
+        for (key, value) in dict {
+            switch key {
+            case 1:
+                guard case let CBOR.boolean(b) = value else { fallthrough }
+                
+                isMaster = b
+            case 2:
+                guard case let CBOR.boolean(b) = value else { fallthrough }
+                
+                isPrivate = b
+            case 3:
+                guard case let CBOR.byteString(bs) = value else { fallthrough }
+                
+                keyData = Data(bs).hexString
+            case 4:
+                guard case let CBOR.byteString(bs) = value else { fallthrough }
+                
+                chainCode = Data(bs).hexString
+            case 5:
+                guard case let CBOR.tagged(_, useInfoCbor) = value else { fallthrough }
+                guard case let CBOR.map(map) = useInfoCbor else { fallthrough }
+                let (type, net) = URHelper.useInfo(map)
+                network = net
+                
+                if type != "btc" {
+                    return nil
+                }
+            case 6:
+                guard case let CBOR.tagged(_, originCbor) = value else { fallthrough }
+                guard case let CBOR.map(map) = originCbor else { fallthrough }
+                
+                (origins, depth, sourceXfp) = URHelper.origins(map)
+            case 8:
+                guard case let CBOR.unsignedInt(xfp) = value else { fallthrough }
+                
+                parentFingerprint = String(format: "%08x", xfp)
+            default:
+                break
+            }
+        }
+        
+        var extendedKey:String?
+        var cosigner:String?
+        
+        guard let keydata = keyData, let chaincode = chainCode else { return nil }
+        
+        if !isPrivate && !isMaster {
+            extendedKey = URHelper.xpub(keydata, chaincode, network ?? "main", parentFingerprint, depth)
+        } else {
+            extendedKey = URHelper.xprv(keydata, chaincode, network ?? "main", parentFingerprint, depth)
+        }
+        
+        guard let key = extendedKey else { return nil }
+        
+        if isMaster {
+            cosigner = Keys.bip48SegwitAccountXprv(key)
+        } else {
+            guard let origin = origins, let xfp = sourceXfp else { return nil }
+            
+            cosigner = "[\(xfp + "/" + origin)]\(key)"
+        }
+                
+        return cosigner
+    }
+    
     static func xprv(_ keyData: String, _ chainCode: String, _ network: String?, _ xfp: String?, _ depth: String?) -> String? {
         var prefix = "0488ade4"//mainnet
         
@@ -490,7 +570,13 @@ enum URHelper {
         return Data(result.encode())
     }
     
-    static func requestXprv(_ xpub: String, _ sourceXfp: String, _ description: String) -> String? {
+    static func requestXprv(_ cosigner: String, _ description: String) -> String? {
+        let hack = "wsh(\(cosigner)/0/*)"
+        let descriptorParser = DescriptorParser()
+        let descriptorStr = descriptorParser.descriptor(hack)
+        let xpub = descriptorStr.accountXpub
+        let sourceXfp = descriptorStr.fingerprint
+        
         var coinType:UInt64 = 0
         
         if Keys.coinType == "1" {
@@ -504,6 +590,8 @@ enum URHelper {
         var requestId = UUID().uuidString
         requestId = requestId.replacingOccurrences(of: "-", with: "")
         let uuidByteString = CBOR.byteString([UInt8](Data(value: requestId)))
+        
+        UserDefaults.standard.setValue(requestId, forKey: "uuid")
         
         var originsWrapper:[OrderedMapEntry] = []
         originsWrapper.append(.init(key: 1, value: .array([.unsignedInt(48), true, .unsignedInt(coinType), true, .unsignedInt(0), true, .unsignedInt(2), true])))
@@ -531,6 +619,45 @@ enum URHelper {
         guard let rawUr = try? UR(type: "crypto-request", cbor: cbor) else { return nil }
         
         return UREncoder.encode(rawUr)
+    }
+    
+    static func decodeResponse(_ cryptoResponse: String) -> String? {
+        //guard let expectedUuid = UserDefaults.standard.object(forKey: "uuid") as? String else { return nil }
+        //print("expectedUuid: \(expectedUuid)")
+        
+        var cosigner:String?
+        
+        guard let ur = try? URDecoder.decode(cryptoResponse.condenseWhitespace().lowercased()),
+              let decodedCbor = try? CBOR.decode(ur.cbor.bytes),
+              case let CBOR.map(dict) = decodedCbor else {
+            return nil
+        }
+        
+        for (key, value) in dict {
+            switch key {
+            
+            case 1:
+                guard case let CBOR.tagged(CBOR.Tag(rawValue: 37), cborUuid) = value else { fallthrough }
+                guard case let CBOR.byteString(bs) = cborUuid else { fallthrough }
+                
+                print("provided uuid: \(Data(bs).hexString)")
+                
+//                if Data(bs).hexString != expectedUuid {
+//                    return nil
+//                }
+                
+            case 2:
+                guard case let CBOR.tagged(CBOR.Tag(rawValue: 303), hdkeyCbor) = value else { fallthrough }
+                guard let cosignerString = URHelper.hdkeyToCosigner(hdkeyCbor) else { fallthrough }
+                
+                cosigner = cosignerString
+                
+            default:
+                break
+            }
+        }
+        
+        return cosigner
     }
     
 }
