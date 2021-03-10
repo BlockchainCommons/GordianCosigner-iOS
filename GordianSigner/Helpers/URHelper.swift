@@ -590,8 +590,10 @@ enum URHelper {
         var requestId = UUID().uuidString
         requestId = requestId.replacingOccurrences(of: "-", with: "")
         let uuidByteString = CBOR.byteString([UInt8](Data(value: requestId)))
+        guard case let CBOR.byteString(bs) = uuidByteString else { return nil }
+        let id = Data(bs).hexString
         
-        UserDefaults.standard.setValue(requestId, forKey: "uuid")
+        UserDefaults.standard.setValue(id, forKey: "uuid")
         
         var originsWrapper:[OrderedMapEntry] = []
         originsWrapper.append(.init(key: 1, value: .array([.unsignedInt(48), true, .unsignedInt(coinType), true, .unsignedInt(0), true, .unsignedInt(2), true])))
@@ -622,8 +624,7 @@ enum URHelper {
     }
     
     static func decodeResponse(_ cryptoResponse: String) -> String? {
-        //guard let expectedUuid = UserDefaults.standard.object(forKey: "uuid") as? String else { return nil }
-        //print("expectedUuid: \(expectedUuid)")
+        guard let expectedUuid = UserDefaults.standard.object(forKey: "uuid") as? String else { return nil }
         
         var cosigner:String?
         
@@ -640,11 +641,9 @@ enum URHelper {
                 guard case let CBOR.tagged(CBOR.Tag(rawValue: 37), cborUuid) = value else { fallthrough }
                 guard case let CBOR.byteString(bs) = cborUuid else { fallthrough }
                 
-                print("provided uuid: \(Data(bs).hexString)")
-                
-//                if Data(bs).hexString != expectedUuid {
-//                    return nil
-//                }
+                if Data(bs).hexString != expectedUuid {
+                    return nil
+                }
                 
             case 2:
                 guard case let CBOR.tagged(CBOR.Tag(rawValue: 303), hdkeyCbor) = value else { fallthrough }

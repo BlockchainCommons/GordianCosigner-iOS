@@ -414,6 +414,12 @@ class SeedDetailViewController: UIViewController, UITextFieldDelegate, UITextVie
                 self.shouldSignSwitch.isOn = true
                 
                 self.mnemonicLabel.text = cryptoSeed
+                
+                self.mnemonicCopy.alpha = 1
+                self.mnemonicQr.alpha = 1
+                self.mnemonicExport.alpha = 1
+                self.mnemonicDelete.alpha = 1
+                self.mnemonicHeader.alpha = 1
             }
         } else {
             self.mnemonicCopy.alpha = 0
@@ -440,8 +446,14 @@ class SeedDetailViewController: UIViewController, UITextFieldDelegate, UITextVie
                 guard let self = self else { return }
                 
                 self.shouldSignSwitch.isOn = true
-                self.privCosigner = URHelper.cosignerToUr("[\(self.descStruct.fingerprint)/48h/\(Keys.coinType)h/0h/2h]\(decryptedXprv.utf8)", true) ?? ""//
+                self.privCosigner = URHelper.cosignerToUr("[\(self.descStruct.fingerprint)/48h/\(Keys.coinType)h/0h/2h]\(decryptedXprv.utf8)", true) ?? ""
                 self.xprvLabel.text = self.privCosigner
+                
+                self.privKeyHeader.alpha = 1
+                self.privKeyDelete.alpha = 1
+                self.privKeyShare.alpha = 1
+                self.privKeyCopy.alpha = 1
+                self.privKeyQr.alpha = 1
             }
         } else {
             self.privKeyHeader.alpha = 0
@@ -529,6 +541,25 @@ class SeedDetailViewController: UIViewController, UITextFieldDelegate, UITextVie
                 vc.header = qrHeader
                 vc.isPsbt = false
                 vc.text = qrText
+                
+                vc.responseDoneBlock = { [weak self] signer in
+                    guard let self = self else { return }
+                    
+                    guard let addedSigner = signer else { return }
+                    
+                    if addedSigner.bip48SegwitAccount == self.cosigner!.bip48SegwitAccount! {
+                        showAlert(self, "", "Cosigner updated with the correct private key ✓")
+                                                
+                        DispatchQueue.main.async { [weak self] in
+                            guard let self = self else { return }
+                            
+                            self.cosigner = addedSigner
+                            self.desc = "wsh(" + self.cosigner.bip48SegwitAccount! + "/0/*)"
+                            self.descStruct = self.dp.descriptor(self.desc)
+                            self.load()
+                        }
+                    }
+                }
             }
         }
     }

@@ -17,7 +17,6 @@ class QRScannerViewController: UIViewController {
     let downSwipe = UISwipeGestureRecognizer()
     let uploadButton = UIButton()
     let torchButton = UIButton()
-    //let closeButton = UIButton()
     let imagePicker = UIImagePickerController()
     var avCaptureSession: AVCaptureSession!
     var previewLayer: AVCaptureVideoPreviewLayer?

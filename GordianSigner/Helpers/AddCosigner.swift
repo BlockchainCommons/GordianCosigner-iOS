@@ -75,27 +75,37 @@ enum AddCosigner {
                         return
                     }
                     
-                    completion((true, "Cosigner updated ✓", nil, false, cosignerToUpdate))
+                    CoreDataService.retrieveEntity(entityName: .cosigner) { (cosigners, errorDescription) in
+                        guard let cosigners = cosigners else { return }
+                        
+                        for cosigner in cosigners {
+                            let str = CosignerStruct(dictionary: cosigner)
+                            if str.id == cosignerToUpdate.id {
+                                completion((true, "Cosigner updated ✓", nil, false, str))
+                            }
+                        }
+                    }
                 }                
             }
         }
         
         CoreDataService.retrieveEntity(entityName: .cosigner) { (cosigners, errorDescription) in
             if let cosigners = cosigners, cosigners.count > 0 {
-                var idToUpdate:UUID?
+                var cosignerToUpdate:CosignerStruct?
+                
                 for (i, cosignerDict) in cosigners.enumerated() {
                     let cosignerStruct = CosignerStruct(dictionary: cosignerDict)
                     
                     if cosignerStruct.bip48SegwitAccount == segwitBip84Account {
                         //update existing
-                        idToUpdate = cosignerStruct.id
+                        cosignerToUpdate = cosignerStruct
                     }
                     
                     if i + 1 == cosigners.count {
-                        if idToUpdate == nil {
+                        if cosignerToUpdate == nil {
                             save()
                         } else if cosigner["xprv"] != nil {
-                            update(cosignerStruct)
+                            update(cosignerToUpdate!)
                         } else {
                             completion((false, "", "That Cosigner already exists.", false, nil))
                         }

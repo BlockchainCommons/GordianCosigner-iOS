@@ -11,15 +11,16 @@ import URKit
 
 class QRDisplayerViewController: UIViewController {
     
-    @IBOutlet weak var textView: UITextView!
-    @IBOutlet weak var headerLabel: UILabel!
+    @IBOutlet weak private var textView: UITextView!
+    @IBOutlet weak private var headerLabel: UILabel!
     @IBOutlet weak private var imageView: UIImageView!
-    @IBOutlet weak var animateOutlet: UIButton!
+    @IBOutlet weak private var animateOutlet: UIButton!
+    @IBOutlet weak private var scanResponseOutlet: UIButton!
     
-    @IBOutlet weak var shareQrOutlet: UIButton!
-    @IBOutlet weak var copyQrOutlet: UIButton!
-    @IBOutlet weak var shareTextOutlet: UIButton!
-    @IBOutlet weak var copyTextOutlet: UIButton!
+    @IBOutlet weak private var shareQrOutlet: UIButton!
+    @IBOutlet weak private var copyQrOutlet: UIButton!
+    @IBOutlet weak private var shareTextOutlet: UIButton!
+    @IBOutlet weak private var copyTextOutlet: UIButton!
     
     var descriptionText = ""
     var header = ""
@@ -32,6 +33,7 @@ class QRDisplayerViewController: UIViewController {
     private var parts = [String]()
     private var ur: UR!
     private var partIndex = 0
+    var responseDoneBlock : ((CosignerStruct?) -> Void)?
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -40,6 +42,7 @@ class QRDisplayerViewController: UIViewController {
         headerLabel.text = header
         textView.text = descriptionText
         imageView.isUserInteractionEnabled = true
+        scanResponseOutlet.alpha = 0
         
         if isPsbt {
             animateOutlet.alpha = 1
@@ -54,9 +57,23 @@ class QRDisplayerViewController: UIViewController {
             shareTextOutlet.alpha = 1
             copyQrOutlet.alpha = 1
             copyTextOutlet.alpha = 1
+            
             showQR(text)
+            
+            if text.lowercased().hasPrefix("ur:crypto-request") {
+                scanResponseOutlet.alpha = 1
+            }
         }
     }
+    
+    @IBAction func scanResponseAction(_ sender: Any) {
+        DispatchQueue.main.async { [weak self] in
+            guard let self = self else { return }
+            
+            self.performSegue(withIdentifier: "segueToScanResponse", sender: self)
+        }
+    }
+    
     
     @IBAction func shareQrAction(_ sender: Any) {
         guard let image = imageView.image else { return }
@@ -157,14 +174,43 @@ class QRDisplayerViewController: UIViewController {
         }
     }
     
-    /*
+    
     // MARK: - Navigation
 
     // In a storyboard-based application, you will often want to do a little preparation before navigation
     override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
         // Get the new view controller using segue.destination.
         // Pass the selected object to the new view controller.
+        if segue.identifier == "segueToScanResponse" {
+            if let vc = segue.destination as? QRScannerViewController {
+                vc.doneBlock = { [weak self] result in
+                    guard let self = self else { return }
+                    
+                    guard let result = result,
+                          result.lowercased().hasPrefix("ur:crypto-response"),
+                          let account = URHelper.decodeResponse(result.lowercased()) else {
+                        
+                        showAlert(self, "", "Invalid response!")
+                        return
+                    }
+                    
+                    AddCosigner.add(account) { (success, message, errorDescription, savedNew, cosignerStruct) in
+                        guard success, let cosignerStruct = cosignerStruct else {
+                            showAlert(self, message, errorDescription ?? "unknown error")
+                            return
+                        }
+                        
+                        DispatchQueue.main.async { [weak self] in
+                            guard let self = self else { return }
+                            
+                            self.responseDoneBlock!(cosignerStruct)
+                            self.navigationController?.popViewController(animated: true)
+                        }
+                    }
+                }
+            }
+        }
     }
-    */
+    
 
 }

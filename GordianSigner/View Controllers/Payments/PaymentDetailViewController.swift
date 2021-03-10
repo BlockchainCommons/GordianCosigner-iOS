@@ -173,10 +173,11 @@ class PsbtTableViewController: UIViewController, UITableViewDelegate, UITableVie
                             let fullPath = pubkeyDict["fullPath"] as! BIP32Path
                             updatedDict["hasSigned"] = false
                             updatedDict["canSign"] = false
+                            updatedDict["isHot"] = false
                             
                             func loopCosigners() {
-                                for (k, keyset) in cosigners.enumerated() {
-                                    let cosignerStruct = CosignerStruct(dictionary: keyset)
+                                for (k, cosignerDict) in cosigners.enumerated() {
+                                    let cosignerStruct = CosignerStruct(dictionary: cosignerDict)
                                     
                                     if let descriptor = cosignerStruct.bip48SegwitAccount {
                                         let arr = descriptor.split(separator: "]")
@@ -191,11 +192,21 @@ class PsbtTableViewController: UIViewController, UITableViewDelegate, UITableVie
                                             let childKey = try? hdkey.derive(using: path) {
                                             if originalPubkey == childKey.pubKey.data.hexString {
                                                 
+                                                self.canSign = true
+                                                updatedDict["canSign"] = true
+                                                
+                                                updatedDict["cosignerStruct"] = cosignerStruct
+                                                
+                                                if cosignerStruct.xprv != nil || cosignerStruct.words != nil {
+                                                    updatedDict["isHot"] = true
+                                                } else {
+                                                    updatedDict["isHot"] = false
+                                                }
+                                                
                                                 if let shouldSignPayment = cosignerStruct.shouldSign {
                                                     if shouldSignPayment {
                                                         if cosignerStruct.xprv == nil && cosignerStruct.words == nil {
-                                                            self.shouldSign = true
-                                                            self.cosignerThatShouldSign = cosignerStruct
+                                                            updatedDict["shouldSign"] = true
                                                         }
                                                     }
                                                 }
@@ -229,6 +240,7 @@ class PsbtTableViewController: UIViewController, UITableViewDelegate, UITableVie
                                                                 
                                                                 if signed == originalPubkey {
                                                                     updatedDict["hasSigned"] = true
+                                                                    updatedDict["shouldSign"] = false
                                                                     pubkeyArray[p] = updatedDict
                                                                     self.inputsArray[i]["pubKeyArray"] = pubkeyArray
                                                                 }
@@ -286,49 +298,7 @@ class PsbtTableViewController: UIViewController, UITableViewDelegate, UITableVie
                                 }
                             }
                             
-                            CoreDataService.retrieveEntity(entityName: .cosigner) { (cosigners, errorDescription) in
-                                if let cosigners = cosigners, cosigners.count > 0 {
-
-                                    for (s, cosigner) in cosigners.enumerated() {
-                                        let cosignerStruct = CosignerStruct(dictionary: cosigner)
-                                        
-                                        if let encryptedXprv = cosignerStruct.xprv {
-                                            if let decryptedXprv = Encryption.decrypt(encryptedXprv) {
-                                                if let hdkey = try? HDKey(base58: decryptedXprv.utf8) {
-                                                    if let accountPath = try? fullPath.chop(depth: 4) {
-                                                        if let childKey = try? hdkey.derive(using: accountPath) {
-                                                            if childKey.pubKey.data.hexString == originalPubkey {
-                                                                self.canSign = true
-                                                                updatedDict["canSign"] = true
-                                                            }
-                                                        }
-                                                    }
-                                                }
-                                            }
-                                        }
-                                        
-                                        if let encryptedXprv = cosignerStruct.masterKey {
-                                            if let decryptedXprv = Encryption.decrypt(encryptedXprv) {
-                                                if let hdkey = try? HDKey(base58: decryptedXprv.utf8) {
-                                                    if let childKey = try? hdkey.derive(using: fullPath) {
-                                                        if childKey.pubKey.data.hexString == originalPubkey {
-                                                            self.canSign = true
-                                                            updatedDict["canSign"] = true
-                                                        }
-                                                    }
-                                                }
-                                            }
-                                        }
-                                        
-                                        if s + 1 == cosigners.count {
-                                            loopCosigners()
-                                        }
-                                    }
-                                } else {
-                                    loopCosigners()
-                                }
-                            }
-
+                            loopCosigners()
                         }
                     } else {
                         self.parseOutputs(completion: completion)
@@ -340,11 +310,15 @@ class PsbtTableViewController: UIViewController, UITableViewDelegate, UITableVie
     
     private func updateButton() {
         var shouldPromptForRequest = false
+        var potentialSigner:CosignerStruct!
+        
         for (i, input) in inputsArray.enumerated() {
             if let pubkeyArray = input["pubKeyArray"] as? [[String:Any]] {
                 for (p, pubkey) in pubkeyArray.enumerated() {
                     let canSign = pubkey["canSign"] as? Bool ?? false
                     let hasSigned = pubkey["hasSigned"] as? Bool ?? false
+                    let shouldSign = pubkey["shouldSign"] as? Bool ?? false
+                    let cosignerStruct = pubkey["cosignerStruct"] as? CosignerStruct
                     
                     if canSign {
                         if !hasSigned {
@@ -353,16 +327,18 @@ class PsbtTableViewController: UIViewController, UITableViewDelegate, UITableVie
                                 
                                 self.signButtonOutlet.alpha = 1
                             }
-                        }
-                    } else if self.shouldSign {
-                        if let _ = self.cosignerThatShouldSign {
-                            shouldPromptForRequest = true
+                            
+                            if shouldSign {
+                                shouldPromptForRequest = true
+                                potentialSigner = cosignerStruct
+                                self.cosignerThatShouldSign = potentialSigner
+                            }
                         }
                     }
                     
                     if p + 1 == pubkeyArray.count && i + 1 == inputsArray.count {
                         if shouldPromptForRequest {
-                            self.promptToRequest()
+                            self.promptToRequest(potentialSigner)
                         }
                     }
                 }
@@ -481,9 +457,9 @@ class PsbtTableViewController: UIViewController, UITableViewDelegate, UITableVie
         let cell = table.dequeueReusableCell(withIdentifier: "participantsCell", for: indexPath)
         cell.selectionStyle = .none
         
-        let lifeHashView = cell.viewWithTag(2) as! LifehashSeedView
-        let sigImage = cell.viewWithTag(3) as! UIImageView
-        let isHotImage = cell.viewWithTag(4) as! UIImageView
+        let lifeHashView = cell.viewWithTag(12) as! LifehashSeedView
+        let sigImage = cell.viewWithTag(13) as! UIImageView
+        let isHotImage = cell.viewWithTag(14) as! UIImageView
         
         lifeHashView.backgroundColor = cell.backgroundColor
         lifeHashView.background.backgroundColor = cell.backgroundColor
@@ -495,9 +471,10 @@ class PsbtTableViewController: UIViewController, UITableViewDelegate, UITableVie
             let participant = participants[indexPath.row]
             let cosignerLabel = participant["cosignerLabel"] as? String ?? "unknown"
             let hasSigned = participant["hasSigned"] as? Bool ?? false
-            let canSign = participant["canSign"] as? Bool ?? false
+            //let canSign = participant["canSign"] as? Bool ?? false
+            let isHot = participant["isHot"] as? Bool ?? false
             
-            if canSign {
+            if isHot {
                 isHotImage.image = UIImage(systemName: "flame")
                 isHotImage.tintColor = .systemOrange
             } else {
@@ -995,19 +972,20 @@ class PsbtTableViewController: UIViewController, UITableViewDelegate, UITableVie
         }
     }
     
-    private func promptToRequest() {
+    private func promptToRequest(_ cosignerToRequest: CosignerStruct) {
         DispatchQueue.main.async { [weak self] in
             guard let self = self else { return }
             
             var alertStyle = UIAlertController.Style.actionSheet
+            
             if (UIDevice.current.userInterfaceIdiom == .pad) {
                 alertStyle = UIAlertController.Style.alert
             }
             
-            let alert = UIAlertController(title: "Private Key Request", message: "One of your cosigners needs a private key to sign this payment. Create a request for the appropriate key.", preferredStyle: alertStyle)
+            let alert = UIAlertController(title: "Private Key Request", message: "\(cosignerToRequest.label) needs a private key to sign this payment.", preferredStyle: alertStyle)
             
             alert.addAction(UIAlertAction(title: "Request Key", style: .default, handler: { action in
-                self.requestKey()
+                self.requestKey(cosignerToRequest)
             }))
             
             alert.addAction(UIAlertAction(title: "Cancel", style: .cancel, handler: { action in }))
@@ -1016,9 +994,8 @@ class PsbtTableViewController: UIViewController, UITableViewDelegate, UITableVie
         }
     }
     
-    private func requestKey() {
-        guard let shouldSigner = cosignerThatShouldSign,
-              let request = URHelper.requestXprv(shouldSigner.bip48SegwitAccount!, "Gordian Cosigner needs a private key from \(shouldSigner.label) to sign a payment") else {
+    private func requestKey(_ cosignerToRequest: CosignerStruct) {
+        guard let request = URHelper.requestXprv(cosignerToRequest.bip48SegwitAccount!, "Gordian Cosigner needs a private key from \(cosignerToRequest.label) to sign a payment.") else {
             
             return
         }        
@@ -1143,6 +1120,18 @@ class PsbtTableViewController: UIViewController, UITableViewDelegate, UITableVie
                 vc.isPsbt = showPsbtQr
                 vc.header = qrHeader
                 vc.descriptionText = qrDescription
+                
+                vc.responseDoneBlock = { [weak self] signer in
+                    guard let self = self else { return }
+                    
+                    guard let addedSigner = signer else { return }
+                    
+                    if addedSigner.bip48SegwitAccount == self.cosignerThatShouldSign!.bip48SegwitAccount! {
+                        showAlert(self, "", "Cosigner updated with the correct private key ✓. Tap the sign now button.")
+                        
+                        self.loadTable()
+                    }
+                }
             }
         }
         

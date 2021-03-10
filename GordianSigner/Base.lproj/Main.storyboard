@@ -423,6 +423,15 @@
                                     <action selector="shareTextAction:" destination="9Vu-3O-YNg" eventType="touchUpInside" id="0Gt-aN-TCa"/>
                                 </connections>
                             </button>
+                            <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="system" showsTouchWhenHighlighted="YES" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="DUr-bp-ir8">
+                                <rect key="frame" x="294" y="20" width="100" height="30"/>
+                                <state key="normal" title="scan response">
+                                    <color key="titleColor" systemColor="systemTealColor"/>
+                                </state>
+                                <connections>
+                                    <action selector="scanResponseAction:" destination="9Vu-3O-YNg" eventType="touchUpInside" id="v5D-SP-r3Y"/>
+                                </connections>
+                            </button>
                         </subviews>
                         <viewLayoutGuide key="safeArea" id="GK0-od-YHe"/>
                         <color key="backgroundColor" white="0.0" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
@@ -433,6 +442,7 @@
                             <constraint firstItem="QDZ-sc-dJG" firstAttribute="centerX" secondItem="i3r-81-WoL" secondAttribute="centerX" id="JlE-Ke-gjy"/>
                             <constraint firstItem="0t4-W0-Izf" firstAttribute="leading" secondItem="GK0-od-YHe" secondAttribute="leading" constant="20" id="KiD-GM-eqQ"/>
                             <constraint firstItem="lJf-Uh-ILV" firstAttribute="top" secondItem="GK0-od-YHe" secondAttribute="top" constant="95" id="Nm8-ka-Xwb"/>
+                            <constraint firstItem="DUr-bp-ir8" firstAttribute="top" secondItem="GK0-od-YHe" secondAttribute="top" constant="20" id="OTY-vh-iBc"/>
                             <constraint firstItem="GK0-od-YHe" firstAttribute="trailing" secondItem="0t4-W0-Izf" secondAttribute="trailing" constant="20" id="UXa-KW-O5Y"/>
                             <constraint firstItem="LAq-QM-9fZ" firstAttribute="leading" secondItem="gnh-pp-jsJ" secondAttribute="trailing" constant="10" id="WCB-GI-YA7"/>
                             <constraint firstItem="0t4-W0-Izf" firstAttribute="top" secondItem="LAq-QM-9fZ" secondAttribute="bottom" constant="8" id="b2Y-iM-eX2"/>
@@ -443,6 +453,7 @@
                             <constraint firstItem="lJf-Uh-ILV" firstAttribute="top" secondItem="hpJ-y0-mBa" secondAttribute="bottom" constant="8" id="rKO-yt-7Gi"/>
                             <constraint firstItem="8Fb-WX-yzn" firstAttribute="leading" secondItem="GK0-od-YHe" secondAttribute="leading" constant="20" id="sbl-9T-L1l"/>
                             <constraint firstItem="QDZ-sc-dJG" firstAttribute="top" secondItem="lJf-Uh-ILV" secondAttribute="bottom" constant="17" id="smS-UW-eh1"/>
+                            <constraint firstItem="GK0-od-YHe" firstAttribute="trailing" secondItem="DUr-bp-ir8" secondAttribute="trailing" constant="20" id="smm-BY-FKL"/>
                             <constraint firstItem="hpJ-y0-mBa" firstAttribute="centerY" secondItem="hEA-SP-XCB" secondAttribute="centerY" id="w9x-fr-RZy"/>
                             <constraint firstItem="LAq-QM-9fZ" firstAttribute="top" secondItem="lJf-Uh-ILV" secondAttribute="bottom" constant="17" id="zht-Q2-AjK"/>
                         </constraints>
@@ -454,9 +465,11 @@
                         <outlet property="copyTextOutlet" destination="LAq-QM-9fZ" id="jnG-42-ncQ"/>
                         <outlet property="headerLabel" destination="8Fb-WX-yzn" id="IAR-Dt-XTV"/>
                         <outlet property="imageView" destination="lJf-Uh-ILV" id="Rev-R0-d3L"/>
+                        <outlet property="scanResponseOutlet" destination="DUr-bp-ir8" id="Veg-QA-626"/>
                         <outlet property="shareQrOutlet" destination="hEA-SP-XCB" id="oU0-gR-RwN"/>
                         <outlet property="shareTextOutlet" destination="gnh-pp-jsJ" id="o6M-7T-OtL"/>
                         <outlet property="textView" destination="0t4-W0-Izf" id="PNM-Pa-ebT"/>
+                        <segue destination="4dz-cW-ULS" kind="presentation" identifier="segueToScanResponse" id="yK0-KX-jOm"/>
                     </connections>
                 </viewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="dZb-Iw-dd0" userLabel="First Responder" customClass="UIResponder" sceneMemberID="firstResponder"/>
@@ -666,7 +679,7 @@
                                                                 <rect key="frame" x="0.0" y="0.0" width="306" height="90"/>
                                                                 <autoresizingMask key="autoresizingMask"/>
                                                                 <subviews>
-                                                                    <view tag="2" contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="86m-uI-ODv" customClass="LifehashSeedView" customModule="Gordian_Cosigner" customModuleProvider="target">
+                                                                    <view tag="12" contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="86m-uI-ODv" customClass="LifehashSeedView" customModule="Gordian_Cosigner" customModuleProvider="target">
                                                                         <rect key="frame" x="54" y="5" width="236" height="80"/>
                                                                         <color key="backgroundColor" systemColor="systemBackgroundColor"/>
                                                                         <constraints>
@@ -674,7 +687,7 @@
                                                                             <constraint firstAttribute="width" constant="68" id="jJ4-26-Sxs"/>
                                                                         </constraints>
                                                                     </view>
-                                                                    <imageView clipsSubviews="YES" userInteractionEnabled="NO" tag="3" contentMode="scaleAspectFit" horizontalHuggingPriority="251" verticalHuggingPriority="251" image="signature" catalog="system" translatesAutoresizingMaskIntoConstraints="NO" id="eaO-Wv-wgK">
+                                                                    <imageView clipsSubviews="YES" userInteractionEnabled="NO" tag="13" contentMode="scaleAspectFit" horizontalHuggingPriority="251" verticalHuggingPriority="251" image="signature" catalog="system" translatesAutoresizingMaskIntoConstraints="NO" id="eaO-Wv-wgK">
                                                                         <rect key="frame" x="16" y="31" width="30" height="31"/>
                                                                         <color key="tintColor" systemColor="systemPinkColor"/>
                                                                         <constraints>
@@ -682,7 +695,7 @@
                                                                             <constraint firstAttribute="width" constant="30" id="cT8-bG-Hgj"/>
                                                                         </constraints>
                                                                     </imageView>
-                                                                    <imageView clipsSubviews="YES" userInteractionEnabled="NO" tag="4" contentMode="scaleAspectFit" horizontalHuggingPriority="251" verticalHuggingPriority="251" image="flame" catalog="system" translatesAutoresizingMaskIntoConstraints="NO" id="fgT-V7-3T8">
+                                                                    <imageView clipsSubviews="YES" userInteractionEnabled="NO" tag="14" contentMode="scaleAspectFit" horizontalHuggingPriority="251" verticalHuggingPriority="251" image="flame" catalog="system" translatesAutoresizingMaskIntoConstraints="NO" id="fgT-V7-3T8">
                                                                         <rect key="frame" x="16" y="4.5" width="19" height="19"/>
                                                                         <color key="tintColor" systemColor="systemOrangeColor"/>
                                                                         <constraints>
@@ -2638,7 +2651,7 @@ Blockchain Commons and Gordian Cosigner never share any data with any third part
     <inferredMetricsTieBreakers>
         <segue reference="6Tx-hX-bdn"/>
         <segue reference="6Zt-E7-EEd"/>
-        <segue reference="GpL-x0-vs7"/>
+        <segue reference="UaS-I9-AEd"/>
         <segue reference="KzM-QC-ivF"/>
         <segue reference="JgM-9d-RH3"/>
         <segue reference="Oi5-2y-6bw"/>
