@@ -302,14 +302,14 @@
                                 </constraints>
                                 <blurEffect style="regular"/>
                             </visualEffectView>
-                            <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" showsTouchWhenHighlighted="YES" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="2gb-qB-VbP">
-                                <rect key="frame" x="187.5" y="20" width="39" height="40"/>
+                            <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="close" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="2gb-qB-VbP">
+                                <rect key="frame" x="355" y="20" width="39" height="40"/>
                                 <constraints>
                                     <constraint firstAttribute="width" constant="39" id="CWh-KB-URW"/>
                                     <constraint firstAttribute="height" constant="40" id="msK-Za-2hZ"/>
                                 </constraints>
                                 <color key="tintColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
-                                <state key="normal" image="chevron.down" catalog="system">
+                                <state key="normal">
                                     <preferredSymbolConfiguration key="preferredSymbolConfiguration" scale="large" weight="bold"/>
                                 </state>
                                 <connections>
@@ -320,13 +320,13 @@
                         <viewLayoutGuide key="safeArea" id="in4-ZL-XAA"/>
                         <color key="backgroundColor" systemColor="systemBackgroundColor"/>
                         <constraints>
+                            <constraint firstItem="in4-ZL-XAA" firstAttribute="trailing" secondItem="2gb-qB-VbP" secondAttribute="trailing" constant="20" id="3Mu-cq-RHc"/>
                             <constraint firstItem="11N-cd-oai" firstAttribute="trailing" secondItem="in4-ZL-XAA" secondAttribute="trailing" id="5pU-pY-v5t"/>
                             <constraint firstItem="11N-cd-oai" firstAttribute="top" secondItem="in4-ZL-XAA" secondAttribute="top" id="94M-7z-8kk"/>
                             <constraint firstItem="in4-ZL-XAA" firstAttribute="trailing" secondItem="3vK-q4-XRq" secondAttribute="trailing" constant="20" id="CR7-oK-zc8"/>
                             <constraint firstItem="2gb-qB-VbP" firstAttribute="top" secondItem="in4-ZL-XAA" secondAttribute="top" constant="20" id="GA9-E6-zCS"/>
                             <constraint firstItem="in4-ZL-XAA" firstAttribute="bottom" secondItem="3vK-q4-XRq" secondAttribute="bottom" constant="49" id="QW4-bZ-YAK"/>
                             <constraint firstItem="3vK-q4-XRq" firstAttribute="leading" secondItem="in4-ZL-XAA" secondAttribute="leading" constant="20" id="RQr-ex-pBh"/>
-                            <constraint firstItem="2gb-qB-VbP" firstAttribute="centerX" secondItem="vUa-HR-41x" secondAttribute="centerX" id="aCN-y8-Ab2"/>
                             <constraint firstItem="11N-cd-oai" firstAttribute="leading" secondItem="in4-ZL-XAA" secondAttribute="leading" id="dA7-Rr-xJS"/>
                             <constraint firstAttribute="bottom" secondItem="11N-cd-oai" secondAttribute="bottom" id="zHV-aJ-rbg"/>
                         </constraints>
@@ -2640,13 +2640,12 @@ Blockchain Commons and Gordian Cosigner never share any data with any third part
         <segue reference="6Zt-E7-EEd"/>
         <segue reference="GpL-x0-vs7"/>
         <segue reference="KzM-QC-ivF"/>
-        <segue reference="2q9-qh-fxy"/>
-        <segue reference="hha-MU-QkB"/>
+        <segue reference="JgM-9d-RH3"/>
+        <segue reference="Oi5-2y-6bw"/>
     </inferredMetricsTieBreakers>
     <resources>
         <image name="arrow.clockwise" catalog="system" width="115" height="128"/>
         <image name="bitcoinsign.circle" catalog="system" width="128" height="121"/>
-        <image name="chevron.down" catalog="system" width="128" height="72"/>
         <image name="chevron.right" catalog="system" width="96" height="128"/>
         <image name="doc.on.clipboard" catalog="system" width="116" height="128"/>
         <image name="doc.on.doc" catalog="system" width="116" height="128"/>

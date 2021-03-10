@@ -17,9 +17,10 @@ class QRScannerViewController: UIViewController {
     let downSwipe = UISwipeGestureRecognizer()
     let uploadButton = UIButton()
     let torchButton = UIButton()
-    let closeButton = UIButton()
+    //let closeButton = UIButton()
     let imagePicker = UIImagePickerController()
-    let avCaptureSession = AVCaptureSession()
+    var avCaptureSession: AVCaptureSession!
+    var previewLayer: AVCaptureVideoPreviewLayer?
     var decoder:URDecoder!
     var doneBlock : ((String?) -> Void)?
     let spinner = Spinner()
@@ -35,21 +36,23 @@ class QRScannerViewController: UIViewController {
     
     override func viewDidLoad() {
         super.viewDidLoad()
+        
         configureScanner()
         spinner.add(vc: self, description: "")
         decoder = URDecoder()
     }
     
     override func viewDidAppear(_ animated: Bool) {
-        #if targetEnvironment(macCatalyst)
-        #else
         scanNow()
-        #endif
     }
     
     @IBAction func closeAction(_ sender: Any) {
         DispatchQueue.main.async { [weak self] in
             guard let self = self else { return }
+            
+            if self.avCaptureSession.isRunning {
+                self.avCaptureSession.stopRunning()
+            }
             
             self.dismiss(animated: true, completion: nil)
         }
@@ -61,7 +64,6 @@ class QRScannerViewController: UIViewController {
             
             self.scanQRCode()
             self.addScannerButtons()
-            self.scannerView.addSubview(self.closeButton)
             self.spinner.remove()
         }
     }
@@ -77,22 +79,13 @@ class QRScannerViewController: UIViewController {
         
         scannerView.isUserInteractionEnabled = true
         uploadButton.addTarget(self, action: #selector(chooseQRCodeFromLibrary), for: .touchUpInside)
-        uploadButton.addTarget(self, action: #selector(chooseQRCodeFromLibrary), for: .touchUpInside)
         torchButton.addTarget(self, action: #selector(toggleTorchNow), for: .touchUpInside)
-        closeButton.addTarget(self, action: #selector(back), for: .touchUpInside)
         isTorchOn = false
         
         configureImagePicker()
-        
-        #if targetEnvironment(macCatalyst)
-        chooseQRCodeFromLibrary()
-
-        #else
         configureUploadButton()
         configureTorchButton()
-        configureCloseButton()
         configureDownSwipe()
-        #endif
     }
     
     func addScannerButtons() {
@@ -133,22 +126,12 @@ class QRScannerViewController: UIViewController {
         scannerView.addSubview(blur)
     }
     
-    @objc func back() {
-        DispatchQueue.main.async { [weak self] in
-            guard let self = self else { return }
-            
-            self.avCaptureSession.stopRunning()
-            self.dismiss(animated: true, completion: nil)
-        }
-    }
-    
     private func stopScanning(_ result: String) {
         DispatchQueue.main.async { [weak self] in
             guard let self = self else { return }
             
             self.dismiss(animated: true) {
                 self.stopScanner()
-                self.avCaptureSession.stopRunning()
                 self.doneBlock!(result)
             }
         }
@@ -204,8 +187,12 @@ class QRScannerViewController: UIViewController {
             
             let expectedParts = decoder.expectedPartCount ?? 0
             
-            DispatchQueue.main.async {
-                self.avCaptureSession.stopRunning()
+            DispatchQueue.main.async { [weak self] in
+                guard let self = self else { return }
+                
+                if self.avCaptureSession.isRunning {
+                    self.avCaptureSession.stopRunning()
+                }
                 let impact = UIImpactFeedbackGenerator()
                 impact.impactOccurred()
                 AudioServicesPlaySystemSound(1103)
@@ -239,15 +226,19 @@ class QRScannerViewController: UIViewController {
             }
         } else if isAccountMap(text) || isCryptoAccount(text) || isCosigner(text) || isCryptoHDKey(text) || isMnemonic(text) || isCryptoSeed(text) || isCryptoResponse(text) {
             DispatchQueue.main.async {
-                self.avCaptureSession.stopRunning()
                 let impact = UIImpactFeedbackGenerator()
                 impact.impactOccurred()
                 AudioServicesPlaySystemSound(1103)
                 self.stopScanning(text)
             }
         } else {
-            DispatchQueue.main.async {
-                self.avCaptureSession.stopRunning()
+            DispatchQueue.main.async { [weak self] in
+                guard let self = self else { return }
+                
+                if self.avCaptureSession.isRunning {
+                    self.avCaptureSession.stopRunning()
+                }
+                
                 let impact = UIImpactFeedbackGenerator()
                 impact.impactOccurred()
                 AudioServicesPlaySystemSound(1103)
@@ -258,12 +249,6 @@ class QRScannerViewController: UIViewController {
     
     @objc func handleSwipes(_ sender: UIGestureRecognizer) {
         stopScanner()
-    }
-    
-    func configureCloseButton() {
-        closeButton.frame = CGRect(x: view.frame.midX - 15, y: view.frame.maxY - 150, width: 30, height: 30)
-        closeButton.setImage(UIImage(systemName: "x.mark.circle"), for: .normal)
-        closeButton.tintColor = .systemTeal
     }
     
     func configureTorchButton() {
@@ -325,12 +310,15 @@ class QRScannerViewController: UIViewController {
     }
     
     func scanQRCode() {
-        guard let avCaptureDevice = AVCaptureDevice.default(for: AVMediaType.video) else { return }
+        let queue = DispatchQueue(label: "codes", qos: .userInteractive)
+        avCaptureSession = AVCaptureSession()
+        
+        guard let avCaptureDevice = AVCaptureDevice.default(for: .video) else { return }
         
         guard let avCaptureInput = try? AVCaptureDeviceInput(device: avCaptureDevice) else { return }
         
         let avCaptureMetadataOutput = AVCaptureMetadataOutput()
-        avCaptureMetadataOutput.setMetadataObjectsDelegate(self, queue: DispatchQueue.main)
+        avCaptureMetadataOutput.setMetadataObjectsDelegate(self, queue: queue)
         
         if let inputs = avCaptureSession.inputs as? [AVCaptureDeviceInput] {
             for input in inputs {
@@ -344,33 +332,27 @@ class QRScannerViewController: UIViewController {
             }
         }
         
+        guard avCaptureSession.canAddInput(avCaptureInput) else { return }
         avCaptureSession.addInput(avCaptureInput)
+        
+        guard avCaptureSession.canAddOutput(avCaptureMetadataOutput) else { return }
         avCaptureSession.addOutput(avCaptureMetadataOutput)
-        avCaptureMetadataOutput.metadataObjectTypes = [AVMetadataObject.ObjectType.qr]
-        let avCaptureVideoPreviewLayer = AVCaptureVideoPreviewLayer(session: avCaptureSession)
-        avCaptureVideoPreviewLayer.videoGravity = AVLayerVideoGravity.resizeAspectFill
-        avCaptureVideoPreviewLayer.frame = self.scannerView.bounds
-        self.scannerView.layer.addSublayer(avCaptureVideoPreviewLayer)
+        
+        avCaptureMetadataOutput.metadataObjectTypes = [.qr]
+        previewLayer = AVCaptureVideoPreviewLayer(session: avCaptureSession)
+        previewLayer!.videoGravity = .resizeAspectFill
+        previewLayer!.frame = self.scannerView.bounds
+        self.scannerView.layer.addSublayer(previewLayer!)
         self.avCaptureSession.startRunning()
-        
     }
         
-    func removeScanner() {
-        DispatchQueue.main.async { [weak self] in
-            guard let self = self else { return }
-            
-            self.avCaptureSession.stopRunning()
-            self.torchButton.removeFromSuperview()
-            self.uploadButton.removeFromSuperview()
-            self.scannerView.removeFromSuperview()
-        }
-    }
-    
     func stopScanner() {
         DispatchQueue.main.async { [weak self] in
             guard let self = self else { return }
             
-            self.avCaptureSession.stopRunning()
+            if self.avCaptureSession.isRunning {
+                self.avCaptureSession.stopRunning()
+            }
         }
     }
     
@@ -390,7 +372,7 @@ extension QRScannerViewController: AVCaptureMetadataOutputObjectsDelegate {
         if !isRunning {
             guard metadataObjects.count > 0,
                 let machineReadableCode = metadataObjects[0] as? AVMetadataMachineReadableCodeObject,
-                machineReadableCode.type == AVMetadataObject.ObjectType.qr,
+                machineReadableCode.type == .qr,
                 let string = machineReadableCode.stringValue else {
                     isRunning = false
                     return
@@ -399,7 +381,9 @@ extension QRScannerViewController: AVCaptureMetadataOutputObjectsDelegate {
             DispatchQueue.main.async { [weak self] in
                 guard let self = self else { return }
                 
-                self.avCaptureSession.stopRunning()
+                if self.avCaptureSession.isRunning {
+                    self.avCaptureSession.stopRunning()
+                }
             }
             
             isRunning = true

@@ -460,12 +460,10 @@ class SeedDetailViewController: UIViewController, UITextFieldDelegate, UITextVie
         
         guard let shouldSign = cosigner.shouldSign else { return }
         
-        if !shouldSign {
-            DispatchQueue.main.async { [weak self] in
-                guard let self = self else { return }
-                
-                self.shouldSignSwitch.isOn = false
-            }
+        DispatchQueue.main.async { [weak self] in
+            guard let self = self else { return }
+            
+            self.shouldSignSwitch.isOn = shouldSign
         }
     }
     

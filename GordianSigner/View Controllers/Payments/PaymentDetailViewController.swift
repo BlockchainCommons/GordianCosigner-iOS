@@ -30,6 +30,10 @@ class PsbtTableViewController: UIViewController, UITableViewDelegate, UITableVie
     var providedMnemonic = ""
     var shouldSign = false
     var cosignerThatShouldSign:CosignerStruct?
+    private var qrHeader = ""
+    private var qrDescription = ""
+    private var qrText = ""
+    private var showPsbtQr = false
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -175,13 +179,6 @@ class PsbtTableViewController: UIViewController, UITableViewDelegate, UITableVie
                                     let cosignerStruct = CosignerStruct(dictionary: keyset)
                                     
                                     if let descriptor = cosignerStruct.bip48SegwitAccount {
-                                        if let shouldSignPayment = cosignerStruct.shouldSign {
-                                            if shouldSignPayment && cosignerStruct.xprv == nil && cosignerStruct.words == nil {
-                                                self.shouldSign = true
-                                                self.cosignerThatShouldSign = cosignerStruct
-                                            }
-                                        }
-                                        
                                         let arr = descriptor.split(separator: "]")
                                         var xpub = ""
                                         
@@ -193,6 +190,16 @@ class PsbtTableViewController: UIViewController, UITableViewDelegate, UITableVie
                                             let hdkey = try? HDKey(base58: xpub),
                                             let childKey = try? hdkey.derive(using: path) {
                                             if originalPubkey == childKey.pubKey.data.hexString {
+                                                
+                                                if let shouldSignPayment = cosignerStruct.shouldSign {
+                                                    if shouldSignPayment {
+                                                        if cosignerStruct.xprv == nil && cosignerStruct.words == nil {
+                                                            self.shouldSign = true
+                                                            self.cosignerThatShouldSign = cosignerStruct
+                                                        }
+                                                    }
+                                                }
+                                                
                                                 updatedDict["cosignerLabel"] = cosignerStruct.label
                                                 updatedDict["lifeHash"] = LifeHash.image(cosignerStruct.lifehash) ?? UIImage()
                                                 
@@ -332,9 +339,10 @@ class PsbtTableViewController: UIViewController, UITableViewDelegate, UITableVie
     }
     
     private func updateButton() {
-        for input in inputsArray {
+        var shouldPromptForRequest = false
+        for (i, input) in inputsArray.enumerated() {
             if let pubkeyArray = input["pubKeyArray"] as? [[String:Any]] {
-                for pubkey in pubkeyArray {
+                for (p, pubkey) in pubkeyArray.enumerated() {
                     let canSign = pubkey["canSign"] as? Bool ?? false
                     let hasSigned = pubkey["hasSigned"] as? Bool ?? false
                     
@@ -344,13 +352,17 @@ class PsbtTableViewController: UIViewController, UITableViewDelegate, UITableVie
                                 guard let self = self else { return }
                                 
                                 self.signButtonOutlet.alpha = 1
-                                
-                                if self.shouldSign {
-                                    if let _ = self.cosignerThatShouldSign {
-                                        self.promptToRequest()
-                                    }
-                                }
                             }
+                        }
+                    } else if self.shouldSign {
+                        if let _ = self.cosignerThatShouldSign {
+                            shouldPromptForRequest = true
+                        }
+                    }
+                    
+                    if p + 1 == pubkeyArray.count && i + 1 == inputsArray.count {
+                        if shouldPromptForRequest {
+                            self.promptToRequest()
                         }
                     }
                 }
@@ -940,7 +952,6 @@ class PsbtTableViewController: UIViewController, UITableViewDelegate, UITableVie
             }))
             
             alert.addAction(UIAlertAction(title: "psbt base64 text", style: .default, handler: { action in
-                //print("psbt to export: \(self.psbt.description)")
                 self.exportText(self.psbt.description)
             }))
             
@@ -961,7 +972,11 @@ class PsbtTableViewController: UIViewController, UITableViewDelegate, UITableVie
     }
     
     private func exportAsQR() {
-        DispatchQueue.main.async {
+        DispatchQueue.main.async { [weak self] in
+            guard let self = self else { return }
+            
+            self.showPsbtQr = true
+            self.qrText = self.psbt.description
             self.performSegue(withIdentifier: "segueToQRDisplayer", sender: self)
         }
     }
@@ -1002,10 +1017,21 @@ class PsbtTableViewController: UIViewController, UITableViewDelegate, UITableVie
     }
     
     private func requestKey() {
-        guard let shouldSigner = cosignerThatShouldSign else { return }
+        guard let shouldSigner = cosignerThatShouldSign,
+              let request = URHelper.requestXprv(shouldSigner.bip48SegwitAccount!, "Gordian Cosigner needs a private key from \(shouldSigner.label) to sign a payment") else {
+            
+            return
+        }        
         
-        let request = URHelper.requestXprv(shouldSigner.bip48SegwitAccount!, "Gordian Cosigner needs a private key from \(shouldSigner.label) to sign a payment")
-        print("request: \(request)")
+        DispatchQueue.main.async { [weak self] in
+            guard let self = self else { return }
+            
+            self.showPsbtQr = false
+            self.qrText = request
+            self.qrHeader = "Private Key Request"
+            self.qrDescription = request
+            self.performSegue(withIdentifier: "segueToQRDisplayer", sender: self)
+        }
     }
     
     private func promptToAdd() {
@@ -1113,8 +1139,10 @@ class PsbtTableViewController: UIViewController, UITableViewDelegate, UITableVie
         // Pass the selected object to the new view controller.
         if segue.identifier == "segueToQRDisplayer" {
             if let vc = segue.destination as? QRDisplayerViewController {
-                vc.text = psbt.description
-                vc.isPsbt = true
+                vc.text = qrText//psbt.description
+                vc.isPsbt = showPsbtQr
+                vc.header = qrHeader
+                vc.descriptionText = qrDescription
             }
         }
         
