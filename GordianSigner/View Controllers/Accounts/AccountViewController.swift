@@ -41,6 +41,15 @@ class AccountMapsViewController: UIViewController, UITableViewDelegate, UITableV
         }
     }
     
+    @IBAction func scanQrAction(_ sender: Any) {
+        DispatchQueue.main.async { [weak self] in
+            guard let self = self else { return }
+            
+            self.performSegue(withIdentifier: "segueToAddAccountMap", sender: self)
+        }
+    }
+    
+    
     @IBAction func infoAction(_ sender: Any) {
         showInfo()
     }
@@ -216,17 +225,6 @@ class AccountMapsViewController: UIViewController, UITableViewDelegate, UITableV
             self.performSegue(withIdentifier: "segueToAccountDetail", sender: self)
         }
     }
-    
-//    @objc func seeAddresses(_ sender: UIButton) {
-//        guard let sectionString = sender.restorationIdentifier, let int = Int(sectionString) else { return }
-//
-//        let am = accounts[int]["account"] as! AccountStruct
-//
-//        DispatchQueue.main.async {
-//            self.addressesAm = am
-//            self.performSegue(withIdentifier: "segueToAddresses", sender: self)
-//        }
-//    }
     
     @objc func addCosigner(_ sender: UIButton) {
         guard let sectionString = sender.restorationIdentifier, let int = Int(sectionString) else { return }
@@ -604,13 +602,14 @@ class AccountMapsViewController: UIViewController, UITableViewDelegate, UITableV
             let hack = "wsh(\(fullKey)/0/*)"
             let dp = DescriptorParser()
             let ds = dp.descriptor(hack)
-            let bip48SegwitAccount = fullKey.replacingOccurrences(of: "/0/*", with: "")
+            var bip48SegwitAccount = fullKey.replacingOccurrences(of: "/0/*", with: "")
+            bip48SegwitAccount = bip48SegwitAccount.replacingOccurrences(of: ")", with: "")
             
             guard let ur = URHelper.cosignerToUr(bip48SegwitAccount, false), let lifehash = URHelper.fingerprint(ur) else {
                 showAlert(self, "", "Error deriving Cosigner lifehash.")
                 return
             }
-            
+
             var cosignerToSave = [String:Any]()
             cosignerToSave["id"] = UUID()
             cosignerToSave["label"] = "Cosigner #\(i + 1)"
@@ -620,21 +619,21 @@ class AccountMapsViewController: UIViewController, UITableViewDelegate, UITableV
             cosignerToSave["sharedWith"] = accountId
             cosignerToSave["dateShared"] = Date()
             cosignerToSave["lifehash"] = lifehash
-            
+
             // First fetch all existing cosigners to ensure we do not save duplicates
             CoreDataService.retrieveEntity(entityName: .cosigner) { (cosigners, errorDescription) in
                 var alreadyExists = false
-                
+
                 if let cosigners = cosigners, cosigners.count > 0 {
                     for (i, cosigner) in cosigners.enumerated() {
                         let cosignerStruct = CosignerStruct(dictionary: cosigner)
-                        
+
                         if cosignerStruct.bip48SegwitAccount != nil {
                             if cosignerStruct.bip48SegwitAccount! == bip48SegwitAccount {
                                 alreadyExists = true
                             }
                         }
-                        
+
                         if i + 1 == cosigners.count {
                             if !alreadyExists {
                                 CoreDataService.saveEntity(dict: cosignerToSave, entityName: .cosigner) { (_, _) in }

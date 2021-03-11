@@ -12,7 +12,7 @@ import LibWally
 enum AddCosigner {
     
     static func add(_ account: String, completion: @escaping (((success: Bool, message: String, errorDesc: String?, savedNew: Bool, cosignerStruct: CosignerStruct?)) -> Void)) {
-        var segwitBip84Account = account
+        var segwitBip48Account = account
         var hack = "wsh(\(account)/0/*)"
         let dp = DescriptorParser()
         var ds = dp.descriptor(hack)
@@ -24,7 +24,7 @@ enum AddCosigner {
             cosigner["xprv"] = encryptedXprv
             shouldSign = true
             hack = hack.replacingOccurrences(of: ds.accountXprv, with: hdkey.xpub)
-            segwitBip84Account = segwitBip84Account.replacingOccurrences(of: ds.accountXprv, with: hdkey.xpub)
+            segwitBip48Account = segwitBip48Account.replacingOccurrences(of: ds.accountXprv, with: hdkey.xpub)
             ds = dp.descriptor(hack)
         }
         
@@ -38,14 +38,14 @@ enum AddCosigner {
             return
         }
         
-        guard let ur = URHelper.cosignerToUr(segwitBip84Account, false), let lifehashFingerprint = URHelper.fingerprint(ur) else {
+        guard let ur = URHelper.cosignerToUr(segwitBip48Account, false), let lifehashFingerprint = URHelper.fingerprint(ur) else {
             completion((false, "Invalid Key", "Unsupported key, we only support Bitcoin mainnet/testnet hdkeys.", false, nil))
             return
         }
         
         cosigner["id"] = UUID()
         cosigner["label"] = "Cosigner"
-        cosigner["bip48SegwitAccount"] = segwitBip84Account
+        cosigner["bip48SegwitAccount"] = segwitBip48Account
         cosigner["dateAdded"] = Date()
         cosigner["fingerprint"] = ds.fingerprint
         cosigner["lifehash"] = lifehashFingerprint
@@ -96,8 +96,7 @@ enum AddCosigner {
                 for (i, cosignerDict) in cosigners.enumerated() {
                     let cosignerStruct = CosignerStruct(dictionary: cosignerDict)
                     
-                    if cosignerStruct.bip48SegwitAccount == segwitBip84Account {
-                        //update existing
+                    if cosignerStruct.bip48SegwitAccount! == segwitBip48Account {
                         cosignerToUpdate = cosignerStruct
                     }
                     

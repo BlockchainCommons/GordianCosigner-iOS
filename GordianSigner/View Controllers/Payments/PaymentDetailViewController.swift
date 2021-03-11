@@ -310,6 +310,7 @@ class PsbtTableViewController: UIViewController, UITableViewDelegate, UITableVie
     private func updateButton() {
         var shouldPromptForRequest = false
         var potentialSigner:CosignerStruct!
+        var shouldShowSignButton = false
         
         for (i, input) in inputsArray.enumerated() {
             if let pubkeyArray = input["pubKeyArray"] as? [[String:Any]] {
@@ -321,10 +322,8 @@ class PsbtTableViewController: UIViewController, UITableViewDelegate, UITableVie
                     
                     if canSign {
                         if !hasSigned {
-                            DispatchQueue.main.async { [weak self] in
-                                guard let self = self else { return }
-                                
-                                self.signButtonOutlet.alpha = 1
+                            if self.canSign {
+                                shouldShowSignButton = true
                             }
                             
                             if shouldSign {
@@ -336,6 +335,14 @@ class PsbtTableViewController: UIViewController, UITableViewDelegate, UITableVie
                     }
                     
                     if p + 1 == pubkeyArray.count && i + 1 == inputsArray.count {
+                        if shouldShowSignButton {
+                            DispatchQueue.main.async { [weak self] in
+                                guard let self = self else { return }
+                                
+                                self.signButtonOutlet.alpha = 1
+                            }
+                        }
+                        
                         if shouldPromptForRequest {
                             self.promptToRequest(potentialSigner)
                         }
@@ -951,6 +958,8 @@ class PsbtTableViewController: UIViewController, UITableViewDelegate, UITableVie
         DispatchQueue.main.async { [weak self] in
             guard let self = self else { return }
             
+            self.qrHeader = "Payment"
+            self.qrDescription = ""
             self.showPsbtQr = true
             self.qrText = self.psbt.description
             self.performSegue(withIdentifier: "segueToQRDisplayer", sender: self)

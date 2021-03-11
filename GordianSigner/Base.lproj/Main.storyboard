@@ -422,11 +422,11 @@
                                     <action selector="shareTextAction:" destination="9Vu-3O-YNg" eventType="touchUpInside" id="0Gt-aN-TCa"/>
                                 </connections>
                             </button>
-                            <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="DUr-bp-ir8">
-                                <rect key="frame" x="20" y="66" width="127" height="21"/>
-                                <fontDescription key="fontDescription" type="system" pointSize="16"/>
+                            <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" showsTouchWhenHighlighted="YES" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="DUr-bp-ir8">
+                                <rect key="frame" x="20" y="68" width="93.5" height="19"/>
+                                <fontDescription key="fontDescription" type="system" pointSize="10"/>
                                 <color key="tintColor" systemColor="systemTealColor"/>
-                                <state key="normal" title="scan response" image="qrcode.viewfinder" catalog="system">
+                                <state key="normal" title=" scan response" image="qrcode.viewfinder" catalog="system">
                                     <color key="titleColor" systemColor="systemTealColor"/>
                                 </state>
                                 <connections>
@@ -985,7 +985,7 @@
                                 <color key="textColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                                 <nil key="highlightedColor"/>
                             </label>
-                            <button opaque="NO" clipsSubviews="YES" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="zaS-M0-VOe">
+                            <button opaque="NO" clipsSubviews="YES" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" showsTouchWhenHighlighted="YES" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="zaS-M0-VOe">
                                 <rect key="frame" x="289" y="25.5" width="105" height="23"/>
                                 <color key="backgroundColor" white="0.0" alpha="0.0" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                                 <color key="tintColor" systemColor="systemTealColor"/>
@@ -1411,11 +1411,18 @@
                         </constraints>
                     </view>
                     <navigationItem key="navigationItem" id="IBD-Nb-A9w">
-                        <barButtonItem key="leftBarButtonItem" image="info.circle" catalog="system" id="wwV-Vy-azx">
-                            <connections>
-                                <action selector="infoAction:" destination="wCx-A7-8Dm" id="moL-FB-4BK"/>
-                            </connections>
-                        </barButtonItem>
+                        <leftBarButtonItems>
+                            <barButtonItem image="info.circle" catalog="system" id="wwV-Vy-azx">
+                                <connections>
+                                    <action selector="infoAction:" destination="wCx-A7-8Dm" id="moL-FB-4BK"/>
+                                </connections>
+                            </barButtonItem>
+                            <barButtonItem image="qrcode.viewfinder" catalog="system" id="tPH-vc-qJW">
+                                <connections>
+                                    <action selector="scanQrAction:" destination="wCx-A7-8Dm" id="a62-SE-66a"/>
+                                </connections>
+                            </barButtonItem>
+                        </leftBarButtonItems>
                     </navigationItem>
                     <connections>
                         <outlet property="accountMapTable" destination="QUk-qt-fbj" id="zUN-YT-zzC"/>
@@ -2655,7 +2662,7 @@ Blockchain Commons and Gordian Cosigner never share any data with any third part
         <segue reference="UaS-I9-AEd"/>
         <segue reference="KzM-QC-ivF"/>
         <segue reference="JgM-9d-RH3"/>
-        <segue reference="yK0-KX-jOm"/>
+        <segue reference="Oi5-2y-6bw"/>
     </inferredMetricsTieBreakers>
     <resources>
         <image name="arrow.clockwise" catalog="system" width="115" height="128"/>
