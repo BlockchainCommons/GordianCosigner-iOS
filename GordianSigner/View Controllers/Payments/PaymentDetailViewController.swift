@@ -192,13 +192,12 @@ class PsbtTableViewController: UIViewController, UITableViewDelegate, UITableVie
                                             let childKey = try? hdkey.derive(using: path) {
                                             if originalPubkey == childKey.pubKey.data.hexString {
                                                 
-                                                self.canSign = true
-                                                updatedDict["canSign"] = true
-                                                
                                                 updatedDict["cosignerStruct"] = cosignerStruct
+                                                updatedDict["canSign"] = true
                                                 
                                                 if cosignerStruct.xprv != nil || cosignerStruct.words != nil {
                                                     updatedDict["isHot"] = true
+                                                    self.canSign = true
                                                 } else {
                                                     updatedDict["isHot"] = false
                                                 }
