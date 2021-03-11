@@ -2,7 +2,6 @@
 <document type="com.apple.InterfaceBuilder3.CocoaTouch.Storyboard.XIB" version="3.0" toolsVersion="17701" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" useSafeAreas="YES" colorMatched="YES" initialViewController="shV-H0-8JM">
     <device id="retina6_1" orientation="portrait" appearance="light"/>
     <dependencies>
-        <deployment identifier="iOS"/>
         <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="17703"/>
         <capability name="Safe area layout guides" minToolsVersion="9.0"/>
         <capability name="System colors in document resources" minToolsVersion="11.0"/>
@@ -423,9 +422,11 @@
                                     <action selector="shareTextAction:" destination="9Vu-3O-YNg" eventType="touchUpInside" id="0Gt-aN-TCa"/>
                                 </connections>
                             </button>
-                            <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="system" showsTouchWhenHighlighted="YES" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="DUr-bp-ir8">
-                                <rect key="frame" x="294" y="20" width="100" height="30"/>
-                                <state key="normal" title="scan response">
+                            <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="DUr-bp-ir8">
+                                <rect key="frame" x="20" y="66" width="127" height="21"/>
+                                <fontDescription key="fontDescription" type="system" pointSize="16"/>
+                                <color key="tintColor" systemColor="systemTealColor"/>
+                                <state key="normal" title="scan response" image="qrcode.viewfinder" catalog="system">
                                     <color key="titleColor" systemColor="systemTealColor"/>
                                 </state>
                                 <connections>
@@ -436,13 +437,14 @@
                         <viewLayoutGuide key="safeArea" id="GK0-od-YHe"/>
                         <color key="backgroundColor" white="0.0" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                         <constraints>
+                            <constraint firstItem="lJf-Uh-ILV" firstAttribute="top" secondItem="DUr-bp-ir8" secondAttribute="bottom" constant="8" symbolic="YES" id="0pT-oG-eKE"/>
+                            <constraint firstItem="DUr-bp-ir8" firstAttribute="leading" secondItem="GK0-od-YHe" secondAttribute="leading" constant="20" id="5nl-4V-AeB"/>
                             <constraint firstItem="lJf-Uh-ILV" firstAttribute="centerX" secondItem="i3r-81-WoL" secondAttribute="centerX" id="FY6-aA-ZeU"/>
                             <constraint firstItem="8Fb-WX-yzn" firstAttribute="top" secondItem="GK0-od-YHe" secondAttribute="top" constant="20" id="Gfw-rt-wiH"/>
                             <constraint firstItem="GK0-od-YHe" firstAttribute="trailing" secondItem="hpJ-y0-mBa" secondAttribute="trailing" constant="20" id="IEd-L4-VF8"/>
                             <constraint firstItem="QDZ-sc-dJG" firstAttribute="centerX" secondItem="i3r-81-WoL" secondAttribute="centerX" id="JlE-Ke-gjy"/>
                             <constraint firstItem="0t4-W0-Izf" firstAttribute="leading" secondItem="GK0-od-YHe" secondAttribute="leading" constant="20" id="KiD-GM-eqQ"/>
                             <constraint firstItem="lJf-Uh-ILV" firstAttribute="top" secondItem="GK0-od-YHe" secondAttribute="top" constant="95" id="Nm8-ka-Xwb"/>
-                            <constraint firstItem="DUr-bp-ir8" firstAttribute="top" secondItem="GK0-od-YHe" secondAttribute="top" constant="20" id="OTY-vh-iBc"/>
                             <constraint firstItem="GK0-od-YHe" firstAttribute="trailing" secondItem="0t4-W0-Izf" secondAttribute="trailing" constant="20" id="UXa-KW-O5Y"/>
                             <constraint firstItem="LAq-QM-9fZ" firstAttribute="leading" secondItem="gnh-pp-jsJ" secondAttribute="trailing" constant="10" id="WCB-GI-YA7"/>
                             <constraint firstItem="0t4-W0-Izf" firstAttribute="top" secondItem="LAq-QM-9fZ" secondAttribute="bottom" constant="8" id="b2Y-iM-eX2"/>
@@ -453,7 +455,6 @@
                             <constraint firstItem="lJf-Uh-ILV" firstAttribute="top" secondItem="hpJ-y0-mBa" secondAttribute="bottom" constant="8" id="rKO-yt-7Gi"/>
                             <constraint firstItem="8Fb-WX-yzn" firstAttribute="leading" secondItem="GK0-od-YHe" secondAttribute="leading" constant="20" id="sbl-9T-L1l"/>
                             <constraint firstItem="QDZ-sc-dJG" firstAttribute="top" secondItem="lJf-Uh-ILV" secondAttribute="bottom" constant="17" id="smS-UW-eh1"/>
-                            <constraint firstItem="GK0-od-YHe" firstAttribute="trailing" secondItem="DUr-bp-ir8" secondAttribute="trailing" constant="20" id="smm-BY-FKL"/>
                             <constraint firstItem="hpJ-y0-mBa" firstAttribute="centerY" secondItem="hEA-SP-XCB" secondAttribute="centerY" id="w9x-fr-RZy"/>
                             <constraint firstItem="LAq-QM-9fZ" firstAttribute="top" secondItem="lJf-Uh-ILV" secondAttribute="bottom" constant="17" id="zht-Q2-AjK"/>
                         </constraints>
@@ -2654,7 +2655,7 @@ Blockchain Commons and Gordian Cosigner never share any data with any third part
         <segue reference="UaS-I9-AEd"/>
         <segue reference="KzM-QC-ivF"/>
         <segue reference="JgM-9d-RH3"/>
-        <segue reference="Oi5-2y-6bw"/>
+        <segue reference="yK0-KX-jOm"/>
     </inferredMetricsTieBreakers>
     <resources>
         <image name="arrow.clockwise" catalog="system" width="115" height="128"/>
