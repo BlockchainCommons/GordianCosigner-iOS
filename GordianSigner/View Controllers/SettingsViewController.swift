@@ -7,12 +7,11 @@
 //
 
 import UIKit
+import PDFKit
 
 class SettingsViewController: UIViewController {
     
-    
     @IBOutlet weak var toggle: UISegmentedControl!
-    
 
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -27,7 +26,6 @@ class SettingsViewController: UIViewController {
     }
     
     @IBAction func didToggle(_ sender: Any) {
-        print("toggle.selectedSegmentIndex: \(toggle.selectedSegmentIndex)")
         if toggle.selectedSegmentIndex == 0 {
             UserDefaults.standard.setValue("1", forKey: "coinType")
         } else {
@@ -35,7 +33,41 @@ class SettingsViewController: UIViewController {
         }
     }
     
-    
+    @IBAction func backupAction(_ sender: Any) {
+        CoreDataService.retrieveEntity(entityName: .cosigner) { (cosigners, errorDescription) in
+            guard let cosigners = cosigners else { return }
+            var cosignerStrArray:[CosignerStruct] = []
+            
+            for (i, cosigner) in cosigners.enumerated() {
+                let cosignerStr = CosignerStruct(dictionary: cosigner)
+                cosignerStrArray.append(cosignerStr)
+                
+                if i + 1 == cosigners.count {
+                    let creator = PDFCreator.shared
+                    creator.cosigners = cosignerStrArray
+                    let pdfData = creator.prepareData()
+                    
+                    let printController = UIPrintInteractionController.shared
+                    let printInfo = UIPrintInfo(dictionary: [:])
+                    printInfo.outputType = .general
+                    printInfo.orientation = .portrait
+                    printInfo.jobName = "Cosigner backup"
+                    printController.printInfo = printInfo
+                    
+                    printController.printingItem = pdfData
+                    
+                    printController.present(animated: true) { (controller, completed, error) in
+                        if(!completed && error != nil){
+                            NSLog("Print failed - %@", error!.localizedDescription)
+                        }
+                        else if(completed) {
+                            NSLog("Print succeeded")
+                        }
+                    }
+                }
+            }
+        }
+    }
 
     /*
     // MARK: - Navigation

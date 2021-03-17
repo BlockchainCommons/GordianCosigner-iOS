@@ -2445,18 +2445,39 @@ If you do not want to add seed words to create a cosigner go back and choose the
                                 <color key="textColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                                 <nil key="highlightedColor"/>
                             </label>
+                            <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Backup" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="Pqs-fs-5pb">
+                                <rect key="frame" x="20" y="162" width="58" height="21"/>
+                                <fontDescription key="fontDescription" type="system" pointSize="17"/>
+                                <color key="textColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+                                <nil key="highlightedColor"/>
+                            </label>
+                            <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" showsTouchWhenHighlighted="YES" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="Qtu-Fc-jCg">
+                                <rect key="frame" x="20" y="191" width="149" height="21"/>
+                                <fontDescription key="fontDescription" type="system" pointSize="17"/>
+                                <color key="tintColor" systemColor="systemTealColor"/>
+                                <state key="normal" title="  Print Cosigners" image="printer" catalog="system">
+                                    <color key="titleColor" systemColor="systemTealColor"/>
+                                </state>
+                                <connections>
+                                    <action selector="backupAction:" destination="Ft5-mf-Xqz" eventType="touchUpInside" id="n9v-iF-hC5"/>
+                                </connections>
+                            </button>
                         </subviews>
                         <viewLayoutGuide key="safeArea" id="msy-e7-L5e"/>
                         <color key="backgroundColor" white="0.0" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                         <constraints>
+                            <constraint firstItem="Pqs-fs-5pb" firstAttribute="top" secondItem="YE6-s4-7um" secondAttribute="bottom" constant="24" id="1ee-A4-FVX"/>
                             <constraint firstItem="uX9-KR-ZSc" firstAttribute="top" secondItem="AVc-Tj-3EV" secondAttribute="bottom" constant="18" id="3mw-b5-9gG"/>
                             <constraint firstItem="YE6-s4-7um" firstAttribute="leading" secondItem="msy-e7-L5e" secondAttribute="leading" constant="20" id="64x-Rg-e8S"/>
                             <constraint firstItem="RvT-CP-0v2" firstAttribute="centerY" secondItem="AVc-Tj-3EV" secondAttribute="centerY" constant="0.5" id="9Zm-B8-wLg"/>
                             <constraint firstItem="AVc-Tj-3EV" firstAttribute="leading" secondItem="msy-e7-L5e" secondAttribute="leading" constant="20" id="IdE-sX-3qz"/>
+                            <constraint firstItem="Pqs-fs-5pb" firstAttribute="leading" secondItem="msy-e7-L5e" secondAttribute="leading" constant="20" id="Nbu-PK-DBh"/>
                             <constraint firstItem="RvT-CP-0v2" firstAttribute="leading" secondItem="AVc-Tj-3EV" secondAttribute="trailing" constant="8" id="Nh7-pG-gCt"/>
                             <constraint firstItem="uX9-KR-ZSc" firstAttribute="leading" secondItem="msy-e7-L5e" secondAttribute="leading" constant="20" id="QQi-8L-wT0"/>
+                            <constraint firstItem="Qtu-Fc-jCg" firstAttribute="top" secondItem="Pqs-fs-5pb" secondAttribute="bottom" constant="8" symbolic="YES" id="SBb-Sb-CHw"/>
                             <constraint firstItem="YE6-s4-7um" firstAttribute="top" secondItem="uX9-KR-ZSc" secondAttribute="bottom" constant="8" symbolic="YES" id="fLr-sP-ZfA"/>
                             <constraint firstItem="AVc-Tj-3EV" firstAttribute="top" secondItem="msy-e7-L5e" secondAttribute="top" constant="20" id="gCi-OU-9yD"/>
+                            <constraint firstItem="Qtu-Fc-jCg" firstAttribute="leading" secondItem="msy-e7-L5e" secondAttribute="leading" constant="20" id="lcv-SZ-pRh"/>
                         </constraints>
                     </view>
                     <navigationItem key="navigationItem" id="Bxv-V6-WIC"/>
@@ -2682,6 +2703,7 @@ Blockchain Commons and Gordian Cosigner never share any data with any third part
         <image name="person.crop.circle.badge.checkmark" catalog="system" width="128" height="113"/>
         <image name="plus" catalog="system" width="128" height="113"/>
         <image name="plus.rectangle" catalog="system" width="128" height="93"/>
+        <image name="printer" catalog="system" width="128" height="111"/>
         <image name="qrcode" catalog="system" width="128" height="114"/>
         <image name="qrcode.viewfinder" catalog="system" width="128" height="115"/>
         <image name="signature" catalog="system" width="128" height="90"/>

@@ -9,6 +9,7 @@
 /* Begin PBXBuildFile section */
 		0A0D3A7125D4F4C600E86F70 /* AuthViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0A0D3A7025D4F4C600E86F70 /* AuthViewController.swift */; };
 		0A79C6DD25EF4F2F002470C5 /* AddCosigner.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0A79C6DC25EF4F2F002470C5 /* AddCosigner.swift */; };
+		0A9EE67C2601C8B80000B130 /* PDFCreator.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0A9EE67B2601C8B80000B130 /* PDFCreator.swift */; };
 		0AAAB4B125D2693E00C77B52 /* SettingsViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0AAAB4B025D2693E00C77B52 /* SettingsViewController.swift */; };
 		0AF6442325D4DB91003E619E /* CloudKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 0AF6442225D4DB91003E619E /* CloudKit.framework */; };
 		D00F498D258B2ACD00941DBA /* accounts.png in Resources */ = {isa = PBXBuildFile; fileRef = D00F498C258B2ACD00941DBA /* accounts.png */; };
@@ -106,6 +107,7 @@
 /* Begin PBXFileReference section */
 		0A0D3A7025D4F4C600E86F70 /* AuthViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AuthViewController.swift; sourceTree = "<group>"; };
 		0A79C6DC25EF4F2F002470C5 /* AddCosigner.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AddCosigner.swift; sourceTree = "<group>"; };
+		0A9EE67B2601C8B80000B130 /* PDFCreator.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PDFCreator.swift; sourceTree = "<group>"; };
 		0AAAB4B025D2693E00C77B52 /* SettingsViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsViewController.swift; sourceTree = "<group>"; };
 		0AF6442225D4DB91003E619E /* CloudKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CloudKit.framework; path = System/Library/Frameworks/CloudKit.framework; sourceTree = SDKROOT; };
 		D00F498C258B2ACD00941DBA /* accounts.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = accounts.png; sourceTree = "<group>"; };
@@ -411,6 +413,7 @@
 				D0246DDA256B667800F812A5 /* base58.c */,
 				D04423F225837A8700A25179 /* PaymentHash.swift */,
 				0A79C6DC25EF4F2F002470C5 /* AddCosigner.swift */,
+				0A9EE67B2601C8B80000B130 /* PDFCreator.swift */,
 			);
 			path = Helpers;
 			sourceTree = "<group>";
@@ -589,6 +592,7 @@
 				D06F44572581B86200B42DEB /* AddressesViewController.swift in Sources */,
 				D0974A5E255B93500013DC60 /* Entities.swift in Sources */,
 				D04423F52586F2CC00A25179 /* LifehashSeedView.swift in Sources */,
+				0A9EE67C2601C8B80000B130 /* PDFCreator.swift in Sources */,
 				D04B029C2524A9F800C249B8 /* AddSeedWordsViewController.swift in Sources */,
 				D0B4DDD725258B25009C8624 /* Bip39Words.swift in Sources */,
 				D0AD30002591825F00B9CBFC /* LicenseDisclaimerViewController.swift in Sources */,
