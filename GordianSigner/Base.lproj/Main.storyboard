@@ -238,11 +238,18 @@
                         </constraints>
                     </view>
                     <navigationItem key="navigationItem" id="NxX-NZ-h8V">
-                        <barButtonItem key="leftBarButtonItem" image="info.circle" catalog="system" id="Il9-0H-Vk7">
-                            <connections>
-                                <action selector="infoAction:" destination="tIM-97-jRz" id="CKc-QM-biO"/>
-                            </connections>
-                        </barButtonItem>
+                        <leftBarButtonItems>
+                            <barButtonItem image="info.circle" catalog="system" id="Il9-0H-Vk7">
+                                <connections>
+                                    <action selector="infoAction:" destination="tIM-97-jRz" id="CKc-QM-biO"/>
+                                </connections>
+                            </barButtonItem>
+                            <barButtonItem image="qrcode.viewfinder" catalog="system" id="1CH-pt-IVZ">
+                                <connections>
+                                    <action selector="scanAction:" destination="tIM-97-jRz" id="jMj-3W-tN0"/>
+                                </connections>
+                            </barButtonItem>
+                        </leftBarButtonItems>
                         <barButtonItem key="rightBarButtonItem" systemItem="add" id="Bht-1C-jjw">
                             <connections>
                                 <action selector="addAction:" destination="tIM-97-jRz" id="ful-3Q-wlX"/>
@@ -255,6 +262,7 @@
                         <segue destination="EM0-dh-3fz" kind="show" identifier="addPsbtSegue" id="YOJ-tU-XDe"/>
                         <segue destination="9Vu-3O-YNg" kind="show" identifier="segueToShowPsbtQR" id="no9-tq-P7U"/>
                         <segue destination="swD-W5-MAD" kind="presentation" identifier="segueToPaymentsInfo" id="sdO-iP-xRE"/>
+                        <segue destination="4dz-cW-ULS" kind="presentation" identifier="segueToScanQrToAddPayment" id="ic1-6K-X02"/>
                     </connections>
                 </viewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="Bsg-pq-Bw9" userLabel="First Responder" customClass="UIResponder" sceneMemberID="firstResponder"/>
@@ -2678,12 +2686,12 @@ Blockchain Commons and Gordian Cosigner never share any data with any third part
         </scene>
     </scenes>
     <inferredMetricsTieBreakers>
-        <segue reference="6Tx-hX-bdn"/>
+        <segue reference="sdO-iP-xRE"/>
         <segue reference="6Zt-E7-EEd"/>
         <segue reference="UaS-I9-AEd"/>
         <segue reference="KzM-QC-ivF"/>
-        <segue reference="JgM-9d-RH3"/>
-        <segue reference="Oi5-2y-6bw"/>
+        <segue reference="no9-tq-P7U"/>
+        <segue reference="ic1-6K-X02"/>
     </inferredMetricsTieBreakers>
     <resources>
         <image name="arrow.clockwise" catalog="system" width="115" height="128"/>

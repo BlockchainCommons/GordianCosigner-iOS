@@ -46,6 +46,14 @@ class PsbtViewController: UIViewController, UITableViewDelegate, UITableViewData
         }
     }
     
+    @IBAction func scanAction(_ sender: Any) {
+        DispatchQueue.main.async { [weak self] in
+            guard let self = self else { return }
+            
+            self.performSegue(withIdentifier: "segueToScanQrToAddPayment", sender: self)
+        }
+    }
+    
     @objc func reload() {
         refresh()
     }
@@ -458,6 +466,42 @@ class PsbtViewController: UIViewController, UITableViewDelegate, UITableViewData
             self.performSegue(withIdentifier: "segueToPaymentsInfo", sender: self)
         }
     }
+    
+    private func psbtValid(_ string: String) {
+        guard let validPsbt = Keys.psbt(string) else {
+            showAlert(self, "⚠️ Invalid psbt", "")
+            return
+        }
+        
+        save(validPsbt)
+        self.refresh()
+        
+        showAlert(self, "", "Payment added ✓")
+        
+//        DispatchQueue.main.async { [weak self] in
+//            guard let self = self else { return }
+//
+//            self.performSegue(withIdentifier: "segueToPsbtDetail", sender: self)
+//        }
+    }
+    
+    private func save(_ psbt: PSBT) {
+        var dict = [String:Any]()
+        dict["dateAdded"] = Date()
+        dict["psbt"] = psbt.data
+        dict["label"] = "PSBT"
+        dict["id"] = UUID()
+        
+        self.psbtStruct = PsbtStruct(dictionary: dict)
+        
+        CoreDataService.saveEntity(dict: dict, entityName: .payment, completion: { (success, errorDescription) in
+            guard success else {
+                showAlert(self, "Not saved!", "There was an issue encrypting and saving your psbt. Please reach out and let us know. Error: \(errorDescription ?? "unknown")")
+                
+                return
+            }
+        })
+    }
 
     
     // MARK: - Navigation
@@ -482,6 +526,21 @@ class PsbtViewController: UIViewController, UITableViewDelegate, UITableViewData
         if segue.identifier == "segueToPaymentsInfo" {
             if let vc = segue.destination as? InfoViewController {
                 vc.isPayment = true
+            }
+        }
+        
+        if segue.identifier == "segueToScanQrToAddPayment" {
+            if let vc = segue.destination as? QRScannerViewController {
+                vc.doneBlock = { [weak self] result in
+                    guard let self = self else { return }
+                    
+                    guard let psbt = result else {
+                        showAlert(self, "Ooops", "Whatever you scanned does not seem to be valid text")
+                        return
+                    }
+                    
+                    self.psbtValid(psbt)
+                }
             }
         }
     }
