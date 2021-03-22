@@ -157,7 +157,7 @@ class SeedDetailViewController: UIViewController, UITextFieldDelegate, UITextVie
             DispatchQueue.main.async { [weak self] in
                 guard let self = self else { return }
                 
-                self.pubCosigner = URHelper.cosignerToUr(self.cosigner.bip48SegwitAccount ?? "", false) ?? ""
+                self.pubCosigner = URHelper.cosignerToUrHdkey(self.cosigner.bip48SegwitAccount ?? "", false) ?? ""
                 self.coSignerLabel.text = self.pubCosigner
             }
             
@@ -166,7 +166,7 @@ class SeedDetailViewController: UIViewController, UITextFieldDelegate, UITextVie
                     guard let self = self else { return }
                     
                     self.shouldSignSwitch.isOn = true
-                    self.privCosigner = URHelper.cosignerToUr(self.privCosigner, true) ?? ""
+                    self.privCosigner = URHelper.cosignerToUrHdkey(self.privCosigner, true) ?? ""
                     self.xprvLabel.text = self.privCosigner
                 }
             }
@@ -435,7 +435,7 @@ class SeedDetailViewController: UIViewController, UITextFieldDelegate, UITextVie
         DispatchQueue.main.async { [weak self] in
             guard let self = self else { return }
             
-            self.pubCosigner = URHelper.cosignerToUr(self.cosigner.bip48SegwitAccount ?? "", false) ?? ""
+            self.pubCosigner = URHelper.cosignerToUrHdkey(self.cosigner.bip48SegwitAccount ?? "", false) ?? ""
             self.coSignerLabel.text = self.pubCosigner
         }
         
@@ -446,7 +446,7 @@ class SeedDetailViewController: UIViewController, UITextFieldDelegate, UITextVie
                 guard let self = self else { return }
                 
                 self.shouldSignSwitch.isOn = true
-                self.privCosigner = URHelper.cosignerToUr("[\(self.descStruct.fingerprint)/48h/\(Keys.coinType)h/0h/2h]\(decryptedXprv.utf8)", true) ?? ""
+                self.privCosigner = URHelper.cosignerToUrHdkey("[\(self.descStruct.fingerprint)/48h/\(Keys.coinType)h/0h/2h]\(decryptedXprv.utf8)", true) ?? ""
                 self.xprvLabel.text = self.privCosigner
                 
                 self.privKeyHeader.alpha = 1

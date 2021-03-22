@@ -15,6 +15,7 @@ class AccountDetailViewController: UIViewController, UITextFieldDelegate, UITabl
     var cosigners = [CosignerStruct]()
     var descStruct:Descriptor!
     var cosignerToView:CosignerStruct!
+    var cryptoOutput = ""
     
     @IBOutlet weak var textField: UITextField!
     @IBOutlet weak var thresholdLabel: UILabel!
@@ -49,6 +50,9 @@ class AccountDetailViewController: UIViewController, UITextFieldDelegate, UITabl
         textField.returnKeyType = .done
         
         memoView.text = account.memo ?? "add a memo"
+        
+        guard let cryptoOutputUr = URHelper.accountToUrOutput(account) else { return }
+        cryptoOutput = cryptoOutputUr
     }
     
     private func configureTapGesture() {
@@ -84,7 +88,45 @@ class AccountDetailViewController: UIViewController, UITextFieldDelegate, UITabl
         DispatchQueue.main.async { [weak self] in
             guard let self = self else { return }
             
+            var alertStyle = UIAlertController.Style.actionSheet
+            
+            if (UIDevice.current.userInterfaceIdiom == .pad) {
+              alertStyle = UIAlertController.Style.alert
+            }
+            
+            let message = "Export as an Account Map or as a ur:crypto-output?"
+            
+            let alert = UIAlertController(title: "", message: message, preferredStyle: alertStyle)
+            
+            alert.addAction(UIAlertAction(title: "Account Map", style: .default, handler: { action in
+                self.segueToExportMap()
+            }))
+            
+            alert.addAction(UIAlertAction(title: "ur:crypto-output", style: .default, handler: { action in
+                self.segueToExportUrOutput()
+            }))
+            
+            alert.addAction(UIAlertAction(title: "Cancel", style: .cancel, handler: { action in }))
+            
+            alert.popoverPresentationController?.sourceView = self.view
+            alert.popoverPresentationController?.sourceRect = self.view.bounds
+            self.present(alert, animated: true, completion: nil)
+        }
+    }
+    
+    private func segueToExportMap() {
+        DispatchQueue.main.async { [weak self] in
+            guard let self = self else { return }
+            
             self.performSegue(withIdentifier: "segueToExportAccountMap", sender: self)
+        }
+    }
+    
+    private func segueToExportUrOutput() {
+        DispatchQueue.main.async { [weak self] in
+            guard let self = self else { return }
+            
+            self.performSegue(withIdentifier: "segueToExportUrOutput", sender: self)
         }
     }
     
@@ -125,7 +167,7 @@ class AccountDetailViewController: UIViewController, UITextFieldDelegate, UITabl
                                     let dp = DescriptorParser()
                                     let ds = dp.descriptor(hack)
                                     
-                                    guard let ur = URHelper.cosignerToUr(keyPath, false) else { return }
+                                    guard let ur = URHelper.cosignerToUrHdkey(keyPath, false) else { return }
                                     guard let lifehashFingerprint = URHelper.fingerprint(ur) else { return }
                                     dict["label"] = "Unknown Cosigner"
                                     dict["lifehash"] = lifehashFingerprint
@@ -245,6 +287,14 @@ class AccountDetailViewController: UIViewController, UITextFieldDelegate, UITabl
             guard let vc = segue.destination as? AddressesViewController else { fallthrough }
             
             vc.account = self.account
+            
+        case "segueToExportUrOutput":
+            guard let vc = segue.destination as? QRDisplayerViewController else { fallthrough }
+                        
+            vc.header = account.label
+            vc.descriptionText = self.cryptoOutput
+            vc.isPsbt = false
+            vc.text = self.cryptoOutput
             
         default:
             break

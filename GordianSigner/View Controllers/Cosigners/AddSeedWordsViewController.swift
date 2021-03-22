@@ -104,7 +104,7 @@ class AddSignerViewController: UIViewController {
                 let bip48SegwitAccount = Keys.bip48SegwitAccount(masterKey),
                 let xprv = Keys.accountXprv(masterKey),
                 let encryptedXprv = Encryption.encrypt(xprv.utf8),
-                let ur = URHelper.cosignerToUr(bip48SegwitAccount, false),
+                let ur = URHelper.cosignerToUrHdkey(bip48SegwitAccount, false),
                 let lifehash = URHelper.fingerprint(ur) else {
                 showAlert(self, "Error ⚠️", "Something went wrong, Cosigner not saved!")
                 return

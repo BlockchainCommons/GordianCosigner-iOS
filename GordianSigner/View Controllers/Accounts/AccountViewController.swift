@@ -605,7 +605,7 @@ class AccountMapsViewController: UIViewController, UITableViewDelegate, UITableV
             var bip48SegwitAccount = fullKey.replacingOccurrences(of: "/0/*", with: "")
             bip48SegwitAccount = bip48SegwitAccount.replacingOccurrences(of: ")", with: "")
             
-            guard let ur = URHelper.cosignerToUr(bip48SegwitAccount, false), let lifehash = URHelper.fingerprint(ur) else {
+            guard let ur = URHelper.cosignerToUrHdkey(bip48SegwitAccount, false), let lifehash = URHelper.fingerprint(ur) else {
                 showAlert(self, "", "Error deriving Cosigner lifehash.")
                 return
             }

@@ -57,7 +57,7 @@ class PDFCreator {
                 let lifehash = LifeHash.image(cosigner.lifehash)
                 addLifehash(image: lifehash!, pageRect: pageRect, imageTop: 1.0)
                 
-                if let ur = URHelper.cosignerToUr(cosigner.bip48SegwitAccount!, false),
+                if let ur = URHelper.cosignerToUrHdkey(cosigner.bip48SegwitAccount!, false),
                    let qr = qrGenerator.getQRCode(ur) {
                     addQR(image: qr, pageRect: pageRect, imageTop: 2.0)
                 }

@@ -1704,6 +1704,7 @@
                         <segue destination="iug-s9-0PF" kind="show" identifier="segueToCosignerFromAccountDetail" id="RRe-xD-Awd"/>
                         <segue destination="9Vu-3O-YNg" kind="show" identifier="segueToExportAccountMap" id="cew-VD-Qtb"/>
                         <segue destination="6NQ-R2-fha" kind="show" identifier="segueToAddresses" id="bWu-t4-v64"/>
+                        <segue destination="9Vu-3O-YNg" kind="show" identifier="segueToExportUrOutput" id="1eO-2F-tfa"/>
                     </connections>
                 </viewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="npg-ZV-dua" userLabel="First Responder" customClass="UIResponder" sceneMemberID="firstResponder"/>
@@ -2687,10 +2688,10 @@ Blockchain Commons and Gordian Cosigner never share any data with any third part
     </scenes>
     <inferredMetricsTieBreakers>
         <segue reference="sdO-iP-xRE"/>
-        <segue reference="6Zt-E7-EEd"/>
+        <segue reference="RRe-xD-Awd"/>
         <segue reference="UaS-I9-AEd"/>
         <segue reference="KzM-QC-ivF"/>
-        <segue reference="no9-tq-P7U"/>
+        <segue reference="1eO-2F-tfa"/>
         <segue reference="ic1-6K-X02"/>
     </inferredMetricsTieBreakers>
     <resources>

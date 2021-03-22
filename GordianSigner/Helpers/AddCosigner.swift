@@ -38,7 +38,7 @@ enum AddCosigner {
             return
         }
         
-        guard let ur = URHelper.cosignerToUr(segwitBip48Account, false), let lifehashFingerprint = URHelper.fingerprint(ur) else {
+        guard let ur = URHelper.cosignerToUrHdkey(segwitBip48Account, false), let lifehashFingerprint = URHelper.fingerprint(ur) else {
             completion((false, "Invalid Key", "Unsupported key, we only support Bitcoin mainnet/testnet hdkeys.", false, nil))
             return
         }

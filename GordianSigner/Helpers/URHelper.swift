@@ -79,6 +79,37 @@ enum URHelper {
         return Data(bytes).base64EncodedString()
     }
     
+    static func accountToUrOutput(_ account: AccountStruct) -> String? {
+        let descriptorParser = DescriptorParser()
+        let descriptor = account.descriptor
+        let descriptorStruct = descriptorParser.descriptor(descriptor)
+        let threshold = descriptorStruct.sigsRequired
+        
+        var hdkeyArray:[OrderedMapEntry] = []
+        for key in descriptorStruct.keysWithPath {
+            guard let hdkey = cosignerToCborHdkey(key, false) else { return nil }
+            
+            hdkeyArray.append(.init(key: 303, value: hdkey))
+        }
+        
+        var keyThreshholdArray:[OrderedMapEntry] = []
+        keyThreshholdArray.append(.init(key: 1, value: .unsignedInt(UInt64(threshold))))
+        keyThreshholdArray.append(.init(key: 2, value: .orderedMap(hdkeyArray)))
+        let keyThreshholdArrayCbor = CBOR.orderedMap(keyThreshholdArray)
+        
+        var scriptType:[OrderedMapEntry] = []
+        scriptType.append(.init(key: 406, value: keyThreshholdArrayCbor))//multisig
+        let scriptTypeCbor = CBOR.orderedMap(scriptType)
+        
+        var array:[OrderedMapEntry] = []
+        array.append(.init(key: 401, value: scriptTypeCbor))//witness script hash
+        let arrayCbor = CBOR.orderedMap(array)
+        
+        guard let rawUr = try? UR(type: "crypto-output", cbor: arrayCbor) else { return nil }
+        
+        return UREncoder.encode(rawUr)
+    }
+    
     static func accountUrToCosigner(_ urString: String) -> String? {
         var xfp = ""
         var xpub = ""
@@ -461,7 +492,7 @@ enum URHelper {
         return (type, network)
     }
     
-    static func cosignerToUr(_ cosigner: String, _ isPrivate: Bool) -> String? {
+    static func cosignerToUrHdkey(_ cosigner: String, _ isPrivate: Bool) -> String? {
         let descriptorParser = DescriptorParser()
         let descriptor = "wsh(\(cosigner))"
         let descriptorStruct = descriptorParser.descriptor(descriptor)
@@ -511,6 +542,56 @@ enum URHelper {
         guard let rawUr = try? UR(type: "crypto-hdkey", cbor: hdKeyWrapper) else { return nil }
         
         return UREncoder.encode(rawUr)
+    }
+    
+    static func cosignerToCborHdkey(_ cosigner: String, _ isPrivate: Bool) -> CBOR? {
+        let descriptorParser = DescriptorParser()
+        let descriptor = "wsh(\(cosigner))"
+        let descriptorStruct = descriptorParser.descriptor(descriptor)
+        var key = descriptorStruct.accountXpub
+        
+        if isPrivate {
+            key = descriptorStruct.accountXprv
+        }
+        
+        /// Decodes our original extended key to base58 data.
+        let b58 = Base58.decode(key)
+        let b58Data = Data(b58)
+        let depth = b58Data.subdata(in: Range(4...4))
+        let parentFingerprint = b58Data.subdata(in: Range(5...8))
+        let childIndex = b58Data.subdata(in: Range(9...12))
+        guard childIndex.hexString == "80000002" else { return nil }
+        let chaincode = b58Data.subdata(in: Range(13...44))
+        let keydata = b58Data.subdata(in: Range(45...77))
+        
+        var cointype:UInt64 = 1
+        if Keys.coinType == "0" {
+            cointype = 0
+        }
+        
+        var originsArray:[OrderedMapEntry] = []
+        originsArray.append(.init(key: 1, value: .array([.unsignedInt(48), true, .unsignedInt(cointype), true, .unsignedInt(0), true, .unsignedInt(2), true])))
+        originsArray.append(.init(key: 2, value: .unsignedInt(UInt64(descriptorStruct.fingerprint, radix: 16) ?? 0)))
+        originsArray.append(.init(key: 3, value: .unsignedInt(UInt64(depth.hexString) ?? 0)))
+        let originsWrapper = CBOR.orderedMap(originsArray)
+        
+        let useInfoWrapper:CBOR = .map([
+            .unsignedInt(2) : .unsignedInt(cointype)
+        ])
+        
+        guard let hexValue = UInt64(parentFingerprint.hexString, radix: 16) else { return nil }
+        
+        var hdkeyArray:[OrderedMapEntry] = []
+        hdkeyArray.append(.init(key: 1, value: .boolean(false)))
+        hdkeyArray.append(.init(key: 2, value: .boolean(isPrivate)))
+        hdkeyArray.append(.init(key: 3, value: .byteString([UInt8](keydata))))
+        hdkeyArray.append(.init(key: 4, value: .byteString([UInt8](chaincode))))
+        hdkeyArray.append(.init(key: 5, value: .tagged(CBOR.Tag(rawValue: 305), useInfoWrapper)))
+        hdkeyArray.append(.init(key: 6, value: .tagged(CBOR.Tag(rawValue: 304), originsWrapper)))
+        hdkeyArray.append(.init(key: 8, value: .unsignedInt(hexValue)))
+        let hdKeyWrapper = CBOR.orderedMap(hdkeyArray)
+        
+        return hdKeyWrapper
     }
     
     static func fingerprint(_ hdKey: String) -> Data? {
