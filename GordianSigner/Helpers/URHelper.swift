@@ -659,4 +659,18 @@ enum URHelper {
         return cosigner
     }
     
+    static func urToShard(sskrUr: String) -> String? {
+        guard let ur = try? URDecoder.decode(sskrUr),
+              let decodedCbor = try? CBOR.decode(ur.cbor.bytes),
+            case let CBOR.byteString(byteString) = decodedCbor else { return nil }
+        return Data(byteString).hexString
+    }
+    
+    static func urShardToShardData(sskrUr: String) -> Data? {
+        guard let ur = try? URDecoder.decode(sskrUr),
+              let decodedCbor = try? CBOR.decode(ur.cbor.bytes),
+            case let CBOR.byteString(byteString) = decodedCbor else { return nil }
+        return byteString.data
+    }
+    
 }

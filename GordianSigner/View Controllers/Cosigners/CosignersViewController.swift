@@ -11,6 +11,7 @@ import LibWally
 
 class KeysetsViewController: UIViewController, UITableViewDelegate, UITableViewDataSource, UINavigationControllerDelegate {
     
+    let shardRecovery = ShardRecovery.shared
     var addButton = UIBarButtonItem()
     var editButton = UIBarButtonItem()
     private var cosigners = [CosignerStruct]()
@@ -80,6 +81,74 @@ class KeysetsViewController: UIViewController, UITableViewDelegate, UITableViewD
         }
     }
     
+    private func processShardUr(_ shardUr: String) {
+        let (isValid, alreadyAdded, s) = shardRecovery.parseUr(shardUr)
+        
+        if isValid && !alreadyAdded {
+            if let shardStruct = shardRecovery.parseShard(s) {                
+                shardRecovery.shards.append(shardStruct)
+                
+                let (complete, entropy, totalRemaining) = shardRecovery.processShard(shardStruct)
+                                
+                if !complete {
+                    self.promptToImportAnotherShard(totalRemaining)
+                } else if entropy != nil {
+                    self.shardRecovery.reset()
+                    self.deriveMnemonicFromEntropy(entropy!)
+                } else {
+                    self.shardRecovery.reset()
+                    showAlert(self, "Error!", "There was an error converting those shards to entropy.")
+                }
+            }
+        }
+    }
+    
+    private func promptToImportAnotherShard(_ totalSharesRemainingInGroup: Int) {
+        DispatchQueue.main.async { [weak self] in
+            guard let self = self else { return }
+            
+            var alertStyle = UIAlertController.Style.actionSheet
+            
+            if (UIDevice.current.userInterfaceIdiom == .pad) {
+              alertStyle = UIAlertController.Style.alert
+            }
+            
+            var message = "You still need \(totalSharesRemainingInGroup) more shards from this group."
+            
+            if totalSharesRemainingInGroup == 0 {
+                message = "You need to add more shards from another group."
+            }
+            
+            let alert = UIAlertController(title: "Valid SSKR shard scanned ✓", message: message, preferredStyle: alertStyle)
+            
+            alert.addAction(UIAlertAction(title: "Scan another shard", style: .default, handler: { action in
+                self.segueToScanner()
+            }))
+            
+            alert.addAction(UIAlertAction(title: "Paste another shard", style: .default, handler: { action in
+                self.getPasteboard()
+            }))
+            
+            alert.addAction(UIAlertAction(title: "Cancel", style: .cancel, handler: { action in }))
+            
+            alert.popoverPresentationController?.sourceView = self.view
+            alert.popoverPresentationController?.sourceRect = self.view.bounds
+            self.present(alert, animated: true, completion: nil)
+        }
+    }
+    
+    private func deriveMnemonicFromEntropy(_ entropy: Data) {
+        let recoveredEntropy = BIP39Mnemonic.Entropy(entropy)
+        
+        guard let mnemonic = try? BIP39Mnemonic(entropy: recoveredEntropy) else {
+            showAlert(self, "", "That is not a valid bip39 mnemonic.")
+            return
+        }
+        
+        providedMnemonic = mnemonic.description
+        addSeedWords()
+    }
+    
     @IBAction func scanQrAction(_ sender: Any) {
         segueToScanner()
     }
@@ -121,10 +190,12 @@ class KeysetsViewController: UIViewController, UITableViewDelegate, UITableViewD
     
     private func getPasteboard() {
         guard let text = UIPasteboard.general.string else { return }
+        
         if text.hasPrefix("ur:crypto-account") {
             guard let cosigner = URHelper.accountUrToCosigner(text.lowercased().condenseWhitespace()) else { return }
             
             promptToAddCosigner(cosigner)
+            
         } else if text.hasPrefix("ur:crypto-hdkey") {
             guard let cosigner = URHelper.urHdkeyToCosigner(text.lowercased().condenseWhitespace()) else {
                 showAlert(self, "", "Unsupported key, we only support Bitcoin mainnet/testnet hdkeys.")
@@ -132,15 +203,21 @@ class KeysetsViewController: UIViewController, UITableViewDelegate, UITableViewD
             }
             
             promptToAddCosigner(cosigner)
+            
         } else if text.lowercased().contains("ur:crypto-seed") {
             guard let mnemonic = URHelper.cryptoSeedToMnemonic(cryptoSeed: text.lowercased()) else { return }
             self.providedMnemonic = mnemonic
             self.addSeedWords()
+            
         } else if text.contains("48h/\(coinType)h/0h/2h") || text.contains("48'/\(coinType)'/0'/2'") {
             self.addCosigner(text.condenseWhitespace())
         } else if Keys.validMnemonicString(processedCharacters(text)) {
             self.providedMnemonic = processedCharacters(text)
             self.addSeedWords()
+            
+        } else if text.lowercased().hasPrefix("ur:crypto-sskr") {
+            self.processShardUr(text.lowercased())
+            
         } else {
             showAlert(self, "", "Invalid cosigner text, we accept UR crypto-account or [<fingerprint>/48h/\(coinType)h/0h/2h]tpub.....")
         }
@@ -244,7 +321,6 @@ class KeysetsViewController: UIViewController, UITableViewDelegate, UITableViewD
             guard let self = self else { return }
             
             guard let cosigners = cosigners, cosigners.count > 0 else {
-                //self.spinner.remove()
                 return
             }
             
@@ -257,7 +333,6 @@ class KeysetsViewController: UIViewController, UITableViewDelegate, UITableViewD
                         guard let self = self else { return }
                         
                         self.keysetsTable.reloadData()
-                        //self.spinner.remove()
                     }
                 }
             }
@@ -265,7 +340,6 @@ class KeysetsViewController: UIViewController, UITableViewDelegate, UITableViewD
     }
     
     private func refresh(_ section: Int) {
-        //spinner.add(vc: self, description: "")
         cosigners.removeAll()
         
         CoreDataService.retrieveEntity(entityName: .cosigner) { [weak self] (cosigners, errorDescription) in
@@ -282,7 +356,6 @@ class KeysetsViewController: UIViewController, UITableViewDelegate, UITableViewD
                         guard let self = self else { return }
                         
                         self.keysetsTable.reloadSections(IndexSet(arrayLiteral: section), with: .none)
-                        //self.spinner.remove()
                     }
                 }
             }
@@ -586,6 +659,8 @@ class KeysetsViewController: UIViewController, UITableViewDelegate, UITableViewD
                     self.addSeedWords()
                 } else if result.lowercased().hasPrefix("ur:crypto-response"), let account = URHelper.decodeResponse(result.lowercased()) {
                     self.addCosigner(account)
+                } else if result.lowercased().hasPrefix("ur:crypto-sskr") {
+                    self.processShardUr(result.lowercased())
                 } else {
                     showAlert(self, "", "Unrecognized format.")
                 }

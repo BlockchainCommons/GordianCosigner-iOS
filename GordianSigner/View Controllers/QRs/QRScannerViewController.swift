@@ -170,6 +170,10 @@ class QRScannerViewController: UIViewController {
         return text.lowercased().hasPrefix("ur:crypto-response")
     }
     
+    private func isSskr(_ text: String) -> Bool {
+        return text.lowercased().hasPrefix("ur:crypto-sskr")
+    }
+    
     private func process(text: String) {
         isRunning = true
         
@@ -223,7 +227,7 @@ class QRScannerViewController: UIViewController {
                 self.progressView.alpha = 1
                 self.progressDescriptionLabel.alpha = 1
             }
-        } else if isAccountMap(text) || isCryptoAccount(text) || isCosigner(text) || isCryptoHDKey(text) || isMnemonic(text) || isCryptoSeed(text) || isCryptoResponse(text) {
+        } else if isAccountMap(text) || isCryptoAccount(text) || isCosigner(text) || isCryptoHDKey(text) || isMnemonic(text) || isCryptoSeed(text) || isCryptoResponse(text) || isSskr(text)  {
             DispatchQueue.main.async {
                 let impact = UIImpactFeedbackGenerator()
                 impact.impactOccurred()
