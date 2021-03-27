@@ -661,6 +661,8 @@ class KeysetsViewController: UIViewController, UITableViewDelegate, UITableViewD
                     self.addCosigner(account)
                 } else if result.lowercased().hasPrefix("ur:crypto-sskr") {
                     self.processShardUr(result.lowercased())
+                } else if result.lowercased().hasPrefix("ur:crypto-output") {
+                    print("crypto-output: \(result)")
                 } else {
                     showAlert(self, "", "Unrecognized format.")
                 }

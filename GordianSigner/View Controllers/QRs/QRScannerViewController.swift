@@ -143,11 +143,11 @@ class QRScannerViewController: UIViewController {
     }
     
     private func isCryptoSeed(_ text: String) -> Bool {
-        return text.lowercased().hasPrefix("ur:crypto-seed")
+        return text.lowercased().hasPrefix("ur:crypto-seed/")
     }
     
     private func isCryptoAccount(_ text: String) -> Bool {
-        return text.lowercased().hasPrefix("ur:crypto-account")
+        return text.lowercased().hasPrefix("ur:crypto-account/")
     }
     
     private func isCosigner(_ text: String) -> Bool {
@@ -155,7 +155,7 @@ class QRScannerViewController: UIViewController {
     }
     
     private func isCryptoHDKey(_ text: String) -> Bool {
-        return text.lowercased().hasPrefix("ur:crypto-hdkey")
+        return text.lowercased().hasPrefix("ur:crypto-hdkey/")
     }
     
     private func isMnemonic(_ text: String) -> Bool {
@@ -163,15 +163,19 @@ class QRScannerViewController: UIViewController {
     }
     
     private func isPsbt(_ text: String) -> Bool {
-        return text.lowercased().hasPrefix("ur:crypto-psbt")
+        return text.lowercased().hasPrefix("ur:crypto-psbt/")
     }
     
     private func isCryptoResponse(_ text: String) -> Bool {
-        return text.lowercased().hasPrefix("ur:crypto-response")
+        return text.lowercased().hasPrefix("ur:crypto-response/")
     }
     
     private func isSskr(_ text: String) -> Bool {
-        return text.lowercased().hasPrefix("ur:crypto-sskr")
+        return text.lowercased().hasPrefix("ur:crypto-sskr/")
+    }
+    
+    private func isOutput(_ text: String) -> Bool {
+        return text.lowercased().hasPrefix("ur:crypto-output/")
     }
     
     private func process(text: String) {
@@ -227,7 +231,7 @@ class QRScannerViewController: UIViewController {
                 self.progressView.alpha = 1
                 self.progressDescriptionLabel.alpha = 1
             }
-        } else if isAccountMap(text) || isCryptoAccount(text) || isCosigner(text) || isCryptoHDKey(text) || isMnemonic(text) || isCryptoSeed(text) || isCryptoResponse(text) || isSskr(text)  {
+        } else if isAccountMap(text) || isCryptoAccount(text) || isCosigner(text) || isCryptoHDKey(text) || isMnemonic(text) || isCryptoSeed(text) || isCryptoResponse(text) || isSskr(text) || isOutput(text) {
             DispatchQueue.main.async {
                 let impact = UIImpactFeedbackGenerator()
                 impact.impactOccurred()
