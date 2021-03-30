@@ -191,32 +191,35 @@ class KeysetsViewController: UIViewController, UITableViewDelegate, UITableViewD
     private func getPasteboard() {
         guard let text = UIPasteboard.general.string else { return }
         
-        if text.hasPrefix("ur:crypto-account") {
-            guard let cosigner = URHelper.accountUrToCosigner(text.lowercased().condenseWhitespace()) else { return }
+        let processedText = text.lowercased().condenseWhitespace()
+        
+        if processedText.hasPrefix("ur:crypto-account") {
+            guard let cosigner = URHelper.accountUrToCosigner(processedText) else { return }
             
             promptToAddCosigner(cosigner)
             
-        } else if text.hasPrefix("ur:crypto-hdkey") {
-            guard let cosigner = URHelper.urHdkeyToCosigner(text.lowercased().condenseWhitespace()) else {
+        } else if processedText.hasPrefix("ur:crypto-hdkey") {
+            guard let cosigner = URHelper.urHdkeyToCosigner(processedText) else {
                 showAlert(self, "", "Unsupported key, we only support Bitcoin mainnet/testnet hdkeys.")
                 return
             }
             
             promptToAddCosigner(cosigner)
             
-        } else if text.lowercased().contains("ur:crypto-seed") {
-            guard let mnemonic = URHelper.cryptoSeedToMnemonic(cryptoSeed: text.lowercased()) else { return }
+        } else if processedText.contains("ur:crypto-seed") {
+            guard let mnemonic = URHelper.cryptoSeedToMnemonic(cryptoSeed: processedText) else { return }
             self.providedMnemonic = mnemonic
             self.addSeedWords()
             
         } else if text.contains("48h/\(coinType)h/0h/2h") || text.contains("48'/\(coinType)'/0'/2'") {
             self.addCosigner(text.condenseWhitespace())
+            
         } else if Keys.validMnemonicString(processedCharacters(text)) {
             self.providedMnemonic = processedCharacters(text)
             self.addSeedWords()
             
-        } else if text.lowercased().hasPrefix("ur:crypto-sskr") {
-            self.processShardUr(text.lowercased())
+        } else if processedText.hasPrefix("ur:crypto-sskr") {
+            self.processShardUr(processedText)
             
         } else {
             showAlert(self, "", "Invalid cosigner text, we accept UR crypto-account or [<fingerprint>/48h/\(coinType)h/0h/2h]tpub.....")
@@ -644,25 +647,36 @@ class KeysetsViewController: UIViewController, UITableViewDelegate, UITableViewD
             
             vc.doneBlock = { [weak self] result in
                 guard let self = self, let result = result else { return }
-                if result.lowercased().hasPrefix("ur:crypto-account"), let account = URHelper.accountUrToCosigner(result.lowercased()) {
+                
+                let processedResult = result.lowercased().condenseWhitespace()
+                
+                if processedResult.hasPrefix("ur:crypto-account"), let account = URHelper.accountUrToCosigner(processedResult) {
                     self.addCosigner(account)
-                } else if result.lowercased().hasPrefix("ur:crypto-hdkey"), let account = URHelper.urHdkeyToCosigner(result.lowercased()) {
+                    
+                } else if processedResult.hasPrefix("ur:crypto-hdkey"), let account = URHelper.urHdkeyToCosigner(processedResult) {
                     self.addCosigner(account)
+                    
                 } else if result.contains("48h/\(self.coinType)h/0h/2h") || result.contains("48'/\(self.coinType)'/0'/2'") {
                     self.addCosigner(result)
-                } else if result.lowercased().contains("ur:crypto-seed") {
-                    guard let mnemonic = URHelper.cryptoSeedToMnemonic(cryptoSeed: result.lowercased()) else { return }
+                    
+                } else if processedResult.lowercased().contains("ur:crypto-seed") {
+                    guard let mnemonic = URHelper.cryptoSeedToMnemonic(cryptoSeed: processedResult) else { return }
                     self.providedMnemonic = mnemonic
                     self.addSeedWords()
+                    
                 } else if Keys.validMnemonicString(processedCharacters(result)) {
                     self.providedMnemonic = processedCharacters(result)
                     self.addSeedWords()
-                } else if result.lowercased().hasPrefix("ur:crypto-response"), let account = URHelper.decodeResponse(result.lowercased()) {
+                    
+                } else if processedResult.hasPrefix("ur:crypto-response"), let account = URHelper.decodeResponse(processedResult) {
                     self.addCosigner(account)
-                } else if result.lowercased().hasPrefix("ur:crypto-sskr") {
-                    self.processShardUr(result.lowercased())
-                } else if result.lowercased().hasPrefix("ur:crypto-output") {
-                    print("crypto-output: \(result)")
+                    
+                } else if processedResult.hasPrefix("ur:crypto-sskr") {
+                    self.processShardUr(processedResult)
+                    
+                } else if processedResult.hasPrefix("ur:crypto-output") {
+                    print("crypto-output: \(processedResult)")
+                    
                 } else {
                     showAlert(self, "", "Unrecognized format.")
                 }
