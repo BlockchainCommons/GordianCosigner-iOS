@@ -86,6 +86,7 @@ enum URHelper {
         let threshold = descriptorStruct.sigsRequired
         
         var hdkeyArray:[OrderedMapEntry] = []
+        
         for key in descriptorStruct.keysWithPath {
             guard let hdkey = cosignerToCborHdkey(key, false) else { return nil }
             
@@ -98,7 +99,7 @@ enum URHelper {
         let keyThreshholdArrayCbor = CBOR.orderedMap(keyThreshholdArray)
         
         var scriptType:[OrderedMapEntry] = []
-        scriptType.append(.init(key: 406, value: keyThreshholdArrayCbor))//multisig
+        scriptType.append(.init(key: 407, value: keyThreshholdArrayCbor))//sorted-multisig
         let scriptTypeCbor = CBOR.orderedMap(scriptType)
         
         var array:[OrderedMapEntry] = []
