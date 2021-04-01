@@ -53,10 +53,6 @@ class AccountDetailViewController: UIViewController, UITextFieldDelegate, UITabl
         
         guard let cryptoOutputUr = URHelper.accountToUrOutput(account) else { return }
         cryptoOutput = cryptoOutputUr
-        
-        guard let test = URHelper.urOutputToAccount(cryptoOutput) else { return }
-        
-        print("test: \(test)")
     }
     
     private func configureTapGesture() {

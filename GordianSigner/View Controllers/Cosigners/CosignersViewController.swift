@@ -218,8 +218,11 @@ class KeysetsViewController: UIViewController, UITableViewDelegate, UITableViewD
             self.providedMnemonic = processedCharacters(text)
             self.addSeedWords()
             
-        } else if processedText.hasPrefix("ur:crypto-sskr") {
+        } else if processedText.hasPrefix("ur:crypto-sskr/") {
             self.processShardUr(processedText)
+            
+        } else if processedText.hasPrefix("ur:crypto-output/") {
+            self.parseCryptoOutput(processedText)
             
         } else {
             showAlert(self, "", "Invalid cosigner text, we accept UR crypto-account or [<fingerprint>/48h/\(coinType)h/0h/2h]tpub.....")
@@ -630,6 +633,151 @@ class KeysetsViewController: UIViewController, UITableViewDelegate, UITableViewD
         }
     }
     
+    private func parseCryptoOutput(_ ur: String) {
+        guard var descriptor = URHelper.urOutputToAccount(ur) else { showAlert(self, "", "That is not a supported crypto-output."); return }
+        
+        let accountId = UUID()
+        let descriptorParser = DescriptorParser()
+        var descStruct = descriptorParser.descriptor(descriptor)
+        
+        descriptor = descriptor.replacingOccurrences(of: "'", with: "h")
+        let arr = descriptor.split(separator: "#")
+        descriptor = "\(arr[0])"
+        descStruct = descriptorParser.descriptor(descriptor)
+        
+        // Add range
+        if !descriptor.contains("/0/*") {
+            for key in descStruct.multiSigKeys {
+                if !key.contains("/0/*") {
+                    descriptor = descriptor.replacingOccurrences(of: key, with: key + "/0/*")
+                }
+            }
+        }
+        
+        descStruct = descriptorParser.descriptor(descriptor)
+        
+        guard let sortedDescriptor = sortedDescriptor(descriptor) else { return }
+        
+        for (i, fullKey) in descStruct.keysWithPath.enumerated() {
+            let hack = "wsh(\(fullKey)/0/*)"
+            let dp = DescriptorParser()
+            let ds = dp.descriptor(hack)
+            var bip48SegwitAccount = fullKey.replacingOccurrences(of: "/0/*", with: "")
+            bip48SegwitAccount = bip48SegwitAccount.replacingOccurrences(of: ")", with: "")
+            
+            guard let ur = URHelper.cosignerToUrHdkey(bip48SegwitAccount, false), let lifehash = URHelper.fingerprint(ur) else {
+                showAlert(self, "", "Error deriving Cosigner lifehash.")
+                return
+            }
+
+            var cosignerToSave = [String:Any]()
+            cosignerToSave["id"] = UUID()
+            cosignerToSave["label"] = "Cosigner #\(i + 1)"
+            cosignerToSave["bip48SegwitAccount"] = bip48SegwitAccount
+            cosignerToSave["dateAdded"] = Date()
+            cosignerToSave["fingerprint"] = ds.fingerprint
+            cosignerToSave["sharedWith"] = accountId
+            cosignerToSave["dateShared"] = Date()
+            cosignerToSave["lifehash"] = lifehash
+
+            // First fetch all existing cosigners to ensure we do not save duplicates
+            CoreDataService.retrieveEntity(entityName: .cosigner) { (cosigners, errorDescription) in
+                var alreadyExists = false
+
+                if let cosigners = cosigners, cosigners.count > 0 {
+                    for (i, cosigner) in cosigners.enumerated() {
+                        let cosignerStruct = CosignerStruct(dictionary: cosigner)
+
+                        if cosignerStruct.bip48SegwitAccount != nil {
+                            if cosignerStruct.bip48SegwitAccount! == bip48SegwitAccount {
+                                alreadyExists = true
+                            }
+                        }
+
+                        if i + 1 == cosigners.count {
+                            if !alreadyExists {
+                                CoreDataService.saveEntity(dict: cosignerToSave, entityName: .cosigner) { (_, _) in }
+                            }
+                        }
+                    }
+                } else {
+                    CoreDataService.saveEntity(dict: cosignerToSave, entityName: .cosigner) { (_, _) in }
+                }
+            }
+        }
+        
+        let map = ["label":"Account map", "blockheight":0,"descriptor":sortedDescriptor.condenseWhitespace()] as [String : Any]
+        let accountMapData = (map.json() ?? "").utf8
+        
+        var account = [String:Any]()
+        account["blockheight"] = Int64(0)
+        account["map"] = accountMapData
+        account["label"] = "Account map"
+        account["id"] = accountId
+        account["dateAdded"] = Date()
+        account["complete"] = descStruct.complete
+        account["lifehash"] = LifeHash.hash(sortedDescriptor.utf8)
+        account["descriptor"] = sortedDescriptor.condenseWhitespace()
+        
+        CoreDataService.saveEntity(dict: account, entityName: .account) { [weak self] (success, errorDescription) in
+            guard let self = self, success else { return }
+            
+            DispatchQueue.main.async {
+                NotificationCenter.default.post(name: .cosignerAdded, object: nil, userInfo: nil)
+            }
+            
+            self.load()
+        }
+    }
+    
+    private func sortedDescriptor(_ desc: String) -> String? {
+        var dictArray = [[String:String]]()
+        let descriptorParser = DescriptorParser()
+        let descStruct = descriptorParser.descriptor(desc)
+        
+        for keyWithPath in descStruct.keysWithPath {
+            
+            guard keyWithPath.contains("/48h/\(coinType)h/0h/2h") || keyWithPath.contains("/48'/\(coinType)'/0'/2'") else {
+                showAlert(self, "Unsupported key origin", "Gordian Cosigner currently only supports the m/48'/\(coinType)'/0'/2' origin, you can toggle on mainnet/testnet in settings to switch between the supported derivation paths.")
+                return nil
+            }
+            
+            let arr = keyWithPath.split(separator: "]")
+            
+            if arr.count > 1 {
+                var xpubString = "\(arr[1].replacingOccurrences(of: "))", with: ""))"
+                xpubString = xpubString.replacingOccurrences(of: "/0/*", with: "")
+                
+                guard let xpub = try? HDKey(base58: xpubString) else {
+                    showAlert(self, "Key invalid", "Gordian Cosigner does not yet support slip0132 keys. Please ensure your xpub is valid then try again.")
+                    return nil
+                }
+                
+                let dict = ["path":"\(arr[0])]", "key": xpub.description]
+                dictArray.append(dict)
+            }
+        }
+        
+        dictArray.sort(by: {($0["key"]!) < $1["key"]!})
+        
+        var sortedKeys = ""
+        
+        for (i, sortedItem) in dictArray.enumerated() {
+            let path = sortedItem["path"]!
+            let key = sortedItem["key"]!
+            let fullKey = path + key
+            sortedKeys += fullKey
+            
+            if i + 1 < dictArray.count {
+                sortedKeys += ","
+            }
+        }
+        
+        let arr2 = desc.split(separator: ",")
+        let descriptor = "\(arr2[0])," + sortedKeys + "))"
+        return descriptor
+    }
+    
     // MARK: - Navigation
 
     // In a storyboard-based application, you will often want to do a little preparation before navigation
@@ -675,7 +823,7 @@ class KeysetsViewController: UIViewController, UITableViewDelegate, UITableViewD
                     self.processShardUr(processedResult)
                     
                 } else if processedResult.hasPrefix("ur:crypto-output") {
-                    print("crypto-output: \(processedResult)")
+                    self.parseCryptoOutput(processed)
                     
                 } else {
                     showAlert(self, "", "Unrecognized format.")
