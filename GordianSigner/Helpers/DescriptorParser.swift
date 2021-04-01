@@ -99,8 +99,9 @@ class DescriptorParser {
                     dict["sigsRequired"] = UInt(mofnarray[0])
                     var keysWithPath = [String]()
                     for (i, item) in mofnarray.enumerated() {
+                        let processed = item.replacingOccurrences(of: ")", with: "")
                         if i != 0 {
-                            keysWithPath.append("\(item)")
+                            keysWithPath.append("\(processed)")
                         }
                         if i + 1 == mofnarray.count {
                             dict["keysWithPath"] = keysWithPath

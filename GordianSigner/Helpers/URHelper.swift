@@ -79,35 +79,83 @@ enum URHelper {
         return Data(bytes).base64EncodedString()
     }
     
+    static func urOutputToAccount(_ urString: String) -> String? {
+        var threshold:UInt64?
+        var keys = ""
+        
+        guard let ur = try? URDecoder.decode(urString.condenseWhitespace()),
+              let decodedCbor = try? CBOR.decode(ur.cbor.bytes),
+              case let CBOR.tagged(tag, rawCbor) = decodedCbor, tag.rawValue == 401 else {// only accept wsh
+            return nil
+        }
+        
+        func parseThresholdAndKeys(_ cborDict: CBOR) {
+            guard case let CBOR.map(map) = cborDict else { return }
+            
+            for (key, value) in map {
+                switch key {
+                case 1:
+                    guard case let CBOR.unsignedInt(thresholdRaw) = value else { fallthrough }
+                    
+                    threshold = thresholdRaw
+
+                case 2:
+                    guard case let CBOR.array(hdkeysCbor) = value else { fallthrough }
+
+                    for hdkey in hdkeysCbor {
+                        guard let cosigner = hdkeyToCosigner(hdkey) else { return }
+                        
+                        keys += "," + cosigner
+                    }
+                    
+                default:
+                    break
+                }
+            }
+        }
+        
+        func parseSortedMulti(_ taggedCbor: CBOR) {
+            if case let CBOR.tagged(tag, rawCbor) = taggedCbor {
+                if tag.rawValue == 407 {// only accept bip67
+                    parseThresholdAndKeys(rawCbor)
+                }
+            }
+        }
+        
+        parseSortedMulti(rawCbor)
+        
+        guard let thresholdCheck = threshold, keys != "" else { return nil }
+                
+        return "wsh(sortedmulti(\(thresholdCheck)\(keys)))"
+    }
+    
     static func accountToUrOutput(_ account: AccountStruct) -> String? {
         let descriptorParser = DescriptorParser()
         let descriptor = account.descriptor
         let descriptorStruct = descriptorParser.descriptor(descriptor)
         let threshold = descriptorStruct.sigsRequired
         
-        var hdkeyArray:[OrderedMapEntry] = []
+        var hdkeyArray:[CBOR] = []
         
         for key in descriptorStruct.keysWithPath {
             guard let hdkey = cosignerToCborHdkey(key, false) else { return nil }
             
-            hdkeyArray.append(.init(key: 303, value: hdkey))
+            hdkeyArray.append(hdkey)
         }
         
         var keyThreshholdArray:[OrderedMapEntry] = []
         keyThreshholdArray.append(.init(key: 1, value: .unsignedInt(UInt64(threshold))))
-        keyThreshholdArray.append(.init(key: 2, value: .orderedMap(hdkeyArray)))
+        keyThreshholdArray.append(.init(key: 2, value: .array(hdkeyArray)))
         let keyThreshholdArrayCbor = CBOR.orderedMap(keyThreshholdArray)
         
-        var scriptType:[OrderedMapEntry] = []
-        scriptType.append(.init(key: 407, value: keyThreshholdArrayCbor))//sorted-multisig
-        let scriptTypeCbor = CBOR.orderedMap(scriptType)
+        let sortedMultisigTag:CBOR.Tag = .init(rawValue: 407)
+        let scriptTypeCbor:CBOR = .tagged(sortedMultisigTag, keyThreshholdArrayCbor)
         
-        var array:[OrderedMapEntry] = []
-        array.append(.init(key: 401, value: scriptTypeCbor))//witness script hash
-        let arrayCbor = CBOR.orderedMap(array)
-        
-        guard let rawUr = try? UR(type: "crypto-output", cbor: arrayCbor) else { return nil }
-        
+        let wshTag:CBOR.Tag = .init(rawValue: 401)
+        let taggedCbor:CBOR = .tagged(wshTag, scriptTypeCbor)
+                
+        guard let rawUr = try? UR(type: "crypto-output", cbor: taggedCbor) else { return nil }
+                
         return UREncoder.encode(rawUr)
     }
     
