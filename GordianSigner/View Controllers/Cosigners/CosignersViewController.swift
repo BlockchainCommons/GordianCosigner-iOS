@@ -823,7 +823,7 @@ class KeysetsViewController: UIViewController, UITableViewDelegate, UITableViewD
                     self.processShardUr(processedResult)
                     
                 } else if processedResult.hasPrefix("ur:crypto-output") {
-                    self.parseCryptoOutput(processed)
+                    self.parseCryptoOutput(processedResult)
                     
                 } else {
                     showAlert(self, "", "Unrecognized format.")
