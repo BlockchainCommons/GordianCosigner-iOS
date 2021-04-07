@@ -320,6 +320,12 @@ class PsbtTableViewController: UIViewController, UITableViewDelegate, UITableVie
                     let shouldSign = pubkey["shouldSign"] as? Bool ?? false
                     let cosignerStruct = pubkey["cosignerStruct"] as? CosignerStruct
                     
+                    guard let fullpath = pubkey["fullPath"] as? BIP32Path else {
+                        showAlert(self, "", "No bip32 derivation in provided input.")
+                        
+                        return
+                    }
+                    
                     if canSign {
                         if !hasSigned {
                             if self.canSign {
@@ -344,7 +350,7 @@ class PsbtTableViewController: UIViewController, UITableViewDelegate, UITableVie
                         }
                         
                         if shouldPromptForRequest {
-                            self.promptToRequest(potentialSigner)
+                            self.promptToRequest(potentialSigner, fullpath.description)
                         }
                     }
                 }
@@ -980,7 +986,7 @@ class PsbtTableViewController: UIViewController, UITableViewDelegate, UITableVie
         }
     }
     
-    private func promptToRequest(_ cosignerToRequest: CosignerStruct) {
+    private func promptToRequest(_ cosignerToRequest: CosignerStruct, _ path: String) {
         DispatchQueue.main.async { [weak self] in
             guard let self = self else { return }
             
@@ -993,7 +999,7 @@ class PsbtTableViewController: UIViewController, UITableViewDelegate, UITableVie
             let alert = UIAlertController(title: "Private Key Request", message: "\(cosignerToRequest.label) needs a private key to sign this payment.", preferredStyle: alertStyle)
             
             alert.addAction(UIAlertAction(title: "Request Key", style: .default, handler: { action in
-                self.requestKey(cosignerToRequest)
+                self.requestKey(cosignerToRequest, path)
             }))
             
             alert.addAction(UIAlertAction(title: "Cancel", style: .cancel, handler: { action in }))
@@ -1002,11 +1008,12 @@ class PsbtTableViewController: UIViewController, UITableViewDelegate, UITableVie
         }
     }
     
-    private func requestKey(_ cosignerToRequest: CosignerStruct) {
-        guard let request = URHelper.requestXprv(cosignerToRequest.bip48SegwitAccount!, "Gordian Cosigner needs a private key from \(cosignerToRequest.label) to sign a payment.") else {
+    private func requestKey(_ cosignerToRequest: CosignerStruct, _ path: String) {
+        
+        guard let request = URHelper.requestSigningKey(cosignerToRequest.bip48SegwitAccount!, "Gordian Cosigner needs a private key from \(cosignerToRequest.label) to sign a payment.", path) else {
             
             return
-        }        
+        }
         
         DispatchQueue.main.async { [weak self] in
             guard let self = self else { return }
@@ -1129,15 +1136,51 @@ class PsbtTableViewController: UIViewController, UITableViewDelegate, UITableVie
                 vc.header = qrHeader
                 vc.descriptionText = qrDescription
                 
-                vc.responseDoneBlock = { [weak self] signer in
+                vc.cosignerDoneBlock = { [weak self] result in
                     guard let self = self else { return }
                     
-                    guard let addedSigner = signer else { return }
+                    guard let result = result else { return }
                     
-                    if addedSigner.bip48SegwitAccount == self.cosignerThatShouldSign!.bip48SegwitAccount! {
+                    if result.bip48SegwitAccount! == self.cosignerThatShouldSign!.bip48SegwitAccount! {
                         showAlert(self, "", "Cosigner updated with the correct private key ✓. Tap the sign now button.")
                         
                         self.loadTable()
+                    } else {
+                        showAlert(self, "", "Invalid response.")
+                    }
+                }
+                
+                vc.wifDoneBlock = { [weak self] result in
+                    guard let self = self else { return }
+                    
+                    guard let result = result else { return }
+                    
+                    var network:Network = .testnet
+                    
+                    if Keys.coinType == "0" {
+                        network = .mainnet
+                    }
+                    
+                    guard let key = try? Key(wif: result, network: network) else { return }
+                                        
+                    guard let signedPsbt = try? self.psbt.signed(with: key) else { return }
+                    
+                    DispatchQueue.main.async { [weak self] in
+                        guard let self = self else { return }
+                        
+                        self.save(signedPsbt)
+                        self.psbt = signedPsbt
+                        self.signButtonOutlet.alpha = 0
+                        
+                        self.load { success in
+                            DispatchQueue.main.async { [weak self] in
+                                guard let self = self else { return }
+                                
+                                self.tableView.reloadData()
+                                self.spinner.remove()
+                                showAlert(self, "Payment Signed ✓", "The signed payment has been saved. Export it by tapping the share button in top right.")
+                            }
+                        }
                     }
                 }
             }

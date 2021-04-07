@@ -816,9 +816,6 @@ class KeysetsViewController: UIViewController, UITableViewDelegate, UITableViewD
                     self.providedMnemonic = processedCharacters(result)
                     self.addSeedWords()
                     
-                } else if processedResult.hasPrefix("ur:crypto-response"), let account = URHelper.decodeResponse(processedResult) {
-                    self.addCosigner(account)
-                    
                 } else if processedResult.hasPrefix("ur:crypto-sskr") {
                     self.processShardUr(processedResult)
                     

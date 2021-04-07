@@ -33,7 +33,8 @@ class QRDisplayerViewController: UIViewController {
     private var parts = [String]()
     private var ur: UR!
     private var partIndex = 0
-    var responseDoneBlock : ((CosignerStruct?) -> Void)?
+    var wifDoneBlock : ((String?) -> Void)?
+    var cosignerDoneBlock : ((CosignerStruct?) -> Void)?
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -186,24 +187,42 @@ class QRDisplayerViewController: UIViewController {
                 vc.doneBlock = { [weak self] result in
                     guard let self = self else { return }
                     
-                    guard let result = result,
-                          result.lowercased().hasPrefix("ur:crypto-response"),
-                          let account = URHelper.decodeResponse(result.lowercased()) else {
-                        
+                    
+                    guard let result = result else {
                         showAlert(self, "", "Invalid response!")
+                        
                         return
                     }
                     
-                    AddCosigner.add(account) { (success, message, errorDescription, savedNew, cosignerStruct) in
-                        guard success, let cosignerStruct = cosignerStruct else {
-                            showAlert(self, message, errorDescription ?? "unknown error")
-                            return
+                    
+                    guard result.lowercased().hasPrefix("ur:crypto-response") else {
+                        showAlert(self, "", "Invalid response!")
+                        
+                        return
+                    }
+                    
+                    let (account, wif) = URHelper.decodeResponse(result.lowercased())
+                    
+                    if account != nil {
+                        AddCosigner.add(account!) { (success, message, errorDescription, savedNew, cosignerStruct) in
+                            guard success, let cosignerStruct = cosignerStruct else {
+                                showAlert(self, message, errorDescription ?? "unknown error")
+                                return
+                            }
+                            
+                            DispatchQueue.main.async { [weak self] in
+                                guard let self = self else { return }
+                                
+                                self.cosignerDoneBlock!(cosignerStruct)
+                                self.navigationController?.popViewController(animated: true)
+                            }
                         }
                         
+                    } else if wif != nil {
                         DispatchQueue.main.async { [weak self] in
                             guard let self = self else { return }
                             
-                            self.responseDoneBlock!(cosignerStruct)
+                            self.wifDoneBlock!(wif!)
                             self.navigationController?.popViewController(animated: true)
                         }
                     }
@@ -211,6 +230,5 @@ class QRDisplayerViewController: UIViewController {
             }
         }
     }
-    
 
 }

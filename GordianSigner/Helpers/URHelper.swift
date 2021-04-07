@@ -371,6 +371,58 @@ enum URHelper {
         return cosigner
     }
     
+    static func hdkeyToPrivKey(_ hdkey: CBOR) -> String? {
+        guard case let CBOR.map(dict) = hdkey else {
+            return nil
+        }
+        
+        var keyData:String?
+        var depth:String?
+        var parentFingerprint:String?
+        var network:String?
+        
+        for (key, value) in dict {
+            switch key {
+            case 3:
+                guard case let CBOR.byteString(bs) = value else { fallthrough }
+                
+                keyData = Data(bs).hexString
+            case 5:
+                guard case let CBOR.tagged(_, useInfoCbor) = value else { fallthrough }
+                guard case let CBOR.map(map) = useInfoCbor else { fallthrough }
+                let (type, net) = URHelper.useInfo(map)
+                network = net
+                
+                if type != "btc" {
+                    return nil
+                }
+            case 6:
+                guard case let CBOR.tagged(_, originCbor) = value else { fallthrough }
+                guard case let CBOR.map(map) = originCbor else { fallthrough }
+                
+                (_, depth, _) = URHelper.origins(map)
+            case 8:
+                guard case let CBOR.unsignedInt(xfp) = value else { fallthrough }
+                
+                parentFingerprint = String(format: "%08x", xfp)
+            default:
+                break
+            }
+        }
+        
+        var extendedKey:String?
+        
+        guard let keydata = keyData else { return nil }
+        
+        extendedKey = URHelper.xprv(keydata, "0000000000000000000000000000000000000000000000000000000000000000", network ?? "main", parentFingerprint, depth)
+        
+        guard let key = extendedKey else { return nil }
+        
+        print("key: \(key)")
+                
+        return key
+    }
+    
     static func xprv(_ keyData: String, _ chainCode: String, _ network: String?, _ xfp: String?, _ depth: String?) -> String? {
         var prefix = "0488ade4"//mainnet
         
@@ -700,6 +752,40 @@ enum URHelper {
         return Data(result.encode())
     }
     
+    static func origins(_ path: String) -> [CBOR] {
+        var cborArray:[CBOR] = []
+        for (i, item) in path.split(separator: "/").enumerated() {
+            if i != 0 && item != "m" {
+                if item.contains("h") {
+                    let processed = item.split(separator: "h")
+                    
+                    if let int = Int("\(processed[0])") {
+                        let unsignedInt = CBOR.unsignedInt(UInt64(int))
+                        cborArray.append(unsignedInt)
+                        cborArray.append(CBOR.boolean(true))
+                    }
+                    
+                } else if item.contains("'") {
+                    let processed = item.split(separator: "'")
+                    
+                    if let int = Int("\(processed[0])") {
+                        let unsignedInt = CBOR.unsignedInt(UInt64(int))
+                        cborArray.append(unsignedInt)
+                        cborArray.append(CBOR.boolean(true))
+                    }
+                } else {
+                    if let int = Int("\(item)") {
+                        let unsignedInt = CBOR.unsignedInt(UInt64(int))
+                        cborArray.append(unsignedInt)
+                        cborArray.append(CBOR.boolean(false))
+                    }
+                }
+            }
+        }
+        
+        return cborArray
+    }
+    
     static func requestXprv(_ cosigner: String, _ description: String) -> String? {
         let hack = "wsh(\(cosigner)/0/*)"
         let descriptorParser = DescriptorParser()
@@ -753,15 +839,65 @@ enum URHelper {
         return UREncoder.encode(rawUr)
     }
     
-    static func decodeResponse(_ cryptoResponse: String) -> String? {
-        guard let expectedUuid = UserDefaults.standard.object(forKey: "uuid") as? String else { return nil }
+    static func requestSigningKey(_ cosigner: String, _ description: String, _ path: String) -> String? {
+        let hack = "wsh(\(cosigner)/0/*)"
+        let descriptorParser = DescriptorParser()
+        let descriptorStr = descriptorParser.descriptor(hack)
+        let xpub = descriptorStr.accountXpub
+        let sourceXfp = descriptorStr.fingerprint
+                
+        let b58 = Base58.decode(xpub)
+        let b58Data = Data(b58)
+        let depth = b58Data.subdata(in: Range(4...4))
+        
+        var requestId = UUID().uuidString
+        requestId = requestId.replacingOccurrences(of: "-", with: "")
+        let uuidByteString = CBOR.byteString([UInt8](Data(value: requestId)))
+        guard case let CBOR.byteString(bs) = uuidByteString else { return nil }
+        let id = Data(bs).hexString
+        
+        UserDefaults.standard.setValue(id, forKey: "uuid")
+        
+        var originsWrapper:[OrderedMapEntry] = []
+        originsWrapper.append(.init(key: 1, value: .array(origins(path))))
+        originsWrapper.append(.init(key: 2, value: .unsignedInt(UInt64(sourceXfp, radix: 16) ?? 0)))
+        originsWrapper.append(.init(key: 3, value: .unsignedInt(UInt64(depth.hexString) ?? 0)))
+        let originsCbor = CBOR.orderedMap(originsWrapper)
+        
+        var useInfoWrapper:[OrderedMapEntry] = []
+        useInfoWrapper.append(.init(key: 2, value: .unsignedInt(1)))
+        let useInfoCbor = CBOR.orderedMap(useInfoWrapper)
+        
+        var keyRequest:[OrderedMapEntry] = []
+        keyRequest.append(.init(key: 1, value: .boolean(true)))
+        keyRequest.append(.init(key: 2, value: .tagged(CBOR.Tag(rawValue: 304), originsCbor)))
+        keyRequest.append(.init(key: 3, value: .tagged(CBOR.Tag(rawValue: 305), useInfoCbor)))
+        keyRequest.append(.init(key: 4, value: .boolean(false)))
+        let hdkeyRequestCbor = CBOR.orderedMap(keyRequest)
+        
+        var request:[OrderedMapEntry] = []
+        request.append(.init(key: 1, value: .tagged(CBOR.Tag(rawValue: UInt64(37)), uuidByteString)))
+        request.append(.init(key: 2, value: .tagged(CBOR.Tag(rawValue: UInt64(501)), hdkeyRequestCbor)))
+        request.append(.init(key: 3, value: .utf8String(description)))
+        
+        let cbor = CBOR.orderedMap(request)
+        
+        guard let rawUr = try? UR(type: "crypto-request", cbor: cbor) else { return nil }
+        
+        return UREncoder.encode(rawUr)
+    }
+    
+    static func decodeResponse(_ cryptoResponse: String) -> (cosigner: String?, wif: String?) {
+        guard let expectedUuid = UserDefaults.standard.object(forKey: "uuid") as? String else { return (nil, nil) }
         
         var cosigner:String?
+        var wif:String?
         
         guard let ur = try? URDecoder.decode(cryptoResponse.condenseWhitespace().lowercased()),
               let decodedCbor = try? CBOR.decode(ur.cbor.bytes),
               case let CBOR.map(dict) = decodedCbor else {
-            return nil
+            
+            return (nil, nil)
         }
         
         for (key, value) in dict {
@@ -769,24 +905,35 @@ enum URHelper {
             
             case 1:
                 guard case let CBOR.tagged(CBOR.Tag(rawValue: 37), cborUuid) = value else { fallthrough }
+                
                 guard case let CBOR.byteString(bs) = cborUuid else { fallthrough }
                 
                 if Data(bs).hexString != expectedUuid {
-                    return nil
+                    return (nil, nil)
                 }
                 
             case 2:
                 guard case let CBOR.tagged(CBOR.Tag(rawValue: 303), hdkeyCbor) = value else { fallthrough }
-                guard let cosignerString = URHelper.hdkeyToCosigner(hdkeyCbor) else { fallthrough }
                 
-                cosigner = cosignerString
+                if let cosignerString = URHelper.hdkeyToCosigner(hdkeyCbor) {
+                    
+                    cosigner = cosignerString
+                    
+                } else {
+                    
+                    if let privkey = URHelper.hdkeyToPrivKey(hdkeyCbor) {
+                        guard let hdkey = try? HDKey(base58: privkey) else { return (nil, nil) }
+                        
+                        wif = hdkey.privKey?.wif
+                    }
+                }
                 
             default:
                 break
             }
         }
         
-        return cosigner
+        return (cosigner, wif)
     }
     
     static func urToShard(sskrUr: String) -> String? {

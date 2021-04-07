@@ -542,12 +542,12 @@ class SeedDetailViewController: UIViewController, UITextFieldDelegate, UITextVie
                 vc.isPsbt = false
                 vc.text = qrText
                 
-                vc.responseDoneBlock = { [weak self] signer in
+                vc.cosignerDoneBlock = { [weak self] signer in
                     guard let self = self else { return }
                     
                     guard let addedSigner = signer else { return }
                     
-                    if addedSigner.bip48SegwitAccount == self.cosigner!.bip48SegwitAccount! {
+                    if addedSigner.bip48SegwitAccount! == self.cosigner!.bip48SegwitAccount! {
                         showAlert(self, "", "Cosigner updated with the correct private key ✓")
                                                 
                         DispatchQueue.main.async { [weak self] in
