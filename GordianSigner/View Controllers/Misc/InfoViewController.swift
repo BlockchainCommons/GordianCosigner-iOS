@@ -74,7 +74,7 @@ class InfoViewController: UIViewController {
     
     private func setCosigner() {
         let text = """
-        Cosigners represent the individuals or devices that can be used to create multisignatures accounts.
+        Cosigners represent the individuals or devices that can be used to create multisignature accounts.
 
         Paste xpubs with origin info, crypto-account, crypto-hdkey, crypto-seed, bip39 words or QR codes for everyone who will be participating in a multisignature account. When you are done, proceed to the accounts tab to combine seeds and other cosigners into a multisignature account.
         """

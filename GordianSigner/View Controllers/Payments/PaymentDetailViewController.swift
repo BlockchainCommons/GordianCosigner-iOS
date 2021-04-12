@@ -434,7 +434,13 @@ class PsbtTableViewController: UIViewController, UITableViewDelegate, UITableVie
         #if DEBUG
         sign()
         #else
+        
+        #if targetEnvironment(simulator)
+        sign()
+        #else
         showAuth()
+        #endif
+        
         #endif
     }
     

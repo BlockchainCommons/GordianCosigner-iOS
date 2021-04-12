@@ -94,9 +94,9 @@ class SeedDetailViewController: UIViewController, UITextFieldDelegate, UITextVie
         DispatchQueue.main.async { [weak self] in
             guard let self = self else { return }
             
-            let alert = UIAlertController(title: "Request Private Key?", message: "This setting lets us know you expect to sign payments with this Cosigner. You can create a request for the private key now or you will be automatically prompted when adding a payment.", preferredStyle: .alert)
+            let alert = UIAlertController(title: "Request Private Key (xprv)?", message: "This setting lets us know you expect to sign payments with this Cosigner. You can either create a request for the extended private key now which will allow you to sign all future payments or you will be automatically prompted when adding a payment which can be signed with this key to create a request for children of this extended private key.", preferredStyle: .alert)
             
-            alert.addAction(UIAlertAction(title: "Request Private Key", style: .default, handler: { action in
+            alert.addAction(UIAlertAction(title: "Request Extended Private Key", style: .default, handler: { action in
                 guard let request = URHelper.requestXprv(self.cosigner.bip48SegwitAccount!, "Gordian Cosigner needs a private key from \(self.cosigner.label) to sign a payment") else {
                     showAlert(self, "", "There was an issue creating the key request, please let us know about it.")
                     return
@@ -107,6 +107,8 @@ class SeedDetailViewController: UIViewController, UITextFieldDelegate, UITextVie
                 self.qrHeader = "Private Key Request"
                 self.goToQr()
             }))
+            
+            alert.addAction(UIAlertAction(title: "Request Child Keys Automatically", style: .default, handler: { action in }))
                             
             alert.addAction(UIAlertAction(title: "Cancel", style: .cancel, handler: { action in }))
             

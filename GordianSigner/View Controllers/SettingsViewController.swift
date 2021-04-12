@@ -31,6 +31,7 @@ class SettingsViewController: UIViewController {
         } else {
             UserDefaults.standard.setValue("0", forKey: "coinType")
         }
+        refreshCosigners()
     }
     
     @IBAction func backupAction(_ sender: Any) {
@@ -66,6 +67,12 @@ class SettingsViewController: UIViewController {
                     }
                 }
             }
+        }
+    }
+    
+    private func refreshCosigners() {
+        DispatchQueue.main.async {
+            NotificationCenter.default.post(name: .cosignerAdded, object: nil, userInfo: nil)
         }
     }
 
