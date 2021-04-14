@@ -25,7 +25,7 @@ Specter Desktop will automatically recognize the cosigners. Click **import walle
 
 ![](../images/specter2_import_wallet.png)
 
-On success, Specter Desktop will create a wallet and prompt you to backup it up.
+On success, Specter Desktop will create a wallet and prompt you to back it up.
 
 ![](../images/specter3_import_wallet.png)
 
@@ -79,7 +79,7 @@ Open your wallet and click **Addresses**:
 ![](../images/specter7_addresses.png)
 
 
-You can compare these in **Gordian Cosigner** by going to the **Accounts** tab, clicking the account in question and choosing "Address Explorer". Just click through the first few receive addresses; they should match the first few Bitcoin Core derived addresses.
+You can compare these in **Gordian Cosigner** by going to the **Accounts** tab, clicking the account in question and choosing "Address Explorer". Just click through the first few receive addresses; they should match the first few derived addresses by Specter.
 
 
 
@@ -116,4 +116,4 @@ Any networked wallet can send out the PSBT once everyone has signed it. In Spect
 ![](../images/specter11_psbt.png)
 
 
-Congratulations, you've finished the round-trip for a multisig PSBT, using **Gordian Cosigner** and Specter Desktop.
+Congratulations, you've finished the round-trip for a multisig PSBT, using **Gordian Cosigner** and **Specter Desktop**.
