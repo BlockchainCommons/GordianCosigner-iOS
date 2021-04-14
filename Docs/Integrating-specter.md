@@ -15,24 +15,24 @@ The export function on the **Accounts** tab in **Gordian Cosigner** will produce
 ```
 {"blockheight":0,"descriptor":"wsh(sortedmulti(2,[a890879a\/48h\/1h\/0h\/2h]tpubDEzcZKQ5N3ymDtUv6ekeyiESkAr5BwKSFdL4afXDDLf2f7KhJ5cyr2XrKqHwYutxYEVoUcDxdTFM2qPvvr1nwaa7HtAeJN4b4RuGRhPSS83,[90081696\/48h\/1h\/0h\/2h]tpubDFhpmpiYsqtknPaom1M3hDM17gm4UPhCbjqj33k27tGf1bHWMcfyuNPLYozB1uzaaYyFz3CxJU7wzBdQ1FiRSfMaftbUYHgMZ5SrV5FcxV1))","label":"2 of 2"}
 ```
-To use that descriptor with Specter Desktop, you must do the following:
+To use that descriptor with `Specter Desktop`, you must do the following:
 
-Click Add new wallet -> Import from wallet software and paste the descriptor into the field:
+Click **Add new wallet** -> **Import from wallet software** and paste the descriptor into the field:
 
 ![](../images/specter1_import_wallet.png) <br /><br />
 
-Specter Desktop will automatically recognize the cosigners. Click import wallet.
+Specter Desktop will automatically recognize the cosigners. Click **import wallet**.
 
 ![](../images/specter2_import_wallet.png)
 
-On success, Specter Desktop will prompt you to backup your wallet.
+On success, Specter Desktop will create a wallet and prompt you to backup it up.
 
 ![](../images/specter3_import_wallet.png)
 
 
 #### Creating a Descriptor from Cosigners Information
 
-Alternatively, you have everything you need in the **Cosigners** tab. You can go to each individual cosigner and incorporate all of that information to create your descriptor by hand.
+Alternatively, you have everything you need in the **Cosigners** tab. You can go to each individual cosigner and incorporate all of that information to create your descriptor with Specter Desktop.
 
 For example, look at the "Cosigner Detailer" for the first cosigner above and tap the "Text" button, which will give you an `xpub` that Specter Desktop can understand:
 ```
@@ -46,7 +46,7 @@ tpubDEzcZKQ5N3ymDtUv6ekeyiESkAr5BwKSFdL4afXDDLf2f7KhJ5cyr2XrKqHwYutxYEVoUcDxdTFM
 ```
 You'll need to repeat this for each cosigner:
 
-Click Add new device -> Paste xpub
+Click **Add new device** -> **Paste xpub**
 
 You'll have to paste the xpub in this form:
 
@@ -54,17 +54,17 @@ You'll have to paste the xpub in this form:
 [a890879a/48h/1h/0h/2h]tpubDEzcZKQ5N3ymDtUv6ekeyiESkAr5BwKSFdL4afXDDLf2f7KhJ5cyr2XrKqHwYutxYEVoUcDxdTFM2qPvvr1nwaa7HtAeJN4b4RuGRhPSS83
 ```
 
-On success, Specter will show the xpub in `Multisig Sig (Segwit)` section. Click Add Device.
+On success, Specter will show the xpub in `Multisig Sig (Segwit)` section. Click **Add Device**.
 
 ![](../images/specter4_import_keys.png)
 
-After both cosigners are imported ad devices, you can create a new wallet. Click Add new wallet -> Multisignature wallet. Specter will list all available devices (cosigners). You select your cosigners and click Continue.
+After both cosigners are imported as devices, you can create a new wallet. Click **Add new wallet** -> **Multisignature wallet**. Specter will list all available devices (cosigners). You select your cosigners and click **Continue**.
 
 
 <img src="../images/specter5_add_device.png" alt="devices" width="500"/>
 
 <br /><br/>
-In this section you choose your wallet name, multisig quorum and press Create wallet.
+In this section you choose your `wallet name`, `multisig quorum` and press **Create wallet**.
 
 ![](../images/specter6_wallet.png)
 
@@ -74,7 +74,7 @@ This should generate the same descriptor as created by **Gordian Cosigner**, but
 
 ### Testing Addresses on Specter Desktop
 
-Open your wallet and click Addresses:
+Open your wallet and click **Addresses**:
 
 ![](../images/specter7_addresses.png)
 
@@ -87,16 +87,16 @@ You can compare these in **Gordian Cosigner** by going to the **Accounts** tab, 
 
 You can use Specter Desktop to be a transaction coordinator, acting as an Initiator for your multisigs.
 
-First, make sure to run the Blockchain rescan in Settings to see all of the available funds in your wallet
+First, make sure to run the Blockchain rescan in **Settings** to see all of the available funds in your wallet
 
 ![](../images/specter8_rescan.png)
 
 
-Next, click Send and fill out the Recipient address, amount and click Create unsigned transaction.
+Next, click **Send** and fill out the `Recipient address`, `amount` and click **Create unsigned transaction**.
 
 ![](../images/specter9_send.png)
 
-Specter Desktop will create a (raw) PSBT for you in Transaction details. And offer you several options to export it into Gordian Cosigner, for example you can save it as binary which can be imported into Gordian Cosigner.
+Specter Desktop will create a (raw) `PSBT` for you in `Transaction details`. It will offer you several options to export it into Gordian Cosigner. For example you can save it as a binary PSBT which can be imported into Gordian Cosigner.
 
 ![](../images/specter10_details.png)
 
@@ -110,7 +110,7 @@ At this point you can go to the **Payments** tab in **Gordian Cosigner** and imp
 
 ### Finalizing PSBTs in Specter Desktop
 
-Any networked wallet can send out the PSBT once everyone has signed it. In Specter Desktop you click Paste signed transaction and on success Specter will offer you to broadcast it.
+Any networked wallet can send out the PSBT once everyone has signed it. In Specter Desktop you click **Paste signed transaction** and on success Specter will offer you to broadcast it.
 
 
 ![](../images/specter11_psbt.png)
