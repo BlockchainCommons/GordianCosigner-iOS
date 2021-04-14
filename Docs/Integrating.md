@@ -360,3 +360,7 @@ Importing a account from **Gordian Cosigner** to **Gordian Wallet** is a simple 
 1. In **Gordian Cosigner**, go to the **Accounts** tab, choose an account and export; choose "Copy QR".
 2. In **Gordian Wallet**, go to the **Accounts** tab, add a new account, and choose to "Recover". You should be given a pop-up option to "Upload Account Map QR".
 3. Verify the addresses shown here match with those seen in **Gordian Cosigner** by going to the **Accounts** tab there, clicking the account in question and choosing "Address Explorer". If so, "Confirm".
+
+## Using Specter Desktop as Initiator & Finalizer
+
+See [here](./integrating-specter.md)
