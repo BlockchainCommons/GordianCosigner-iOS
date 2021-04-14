@@ -363,4 +363,4 @@ Importing a account from **Gordian Cosigner** to **Gordian Wallet** is a simple 
 
 ## Using Specter Desktop as Initiator & Finalizer
 
-See [here](./integrating-specter.md)
+See [here](./Integrating-specter.md)
