@@ -1,16 +1,10 @@
-# Integrating Gordian Cosigner with Specter Desktop
-
-Gordian Cosigner is meant to be used with a wallet that can initiate PSBT transactions, or some other transaction coordinator service. Following are documents on using it with other services.
-
 ## Using Specter Desktop as Initiator & Finalizer
-
-Perhaps the best way to use Gordian Cosigner with Bitcoin Core is to fully create your keys and accounts in other systems, such as **Gordian Wallet** and **Gordian Cosigner**, but then to take advantage of the full-node capabilities of Bitcoin Core to Initiate and Finalize transactions. Following is a description of how to do so.
 
 ***Scenario Description:*** Specter Desktop acts as an Initiator and Finalizer; Gordian Cosigner acts as a cosigner; other users cosign by other means.
 
-### Creating a Descriptor for Bitcoin Core
+### Creating a Descriptor for Specter Desktop
 
-To do any work on existing cosigners or accounts in Bitcoin Core requires creating a descriptor that Bitcoin Core will be able to understand. This should be a `wsh(sortmulti` descriptor, to match the methodology of **Gordian Cosigner**. There are two ways to create this descriptor: you can either export the "descriptor" from the **Accounts** tab of **Gordian Cosigner**, or you can export the individual origins and public keys from the **Cosigners** tab and build a complete descriptor on your own. 
+There are two ways to create this descriptor: you can either export the "descriptor" from the **Accounts** tab of **Gordian Cosigner**, or you can export the individual origins and public keys from the **Cosigners** tab and build a complete descriptor on your own. 
 
 Once you have creating a proper descriptor, you'll be able to use it for a variety of functions on Specter Desktop.
 
@@ -24,7 +18,6 @@ The export function on the **Accounts** tab in **Gordian Cosigner** will produce
 To use that descriptor with Specter Desktop, you must do the following:
 
 Click Add new wallet -> Import from wallet software and paste the descriptor into the field:
-
 
 ![](../images/specter1_import_wallet.png) <br /><br />
 
@@ -74,7 +67,6 @@ After both cosigners are imported ad devices, you can create a new wallet. Click
 In this section you choose your wallet name, multisig quorum and press Create wallet.
 
 ![](../images/specter6_wallet.png)
-
 
 
 This should generate the same descriptor as created by **Gordian Cosigner**, but this methodology allows you to create it from the individual keys on your own.
