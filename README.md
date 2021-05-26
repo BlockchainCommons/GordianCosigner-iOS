@@ -22,6 +22,17 @@ Gordian Cosigner is a multiplatform utility that's also available as:
 * [GordianCosigner for Android](https://github.com/BlockchainCommons/GordianSigner-Android)
 * [GordianCosigner for MacOS](https://github.com/BlockchainCommons/GordianSigner-macOS)
 
+## Gordian Principles
+
+**Gordian Cosigner** is a reference implementation meant to display the [Gordian Principles](https://github.com/BlockchainCommons/Gordian#gordian-principles), which are philosophical and technical underpinnings to Blockchain Commons' Gordian technology. This includes:
+
+* **Independence.** Cosigner allows you to sign PSBTs in a way you see fit.
+* **Privacy.** Cosigner keeps your signing totally offline.
+* **Resilience.** Cosigner also keeps your seeds offline, just communicating signatures through airgaps.
+* **Openness.** Cosigner communicates through airgaps via URs and QRs, for maximum interoperability.
+
+Blockchain Commons apps do not phone home and do not run ads. Some are available through various app stores; all are available in our code repositories for your usage.
+
 ## Status - Late Alpha
 
 GordianCosigner-Catalyst is currently a late alpha. It should not be used for production tasks until it has had further testing and auditing. Though it now supports mainnet interactions, it should be considered _very risky_ to use, and minimal Bitcoin funds should be used for testing.
