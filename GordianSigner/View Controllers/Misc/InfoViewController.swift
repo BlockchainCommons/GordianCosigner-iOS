@@ -52,9 +52,13 @@ class InfoViewController: UIViewController {
     
     private func setAccount() {
         let text = """
-        Accounts are holders of Bitcoin value. An account map describes the account. An account can also generate addresses, where you will receive money.
+        An account is a sequential list of addresses that can be summed into a balance: it is a holder of Bitcoin value. The addresses are where you receive that value. 
+        
+        An account map is a full Bitcoin descriptor of an account, including metadata, but built using only xpubs. For a multisignature account, the account map describes the multisig.
 
-        To create an account, define the policy of how many cosigners are possible and how many of those signatures are required, and then import cosigners from your cosigners tab (including the seeds from your seeds tab, which you will be using to sign). You can alternatively import an account map using the QR code from apps like Gordian Wallet, Specter and Fully Noded. When you are done, you can export your account map or your addresses, receive transactions, and make payments on the payments tab.
+        To create an account, CREATE a policy defining how many cosigners are possible and how many of those signatures are required, and then ADD cosigners from your cosigners tab. You can alternatively IMPORT an account map using a QR code from an app like Gordian Wallet, Specter, or Fully Noded. When you are done, you can export your account map or your addresses, receive transactions, or make payments on the payments tab.
+        
+        You will typically import an account map created from another device, defining a multisig account.
         """
         
         configureView(icon: UIImage(systemName: "person.2.square.stack")!, blurbText: text, headerLabel: "Accounts")
@@ -76,7 +80,9 @@ class InfoViewController: UIViewController {
         let text = """
         Cosigners represent the individuals or devices that can be used to create multisignature accounts.
 
-        Paste xpubs with origin info, crypto-account, crypto-hdkey, crypto-seed, bip39 words or QR codes for everyone who will be participating in a multisignature account. When you are done, proceed to the accounts tab to combine seeds and other cosigners into a multisignature account.
+        To add a cosigner, choose IMPORT to paste an xpub with origin info, crypto-account, crypto-hdkey, crypto-seed, or bip39 words, or scan a QR code. This must be done for everyone who will be participating in a multisignature account. When you are done, proceed to the accounts tab to combine cosigners into a multisignature account.
+        
+        You will typically add the cosigner that you sign with for a multisig account that you have been given.
         """
                 
         configureView(icon: UIImage(systemName: "person.2")!, blurbText: text, headerLabel: "Cosigners")
@@ -84,9 +90,9 @@ class InfoViewController: UIViewController {
     
     private func setPayment() {
         let text = """
-        Payments are Bitcoin transactions sent out of your account. They will be imported as partially signed transactions (PSBTs) created by Gordian Wallet or another app.
+        A payment is Bitcoin transactions sent from your account. It will be imported into Gordian Cosigner as a partially signed transaction (PSBT) created by Gordian Wallet or another app.
 
-        Import PSBTs using animated QR codes, text, or files. You can then sign, export, and view details. Another app, such as Gordian Wallet, will finalize the transaction after it's exported.
+        To IMPORT a payment, use an animated QR code, text, or file. You can then sign, export, and view details. Another app, such as Gordian Wallet, will finalize the transaction after it's exported.
 
         Signing is always done offline. Payments are automatically saved when you add a transaction or sign it.
         """
