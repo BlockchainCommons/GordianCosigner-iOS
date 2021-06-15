@@ -449,7 +449,7 @@ extension QRScannerViewController: UIImagePickerControllerDelegate {
     
 }
 
-extension QRScannerViewController: UINavigationControllerDelegate { }
+extension QRScannerViewController: UINavigationControllerDelegate {}
 
 fileprivate func convertFromUIImagePickerControllerInfoKeyDictionary(_ input: [UIImagePickerController.InfoKey: Any]) -> [String: Any] {
     return Dictionary(uniqueKeysWithValues: input.map {key, value in (key.rawValue, value)})

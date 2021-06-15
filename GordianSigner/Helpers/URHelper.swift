@@ -502,14 +502,15 @@ enum URHelper {
             case 6:
                 guard case let CBOR.tagged(_, originCbor) = value else { fallthrough }
                 guard case let CBOR.map(map) = originCbor else { fallthrough }
+                
                 let (originsCheck, depthCheck, _) = URHelper.origins(map)
                 origins = originsCheck
                 depth = depthCheck
-                
             default:
                 break
             }
         }
+        
         return (keyData, chainCode, origins, depth)
     }
     
@@ -752,7 +753,7 @@ enum URHelper {
         return Data(result.encode())
     }
     
-    static func origins(_ path: String) -> [CBOR] {
+    static func origins(path: String) -> [CBOR] {
         var cborArray:[CBOR] = []
         for (i, item) in path.split(separator: "/").enumerated() {
             if i != 0 && item != "m" {
@@ -859,7 +860,7 @@ enum URHelper {
         UserDefaults.standard.setValue(id, forKey: "uuid")
         
         var originsWrapper:[OrderedMapEntry] = []
-        originsWrapper.append(.init(key: 1, value: .array(origins(path))))
+        originsWrapper.append(.init(key: 1, value: .array(origins(path: path))))
         originsWrapper.append(.init(key: 2, value: .unsignedInt(UInt64(sourceXfp, radix: 16) ?? 0)))
         originsWrapper.append(.init(key: 3, value: .unsignedInt(UInt64(depth.hexString) ?? 0)))
         let originsCbor = CBOR.orderedMap(originsWrapper)

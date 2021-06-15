@@ -51,6 +51,7 @@ class KeysetsViewController: UIViewController, UITableViewDelegate, UITableViewD
         editButton = UIBarButtonItem.init(barButtonSystemItem: .edit, target: self, action: #selector(editCosigners))
         self.navigationItem.setRightBarButtonItems([addButton, editButton], animated: true)
         NotificationCenter.default.addObserver(self, selector: #selector(refreshTable), name: .cosignerAdded, object: nil)
+        NotificationCenter.default.addObserver(self, selector: #selector(cosignerDeepLink), name: .cosignerDeeplink, object: nil)
         
         if UserDefaults.standard.object(forKey: "coinType") == nil {
             UserDefaults.standard.setValue("0", forKey: "coinType")
@@ -78,6 +79,34 @@ class KeysetsViewController: UIViewController, UITableViewDelegate, UITableViewD
                 showInfo()
                 UserDefaults.standard.set(true, forKey: "seenCosignerInfo")
             }
+        }
+    }
+    
+    @objc func cosignerDeepLink(_ notification: NSNotification) {
+        guard let accountDict = notification.userInfo as? [String:Any], let account = accountDict["account"] as? String else {
+            return
+        }
+        
+        DispatchQueue.main.async { [weak self] in
+            guard let self = self else { return }
+            
+            let alertStyle = UIAlertController.Style.alert
+            
+            let message = "Another app shared a cosigner. Would you like to save it?"
+            
+            let alert = UIAlertController(title: "Cosigner Shared", message: message, preferredStyle: alertStyle)
+            
+            alert.addAction(UIAlertAction(title: "Save", style: .default, handler: { [weak self] action in
+                guard let self = self else { return }
+                
+                self.addCosigner(account)
+            }))
+            
+            alert.addAction(UIAlertAction(title: "Cancel", style: .cancel, handler: { action in }))
+            
+            alert.popoverPresentationController?.sourceView = self.view
+            alert.popoverPresentationController?.sourceRect = self.view.bounds
+            self.present(alert, animated: true, completion: nil)
         }
     }
     
