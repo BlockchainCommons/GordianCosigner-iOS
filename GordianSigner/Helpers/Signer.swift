@@ -127,7 +127,7 @@ class PSBTSigner {
                             completion((nil, nil, "There was an error decrypting your account xprv."))
                             return
                         }
-                        
+                                                
                         guard let hdkey = try? HDKey(base58: decryptedXprv.utf8) else {
                             reset()
                             completion((nil, nil, "There was an error deriving your account xprv."))

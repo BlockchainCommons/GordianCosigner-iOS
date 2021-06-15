@@ -2,7 +2,6 @@
 <document type="com.apple.InterfaceBuilder3.CocoaTouch.Storyboard.XIB" version="3.0" toolsVersion="17701" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" useSafeAreas="YES" colorMatched="YES" initialViewController="shV-H0-8JM">
     <device id="retina6_1" orientation="portrait" appearance="light"/>
     <dependencies>
-        <deployment identifier="iOS"/>
         <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="17703"/>
         <capability name="Safe area layout guides" minToolsVersion="9.0"/>
         <capability name="System colors in document resources" minToolsVersion="11.0"/>
@@ -14,6 +13,7 @@
             <objects>
                 <navigationController id="Inf-1k-cZk" sceneMemberID="viewController">
                     <tabBarItem key="tabBarItem" title="Cosigners" image="person.2" catalog="system" id="lj9-LP-8Db"/>
+                    <navigationItem key="navigationItem" id="JFE-8W-1q0"/>
                     <navigationBar key="navigationBar" contentMode="scaleToFill" insetsLayoutMarginsFromSafeArea="NO" barStyle="black" translucent="NO" id="4bi-7m-Lwm">
                         <rect key="frame" x="0.0" y="44" width="414" height="44"/>
                         <autoresizingMask key="autoresizingMask"/>
@@ -238,11 +238,18 @@
                         </constraints>
                     </view>
                     <navigationItem key="navigationItem" id="NxX-NZ-h8V">
-                        <barButtonItem key="leftBarButtonItem" image="info.circle" catalog="system" id="Il9-0H-Vk7">
-                            <connections>
-                                <action selector="infoAction:" destination="tIM-97-jRz" id="CKc-QM-biO"/>
-                            </connections>
-                        </barButtonItem>
+                        <leftBarButtonItems>
+                            <barButtonItem image="info.circle" catalog="system" id="Il9-0H-Vk7">
+                                <connections>
+                                    <action selector="infoAction:" destination="tIM-97-jRz" id="CKc-QM-biO"/>
+                                </connections>
+                            </barButtonItem>
+                            <barButtonItem image="qrcode.viewfinder" catalog="system" id="1CH-pt-IVZ">
+                                <connections>
+                                    <action selector="scanAction:" destination="tIM-97-jRz" id="jMj-3W-tN0"/>
+                                </connections>
+                            </barButtonItem>
+                        </leftBarButtonItems>
                         <barButtonItem key="rightBarButtonItem" systemItem="add" id="Bht-1C-jjw">
                             <connections>
                                 <action selector="addAction:" destination="tIM-97-jRz" id="ful-3Q-wlX"/>
@@ -255,6 +262,7 @@
                         <segue destination="EM0-dh-3fz" kind="show" identifier="addPsbtSegue" id="YOJ-tU-XDe"/>
                         <segue destination="9Vu-3O-YNg" kind="show" identifier="segueToShowPsbtQR" id="no9-tq-P7U"/>
                         <segue destination="swD-W5-MAD" kind="presentation" identifier="segueToPaymentsInfo" id="sdO-iP-xRE"/>
+                        <segue destination="4dz-cW-ULS" kind="presentation" identifier="segueToScanQrToAddPayment" id="ic1-6K-X02"/>
                     </connections>
                 </viewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="Bsg-pq-Bw9" userLabel="First Responder" customClass="UIResponder" sceneMemberID="firstResponder"/>
@@ -301,14 +309,14 @@
                                 </constraints>
                                 <blurEffect style="regular"/>
                             </visualEffectView>
-                            <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" showsTouchWhenHighlighted="YES" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="2gb-qB-VbP">
-                                <rect key="frame" x="187.5" y="20" width="39" height="40"/>
+                            <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="close" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="2gb-qB-VbP">
+                                <rect key="frame" x="355" y="20" width="39" height="40"/>
                                 <constraints>
                                     <constraint firstAttribute="width" constant="39" id="CWh-KB-URW"/>
                                     <constraint firstAttribute="height" constant="40" id="msK-Za-2hZ"/>
                                 </constraints>
                                 <color key="tintColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
-                                <state key="normal" image="chevron.down" catalog="system">
+                                <state key="normal">
                                     <preferredSymbolConfiguration key="preferredSymbolConfiguration" scale="large" weight="bold"/>
                                 </state>
                                 <connections>
@@ -319,13 +327,13 @@
                         <viewLayoutGuide key="safeArea" id="in4-ZL-XAA"/>
                         <color key="backgroundColor" systemColor="systemBackgroundColor"/>
                         <constraints>
+                            <constraint firstItem="in4-ZL-XAA" firstAttribute="trailing" secondItem="2gb-qB-VbP" secondAttribute="trailing" constant="20" id="3Mu-cq-RHc"/>
                             <constraint firstItem="11N-cd-oai" firstAttribute="trailing" secondItem="in4-ZL-XAA" secondAttribute="trailing" id="5pU-pY-v5t"/>
                             <constraint firstItem="11N-cd-oai" firstAttribute="top" secondItem="in4-ZL-XAA" secondAttribute="top" id="94M-7z-8kk"/>
                             <constraint firstItem="in4-ZL-XAA" firstAttribute="trailing" secondItem="3vK-q4-XRq" secondAttribute="trailing" constant="20" id="CR7-oK-zc8"/>
                             <constraint firstItem="2gb-qB-VbP" firstAttribute="top" secondItem="in4-ZL-XAA" secondAttribute="top" constant="20" id="GA9-E6-zCS"/>
                             <constraint firstItem="in4-ZL-XAA" firstAttribute="bottom" secondItem="3vK-q4-XRq" secondAttribute="bottom" constant="49" id="QW4-bZ-YAK"/>
                             <constraint firstItem="3vK-q4-XRq" firstAttribute="leading" secondItem="in4-ZL-XAA" secondAttribute="leading" constant="20" id="RQr-ex-pBh"/>
-                            <constraint firstItem="2gb-qB-VbP" firstAttribute="centerX" secondItem="vUa-HR-41x" secondAttribute="centerX" id="aCN-y8-Ab2"/>
                             <constraint firstItem="11N-cd-oai" firstAttribute="leading" secondItem="in4-ZL-XAA" secondAttribute="leading" id="dA7-Rr-xJS"/>
                             <constraint firstAttribute="bottom" secondItem="11N-cd-oai" secondAttribute="bottom" id="zHV-aJ-rbg"/>
                         </constraints>
@@ -422,10 +430,23 @@
                                     <action selector="shareTextAction:" destination="9Vu-3O-YNg" eventType="touchUpInside" id="0Gt-aN-TCa"/>
                                 </connections>
                             </button>
+                            <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" showsTouchWhenHighlighted="YES" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="DUr-bp-ir8">
+                                <rect key="frame" x="20" y="68" width="93.5" height="19"/>
+                                <fontDescription key="fontDescription" type="system" pointSize="10"/>
+                                <color key="tintColor" systemColor="systemTealColor"/>
+                                <state key="normal" title=" scan response" image="qrcode.viewfinder" catalog="system">
+                                    <color key="titleColor" systemColor="systemTealColor"/>
+                                </state>
+                                <connections>
+                                    <action selector="scanResponseAction:" destination="9Vu-3O-YNg" eventType="touchUpInside" id="v5D-SP-r3Y"/>
+                                </connections>
+                            </button>
                         </subviews>
                         <viewLayoutGuide key="safeArea" id="GK0-od-YHe"/>
                         <color key="backgroundColor" white="0.0" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                         <constraints>
+                            <constraint firstItem="lJf-Uh-ILV" firstAttribute="top" secondItem="DUr-bp-ir8" secondAttribute="bottom" constant="8" symbolic="YES" id="0pT-oG-eKE"/>
+                            <constraint firstItem="DUr-bp-ir8" firstAttribute="leading" secondItem="GK0-od-YHe" secondAttribute="leading" constant="20" id="5nl-4V-AeB"/>
                             <constraint firstItem="lJf-Uh-ILV" firstAttribute="centerX" secondItem="i3r-81-WoL" secondAttribute="centerX" id="FY6-aA-ZeU"/>
                             <constraint firstItem="8Fb-WX-yzn" firstAttribute="top" secondItem="GK0-od-YHe" secondAttribute="top" constant="20" id="Gfw-rt-wiH"/>
                             <constraint firstItem="GK0-od-YHe" firstAttribute="trailing" secondItem="hpJ-y0-mBa" secondAttribute="trailing" constant="20" id="IEd-L4-VF8"/>
@@ -453,9 +474,11 @@
                         <outlet property="copyTextOutlet" destination="LAq-QM-9fZ" id="jnG-42-ncQ"/>
                         <outlet property="headerLabel" destination="8Fb-WX-yzn" id="IAR-Dt-XTV"/>
                         <outlet property="imageView" destination="lJf-Uh-ILV" id="Rev-R0-d3L"/>
+                        <outlet property="scanResponseOutlet" destination="DUr-bp-ir8" id="Veg-QA-626"/>
                         <outlet property="shareQrOutlet" destination="hEA-SP-XCB" id="oU0-gR-RwN"/>
                         <outlet property="shareTextOutlet" destination="gnh-pp-jsJ" id="o6M-7T-OtL"/>
                         <outlet property="textView" destination="0t4-W0-Izf" id="PNM-Pa-ebT"/>
+                        <segue destination="4dz-cW-ULS" kind="presentation" identifier="segueToScanResponse" id="yK0-KX-jOm"/>
                     </connections>
                 </viewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="dZb-Iw-dd0" userLabel="First Responder" customClass="UIResponder" sceneMemberID="firstResponder"/>
@@ -665,7 +688,7 @@
                                                                 <rect key="frame" x="0.0" y="0.0" width="306" height="90"/>
                                                                 <autoresizingMask key="autoresizingMask"/>
                                                                 <subviews>
-                                                                    <view tag="2" contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="86m-uI-ODv" customClass="LifehashSeedView" customModule="Gordian_Cosigner" customModuleProvider="target">
+                                                                    <view tag="12" contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="86m-uI-ODv" customClass="LifehashSeedView" customModule="Gordian_Cosigner" customModuleProvider="target">
                                                                         <rect key="frame" x="54" y="5" width="236" height="80"/>
                                                                         <color key="backgroundColor" systemColor="systemBackgroundColor"/>
                                                                         <constraints>
@@ -673,7 +696,7 @@
                                                                             <constraint firstAttribute="width" constant="68" id="jJ4-26-Sxs"/>
                                                                         </constraints>
                                                                     </view>
-                                                                    <imageView clipsSubviews="YES" userInteractionEnabled="NO" tag="3" contentMode="scaleAspectFit" horizontalHuggingPriority="251" verticalHuggingPriority="251" image="signature" catalog="system" translatesAutoresizingMaskIntoConstraints="NO" id="eaO-Wv-wgK">
+                                                                    <imageView clipsSubviews="YES" userInteractionEnabled="NO" tag="13" contentMode="scaleAspectFit" horizontalHuggingPriority="251" verticalHuggingPriority="251" image="signature" catalog="system" translatesAutoresizingMaskIntoConstraints="NO" id="eaO-Wv-wgK">
                                                                         <rect key="frame" x="16" y="31" width="30" height="31"/>
                                                                         <color key="tintColor" systemColor="systemPinkColor"/>
                                                                         <constraints>
@@ -681,7 +704,7 @@
                                                                             <constraint firstAttribute="width" constant="30" id="cT8-bG-Hgj"/>
                                                                         </constraints>
                                                                     </imageView>
-                                                                    <imageView clipsSubviews="YES" userInteractionEnabled="NO" tag="4" contentMode="scaleAspectFit" horizontalHuggingPriority="251" verticalHuggingPriority="251" image="flame" catalog="system" translatesAutoresizingMaskIntoConstraints="NO" id="fgT-V7-3T8">
+                                                                    <imageView clipsSubviews="YES" userInteractionEnabled="NO" tag="14" contentMode="scaleAspectFit" horizontalHuggingPriority="251" verticalHuggingPriority="251" image="flame" catalog="system" translatesAutoresizingMaskIntoConstraints="NO" id="fgT-V7-3T8">
                                                                         <rect key="frame" x="16" y="4.5" width="19" height="19"/>
                                                                         <color key="tintColor" systemColor="systemOrangeColor"/>
                                                                         <constraints>
@@ -905,12 +928,20 @@
                                                     <color key="textColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                                                     <nil key="highlightedColor"/>
                                                 </label>
+                                                <button opaque="NO" tag="3" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="system" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="hFd-KB-RCu">
+                                                    <rect key="frame" x="241" y="7" width="73" height="30"/>
+                                                    <state key="normal" title="add signer">
+                                                        <color key="titleColor" systemColor="systemTealColor"/>
+                                                    </state>
+                                                </button>
                                             </subviews>
                                             <constraints>
                                                 <constraint firstItem="tOw-6L-nth" firstAttribute="centerY" secondItem="jZ4-5q-3vW" secondAttribute="centerY" id="7xy-5z-r6E"/>
                                                 <constraint firstItem="DBI-yb-b5V" firstAttribute="centerY" secondItem="jZ4-5q-3vW" secondAttribute="centerY" id="BZd-gN-F65"/>
                                                 <constraint firstItem="tOw-6L-nth" firstAttribute="leading" secondItem="jZ4-5q-3vW" secondAttribute="leading" constant="20" id="CeC-xz-ZVs"/>
+                                                <constraint firstAttribute="trailing" secondItem="hFd-KB-RCu" secondAttribute="trailing" constant="20" symbolic="YES" id="Teb-0d-YMB"/>
                                                 <constraint firstItem="DBI-yb-b5V" firstAttribute="centerY" secondItem="jZ4-5q-3vW" secondAttribute="centerY" id="bgu-OH-kS3"/>
+                                                <constraint firstItem="hFd-KB-RCu" firstAttribute="centerY" secondItem="jZ4-5q-3vW" secondAttribute="centerY" id="lFX-Ki-4RM"/>
                                                 <constraint firstItem="DBI-yb-b5V" firstAttribute="leading" secondItem="tOw-6L-nth" secondAttribute="trailing" constant="8" id="s93-Ob-u4X"/>
                                             </constraints>
                                         </tableViewCellContentView>
@@ -962,7 +993,7 @@
                                 <color key="textColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                                 <nil key="highlightedColor"/>
                             </label>
-                            <button opaque="NO" clipsSubviews="YES" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="zaS-M0-VOe">
+                            <button opaque="NO" clipsSubviews="YES" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" showsTouchWhenHighlighted="YES" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="zaS-M0-VOe">
                                 <rect key="frame" x="289" y="25.5" width="105" height="23"/>
                                 <color key="backgroundColor" white="0.0" alpha="0.0" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                                 <color key="tintColor" systemColor="systemTealColor"/>
@@ -1001,6 +1032,7 @@
                         <segue destination="vZg-oW-Ek8" kind="show" identifier="segueToSign" id="UaS-I9-AEd"/>
                         <segue destination="L8r-ds-Dk1" kind="presentation" identifier="editPaymentLabel" id="ly6-ws-tN5"/>
                         <segue destination="okc-Vs-IoW" kind="presentation" identifier="segueToAuth" id="ji4-mX-q7w"/>
+                        <segue destination="4dz-cW-ULS" kind="presentation" identifier="segueToScanCosigner" id="Oi5-2y-6bw"/>
                     </connections>
                 </viewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="tsY-j5-GmE" userLabel="First Responder" customClass="UIResponder" sceneMemberID="firstResponder"/>
@@ -1185,11 +1217,18 @@
                         </constraints>
                     </view>
                     <navigationItem key="navigationItem" id="EWg-zu-rzB">
-                        <barButtonItem key="leftBarButtonItem" image="info.circle" catalog="system" id="IlK-rd-fB9">
-                            <connections>
-                                <action selector="infoAction:" destination="50H-8w-bzV" id="Yp0-Qh-GuX"/>
-                            </connections>
-                        </barButtonItem>
+                        <leftBarButtonItems>
+                            <barButtonItem image="info.circle" catalog="system" id="IlK-rd-fB9">
+                                <connections>
+                                    <action selector="infoAction:" destination="50H-8w-bzV" id="Yp0-Qh-GuX"/>
+                                </connections>
+                            </barButtonItem>
+                            <barButtonItem image="qrcode.viewfinder" catalog="system" id="qxT-IQ-DKA">
+                                <connections>
+                                    <action selector="scanQrAction:" destination="50H-8w-bzV" id="W6U-Dn-GOg"/>
+                                </connections>
+                            </barButtonItem>
+                        </leftBarButtonItems>
                     </navigationItem>
                     <connections>
                         <outlet property="keysetsTable" destination="MwK-VP-A9M" id="3JO-uw-bHb"/>
@@ -1380,11 +1419,18 @@
                         </constraints>
                     </view>
                     <navigationItem key="navigationItem" id="IBD-Nb-A9w">
-                        <barButtonItem key="leftBarButtonItem" image="info.circle" catalog="system" id="wwV-Vy-azx">
-                            <connections>
-                                <action selector="infoAction:" destination="wCx-A7-8Dm" id="moL-FB-4BK"/>
-                            </connections>
-                        </barButtonItem>
+                        <leftBarButtonItems>
+                            <barButtonItem image="info.circle" catalog="system" id="wwV-Vy-azx">
+                                <connections>
+                                    <action selector="infoAction:" destination="wCx-A7-8Dm" id="moL-FB-4BK"/>
+                                </connections>
+                            </barButtonItem>
+                            <barButtonItem image="qrcode.viewfinder" catalog="system" id="tPH-vc-qJW">
+                                <connections>
+                                    <action selector="scanQrAction:" destination="wCx-A7-8Dm" id="a62-SE-66a"/>
+                                </connections>
+                            </barButtonItem>
+                        </leftBarButtonItems>
                     </navigationItem>
                     <connections>
                         <outlet property="accountMapTable" destination="QUk-qt-fbj" id="zUN-YT-zzC"/>
@@ -1658,6 +1704,7 @@
                         <segue destination="iug-s9-0PF" kind="show" identifier="segueToCosignerFromAccountDetail" id="RRe-xD-Awd"/>
                         <segue destination="9Vu-3O-YNg" kind="show" identifier="segueToExportAccountMap" id="cew-VD-Qtb"/>
                         <segue destination="6NQ-R2-fha" kind="show" identifier="segueToAddresses" id="bWu-t4-v64"/>
+                        <segue destination="9Vu-3O-YNg" kind="show" identifier="segueToExportUrOutput" id="1eO-2F-tfa"/>
                     </connections>
                 </viewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="npg-ZV-dua" userLabel="First Responder" customClass="UIResponder" sceneMemberID="firstResponder"/>
@@ -1935,6 +1982,7 @@ If you do not want to add seed words to create a cosigner go back and choose the
                         <outlet property="addSignerOutlet" destination="tXJ-Ca-pfZ" id="yAV-3C-uFh"/>
                         <outlet property="aliasField" destination="Fgt-26-vN0" id="yzd-61-Yi9"/>
                         <outlet property="generateOutlet" destination="EzJ-7h-OG7" id="rrN-Fy-9Cv"/>
+                        <outlet property="headerLabel" destination="bnh-FZ-tjQ" id="ama-pa-luQ"/>
                         <outlet property="passphraseField" destination="wpH-XP-q7h" id="lB7-08-63s"/>
                         <outlet property="textField" destination="hp1-4b-9IK" id="psN-M6-Q9t"/>
                         <outlet property="textView" destination="ioS-z5-N7c" id="i7x-JN-x8Y"/>
@@ -2178,11 +2226,24 @@ If you do not want to add seed words to create a cosigner go back and choose the
                                 <color key="textColor" white="0.66666666669999997" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                                 <nil key="highlightedColor"/>
                             </label>
+                            <switch opaque="NO" contentMode="scaleToFill" horizontalHuggingPriority="750" verticalHuggingPriority="750" contentHorizontalAlignment="center" contentVerticalAlignment="center" on="YES" translatesAutoresizingMaskIntoConstraints="NO" id="ivi-EP-bpT">
+                                <rect key="frame" x="345" y="166" width="51" height="31"/>
+                                <connections>
+                                    <action selector="switchAction:" destination="iug-s9-0PF" eventType="valueChanged" id="spK-8e-a7M"/>
+                                </connections>
+                            </switch>
+                            <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Should sign" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="DYq-ji-JV7">
+                                <rect key="frame" x="248" y="171.5" width="89" height="20.5"/>
+                                <fontDescription key="fontDescription" type="system" pointSize="17"/>
+                                <color key="textColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+                                <nil key="highlightedColor"/>
+                            </label>
                         </subviews>
                         <viewLayoutGuide key="safeArea" id="xbm-eg-gSI"/>
                         <color key="backgroundColor" white="0.0" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                         <constraints>
                             <constraint firstItem="71C-oD-tQb" firstAttribute="leading" secondItem="xbm-eg-gSI" secondAttribute="leading" constant="104" id="0eu-Yv-LeL"/>
+                            <constraint firstItem="ivi-EP-bpT" firstAttribute="leading" secondItem="DYq-ji-JV7" secondAttribute="trailing" constant="8" id="14w-Fq-xmv"/>
                             <constraint firstItem="xbm-eg-gSI" firstAttribute="trailing" secondItem="X8a-IG-Tk9" secondAttribute="trailing" constant="20" id="1gz-HY-Y67"/>
                             <constraint firstItem="x2U-GM-38H" firstAttribute="top" secondItem="kfk-gj-Xgg" secondAttribute="bottom" constant="8" id="4sI-JL-moc"/>
                             <constraint firstItem="7pm-Dc-f2r" firstAttribute="top" secondItem="xbm-eg-gSI" secondAttribute="top" constant="18" id="6r0-yP-kvG"/>
@@ -2198,6 +2259,7 @@ If you do not want to add seed words to create a cosigner go back and choose the
                             <constraint firstItem="X8a-IG-Tk9" firstAttribute="leading" secondItem="xbm-eg-gSI" secondAttribute="leading" constant="20" id="MkO-sG-KTo"/>
                             <constraint firstItem="Y4Q-KM-Xxh" firstAttribute="leading" secondItem="xbm-eg-gSI" secondAttribute="leading" constant="20" id="Njz-tj-jOh"/>
                             <constraint firstItem="kfk-gj-Xgg" firstAttribute="leading" secondItem="xbm-eg-gSI" secondAttribute="leading" constant="20" id="Qvg-4i-NXe"/>
+                            <constraint firstItem="xbm-eg-gSI" firstAttribute="trailing" secondItem="ivi-EP-bpT" secondAttribute="trailing" constant="20" id="R9S-vV-dku"/>
                             <constraint firstItem="Y4Q-KM-Xxh" firstAttribute="top" secondItem="FDm-Ak-eCi" secondAttribute="bottom" constant="8" symbolic="YES" id="RxI-8K-Kuw"/>
                             <constraint firstItem="x2U-GM-38H" firstAttribute="leading" secondItem="xbm-eg-gSI" secondAttribute="leading" constant="20" id="Swn-YX-j3g"/>
                             <constraint firstItem="0Wx-cr-yyS" firstAttribute="centerY" secondItem="kfk-gj-Xgg" secondAttribute="centerY" id="Syx-PJ-abn"/>
@@ -2213,6 +2275,7 @@ If you do not want to add seed words to create a cosigner go back and choose the
                             <constraint firstItem="FDm-Ak-eCi" firstAttribute="top" secondItem="X8a-IG-Tk9" secondAttribute="bottom" constant="8" symbolic="YES" id="ece-ws-I1y"/>
                             <constraint firstItem="h5j-1m-awu" firstAttribute="top" secondItem="b5m-P6-H7W" secondAttribute="bottom" constant="8" id="en6-bn-5a9"/>
                             <constraint firstItem="b5m-P6-H7W" firstAttribute="leading" secondItem="xbm-eg-gSI" secondAttribute="leading" constant="20" id="ese-7Q-a3t"/>
+                            <constraint firstItem="ivi-EP-bpT" firstAttribute="centerY" secondItem="DYq-ji-JV7" secondAttribute="centerY" id="fHz-GZ-rLh"/>
                             <constraint firstItem="2zW-lg-exE" firstAttribute="top" secondItem="7pm-Dc-f2r" secondAttribute="bottom" constant="8" symbolic="YES" id="fVI-mA-e4j"/>
                             <constraint firstItem="FDm-Ak-eCi" firstAttribute="leading" secondItem="xbm-eg-gSI" secondAttribute="leading" constant="20" id="fa2-fm-ueX"/>
                             <constraint firstItem="2zW-lg-exE" firstAttribute="leading" secondItem="xbm-eg-gSI" secondAttribute="leading" constant="20" id="fpB-2I-kJa"/>
@@ -2220,6 +2283,7 @@ If you do not want to add seed words to create a cosigner go back and choose the
                             <constraint firstItem="gmd-jY-AQy" firstAttribute="leading" secondItem="xbm-eg-gSI" secondAttribute="leading" constant="20" id="lrg-7U-smk"/>
                             <constraint firstItem="gmd-jY-AQy" firstAttribute="top" secondItem="x2U-GM-38H" secondAttribute="bottom" constant="8" id="q6A-xa-e8g"/>
                             <constraint firstItem="3EA-D1-HTw" firstAttribute="leading" secondItem="xbm-eg-gSI" secondAttribute="leading" constant="20" id="sIR-wR-RE3"/>
+                            <constraint firstItem="71C-oD-tQb" firstAttribute="top" secondItem="ivi-EP-bpT" secondAttribute="bottom" constant="8" symbolic="YES" id="uMh-aS-v6b"/>
                             <constraint firstItem="b5m-P6-H7W" firstAttribute="top" secondItem="gmd-jY-AQy" secondAttribute="bottom" constant="8" id="vMW-eW-INn"/>
                             <constraint firstItem="3EA-D1-HTw" firstAttribute="top" secondItem="R5b-EE-jgH" secondAttribute="bottom" constant="8" id="xUD-Lm-iNf"/>
                             <constraint firstItem="xbm-eg-gSI" firstAttribute="trailing" secondItem="x2U-GM-38H" secondAttribute="trailing" constant="20" id="zg0-VT-ywD"/>
@@ -2244,6 +2308,7 @@ If you do not want to add seed words to create a cosigner go back and choose the
                         <outlet property="privKeyHeader" destination="gmd-jY-AQy" id="5Im-WH-MVT"/>
                         <outlet property="privKeyQr" destination="O11-vn-7W0" id="VgW-CQ-bQp"/>
                         <outlet property="privKeyShare" destination="aS8-MJ-QRw" id="Kp5-8J-sA6"/>
+                        <outlet property="shouldSignSwitch" destination="ivi-EP-bpT" id="LBG-C2-dDO"/>
                         <outlet property="xprvLabel" destination="b5m-P6-H7W" id="Vf4-ZJ-vv2"/>
                         <segue destination="9Vu-3O-YNg" kind="show" identifier="segueToCosignerQr" id="MZ7-2Z-REz"/>
                     </connections>
@@ -2389,18 +2454,39 @@ If you do not want to add seed words to create a cosigner go back and choose the
                                 <color key="textColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                                 <nil key="highlightedColor"/>
                             </label>
+                            <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Backup" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="Pqs-fs-5pb">
+                                <rect key="frame" x="20" y="162" width="58" height="21"/>
+                                <fontDescription key="fontDescription" type="system" pointSize="17"/>
+                                <color key="textColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+                                <nil key="highlightedColor"/>
+                            </label>
+                            <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" showsTouchWhenHighlighted="YES" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="Qtu-Fc-jCg">
+                                <rect key="frame" x="20" y="191" width="149" height="21"/>
+                                <fontDescription key="fontDescription" type="system" pointSize="17"/>
+                                <color key="tintColor" systemColor="systemTealColor"/>
+                                <state key="normal" title="  Print Cosigners" image="printer" catalog="system">
+                                    <color key="titleColor" systemColor="systemTealColor"/>
+                                </state>
+                                <connections>
+                                    <action selector="backupAction:" destination="Ft5-mf-Xqz" eventType="touchUpInside" id="n9v-iF-hC5"/>
+                                </connections>
+                            </button>
                         </subviews>
                         <viewLayoutGuide key="safeArea" id="msy-e7-L5e"/>
                         <color key="backgroundColor" white="0.0" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                         <constraints>
+                            <constraint firstItem="Pqs-fs-5pb" firstAttribute="top" secondItem="YE6-s4-7um" secondAttribute="bottom" constant="24" id="1ee-A4-FVX"/>
                             <constraint firstItem="uX9-KR-ZSc" firstAttribute="top" secondItem="AVc-Tj-3EV" secondAttribute="bottom" constant="18" id="3mw-b5-9gG"/>
                             <constraint firstItem="YE6-s4-7um" firstAttribute="leading" secondItem="msy-e7-L5e" secondAttribute="leading" constant="20" id="64x-Rg-e8S"/>
                             <constraint firstItem="RvT-CP-0v2" firstAttribute="centerY" secondItem="AVc-Tj-3EV" secondAttribute="centerY" constant="0.5" id="9Zm-B8-wLg"/>
                             <constraint firstItem="AVc-Tj-3EV" firstAttribute="leading" secondItem="msy-e7-L5e" secondAttribute="leading" constant="20" id="IdE-sX-3qz"/>
+                            <constraint firstItem="Pqs-fs-5pb" firstAttribute="leading" secondItem="msy-e7-L5e" secondAttribute="leading" constant="20" id="Nbu-PK-DBh"/>
                             <constraint firstItem="RvT-CP-0v2" firstAttribute="leading" secondItem="AVc-Tj-3EV" secondAttribute="trailing" constant="8" id="Nh7-pG-gCt"/>
                             <constraint firstItem="uX9-KR-ZSc" firstAttribute="leading" secondItem="msy-e7-L5e" secondAttribute="leading" constant="20" id="QQi-8L-wT0"/>
+                            <constraint firstItem="Qtu-Fc-jCg" firstAttribute="top" secondItem="Pqs-fs-5pb" secondAttribute="bottom" constant="8" symbolic="YES" id="SBb-Sb-CHw"/>
                             <constraint firstItem="YE6-s4-7um" firstAttribute="top" secondItem="uX9-KR-ZSc" secondAttribute="bottom" constant="8" symbolic="YES" id="fLr-sP-ZfA"/>
                             <constraint firstItem="AVc-Tj-3EV" firstAttribute="top" secondItem="msy-e7-L5e" secondAttribute="top" constant="20" id="gCi-OU-9yD"/>
+                            <constraint firstItem="Qtu-Fc-jCg" firstAttribute="leading" secondItem="msy-e7-L5e" secondAttribute="leading" constant="20" id="lcv-SZ-pRh"/>
                         </constraints>
                     </view>
                     <navigationItem key="navigationItem" id="Bxv-V6-WIC"/>
@@ -2601,17 +2687,16 @@ Blockchain Commons and Gordian Cosigner never share any data with any third part
         </scene>
     </scenes>
     <inferredMetricsTieBreakers>
-        <segue reference="6Tx-hX-bdn"/>
-        <segue reference="6Zt-E7-EEd"/>
+        <segue reference="sdO-iP-xRE"/>
+        <segue reference="RRe-xD-Awd"/>
         <segue reference="UaS-I9-AEd"/>
         <segue reference="KzM-QC-ivF"/>
-        <segue reference="MZ7-2Z-REz"/>
-        <segue reference="hha-MU-QkB"/>
+        <segue reference="1eO-2F-tfa"/>
+        <segue reference="ic1-6K-X02"/>
     </inferredMetricsTieBreakers>
     <resources>
         <image name="arrow.clockwise" catalog="system" width="115" height="128"/>
         <image name="bitcoinsign.circle" catalog="system" width="128" height="121"/>
-        <image name="chevron.down" catalog="system" width="128" height="72"/>
         <image name="chevron.right" catalog="system" width="96" height="128"/>
         <image name="doc.on.clipboard" catalog="system" width="116" height="128"/>
         <image name="doc.on.doc" catalog="system" width="116" height="128"/>
@@ -2627,6 +2712,7 @@ Blockchain Commons and Gordian Cosigner never share any data with any third part
         <image name="person.crop.circle.badge.checkmark" catalog="system" width="128" height="113"/>
         <image name="plus" catalog="system" width="128" height="113"/>
         <image name="plus.rectangle" catalog="system" width="128" height="93"/>
+        <image name="printer" catalog="system" width="128" height="111"/>
         <image name="qrcode" catalog="system" width="128" height="114"/>
         <image name="qrcode.viewfinder" catalog="system" width="128" height="115"/>
         <image name="signature" catalog="system" width="128" height="90"/>

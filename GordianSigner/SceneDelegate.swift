@@ -51,6 +51,22 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
         //(UIApplication.shared.delegate as? AppDelegate)?.saveContext()
         CoreDataService.saveContext()
     }
+    
+    func scene(_ scene: UIScene, openURLContexts URLContexts: Set<UIOpenURLContext>) {
+        let urlcontexts = URLContexts.first
+        
+        guard let url = urlcontexts?.url else { return }
+        
+        let string = url.absoluteString.lowercased().condenseWhitespace()
+        
+        guard string.hasPrefix("ur://ur:crypto-hdkey/") else { return }
+        
+        let processed = string.replacingOccurrences(of: "ur://", with: "")
+        
+        guard let account = URHelper.urHdkeyToCosigner(processed) else { return }
+        
+        NotificationCenter.default.post(name: .cosignerDeeplink, object: nil, userInfo: ["account":account])
+    }
 
 
 }

@@ -15,7 +15,7 @@ enum KeyChain {
             kSecClass as String       : kSecClassGenericPassword as String,
             kSecAttrSynchronizable as String : kCFBooleanTrue!,
             kSecAttrAccessible as String : kSecAttrAccessibleAfterFirstUnlock,
-            kSecAttrAccessGroup as String: "YZHG975W3A.com.blockchaincommons.sharedItems",
+            kSecAttrAccessGroup as String: "YZHG975W3A.com.blockchaincommons.GordianSigner",
             kSecAttrAccount as String : forKey,
             kSecValueData as String   : data ] as [String : Any]
 
@@ -41,7 +41,7 @@ enum KeyChain {
             kSecReturnData as String  : kCFBooleanTrue!,
             kSecAttrAccessible as String : kSecAttrAccessibleAfterFirstUnlock,
             kSecAttrSynchronizable as String : kCFBooleanTrue!,
-            kSecAttrAccessGroup as String: "YZHG975W3A.com.blockchaincommons.sharedItems",
+            kSecAttrAccessGroup as String: "YZHG975W3A.com.blockchaincommons.GordianSigner",
             kSecMatchLimit as String  : kSecMatchLimitOne ] as [String : Any]
 
         var dataTypeRef: AnyObject? = nil

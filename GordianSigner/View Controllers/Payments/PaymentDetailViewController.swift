@@ -19,12 +19,21 @@ class PsbtTableViewController: UIViewController, UITableViewDelegate, UITableVie
     var rawTx = ""
     var psbtStruct:PsbtStruct!
     var psbt:PSBT!
+    var signedPsbt:PSBT!
     private var canSign = false
     private var alertStyle = UIAlertController.Style.actionSheet
     var inputsArray = [[String:Any]]()
     var outputsArray = [[String:Any]]()
     var signedFor = [String]()
     var accounts = [AccountStruct]()
+    var isComplete = false
+    var providedMnemonic = ""
+    var shouldSign = false
+    var cosignerThatShouldSign:CosignerStruct?
+    private var qrHeader = ""
+    private var qrDescription = ""
+    private var qrText = ""
+    private var showPsbtQr = false
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -42,16 +51,12 @@ class PsbtTableViewController: UIViewController, UITableViewDelegate, UITableVie
                 
         psbt = try? PSBT(psbt: psbtStruct.psbt, network: Keys.chain)
         
-        if let psbtToFinalize = try? psbt.finalized() {
-            if psbtToFinalize.isComplete {
-                if let final = psbtToFinalize.transactionFinal {
-                    if let hex = final.description {
-                        self.rawTx = hex
-                    }
-                }
-            }
-        }
+        NotificationCenter.default.addObserver(self, selector: #selector(refresh), name: .cosignerAdded, object: nil)
         
+        loadTable()
+    }
+    
+    @objc func refresh() {
         loadTable()
     }
     
@@ -91,6 +96,12 @@ class PsbtTableViewController: UIViewController, UITableViewDelegate, UITableVie
                         }
                     }
                 }
+            }
+        }
+        
+        if let final = try? psbt.finalized() {
+            if let _ = final.transactionFinal {
+                self.isComplete = true
             }
         }
         
@@ -162,10 +173,11 @@ class PsbtTableViewController: UIViewController, UITableViewDelegate, UITableVie
                             let fullPath = pubkeyDict["fullPath"] as! BIP32Path
                             updatedDict["hasSigned"] = false
                             updatedDict["canSign"] = false
+                            updatedDict["isHot"] = false
                             
                             func loopCosigners() {
-                                for (k, keyset) in cosigners.enumerated() {
-                                    let cosignerStruct = CosignerStruct(dictionary: keyset)
+                                for (k, cosignerDict) in cosigners.enumerated() {
+                                    let cosignerStruct = CosignerStruct(dictionary: cosignerDict)
                                     
                                     if let descriptor = cosignerStruct.bip48SegwitAccount {
                                         let arr = descriptor.split(separator: "]")
@@ -179,6 +191,25 @@ class PsbtTableViewController: UIViewController, UITableViewDelegate, UITableVie
                                             let hdkey = try? HDKey(base58: xpub),
                                             let childKey = try? hdkey.derive(using: path) {
                                             if originalPubkey == childKey.pubKey.data.hexString {
+                                                
+                                                updatedDict["cosignerStruct"] = cosignerStruct
+                                                updatedDict["canSign"] = true
+                                                
+                                                if cosignerStruct.xprv != nil || cosignerStruct.words != nil {
+                                                    updatedDict["isHot"] = true
+                                                    self.canSign = true
+                                                } else {
+                                                    updatedDict["isHot"] = false
+                                                }
+                                                
+                                                if let shouldSignPayment = cosignerStruct.shouldSign {
+                                                    if shouldSignPayment {
+                                                        if cosignerStruct.xprv == nil && cosignerStruct.words == nil {
+                                                            updatedDict["shouldSign"] = true
+                                                        }
+                                                    }
+                                                }
+                                                
                                                 updatedDict["cosignerLabel"] = cosignerStruct.label
                                                 updatedDict["lifeHash"] = LifeHash.image(cosignerStruct.lifehash) ?? UIImage()
                                                 
@@ -208,6 +239,7 @@ class PsbtTableViewController: UIViewController, UITableViewDelegate, UITableVie
                                                                 
                                                                 if signed == originalPubkey {
                                                                     updatedDict["hasSigned"] = true
+                                                                    updatedDict["shouldSign"] = false
                                                                     pubkeyArray[p] = updatedDict
                                                                     self.inputsArray[i]["pubKeyArray"] = pubkeyArray
                                                                 }
@@ -265,49 +297,7 @@ class PsbtTableViewController: UIViewController, UITableViewDelegate, UITableVie
                                 }
                             }
                             
-                            CoreDataService.retrieveEntity(entityName: .cosigner) { (cosigners, errorDescription) in
-                                if let cosigners = cosigners, cosigners.count > 0 {
-
-                                    for (s, cosigner) in cosigners.enumerated() {
-                                        let cosignerStruct = CosignerStruct(dictionary: cosigner)
-                                        
-                                        if let encryptedXprv = cosignerStruct.xprv {
-                                            if let decryptedXprv = Encryption.decrypt(encryptedXprv) {
-                                                if let hdkey = try? HDKey(base58: decryptedXprv.utf8) {
-                                                    if let accountPath = try? fullPath.chop(depth: 4) {
-                                                        if let childKey = try? hdkey.derive(using: accountPath) {
-                                                            if childKey.pubKey.data.hexString == originalPubkey {
-                                                                self.canSign = true
-                                                                updatedDict["canSign"] = true
-                                                            }
-                                                        }
-                                                    }
-                                                }
-                                            }
-                                        }
-                                        
-                                        if let encryptedXprv = cosignerStruct.masterKey {
-                                            if let decryptedXprv = Encryption.decrypt(encryptedXprv) {
-                                                if let hdkey = try? HDKey(base58: decryptedXprv.utf8) {
-                                                    if let childKey = try? hdkey.derive(using: fullPath) {
-                                                        if childKey.pubKey.data.hexString == originalPubkey {
-                                                            self.canSign = true
-                                                            updatedDict["canSign"] = true
-                                                        }
-                                                    }
-                                                }
-                                            }
-                                        }
-                                        
-                                        if s + 1 == cosigners.count {
-                                            loopCosigners()
-                                        }
-                                    }
-                                } else {
-                                    loopCosigners()
-                                }
-                            }
-
+                            loopCosigners()
                         }
                     } else {
                         self.parseOutputs(completion: completion)
@@ -318,19 +308,49 @@ class PsbtTableViewController: UIViewController, UITableViewDelegate, UITableVie
     }
     
     private func updateButton() {
-        for input in inputsArray {
+        var shouldPromptForRequest = false
+        var potentialSigner:CosignerStruct!
+        var shouldShowSignButton = false
+        
+        for (i, input) in inputsArray.enumerated() {
             if let pubkeyArray = input["pubKeyArray"] as? [[String:Any]] {
-                for pubkey in pubkeyArray {
+                for (p, pubkey) in pubkeyArray.enumerated() {
                     let canSign = pubkey["canSign"] as? Bool ?? false
                     let hasSigned = pubkey["hasSigned"] as? Bool ?? false
+                    let shouldSign = pubkey["shouldSign"] as? Bool ?? false
+                    let cosignerStruct = pubkey["cosignerStruct"] as? CosignerStruct
+                    
+                    guard let fullpath = pubkey["fullPath"] as? BIP32Path else {
+                        showAlert(self, "", "No bip32 derivation in provided input.")
+                        
+                        return
+                    }
                     
                     if canSign {
                         if !hasSigned {
+                            if self.canSign {
+                                shouldShowSignButton = true
+                            }
+                            
+                            if shouldSign {
+                                shouldPromptForRequest = true
+                                potentialSigner = cosignerStruct
+                                self.cosignerThatShouldSign = potentialSigner
+                            }
+                        }
+                    }
+                    
+                    if p + 1 == pubkeyArray.count && i + 1 == inputsArray.count {
+                        if shouldShowSignButton {
                             DispatchQueue.main.async { [weak self] in
                                 guard let self = self else { return }
                                 
                                 self.signButtonOutlet.alpha = 1
                             }
+                        }
+                        
+                        if shouldPromptForRequest {
+                            self.promptToRequest(potentialSigner, fullpath.description)
                         }
                     }
                 }
@@ -414,7 +434,13 @@ class PsbtTableViewController: UIViewController, UITableViewDelegate, UITableVie
         #if DEBUG
         sign()
         #else
+        
+        #if targetEnvironment(simulator)
+        sign()
+        #else
         showAuth()
+        #endif
+        
         #endif
     }
     
@@ -449,9 +475,9 @@ class PsbtTableViewController: UIViewController, UITableViewDelegate, UITableVie
         let cell = table.dequeueReusableCell(withIdentifier: "participantsCell", for: indexPath)
         cell.selectionStyle = .none
         
-        let lifeHashView = cell.viewWithTag(2) as! LifehashSeedView
-        let sigImage = cell.viewWithTag(3) as! UIImageView
-        let isHotImage = cell.viewWithTag(4) as! UIImageView
+        let lifeHashView = cell.viewWithTag(12) as! LifehashSeedView
+        let sigImage = cell.viewWithTag(13) as! UIImageView
+        let isHotImage = cell.viewWithTag(14) as! UIImageView
         
         lifeHashView.backgroundColor = cell.backgroundColor
         lifeHashView.background.backgroundColor = cell.backgroundColor
@@ -463,9 +489,10 @@ class PsbtTableViewController: UIViewController, UITableViewDelegate, UITableVie
             let participant = participants[indexPath.row]
             let cosignerLabel = participant["cosignerLabel"] as? String ?? "unknown"
             let hasSigned = participant["hasSigned"] as? Bool ?? false
-            let canSign = participant["canSign"] as? Bool ?? false
+            //let canSign = participant["canSign"] as? Bool ?? false
+            let isHot = participant["isHot"] as? Bool ?? false
             
-            if canSign {
+            if isHot {
                 isHotImage.image = UIImage(systemName: "flame")
                 isHotImage.tintColor = .systemOrange
             } else {
@@ -552,28 +579,26 @@ class PsbtTableViewController: UIViewController, UITableViewDelegate, UITableVie
         
         let label = cell.viewWithTag(1) as! UILabel
         let icon = cell.viewWithTag(2) as! UIImageView
+        let addCosignerButton = cell.viewWithTag(3) as! UIButton
         
-        if let psbtToFinalize = try? psbt.finalized() {
-            if psbtToFinalize.isComplete {
-                label.text = "Signatures complete"
-                icon.image = UIImage(systemName: "checkmark.square")
-                icon.tintColor = .systemGreen
-            } else {
-                label.text = "Signatures required"
-                icon.image = UIImage(systemName: "exclamationmark.square")
-                icon.tintColor = .systemPink
-            }
+        addCosignerButton.addTarget(self, action: #selector(addCosigner(_:)), for: .touchUpInside)
+        
+        if isComplete {
+            label.text = "Signatures complete"
+            icon.image = UIImage(systemName: "checkmark.square")
+            icon.tintColor = .systemGreen
+            addCosignerButton.alpha = 0
         } else {
-            if psbt.isComplete {
-                label.text = "Signatures complete"
-                icon.image = UIImage(systemName: "checkmark.square")
-                icon.tintColor = .systemGreen
+            label.text = "Signatures required"
+            icon.image = UIImage(systemName: "exclamationmark.square")
+            icon.tintColor = .systemPink
+            if !canSign {
+                addCosignerButton.alpha = 1
             } else {
-                label.text = "Signatures required"
-                icon.image = UIImage(systemName: "exclamationmark.square")
-                icon.tintColor = .systemPink
+                addCosignerButton.alpha = 0
             }
-        }        
+            
+        }
         
         return cell
     }
@@ -818,6 +843,10 @@ class PsbtTableViewController: UIViewController, UITableViewDelegate, UITableVie
         }
     }
     
+    @objc func addCosigner(_ sender: UIButton) {
+        promptToAdd()
+    }
+    
     @objc func editLabelMemo(_ sender: UIButton) {
         DispatchQueue.main.async { [weak self] in
             guard let self = self else { return }
@@ -837,28 +866,18 @@ class PsbtTableViewController: UIViewController, UITableViewDelegate, UITableVie
                 return
             }
             
-            self.signedFor = signedFor
-            
-            self.save(signedPsbt)
-            
-            if let psbtToFinalize = try? signedPsbt.finalized() {
-                if psbtToFinalize.isComplete {
-                    if let final = psbtToFinalize.transactionFinal {
-                        if let hex = final.description {
-                            self.rawTx = hex
-                        }
-                    }
-                }
-            }
-            
             DispatchQueue.main.async { [weak self] in
                 guard let self = self else { return }
                 
+                self.signedFor = signedFor
+                self.save(signedPsbt)
                 self.psbt = signedPsbt
                 self.signButtonOutlet.alpha = 0
+                
                 self.load { success in
                     DispatchQueue.main.async { [weak self] in
                         guard let self = self else { return }
+                        
                         self.tableView.reloadData()
                         self.spinner.remove()
                         showAlert(self, "Payment Signed ✓", "The signed payment has been saved. Export it by tapping the share button in top right.")
@@ -948,7 +967,13 @@ class PsbtTableViewController: UIViewController, UITableViewDelegate, UITableVie
     }
     
     private func exportAsQR() {
-        DispatchQueue.main.async {
+        DispatchQueue.main.async { [weak self] in
+            guard let self = self else { return }
+            
+            self.qrHeader = "Payment"
+            self.qrDescription = ""
+            self.showPsbtQr = true
+            self.qrText = self.psbt.description
             self.performSegue(withIdentifier: "segueToQRDisplayer", sender: self)
         }
     }
@@ -967,6 +992,143 @@ class PsbtTableViewController: UIViewController, UITableViewDelegate, UITableVie
         }
     }
     
+    private func promptToRequest(_ cosignerToRequest: CosignerStruct, _ path: String) {
+        DispatchQueue.main.async { [weak self] in
+            guard let self = self else { return }
+            
+            var alertStyle = UIAlertController.Style.actionSheet
+            
+            if (UIDevice.current.userInterfaceIdiom == .pad) {
+                alertStyle = UIAlertController.Style.alert
+            }
+            
+            let alert = UIAlertController(title: "Private Key Request", message: "\(cosignerToRequest.label) needs a private key to sign this payment.", preferredStyle: alertStyle)
+            
+            alert.addAction(UIAlertAction(title: "Request Key", style: .default, handler: { action in
+                self.requestKey(cosignerToRequest, path)
+            }))
+            
+            alert.addAction(UIAlertAction(title: "Cancel", style: .cancel, handler: { action in }))
+            alert.popoverPresentationController?.sourceView = self.view
+            self.present(alert, animated: true, completion: nil)
+        }
+    }
+    
+    private func requestKey(_ cosignerToRequest: CosignerStruct, _ path: String) {
+        
+        guard let request = URHelper.requestSigningKey(cosignerToRequest.bip48SegwitAccount!, "Gordian Cosigner needs a private key from \(cosignerToRequest.label) to sign a payment.", path) else {
+            
+            return
+        }
+        
+        DispatchQueue.main.async { [weak self] in
+            guard let self = self else { return }
+            
+            self.showPsbtQr = false
+            self.qrText = request
+            self.qrHeader = "Private Key Request"
+            self.qrDescription = request
+            self.performSegue(withIdentifier: "segueToQRDisplayer", sender: self)
+        }
+    }
+    
+    private func promptToAdd() {
+        DispatchQueue.main.async { [weak self] in
+            guard let self = self else { return }
+            
+            var alertStyle = UIAlertController.Style.actionSheet
+            if (UIDevice.current.userInterfaceIdiom == .pad) {
+                alertStyle = UIAlertController.Style.alert
+            }
+            
+            let alert = UIAlertController(title: "Add Cosigner", message: "You will need to add a private key Cosigner in order to be able to sign this payment.", preferredStyle: alertStyle)
+            
+            alert.addAction(UIAlertAction(title: "Scan QR", style: .default, handler: { action in
+                DispatchQueue.main.async { [weak self] in
+                    guard let self = self else { return }
+                    
+                    self.performSegue(withIdentifier: "segueToScanCosigner", sender: self)
+                }
+            }))
+            
+            alert.addAction(UIAlertAction(title: "Paste", style: .default, handler: { action in
+                self.getPasteboard()
+            }))
+            
+            alert.addAction(UIAlertAction(title: "Cancel", style: .cancel, handler: { action in }))
+            alert.popoverPresentationController?.sourceView = self.view
+            self.present(alert, animated: true, completion: nil)
+        }
+    }
+    
+    private func getPasteboard() {
+        guard let text = UIPasteboard.general.string else { return }
+        if text.hasPrefix("ur:crypto-account") {
+            guard let cosigner = URHelper.accountUrToCosigner(text.lowercased().condenseWhitespace()) else { return }
+            
+            promptToAddCosigner(cosigner)
+        } else if text.hasPrefix("ur:crypto-hdkey") {
+            guard let cosigner = URHelper.urHdkeyToCosigner(text.lowercased().condenseWhitespace()) else {
+                showAlert(self, "", "Unsupported key, we only support Bitcoin mainnet/testnet hdkeys.")
+                return
+            }
+            
+            promptToAddCosigner(cosigner)
+        } else if text.lowercased().contains("ur:crypto-seed") {
+            guard let mnemonic = URHelper.cryptoSeedToMnemonic(cryptoSeed: text.lowercased()) else { return }
+            self.providedMnemonic = mnemonic
+            self.addSeedWords()
+        } else if text.contains("48h/\(Keys.coinType)h/0h/2h") || text.contains("48'/\(Keys.coinType)'/0'/2'") {
+            self.addCosignerNow(text.condenseWhitespace())
+        } else if Keys.validMnemonicString(processedCharacters(text)) {
+            self.providedMnemonic = processedCharacters(text)
+            self.addSeedWords()
+        } else {
+            showAlert(self, "", "Invalid cosigner text, we accept UR crypto-account or [<fingerprint>/48h/\(Keys.coinType)h/0h/2h]tpub.....")
+        }
+    }
+    
+    private func promptToAddCosigner(_ cosigner: String) {
+        DispatchQueue.main.async { [weak self] in
+            guard let self = self else { return }
+            
+            var alertStyle = UIAlertController.Style.actionSheet
+            if (UIDevice.current.userInterfaceIdiom == .pad) {
+                alertStyle = UIAlertController.Style.alert
+            }
+            
+            let alert = UIAlertController(title: "Import Cosigner?", message: "You have a valid cosigner on your clipboard, would you like to import it?", preferredStyle: alertStyle)
+            
+            alert.addAction(UIAlertAction(title: "Yes", style: .default, handler: { action in
+                self.addCosignerNow(cosigner)
+            }))
+            
+            alert.addAction(UIAlertAction(title: "Cancel", style: .cancel, handler: { action in }))
+            alert.popoverPresentationController?.sourceView = self.view
+            self.present(alert, animated: true, completion: nil)
+        }
+    }
+    
+    private func addCosignerNow(_ cosigner: String) {
+        AddCosigner.add(cosigner) { (success, message, errorDesc, savedNew, cosignerStruct) in
+            guard success else {
+                showAlert(self, message, errorDesc ?? "")
+                return
+            }
+            
+            showAlert(self, "Cosigner Added ✓", "")
+            self.loadTable()
+        }
+    }
+    
+    private func addSeedWords() {
+        DispatchQueue.main.async { [weak self] in
+            guard let self = self else { return }
+            
+            self.performSegue(withIdentifier: "segueToSign", sender: self)
+        }
+    }
+    
     // MARK: - Navigation
 
     // In a storyboard-based application, you will often want to do a little preparation before navigation
@@ -975,19 +1137,69 @@ class PsbtTableViewController: UIViewController, UITableViewDelegate, UITableVie
         // Pass the selected object to the new view controller.
         if segue.identifier == "segueToQRDisplayer" {
             if let vc = segue.destination as? QRDisplayerViewController {
-                vc.text = psbt.description
-                vc.isPsbt = true
+                vc.text = qrText//psbt.description
+                vc.isPsbt = showPsbtQr
+                vc.header = qrHeader
+                vc.descriptionText = qrDescription
+                
+                vc.cosignerDoneBlock = { [weak self] result in
+                    guard let self = self else { return }
+                    
+                    guard let result = result else { return }
+                    
+                    if result.bip48SegwitAccount! == self.cosignerThatShouldSign!.bip48SegwitAccount! {
+                        showAlert(self, "", "Cosigner updated with the correct private key ✓. Tap the sign now button.")
+                        
+                        self.loadTable()
+                    } else {
+                        showAlert(self, "", "Invalid response.")
+                    }
+                }
+                
+                vc.wifDoneBlock = { [weak self] result in
+                    guard let self = self else { return }
+                    
+                    guard let result = result else { return }
+                    
+                    var network:Network = .testnet
+                    
+                    if Keys.coinType == "0" {
+                        network = .mainnet
+                    }
+                    
+                    guard let key = try? Key(wif: result, network: network) else { return }
+                                        
+                    guard let signedPsbt = try? self.psbt.signed(with: key) else { return }
+                    
+                    DispatchQueue.main.async { [weak self] in
+                        guard let self = self else { return }
+                        
+                        self.save(signedPsbt)
+                        self.psbt = signedPsbt
+                        self.signButtonOutlet.alpha = 0
+                        
+                        self.load { success in
+                            DispatchQueue.main.async { [weak self] in
+                                guard let self = self else { return }
+                                
+                                self.tableView.reloadData()
+                                self.spinner.remove()
+                                showAlert(self, "Payment Signed ✓", "The signed payment has been saved. Export it by tapping the share button in top right.")
+                            }
+                        }
+                    }
+                }
             }
         }
         
         if segue.identifier == "segueToSign" {
             if let vc = segue.destination as? AddSignerViewController {
-                vc.tempWords = true
+                vc.providedMnemonic = self.providedMnemonic
                 
                 vc.doneBlock = { [weak self] in
                     guard let self = self else { return }
                     
-                    self.showAuth()
+                    self.loadTable()
                 }
             }
         }

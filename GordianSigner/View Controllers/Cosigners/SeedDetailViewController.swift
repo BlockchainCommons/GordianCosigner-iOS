@@ -13,6 +13,7 @@ class SeedDetailViewController: UIViewController, UITextFieldDelegate, UITextVie
     var cosigner:CosignerStruct!
     private var qrText = ""
     private var qrDescription = ""
+    private var qrHeader = ""
     let dp = DescriptorParser()
     var desc = ""
     var descStruct:Descriptor!
@@ -39,6 +40,7 @@ class SeedDetailViewController: UIViewController, UITextFieldDelegate, UITextVie
     @IBOutlet weak var mnemonicQr: UIButton!
     @IBOutlet weak var mnemonicCopy: UIButton!
     @IBOutlet weak var memoView: UITextView!
+    @IBOutlet weak var shouldSignSwitch: UISwitch!
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -58,6 +60,63 @@ class SeedDetailViewController: UIViewController, UITextFieldDelegate, UITextVie
         NotificationCenter.default.addObserver(self, selector: #selector(keyboardWillHide), name: UIResponder.keyboardWillHideNotification, object: nil)
         load()
     }
+    
+    @IBAction func switchAction(_ sender: Any) {
+        if shouldSignSwitch.isOn {
+            // update entity
+            CoreDataService.updateEntity(id: cosigner.id, keyToUpdate: "shouldSign", newValue: true, entityName: .cosigner) { (success, errorDescription) in
+                guard success else {
+                    showAlert(self, "", "There was an issue updating your cosigner, please let us know about it.")
+                    return
+                }
+            }
+            
+            promptToCreateRequest()
+            
+        } else {
+            if cosigner.xprv != nil || cosigner.words != nil {
+                showAlert(self, "", "First you need to delete the private key and seed.")
+                self.shouldSignSwitch.isOn = true
+            } else {
+                CoreDataService.updateEntity(id: cosigner.id, keyToUpdate: "shouldSign", newValue: false, entityName: .cosigner) { (success, errorDescription) in
+                    guard success else {
+                        showAlert(self, "", "There was an issue updating your cosigner, please let us know about it.")
+                        return
+                    }
+                }
+                
+                showAlert(self, "", "Cosigner updated ✓")
+            }
+        }
+    }
+    
+    private func promptToCreateRequest() {
+        DispatchQueue.main.async { [weak self] in
+            guard let self = self else { return }
+            
+            let alert = UIAlertController(title: "Request Private Key (xprv)?", message: "This setting lets us know you expect to sign payments with this Cosigner. You can either create a request for the extended private key now which will allow you to sign all future payments or you will be automatically prompted when adding a payment which can be signed with this key to create a request for children of this extended private key.", preferredStyle: .alert)
+            
+            alert.addAction(UIAlertAction(title: "Request Extended Private Key", style: .default, handler: { action in
+                guard let request = URHelper.requestXprv(self.cosigner.bip48SegwitAccount!, "Gordian Cosigner needs a private key from \(self.cosigner.label) to sign a payment") else {
+                    showAlert(self, "", "There was an issue creating the key request, please let us know about it.")
+                    return
+                }
+                
+                self.qrDescription = request
+                self.qrText = request
+                self.qrHeader = "Private Key Request"
+                self.goToQr()
+            }))
+            
+            alert.addAction(UIAlertAction(title: "Request Child Keys Automatically", style: .default, handler: { action in }))
+                            
+            alert.addAction(UIAlertAction(title: "Cancel", style: .cancel, handler: { action in }))
+            
+            alert.popoverPresentationController?.sourceView = self.view
+            self.present(alert, animated: true, completion: nil)
+        }
+    }
+    
     
     func textViewShouldBeginEditing(_ textView: UITextView) -> Bool {
         memoEditing = true
@@ -100,7 +159,7 @@ class SeedDetailViewController: UIViewController, UITextFieldDelegate, UITextVie
             DispatchQueue.main.async { [weak self] in
                 guard let self = self else { return }
                 
-                self.pubCosigner = URHelper.cosignerToUr(self.cosigner.bip48SegwitAccount ?? "", false) ?? ""
+                self.pubCosigner = URHelper.cosignerToUrHdkey(self.cosigner.bip48SegwitAccount ?? "", false) ?? ""
                 self.coSignerLabel.text = self.pubCosigner
             }
             
@@ -108,7 +167,8 @@ class SeedDetailViewController: UIViewController, UITextFieldDelegate, UITextVie
                 DispatchQueue.main.async { [weak self] in
                     guard let self = self else { return }
                     
-                    self.privCosigner = URHelper.cosignerToUr(self.privCosigner, true) ?? ""
+                    self.shouldSignSwitch.isOn = true
+                    self.privCosigner = URHelper.cosignerToUrHdkey(self.privCosigner, true) ?? ""
                     self.xprvLabel.text = self.privCosigner
                 }
             }
@@ -119,6 +179,7 @@ class SeedDetailViewController: UIViewController, UITextFieldDelegate, UITextVie
                 DispatchQueue.main.async { [weak self] in
                     guard let self = self else { return }
                     
+                    self.shouldSignSwitch.isOn = true
                     self.mnemonicLabel.text = cryptoSeed
                 }
             }
@@ -136,6 +197,8 @@ class SeedDetailViewController: UIViewController, UITextFieldDelegate, UITextVie
                 DispatchQueue.main.async { [weak self] in
                     guard let self = self else { return }
                     
+                    self.shouldSignSwitch.isOn = true
+                    
                     self.privCosigner = self.cosigner.bip48SegwitAccount!.replacingOccurrences(of: self.descStruct.accountXpub, with: decryptedXprv.utf8)
                     
                     self.xprvLabel.text = decryptedXprv.utf8
@@ -147,6 +210,8 @@ class SeedDetailViewController: UIViewController, UITextFieldDelegate, UITextVie
                             
                 DispatchQueue.main.async { [weak self] in
                     guard let self = self else { return }
+                    
+                    self.shouldSignSwitch.isOn = true
                     
                     self.mnemonicLabel.text = decryptedWords.utf8
                 }
@@ -221,6 +286,7 @@ class SeedDetailViewController: UIViewController, UITextFieldDelegate, UITextVie
     
     @IBAction func showQrMnemonic(_ sender: Any) {
         if cosigner.words != nil {
+            qrHeader = cosigner.label
             qrText = mnemonicLabel.text ?? ""
             qrDescription = mnemonicLabel.text ?? ""
             goToQr()
@@ -249,6 +315,7 @@ class SeedDetailViewController: UIViewController, UITextFieldDelegate, UITextVie
     
     @IBAction func showQrXprv(_ sender: Any) {
         if cosigner.xprv != nil {
+            qrHeader = cosigner.label
             qrText = privCosigner
             qrDescription = privCosigner
             goToQr()
@@ -288,7 +355,8 @@ class SeedDetailViewController: UIViewController, UITextFieldDelegate, UITextVie
         share(pubCosigner)
     }
     
-    @IBAction func showCosignerQr(_ sender: Any) {        
+    @IBAction func showCosignerQr(_ sender: Any) {
+        qrHeader = cosigner.label
         qrText = self.pubCosigner
         qrDescription = self.pubCosigner
         goToQr()
@@ -331,6 +399,12 @@ class SeedDetailViewController: UIViewController, UITextFieldDelegate, UITextVie
     }
     
     private func load() {
+        DispatchQueue.main.async { [weak self] in
+            guard let self = self else { return }
+            
+            self.shouldSignSwitch.isOn = false
+        }
+        
         memoView.text = cosigner.memo ?? "tap to add a memo"
         
         if let words = cosigner.words {
@@ -339,7 +413,15 @@ class SeedDetailViewController: UIViewController, UITextFieldDelegate, UITextVie
             DispatchQueue.main.async { [weak self] in
                 guard let self = self else { return }
                 
+                self.shouldSignSwitch.isOn = true
+                
                 self.mnemonicLabel.text = cryptoSeed
+                
+                self.mnemonicCopy.alpha = 1
+                self.mnemonicQr.alpha = 1
+                self.mnemonicExport.alpha = 1
+                self.mnemonicDelete.alpha = 1
+                self.mnemonicHeader.alpha = 1
             }
         } else {
             self.mnemonicCopy.alpha = 0
@@ -355,7 +437,7 @@ class SeedDetailViewController: UIViewController, UITextFieldDelegate, UITextVie
         DispatchQueue.main.async { [weak self] in
             guard let self = self else { return }
             
-            self.pubCosigner = URHelper.cosignerToUr(self.cosigner.bip48SegwitAccount ?? "", false) ?? ""
+            self.pubCosigner = URHelper.cosignerToUrHdkey(self.cosigner.bip48SegwitAccount ?? "", false) ?? ""
             self.coSignerLabel.text = self.pubCosigner
         }
         
@@ -365,8 +447,15 @@ class SeedDetailViewController: UIViewController, UITextFieldDelegate, UITextVie
             DispatchQueue.main.async { [weak self] in
                 guard let self = self else { return }
                 
-                self.privCosigner = URHelper.cosignerToUr("[\(self.descStruct.fingerprint)/48h/\(Keys.coinType)h/0h/2h]\(decryptedXprv.utf8)", true) ?? ""//
+                self.shouldSignSwitch.isOn = true
+                self.privCosigner = URHelper.cosignerToUrHdkey("[\(self.descStruct.fingerprint)/48h/\(Keys.coinType)h/0h/2h]\(decryptedXprv.utf8)", true) ?? ""
                 self.xprvLabel.text = self.privCosigner
+                
+                self.privKeyHeader.alpha = 1
+                self.privKeyDelete.alpha = 1
+                self.privKeyShare.alpha = 1
+                self.privKeyCopy.alpha = 1
+                self.privKeyQr.alpha = 1
             }
         } else {
             self.privKeyHeader.alpha = 0
@@ -382,6 +471,14 @@ class SeedDetailViewController: UIViewController, UITextFieldDelegate, UITextVie
         
         
         originLabel.text = "\(descStruct.fingerprint)/48h/\(Keys.coinType)h/0h/2h"
+        
+        guard let shouldSign = cosigner.shouldSign else { return }
+        
+        DispatchQueue.main.async { [weak self] in
+            guard let self = self else { return }
+            
+            self.shouldSignSwitch.isOn = shouldSign
+        }
     }
     
     func textFieldShouldReturn(_ textField: UITextField) -> Bool {
@@ -443,9 +540,28 @@ class SeedDetailViewController: UIViewController, UITextFieldDelegate, UITextVie
         if segue.identifier == "segueToCosignerQr" {
             if let vc = segue.destination as? QRDisplayerViewController {
                 vc.descriptionText = qrDescription
-                vc.header = cosigner.label
+                vc.header = qrHeader
                 vc.isPsbt = false
                 vc.text = qrText
+                
+                vc.cosignerDoneBlock = { [weak self] signer in
+                    guard let self = self else { return }
+                    
+                    guard let addedSigner = signer else { return }
+                    
+                    if addedSigner.bip48SegwitAccount! == self.cosigner!.bip48SegwitAccount! {
+                        showAlert(self, "", "Cosigner updated with the correct private key ✓")
+                                                
+                        DispatchQueue.main.async { [weak self] in
+                            guard let self = self else { return }
+                            
+                            self.cosigner = addedSigner
+                            self.desc = "wsh(" + self.cosigner.bip48SegwitAccount! + "/0/*)"
+                            self.descStruct = self.dp.descriptor(self.desc)
+                            self.load()
+                        }
+                    }
+                }
             }
         }
     }

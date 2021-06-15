@@ -22,6 +22,7 @@ public struct CosignerStruct: CustomStringConvertible {
     let lifehash:Data
     let masterKey:Data?
     let memo:String?
+    let shouldSign:Bool?
     
     init(dictionary: [String: Any]) {
         id = dictionary["id"] as! UUID
@@ -36,6 +37,7 @@ public struct CosignerStruct: CustomStringConvertible {
         lifehash = dictionary["lifehash"] as! Data
         masterKey = dictionary["masterKey"] as? Data
         memo = dictionary["memo"] as? String
+        shouldSign = dictionary["shouldSign"] as? Bool
     }
     
     public var description: String {

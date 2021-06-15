@@ -78,7 +78,7 @@ class InfoViewController: UIViewController {
     
     private func setCosigner() {
         let text = """
-        A cosigner is an individual or a device that can be used to create multisignatures accounts.
+        Cosigners represent the individuals or devices that can be used to create multisignature accounts.
 
         To add a cosigner, choose IMPORT to paste an xpub with origin info, crypto-account, crypto-hdkey, crypto-seed, or bip39 words, or scan a QR code. This must be done for everyone who will be participating in a multisignature account. When you are done, proceed to the accounts tab to combine cosigners into a multisignature account.
         

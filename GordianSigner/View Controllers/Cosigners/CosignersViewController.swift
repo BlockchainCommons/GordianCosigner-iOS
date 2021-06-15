@@ -9,8 +9,9 @@
 import UIKit
 import LibWally
 
-class KeysetsViewController: UIViewController, UITableViewDelegate, UITableViewDataSource {
+class KeysetsViewController: UIViewController, UITableViewDelegate, UITableViewDataSource, UINavigationControllerDelegate {
     
+    let shardRecovery = ShardRecovery.shared
     var addButton = UIBarButtonItem()
     var editButton = UIBarButtonItem()
     private var cosigners = [CosignerStruct]()
@@ -31,6 +32,7 @@ class KeysetsViewController: UIViewController, UITableViewDelegate, UITableViewD
         // Do any additional setup after loading the view.
         keysetsTable.delegate = self
         keysetsTable.dataSource = self
+        navigationController?.delegate = self
         
         if KeyChain.getData("hasUpdated") == nil {
             KeyChain.removeAll()
@@ -38,8 +40,7 @@ class KeysetsViewController: UIViewController, UITableViewDelegate, UITableViewD
             CoreDataService.deleteAllData(entity: .cosigner) { (_) in }
             CoreDataService.deleteAllData(entity: .payment) { (_) in }
             UserDefaults.standard.setValue(true, forKey: "hasUpdated")
-            KeyChain.set("true".utf8, forKey: "hasUpdated")
-            //showAlert(self, "", "This update is not backwards compatible and all existing data has been deleted to allow for iCloud backups across devices.")
+            let _ = KeyChain.set("true".utf8, forKey: "hasUpdated")
         }
         
         if !FirstTime.firstTimeHere() {
@@ -50,12 +51,18 @@ class KeysetsViewController: UIViewController, UITableViewDelegate, UITableViewD
         editButton = UIBarButtonItem.init(barButtonSystemItem: .edit, target: self, action: #selector(editCosigners))
         self.navigationItem.setRightBarButtonItems([addButton, editButton], animated: true)
         NotificationCenter.default.addObserver(self, selector: #selector(refreshTable), name: .cosignerAdded, object: nil)
+        NotificationCenter.default.addObserver(self, selector: #selector(cosignerDeepLink), name: .cosignerDeeplink, object: nil)
         
         if UserDefaults.standard.object(forKey: "coinType") == nil {
             UserDefaults.standard.setValue("0", forKey: "coinType")
         }
         
         load()
+        
+        if UserDefaults.standard.object(forKey: "hasUpdatedShouldSign") == nil {
+            updateCosignersForShouldSign()
+            UserDefaults.standard.setValue(true, forKey: "hasUpdatedShouldSign")
+        }
     }
     
     override func viewDidAppear(_ animated: Bool) {
@@ -75,6 +82,129 @@ class KeysetsViewController: UIViewController, UITableViewDelegate, UITableViewD
         }
     }
     
+    @objc func cosignerDeepLink(_ notification: NSNotification) {
+        guard let accountDict = notification.userInfo as? [String:Any], let account = accountDict["account"] as? String else {
+            return
+        }
+        
+        DispatchQueue.main.async { [weak self] in
+            guard let self = self else { return }
+            
+            let alertStyle = UIAlertController.Style.alert
+            
+            let message = "Another app shared a cosigner. Would you like to save it?"
+            
+            let alert = UIAlertController(title: "Cosigner Shared", message: message, preferredStyle: alertStyle)
+            
+            alert.addAction(UIAlertAction(title: "Save", style: .default, handler: { [weak self] action in
+                guard let self = self else { return }
+                
+                self.addCosigner(account)
+            }))
+            
+            alert.addAction(UIAlertAction(title: "Cancel", style: .cancel, handler: { action in }))
+            
+            alert.popoverPresentationController?.sourceView = self.view
+            alert.popoverPresentationController?.sourceRect = self.view.bounds
+            self.present(alert, animated: true, completion: nil)
+        }
+    }
+    
+    private func processShardUr(_ shardUr: String) {
+        let (isValid, alreadyAdded, s) = shardRecovery.parseUr(shardUr)
+        
+        if isValid && !alreadyAdded {
+            if let shardStruct = shardRecovery.parseShard(s) {                
+                shardRecovery.shards.append(shardStruct)
+                
+                let (complete, entropy, totalRemaining) = shardRecovery.processShard(shardStruct)
+                                
+                if !complete {
+                    self.promptToImportAnotherShard(totalRemaining)
+                } else if entropy != nil {
+                    self.shardRecovery.reset()
+                    self.deriveMnemonicFromEntropy(entropy!)
+                } else {
+                    self.shardRecovery.reset()
+                    showAlert(self, "Error!", "There was an error converting those shards to entropy.")
+                }
+            }
+        }
+    }
+    
+    private func promptToImportAnotherShard(_ totalSharesRemainingInGroup: Int) {
+        DispatchQueue.main.async { [weak self] in
+            guard let self = self else { return }
+            
+            var alertStyle = UIAlertController.Style.actionSheet
+            
+            if (UIDevice.current.userInterfaceIdiom == .pad) {
+              alertStyle = UIAlertController.Style.alert
+            }
+            
+            var message = "You still need \(totalSharesRemainingInGroup) more shards from this group."
+            
+            if totalSharesRemainingInGroup == 0 {
+                message = "You need to add more shards from another group."
+            }
+            
+            let alert = UIAlertController(title: "Valid SSKR shard scanned ✓", message: message, preferredStyle: alertStyle)
+            
+            alert.addAction(UIAlertAction(title: "Scan another shard", style: .default, handler: { action in
+                self.segueToScanner()
+            }))
+            
+            alert.addAction(UIAlertAction(title: "Paste another shard", style: .default, handler: { action in
+                self.getPasteboard()
+            }))
+            
+            alert.addAction(UIAlertAction(title: "Cancel", style: .cancel, handler: { action in }))
+            
+            alert.popoverPresentationController?.sourceView = self.view
+            alert.popoverPresentationController?.sourceRect = self.view.bounds
+            self.present(alert, animated: true, completion: nil)
+        }
+    }
+    
+    private func deriveMnemonicFromEntropy(_ entropy: Data) {
+        let recoveredEntropy = BIP39Mnemonic.Entropy(entropy)
+        
+        guard let mnemonic = try? BIP39Mnemonic(entropy: recoveredEntropy) else {
+            showAlert(self, "", "That is not a valid bip39 mnemonic.")
+            return
+        }
+        
+        providedMnemonic = mnemonic.description
+        addSeedWords()
+    }
+    
+    @IBAction func scanQrAction(_ sender: Any) {
+        segueToScanner()
+    }
+    
+    
+    private func updateCosignersForShouldSign() {
+        CoreDataService.retrieveEntity(entityName: .cosigner) { [weak self] (cosigners, errorDescription) in
+            guard let self = self else { return }
+            
+            guard let cosigners = cosigners, cosigners.count > 0 else { return }
+            
+            for cosigner in cosigners {
+                let str = CosignerStruct(dictionary: cosigner)
+                
+                if str.xprv != nil || str.words != nil {
+                    self.update(str.id, true)
+                } else {
+                    self.update(str.id, false)
+                }
+            }
+        }
+    }
+    
+    private func update(_ id: UUID, _ shouldSign: Bool) {
+        CoreDataService.updateEntity(id: id, keyToUpdate: "shouldSign", newValue: shouldSign, entityName: .cosigner) { (_, _) in }
+    }
+    
     @IBAction func infoAction(_ sender: Any) {
         showInfo()
     }
@@ -89,26 +219,40 @@ class KeysetsViewController: UIViewController, UITableViewDelegate, UITableViewD
     
     private func getPasteboard() {
         guard let text = UIPasteboard.general.string else { return }
-        if text.hasPrefix("ur:crypto-account") {
-            guard let cosigner = URHelper.accountUrToCosigner(text.lowercased().condenseWhitespace()) else { return }
+        
+        let processedText = text.lowercased().condenseWhitespace()
+        
+        if processedText.hasPrefix("ur:crypto-account") {
+            guard let cosigner = URHelper.accountUrToCosigner(processedText) else { return }
             
             promptToAddCosigner(cosigner)
-        } else if text.hasPrefix("ur:crypto-hdkey") {
-            guard let cosigner = URHelper.urHdkeyToCosigner(text.lowercased().condenseWhitespace()) else {
+            
+        } else if processedText.hasPrefix("ur:crypto-hdkey") {
+            guard let cosigner = URHelper.urHdkeyToCosigner(processedText) else {
                 showAlert(self, "", "Unsupported key, we only support Bitcoin mainnet/testnet hdkeys.")
                 return
             }
             
             promptToAddCosigner(cosigner)
-        } else if text.lowercased().contains("ur:crypto-seed") {
-            guard let mnemonic = URHelper.cryptoSeedToMnemonic(cryptoSeed: text.lowercased()) else { return }
+            
+        } else if processedText.contains("ur:crypto-seed") {
+            guard let mnemonic = URHelper.cryptoSeedToMnemonic(cryptoSeed: processedText) else { return }
             self.providedMnemonic = mnemonic
             self.addSeedWords()
+            
         } else if text.contains("48h/\(coinType)h/0h/2h") || text.contains("48'/\(coinType)'/0'/2'") {
             self.addCosigner(text.condenseWhitespace())
+            
         } else if Keys.validMnemonicString(processedCharacters(text)) {
             self.providedMnemonic = processedCharacters(text)
             self.addSeedWords()
+            
+        } else if processedText.hasPrefix("ur:crypto-sskr/") {
+            self.processShardUr(processedText)
+            
+        } else if processedText.hasPrefix("ur:crypto-output/") {
+            self.parseCryptoOutput(processedText)
+            
         } else {
             showAlert(self, "", "Invalid cosigner text, we accept UR crypto-account or [<fingerprint>/48h/\(coinType)h/0h/2h]tpub.....")
         }
@@ -136,6 +280,10 @@ class KeysetsViewController: UIViewController, UITableViewDelegate, UITableViewD
     }
     
     @objc func add() {
+        promptToAdd()
+    }
+    
+    private func promptToAdd() {
         DispatchQueue.main.async { [weak self] in
             guard let self = self else { return }
             
@@ -171,11 +319,7 @@ class KeysetsViewController: UIViewController, UITableViewDelegate, UITableViewD
             }))
             
             alert.addAction(UIAlertAction(title: "Scan QR", style: .default, handler: { action in
-                DispatchQueue.main.async { [weak self] in
-                    guard let self = self else { return }
-                    
-                    self.performSegue(withIdentifier: "segueToScanKeyset", sender: self)
-                }
+                self.segueToScanner()
             }))
             
             alert.addAction(UIAlertAction(title: "Cancel", style: .cancel, handler: { action in }))
@@ -184,12 +328,19 @@ class KeysetsViewController: UIViewController, UITableViewDelegate, UITableViewD
         }
     }
     
+    private func segueToScanner() {
+        DispatchQueue.main.async { [weak self] in
+            guard let self = self else { return }
+            
+            self.performSegue(withIdentifier: "segueToScanKeyset", sender: self)
+        }
+    }
+    
     @objc func refreshTable() {
         load()
     }
     
     private func load() {
-        //spinner.add(vc: self, description: "loading...")
         cosigners.removeAll()
         accounts.removeAll()
         
@@ -205,7 +356,6 @@ class KeysetsViewController: UIViewController, UITableViewDelegate, UITableViewD
             guard let self = self else { return }
             
             guard let cosigners = cosigners, cosigners.count > 0 else {
-                //self.spinner.remove()
                 return
             }
             
@@ -218,7 +368,6 @@ class KeysetsViewController: UIViewController, UITableViewDelegate, UITableViewD
                         guard let self = self else { return }
                         
                         self.keysetsTable.reloadData()
-                        //self.spinner.remove()
                     }
                 }
             }
@@ -226,7 +375,6 @@ class KeysetsViewController: UIViewController, UITableViewDelegate, UITableViewD
     }
     
     private func refresh(_ section: Int) {
-        //spinner.add(vc: self, description: "")
         cosigners.removeAll()
         
         CoreDataService.retrieveEntity(entityName: .cosigner) { [weak self] (cosigners, errorDescription) in
@@ -243,7 +391,6 @@ class KeysetsViewController: UIViewController, UITableViewDelegate, UITableViewD
                         guard let self = self else { return }
                         
                         self.keysetsTable.reloadSections(IndexSet(arrayLiteral: section), with: .none)
-                        //self.spinner.remove()
                     }
                 }
             }
@@ -450,7 +597,6 @@ class KeysetsViewController: UIViewController, UITableViewDelegate, UITableViewD
                     self?.editCosigners()
                     self?.keysetsTable.reloadData()
                 }
-                
             }            
         }
     }
@@ -472,111 +618,38 @@ class KeysetsViewController: UIViewController, UITableViewDelegate, UITableViewD
     }
     
     private func addCosigner(_ account: String) {
-        print("account: \(account)")
-        var segwitBip84Account = account
-        var hack = "wsh(\(account)/0/*)"
-        let dp = DescriptorParser()
-        var ds = dp.descriptor(hack)
-        var cosigner = [String:Any]()
-        
-        if let hdkey = try? HDKey(base58: ds.accountXprv) {
-            guard let encryptedXprv = Encryption.encrypt(ds.accountXprv.utf8) else { return }
-            cosigner["xprv"] = encryptedXprv
-            hack = hack.replacingOccurrences(of: ds.accountXprv, with: hdkey.xpub)
-            segwitBip84Account = segwitBip84Account.replacingOccurrences(of: ds.accountXprv, with: hdkey.xpub)
-            ds = dp.descriptor(hack)
-        }
-                
-        guard let _ = try? HDKey(base58: ds.accountXpub) else {
-            showAlert(self, "Invalid key", "Gordian Cosigner is not yet compatible with slip132, please ensure you are adding a valid xpub and try again.")
-            return
-        }
-        
-        guard account.contains("/48h/\(coinType)h/0h/2h") || account.contains("/48'/\(coinType)'/0'/2'") else {
-            showAlert(self, "Derivation not supported", "Gordian Cosigner currently only supports the m/48h/\(coinType)h/0h/2h key origin.")
-            return
-        }
-        
-        guard let ur = URHelper.cosignerToUr(segwitBip84Account, false), let lifehashFingerprint = URHelper.fingerprint(ur) else {
-            showAlert(self, "", "Unsupported key, we only support Bitcoin mainnet/testnet hdkeys.")
-            return
-        }
-                        
-        cosigner["id"] = UUID()
-        cosigner["label"] = "Cosigner"
-        cosigner["bip48SegwitAccount"] = segwitBip84Account
-        cosigner["dateAdded"] = Date()
-        cosigner["fingerprint"] = ds.fingerprint
-        cosigner["lifehash"] = lifehashFingerprint
-        
-        func save() {
-            CoreDataService.saveEntity(dict: cosigner, entityName: .cosigner) { [weak self] (success, errorDesc) in
-                guard let self = self else { return }
-                
-                guard success else {
-                    showAlert(self, "Cosigner not saved!", "Please let us know about this bug.")
-                    return
-                }
-                
-                DispatchQueue.main.async {
-                    self.keysetsTable.reloadData()
-                    
-                    var alertStyle = UIAlertController.Style.actionSheet
-                    if (UIDevice.current.userInterfaceIdiom == .pad) {
-                      alertStyle = UIAlertController.Style.alert
-                    }
-                    
-                    let alert = UIAlertController(title: "Cosigner imported ✓", message: "Would you like to give it a label now? You can edit the label at any time.", preferredStyle: alertStyle)
-                    
-                    alert.addAction(UIAlertAction(title: "Add label", style: .default, handler: { action in
-                        self.promptToEditLabel(CosignerStruct(dictionary: cosigner))
-                    }))
-                                    
-                    alert.addAction(UIAlertAction(title: "Cancel", style: .cancel, handler: { action in
-                        self.load()
-                    }))
-                    
-                    alert.popoverPresentationController?.sourceView = self.view
-                    self.present(alert, animated: true, completion: nil)
-                }
+        AddCosigner.add(account) { (success, message, errorDescription, savedNew, cosignerStruct) in
+            guard success, let cosignerStruct = cosignerStruct else {
+                showAlert(self, message, errorDescription ?? "unknown error")
+                return
             }
-        }
-        
-        func update(_ id: UUID) {
-            CoreDataService.updateEntity(id: id, keyToUpdate: "xprv", newValue: cosigner["xprv"] as! Data, entityName: .cosigner) { (success, errorDescription) in
-                guard success else {
-                    showAlert(self, "", "There was an issue updating the Cosigner...")
-                    return
-                }
-                
+            
+            guard savedNew else {
                 self.load()
-                showAlert(self, "", "Cosigner updated with xprv.")
+                showAlert(self, "", "\(cosignerStruct.label) has been updated with a private key ✓")
+                return
             }
-        }
-        
-        CoreDataService.retrieveEntity(entityName: .cosigner) { (cosigners, errorDescription) in
-            if let cosigners = cosigners, cosigners.count > 0 {
-                var idToUpdate:UUID?
-                for (i, cosignerDict) in cosigners.enumerated() {
-                    let cosignerStruct = CosignerStruct(dictionary: cosignerDict)
-                    
-                    if cosignerStruct.bip48SegwitAccount == segwitBip84Account {
-                        //update existing
-                        idToUpdate = cosignerStruct.id
-                    }
-                    
-                    if i + 1 == cosigners.count {
-                        if idToUpdate == nil {
-                            save()
-                        } else if cosigner["xprv"] != nil {
-                            update(idToUpdate!)
-                        } else {
-                            showAlert(self, "", "That Cosigner already exists.")
-                        }
-                    }
+            
+            DispatchQueue.main.async {
+                self.keysetsTable.reloadData()
+                
+                var alertStyle = UIAlertController.Style.actionSheet
+                if (UIDevice.current.userInterfaceIdiom == .pad) {
+                  alertStyle = UIAlertController.Style.alert
                 }
-            } else {
-                save()
+                
+                let alert = UIAlertController(title: "Cosigner imported ✓", message: "Would you like to give it a label now? You can edit the label at any time.", preferredStyle: alertStyle)
+                
+                alert.addAction(UIAlertAction(title: "Add label", style: .default, handler: { action in
+                    self.promptToEditLabel(cosignerStruct)
+                }))
+                                
+                alert.addAction(UIAlertAction(title: "Cancel", style: .cancel, handler: { action in
+                    self.load()
+                }))
+                
+                alert.popoverPresentationController?.sourceView = self.view
+                self.present(alert, animated: true, completion: nil)
             }
         }
     }
@@ -587,6 +660,151 @@ class KeysetsViewController: UIViewController, UITableViewDelegate, UITableViewD
             
             self.performSegue(withIdentifier: "segueToCosignersInfo", sender: self)
         }
+    }
+    
+    private func parseCryptoOutput(_ ur: String) {
+        guard var descriptor = URHelper.urOutputToAccount(ur) else { showAlert(self, "", "That is not a supported crypto-output."); return }
+        
+        let accountId = UUID()
+        let descriptorParser = DescriptorParser()
+        var descStruct = descriptorParser.descriptor(descriptor)
+        
+        descriptor = descriptor.replacingOccurrences(of: "'", with: "h")
+        let arr = descriptor.split(separator: "#")
+        descriptor = "\(arr[0])"
+        descStruct = descriptorParser.descriptor(descriptor)
+        
+        // Add range
+        if !descriptor.contains("/0/*") {
+            for key in descStruct.multiSigKeys {
+                if !key.contains("/0/*") {
+                    descriptor = descriptor.replacingOccurrences(of: key, with: key + "/0/*")
+                }
+            }
+        }
+        
+        descStruct = descriptorParser.descriptor(descriptor)
+        
+        guard let sortedDescriptor = sortedDescriptor(descriptor) else { return }
+        
+        for (i, fullKey) in descStruct.keysWithPath.enumerated() {
+            let hack = "wsh(\(fullKey)/0/*)"
+            let dp = DescriptorParser()
+            let ds = dp.descriptor(hack)
+            var bip48SegwitAccount = fullKey.replacingOccurrences(of: "/0/*", with: "")
+            bip48SegwitAccount = bip48SegwitAccount.replacingOccurrences(of: ")", with: "")
+            
+            guard let ur = URHelper.cosignerToUrHdkey(bip48SegwitAccount, false), let lifehash = URHelper.fingerprint(ur) else {
+                showAlert(self, "", "Error deriving Cosigner lifehash.")
+                return
+            }
+
+            var cosignerToSave = [String:Any]()
+            cosignerToSave["id"] = UUID()
+            cosignerToSave["label"] = "Cosigner #\(i + 1)"
+            cosignerToSave["bip48SegwitAccount"] = bip48SegwitAccount
+            cosignerToSave["dateAdded"] = Date()
+            cosignerToSave["fingerprint"] = ds.fingerprint
+            cosignerToSave["sharedWith"] = accountId
+            cosignerToSave["dateShared"] = Date()
+            cosignerToSave["lifehash"] = lifehash
+
+            // First fetch all existing cosigners to ensure we do not save duplicates
+            CoreDataService.retrieveEntity(entityName: .cosigner) { (cosigners, errorDescription) in
+                var alreadyExists = false
+
+                if let cosigners = cosigners, cosigners.count > 0 {
+                    for (i, cosigner) in cosigners.enumerated() {
+                        let cosignerStruct = CosignerStruct(dictionary: cosigner)
+
+                        if cosignerStruct.bip48SegwitAccount != nil {
+                            if cosignerStruct.bip48SegwitAccount! == bip48SegwitAccount {
+                                alreadyExists = true
+                            }
+                        }
+
+                        if i + 1 == cosigners.count {
+                            if !alreadyExists {
+                                CoreDataService.saveEntity(dict: cosignerToSave, entityName: .cosigner) { (_, _) in }
+                            }
+                        }
+                    }
+                } else {
+                    CoreDataService.saveEntity(dict: cosignerToSave, entityName: .cosigner) { (_, _) in }
+                }
+            }
+        }
+        
+        let map = ["label":"Account map", "blockheight":0,"descriptor":sortedDescriptor.condenseWhitespace()] as [String : Any]
+        let accountMapData = (map.json() ?? "").utf8
+        
+        var account = [String:Any]()
+        account["blockheight"] = Int64(0)
+        account["map"] = accountMapData
+        account["label"] = "Account map"
+        account["id"] = accountId
+        account["dateAdded"] = Date()
+        account["complete"] = descStruct.complete
+        account["lifehash"] = LifeHash.hash(sortedDescriptor.utf8)
+        account["descriptor"] = sortedDescriptor.condenseWhitespace()
+        
+        CoreDataService.saveEntity(dict: account, entityName: .account) { [weak self] (success, errorDescription) in
+            guard let self = self, success else { return }
+            
+            DispatchQueue.main.async {
+                NotificationCenter.default.post(name: .cosignerAdded, object: nil, userInfo: nil)
+            }
+            
+            self.load()
+        }
+    }
+    
+    private func sortedDescriptor(_ desc: String) -> String? {
+        var dictArray = [[String:String]]()
+        let descriptorParser = DescriptorParser()
+        let descStruct = descriptorParser.descriptor(desc)
+        
+        for keyWithPath in descStruct.keysWithPath {
+            
+            guard keyWithPath.contains("/48h/\(coinType)h/0h/2h") || keyWithPath.contains("/48'/\(coinType)'/0'/2'") else {
+                showAlert(self, "Unsupported key origin", "Gordian Cosigner currently only supports the m/48'/\(coinType)'/0'/2' origin, you can toggle on mainnet/testnet in settings to switch between the supported derivation paths.")
+                return nil
+            }
+            
+            let arr = keyWithPath.split(separator: "]")
+            
+            if arr.count > 1 {
+                var xpubString = "\(arr[1].replacingOccurrences(of: "))", with: ""))"
+                xpubString = xpubString.replacingOccurrences(of: "/0/*", with: "")
+                
+                guard let xpub = try? HDKey(base58: xpubString) else {
+                    showAlert(self, "Key invalid", "Gordian Cosigner does not yet support slip0132 keys. Please ensure your xpub is valid then try again.")
+                    return nil
+                }
+                
+                let dict = ["path":"\(arr[0])]", "key": xpub.description]
+                dictArray.append(dict)
+            }
+        }
+        
+        dictArray.sort(by: {($0["key"]!) < $1["key"]!})
+        
+        var sortedKeys = ""
+        
+        for (i, sortedItem) in dictArray.enumerated() {
+            let path = sortedItem["path"]!
+            let key = sortedItem["key"]!
+            let fullKey = path + key
+            sortedKeys += fullKey
+            
+            if i + 1 < dictArray.count {
+                sortedKeys += ","
+            }
+        }
+        
+        let arr2 = desc.split(separator: ",")
+        let descriptor = "\(arr2[0])," + sortedKeys + "))"
+        return descriptor
     }
     
     // MARK: - Navigation
@@ -606,19 +824,33 @@ class KeysetsViewController: UIViewController, UITableViewDelegate, UITableViewD
             
             vc.doneBlock = { [weak self] result in
                 guard let self = self, let result = result else { return }
-                if result.lowercased().hasPrefix("ur:crypto-account"), let account = URHelper.accountUrToCosigner(result.lowercased()) {
+                
+                let processedResult = result.lowercased().condenseWhitespace()
+                
+                if processedResult.hasPrefix("ur:crypto-account"), let account = URHelper.accountUrToCosigner(processedResult) {
                     self.addCosigner(account)
-                } else if result.lowercased().hasPrefix("ur:crypto-hdkey"), let account = URHelper.urHdkeyToCosigner(result.lowercased()) {
+                    
+                } else if processedResult.hasPrefix("ur:crypto-hdkey"), let account = URHelper.urHdkeyToCosigner(processedResult) {
                     self.addCosigner(account)
+                    
                 } else if result.contains("48h/\(self.coinType)h/0h/2h") || result.contains("48'/\(self.coinType)'/0'/2'") {
                     self.addCosigner(result)
-                } else if result.lowercased().contains("ur:crypto-seed") {
-                    guard let mnemonic = URHelper.cryptoSeedToMnemonic(cryptoSeed: result.lowercased()) else { return }
+                    
+                } else if processedResult.lowercased().contains("ur:crypto-seed") {
+                    guard let mnemonic = URHelper.cryptoSeedToMnemonic(cryptoSeed: processedResult) else { return }
                     self.providedMnemonic = mnemonic
                     self.addSeedWords()
+                    
                 } else if Keys.validMnemonicString(processedCharacters(result)) {
                     self.providedMnemonic = processedCharacters(result)
                     self.addSeedWords()
+                    
+                } else if processedResult.hasPrefix("ur:crypto-sskr") {
+                    self.processShardUr(processedResult)
+                    
+                } else if processedResult.hasPrefix("ur:crypto-output") {
+                    self.parseCryptoOutput(processedResult)
+                    
                 } else {
                     showAlert(self, "", "Unrecognized format.")
                 }
