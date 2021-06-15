@@ -10,8 +10,12 @@
 
 ## Additional Information
 
+### Documents
+
 * [Integration](Docs/Integrating.md) — Using **Gordian Cosigner** with other applications.
 * [User Scenarios](Docs/Scenarios.md) — Reasons that you might use multisignatures to ensure the [#SmartCustody](https://www.smartcustody.com/) of your funds.
+
+### Other Gordian Applications
 
 This is a companion app for the Gordian system:
 
