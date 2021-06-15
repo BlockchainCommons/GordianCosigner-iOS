@@ -96,7 +96,7 @@ Next, click **Send** and fill out the `Recipient address`, `amount` and click **
 
 ![](../images/specter9_send.png)
 
-Specter Desktop will create a (raw) `PSBT` for you in `Transaction details`. It will offer you several options to export it into Gordian Cosigner. For example you can save it as a binary PSBT which can be imported into Gordian Cosigner.
+Specter Desktop will create a (raw) `PSBT` for you in `Transaction details`. Save it as a binary PSBT and then import it into Gordian Cosigner.
 
 ![](../images/specter10_details.png)
 

@@ -363,4 +363,19 @@ Importing a account from **Gordian Cosigner** to **Gordian Wallet** is a simple 
 
 ## Using Specter Desktop as Initiator & Finalizer
 
-See [here](./integrating-specter.md)
+See [here](./Integrating-specter.md)
+
+## Using LetheKit as a Cosigner
+
+Whenever you turn on LetheKit it requires you to generate (by rolling dice) or restore a seed from several options available (BIP32, SSKR). Once the seed is present, press C to display Keys. Lethekit will show an **xpub**. On the **xpub menu** press C to make sure that the derivation path is set to **cosigner**:
+
+![](../images/lethekit0_menu.png) ![](../images/lethekit3_xpub.png) ![](../images/lethekit1_cosigner.png)
+
+From the **xpub** menu you can press A to set the format. The easiest way to import the cosigner to Gordian Cosigner is over a **Qr-UR** option.
+
+![](../images/lethekit4_format.png)
+
+From the **xpub** menu we can also press B for options and set **show privkey** to true. This will refresh the **xpub** menu with the cosigner's private key which can be imported into Gordian Cosigner to sign a PSBT transaction
+
+![](../images/lethekit_options.png)
+![](../images/lethekit5_xpriv.png)
