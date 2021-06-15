@@ -2,6 +2,16 @@
 
 Gordian Cosigner is meant to be used with a wallet that can initiate PSBT transactions, or some other transaction coordinator service. Following are documents on using it with other services.
 
+* **Bitcoin Core:**
+   * [Initiator & Finalizer](https://github.com/BlockchainCommons/GordianCosigner-iOS/blob/master/Docs/Integrating.md#using-bitcoin-core-as-initiator--finalizer)
+* **Gordian Wallet:**
+   * [Cosigner](https://github.com/BlockchainCommons/GordianCosigner-iOS/blob/master/Docs/Integrating.md#using-gordian-wallet-as-a-cosigner)
+   * [Initiator & Finalizer](https://github.com/BlockchainCommons/GordianCosigner-iOS/blob/master/Docs/Integrating.md#using-gordian-wallet-as-initiator--finalizer)
+* **LetheKit:**
+   * [Cosigner](https://github.com/BlockchainCommons/GordianCosigner-iOS/blob/master/Docs/Integrating.md#using-lethekit-as-a-cosigner)
+* **Specter Desktop:**
+   * [Initiator & Finalizer](https://github.com/BlockchainCommons/GordianCosigner-iOS/blob/master/Docs/Integrating.md#using-specter-desktop-as-initiator--finalizer)
+
 ## Using Bitcoin Core as Initiator & Finalizer
 
 Perhaps the best way to use Gordian Cosigner with Bitcoin Core is to fully create your keys and accounts in other systems, such as **Gordian Wallet** and **Gordian Cosigner**, but then to take advantage of the full-node capabilities of Bitcoin Core to Initiate and Finalize transactions. Following is a description of how to do so.
@@ -361,21 +371,24 @@ Importing a account from **Gordian Cosigner** to **Gordian Wallet** is a simple 
 2. In **Gordian Wallet**, go to the **Accounts** tab, add a new account, and choose to "Recover". You should be given a pop-up option to "Upload Account Map QR".
 3. Verify the addresses shown here match with those seen in **Gordian Cosigner** by going to the **Accounts** tab there, clicking the account in question and choosing "Address Explorer". If so, "Confirm".
 
+## Using LetheKit as a Cosigner
+
+Whenever you turn on LetheKit it requires you to generate a seed (by rolling dice) or to restore a seed from several options available (BIP32, SSKR). 
+
+Once the seed is present, press C to display Keys. Lethekit will show an **xpub**. On the **xpub menu** press C to make sure that the derivation path is set to **cosigner**:
+
+![](../images/lethekit0_menu.png) ![](../images/lethekit3_xpub.png) ![](../images/lethekit1_cosigner.png)
+
+From the **xpub** menu you can press A to set the format. The easiest way to import the cosigner to Gordian Cosigner is using the **Qr-UR** option.
+
+![](../images/lethekit4_format.png)
+
+From the **xpub** menu you can also press B for options and set **show privkey** to true. This will refresh the **xpub** menu with the cosigner's private key, which can be imported into Gordian Cosigner to sign a PSBT transaction
+
+![](../images/lethekit_options.png)
+![](../images/lethekit5_xpriv.png)
+
 ## Using Specter Desktop as Initiator & Finalizer
 
 See [here](./Integrating-specter.md)
 
-## Using LetheKit as a Cosigner
-
-Whenever you turn on LetheKit it requires you to generate (by rolling dice) or restore a seed from several options available (BIP32, SSKR). Once the seed is present, press C to display Keys. Lethekit will show an **xpub**. On the **xpub menu** press C to make sure that the derivation path is set to **cosigner**:
-
-![](../images/lethekit0_menu.png) ![](../images/lethekit3_xpub.png) ![](../images/lethekit1_cosigner.png)
-
-From the **xpub** menu you can press A to set the format. The easiest way to import the cosigner to Gordian Cosigner is over a **Qr-UR** option.
-
-![](../images/lethekit4_format.png)
-
-From the **xpub** menu we can also press B for options and set **show privkey** to true. This will refresh the **xpub** menu with the cosigner's private key which can be imported into Gordian Cosigner to sign a PSBT transaction
-
-![](../images/lethekit_options.png)
-![](../images/lethekit5_xpriv.png)
