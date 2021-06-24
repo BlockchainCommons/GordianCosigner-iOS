@@ -35,6 +35,15 @@ class KeysetsViewController: UIViewController, UITableViewDelegate, UITableViewD
         keysetsTable.dataSource = self
         navigationController?.delegate = self
         
+        if KeyChain.getData("userIdentifier") == nil {
+            if let userId = UserDefaults.standard.object(forKey: "userIdentifier") as? String {
+                guard KeyChain.set(userId.utf8, forKey: "userIdentifier") else {
+                    showAlert(self, "Error", "There was an issue saving your user ID to the keychain.")
+                    return
+                }
+            }
+        }
+        
         if KeyChain.getData("hasUpdated") == nil {
             KeyChain.removeAll()
             CoreDataService.deleteAllData(entity: .account) { (_) in }
@@ -521,7 +530,7 @@ class KeysetsViewController: UIViewController, UITableViewDelegate, UITableViewD
     }
     
     private func segueToAuth() {
-        if UserDefaults.standard.object(forKey: "userIdentifier") != nil {
+        if KeyChain.getData("userIdentifier") != nil {
             DispatchQueue.main.async { [weak self] in
                 guard let self = self else { return }
                 
@@ -925,7 +934,7 @@ class KeysetsViewController: UIViewController, UITableViewDelegate, UITableViewD
     }
     
     func authorizationController(controller: ASAuthorizationController, didCompleteWithAuthorization authorization: ASAuthorization) {
-        if let username = UserDefaults.standard.object(forKey: "userIdentifier") as? String {
+        if let username = KeyChain.getData("userIdentifier")?.utf8 {
             switch authorization.credential {
             case _ as ASAuthorizationAppleIDCredential:
                 let authorizationProvider = ASAuthorizationAppleIDProvider()

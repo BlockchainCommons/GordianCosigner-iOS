@@ -62,7 +62,10 @@ class AuthViewController: UIViewController, ASAuthorizationControllerDelegate, A
             DispatchQueue.main.async { [weak self] in
                 guard let self = self else { return }
                 
-                UserDefaults.standard.setValue(appleIDCredential.user, forKeyPath: "userIdentifier")
+                guard KeyChain.set(appleIDCredential.user.utf8, forKey: "userIdentifier") else {
+                    showAlert(self, "Error", "There was an issue saving your user ID to the keychain!")
+                    return
+                }
                 self.authenticated = true
                 self.dismiss()
             }
