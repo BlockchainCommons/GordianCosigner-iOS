@@ -8,8 +8,9 @@
 
 import UIKit
 import LibWally
+import AuthenticationServices
 
-class KeysetsViewController: UIViewController, UITableViewDelegate, UITableViewDataSource, UINavigationControllerDelegate {
+class KeysetsViewController: UIViewController, UITableViewDelegate, UITableViewDataSource, UINavigationControllerDelegate, ASAuthorizationControllerDelegate, ASAuthorizationControllerPresentationContextProviding {
     
     let shardRecovery = ShardRecovery.shared
     var addButton = UIBarButtonItem()
@@ -511,6 +512,35 @@ class KeysetsViewController: UIViewController, UITableViewDelegate, UITableViewD
         
         cosigner = cosigners[int]
         
+        guard cosigner.words != nil && cosigner.xprv != nil else {
+            segueToDetail()
+            return
+        }
+        
+        segueToAuth()
+    }
+    
+    private func segueToAuth() {
+        if UserDefaults.standard.object(forKey: "userIdentifier") != nil {
+            DispatchQueue.main.async { [weak self] in
+                guard let self = self else { return }
+                
+                let request = ASAuthorizationAppleIDProvider().createRequest()
+                let controller = ASAuthorizationController(authorizationRequests: [request])
+                controller.delegate = self
+                controller.presentationContextProvider = self
+                controller.performRequests()
+            }
+        } else {
+            DispatchQueue.main.async { [weak self] in
+                guard let self = self else { return }
+                
+                self.performSegue(withIdentifier: "segueToAuthFromCosigners", sender: self)
+            }
+        }
+    }
+    
+    private func segueToDetail() {
         DispatchQueue.main.async { [weak self] in
             guard let self = self else { return }
             
@@ -871,16 +901,52 @@ class KeysetsViewController: UIViewController, UITableViewDelegate, UITableViewD
                 self.load()
             }
             
+        case "segueToAuthFromCosigners":
+            guard let vc = segue.destination as? AuthViewController else { fallthrough }
+                    
+            vc.doneBlock = { [weak self] signedUp in
+                guard let self = self else { return }
+                
+                guard signedUp else {
+                    showAlert(self, "Auth Required", "To view private key material please authenticate first.")
+                    return
+                }
+                
+                self.segueToDetail()
+            }
+            
         default:
             break
         }
     }
     
-    private func authenticate() {
-        DispatchQueue.main.async { [weak self] in
-            guard let self = self else { return }
-            
-            self.performSegue(withIdentifier: "segueToAuth", sender: self)
+    func presentationAnchor(for controller: ASAuthorizationController) -> ASPresentationAnchor {
+        return self.view.window!
+    }
+    
+    func authorizationController(controller: ASAuthorizationController, didCompleteWithAuthorization authorization: ASAuthorization) {
+        if let username = UserDefaults.standard.object(forKey: "userIdentifier") as? String {
+            switch authorization.credential {
+            case _ as ASAuthorizationAppleIDCredential:
+                let authorizationProvider = ASAuthorizationAppleIDProvider()
+                authorizationProvider.getCredentialState(forUserID: username) { [weak self] (state, error) in
+                    guard let self = self else { return }
+                    
+                    switch (state) {
+                    case .authorized:
+                        self.segueToDetail()
+                    case .revoked:
+                        print("No Account Found")
+                        fallthrough
+                    case .notFound:
+                        print("No Account Found")
+                    default:
+                        break
+                    }
+                }
+            default:
+                break
+            }
         }
     }
 }
