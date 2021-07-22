@@ -693,7 +693,9 @@ enum URHelper {
         hdkeyArray.append(.init(key: 8, value: .unsignedInt(hexValue)))
         let hdKeyWrapper = CBOR.orderedMap(hdkeyArray)
         
-        return hdKeyWrapper
+        let taggedCbor = CBOR.tagged(CBOR.Tag(rawValue: 303), hdKeyWrapper)
+        
+        return taggedCbor
     }
     
     static func fingerprint(_ hdKey: String) -> Data? {
