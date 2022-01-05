@@ -51,7 +51,7 @@ At current, this Catalyst repo is only used for our iOS release, but we hope to 
 
 ## Installation Instructions
 
-**Gordian Cosigner** is available for testing from Testflight [here](https://testflight.apple.com/join/sJTaoUsM).
+**Gordian Cosigner** can be compiled and installed using Xcode.
 
 ## Usage Instructions
 
